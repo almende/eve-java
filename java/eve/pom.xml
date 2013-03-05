@@ -5,7 +5,7 @@
 
 	<groupId>com.almende.eve</groupId>
 	<artifactId>eve</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>EVE</name>
@@ -60,8 +60,6 @@
 		<module>../eve-core</module>
 		<module>../eve-android</module>
 		<module>../eve-gae</module>
-		<module>../eve-gae-demo</module>
-		<module>../eve-gae-test</module>
 		<module>../eve-planning</module>
 	</modules>
 
