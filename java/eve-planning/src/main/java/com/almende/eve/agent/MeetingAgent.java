@@ -1490,6 +1490,7 @@ public class MeetingAgent extends Agent {
 	/*
 	 * Get the first url filtered by a specific protocol
 	 * @param protocol    For example "http"
+	 * @return url        Returns url or null if not found
 	 */
 	protected URI getFirstUrl(String protocol) {
 		final List<String> urls = getUrls();

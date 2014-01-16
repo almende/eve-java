@@ -1,5 +1,6 @@
 package com.almende.eve.agent;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class DirectoryAgent extends Agent {
 		
 		// create a new registration
 		Registration registration = new Registration();
-		registration.setDirectoryAgent(getFirstUrl().toASCIIString());
+		registration.setDirectoryAgent(getFirstUrl("http").toASCIIString());
 		registration.setAgent(agent);
 		registration.setType(type);
 		registration.setUsername(username);
@@ -99,7 +100,7 @@ public class DirectoryAgent extends Agent {
 		
 		RootFindCommand<Registration> command = datastore.find()
 			.type(Registration.class)
-			.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl());
+			.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl("http"));
 		if (agent != null) {
 			command = command.addFilter("agent", FilterOperator.EQUAL, agent);
 		}
@@ -138,7 +139,7 @@ public class DirectoryAgent extends Agent {
 		
 		QueryResultIterator<Registration> it = datastore.find()
 		.type(Registration.class)
-		.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl())
+		.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl("http"))
 		.addFilter(field, FilterOperator.EQUAL, value)
 		.now();
 	
@@ -156,7 +157,7 @@ public class DirectoryAgent extends Agent {
 		ObjectDatastore datastore = new AnnotationObjectDatastore();
 		QueryResultIterator<Registration> it = datastore.find()
 			.type(Registration.class)
-			.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl())
+			.addFilter("directoryAgent", FilterOperator.EQUAL, getFirstUrl("http"))
 			.now();
 		
 		while (it.hasNext()) {
@@ -167,7 +168,24 @@ public class DirectoryAgent extends Agent {
 		
 		super.onDelete();
 	}
-
+	
+	/*
+	 * Get the first url filtered by a specific protocol
+	 * @param protocol    For example "http"
+	 * @return url        Returns url or null if not found
+	 */
+	protected URI getFirstUrl(String protocol) {
+		final List<String> urls = getUrls();
+		
+		for (String url : urls) {
+			if (url.startsWith(protocol + ":")) {
+				return URI.create(url);
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public String getDescription() {
 		return "DirectoryAgent stores a list with registered agents.";
