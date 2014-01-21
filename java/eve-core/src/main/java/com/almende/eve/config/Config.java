@@ -16,6 +16,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.util.TypeUtil;
+
 /**
  * The Class Config.
  */
@@ -30,7 +32,7 @@ public class Config implements EveConfig {
 	private static ThreadFactory				threadFactory		= Executors
 																			.defaultThreadFactory();
 	
-	private static EveConfig					config				= null;
+	private Map<String, Object>					config				= null;
 	
 	/*
 	 * Several classname maps for configuration conveniency:
@@ -77,7 +79,7 @@ public class Config implements EveConfig {
 		LOG.info("Loading configuration file " + file.getAbsoluteFile() + "...");
 		try {
 			final FileInputStream in = new FileInputStream(filename);
-			config = new YamlConfig(in);
+			config = YamlConfig.load(in);
 			in.close();
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE,
@@ -94,7 +96,7 @@ public class Config implements EveConfig {
 	 *            the input stream
 	 */
 	public Config(final InputStream inputStream) {
-		config = new YamlConfig(inputStream);
+		config = YamlConfig.load(inputStream);
 	}
 	
 	/**
@@ -104,7 +106,7 @@ public class Config implements EveConfig {
 	 *            the config
 	 */
 	public Config(final Map<String, Object> mapConfig) {
-		config = new YamlConfig(mapConfig);
+		config = mapConfig;
 	}
 	
 	/*
@@ -114,11 +116,10 @@ public class Config implements EveConfig {
 	 */
 	@Override
 	public Map<String, Object> get() {
-		if (config == null){
+		if (config == null) {
 			LOG.warning("Configuration not initialized, returning null.");
-			return null;
 		}
-		return config.get();
+		return config;
 	}
 	
 	/*
@@ -129,7 +130,7 @@ public class Config implements EveConfig {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(final String... params) {
-		if (config == null){
+		if (config == null) {
 			LOG.warning("Configuration not initialized, returning null.");
 			return null;
 		}
@@ -138,15 +139,31 @@ public class Config implements EveConfig {
 		envParams.add("environment");
 		envParams.add(getEnvironment());
 		envParams.addAll(Arrays.asList(params));
-		T result = config.get(envParams.toArray(new String[0]));
+		T result = locGet(envParams.toArray(new String[0]));
 		if (result == null) {
-			result = config.get(params);
+			result = locGet(params);
 		}
 		
 		if (result != null && String.class.isAssignableFrom(result.getClass())) {
 			result = (T) map((String) result);
 		}
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T> T locGet(final String... params) {
+		TypeUtil<Map<String, Object>> injector = new TypeUtil<Map<String, Object>>(){};
+		Map<String, Object> c = config;
+		for (int i = 0; i < params.length - 1; i++) {
+			final String key = params[i];
+			c = injector.inject(c.get(key));
+			if (c == null) {
+				return null;
+			}
+		}
+		
+		// FIXME: check instance
+		return (T) c.get(params[params.length - 1]);
 	}
 	
 	/**
