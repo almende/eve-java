@@ -4,7 +4,8 @@
  */
 package com.almende.eve.config;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * The Class Config.
  */
-public class Config extends YamlConfig {
+public class Config implements EveConfig {
 	// TODO: https://github.com/mojombo/toml
 	private static final Logger					LOG					= Logger.getLogger(Config.class
 																			.getCanonicalName());
@@ -27,6 +29,8 @@ public class Config extends YamlConfig {
 	private static String						environment			= null;
 	private static ThreadFactory				threadFactory		= Executors
 																			.defaultThreadFactory();
+	
+	private static EveConfig					config				= null;
 	
 	/*
 	 * Several classname maps for configuration conveniency:
@@ -52,22 +56,35 @@ public class Config extends YamlConfig {
 	}
 	
 	/**
-	 * Instantiates a new config.
+	 * Instantiates a new empty config.
+	 * 
 	 */
 	public Config() {
-		super();
 	}
 	
 	/**
-	 * Instantiates a new config.
+	 * Load the configuration file by filename (absolute path)
 	 * 
 	 * @param filename
 	 *            the filename
-	 * @throws FileNotFoundException
-	 *             the file not found exception
 	 */
-	public Config(final String filename) throws FileNotFoundException {
-		super(filename);
+	public Config(final String filename) {
+		final File file = new File(filename);
+		if (!file.exists() || !file.isFile() || !file.canRead()) {
+			LOG.severe("Couldn't find or read given config file at:" + filename);
+			return;
+		}
+		LOG.info("Loading configuration file " + file.getAbsoluteFile() + "...");
+		try {
+			final FileInputStream in = new FileInputStream(filename);
+			config = new YamlConfig(in);
+			in.close();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE,
+					"Exception while reading given config file at:" + filename,
+					e);
+			
+		}
 	}
 	
 	/**
@@ -77,7 +94,31 @@ public class Config extends YamlConfig {
 	 *            the input stream
 	 */
 	public Config(final InputStream inputStream) {
-		super(inputStream);
+		config = new YamlConfig(inputStream);
+	}
+	
+	/**
+	 * Load the configuration from a map.
+	 * 
+	 * @param mapConfig
+	 *            the config
+	 */
+	public Config(final Map<String, Object> mapConfig) {
+		config = new YamlConfig(mapConfig);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.config.EveConfig#get()
+	 */
+	@Override
+	public Map<String, Object> get() {
+		if (config == null){
+			LOG.warning("Configuration not initialized, returning null.");
+			return null;
+		}
+		return config.get();
 	}
 	
 	/*
@@ -88,14 +129,18 @@ public class Config extends YamlConfig {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(final String... params) {
+		if (config == null){
+			LOG.warning("Configuration not initialized, returning null.");
+			return null;
+		}
 		final ArrayList<String> envParams = new ArrayList<String>(
 				params.length + 2);
 		envParams.add("environment");
 		envParams.add(getEnvironment());
 		envParams.addAll(Arrays.asList(params));
-		T result = super.get(envParams.toArray(new String[0]));
+		T result = config.get(envParams.toArray(new String[0]));
 		if (result == null) {
-			result = super.get(params);
+			result = config.get(params);
 		}
 		
 		if (result != null && String.class.isAssignableFrom(result.getClass())) {
@@ -174,4 +219,5 @@ public class Config extends YamlConfig {
 	public static void setThreadFactory(ThreadFactory factory) {
 		threadFactory = factory;
 	}
+	
 }

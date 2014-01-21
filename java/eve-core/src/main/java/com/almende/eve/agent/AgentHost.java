@@ -83,6 +83,14 @@ public abstract class AgentHost {
 	 *            the config
 	 */
 	public abstract void loadConfig(Config config);
+
+	/**
+	 * Instantiate the services from the given config.
+	 * 
+	 * @param path
+	 *            the path
+	 */
+	public abstract void loadConfig(String path);
 	
 	/**
 	 * Signal all agents about AgentHost event.

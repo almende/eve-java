@@ -72,6 +72,19 @@ public final class AgentHostDefImpl extends AgentHost {
 		return pool;
 	}
 	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.agent.AgentHost#loadConfig(com.almende.eve.config.Config)
+	 */
+	@Override
+	public void loadConfig(final String path) {
+		Config config = new Config(path);
+		loadConfig(config);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

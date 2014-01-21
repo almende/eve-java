@@ -55,7 +55,7 @@ public class AgentServlet extends HttpServlet {
 	@Override
 	public void init() {
 		if (AgentHost.getInstance().getStateFactory() == null) {
-			LOG.severe("DEPRECIATED SETUP: Please add com.almende.eve.transport.http.AgentListener as a Listener to your web.xml!");
+			LOG.severe("DEPRECATED SETUP: Please add com.almende.eve.transport.http.AgentListener as a Listener to your web.xml!");
 			AgentListener.init(getServletContext());
 		}
 		host = AgentHost.getInstance();
