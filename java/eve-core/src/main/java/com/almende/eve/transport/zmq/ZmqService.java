@@ -52,17 +52,6 @@ public class ZmqService implements TransportService {
 		
 	}
 	
-	// Outbound Socket(s) per agent (1 socket per endaddress, so many sockets
-	// per agent)
-	// Inbound Socket per agent per ZmqService
-	
-	// Inbound Socket determines agentUrl
-	// Socket is bound to address of form:
-	// "tcp://<address>:<basePort+agentOffset>"
-	// Decorate Socket class with agentId for inbound usage.
-	
-	// Within EVE zmq urls look like: "zmq:tcp://<address>:<inboundPort>" and
-	// "zmq:ipc://<label>.ipc"
 	
 	/* (non-Javadoc)
 	 * @see com.almende.eve.transport.TransportService#getAgentUrl(java.lang.String)
