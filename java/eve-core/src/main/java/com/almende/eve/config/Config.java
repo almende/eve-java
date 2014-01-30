@@ -224,7 +224,7 @@ public class Config implements EveConfig {
 	}
 	
 	/**
-	 * @return
+	 * @return ThreadFactory
 	 */
 	public static ThreadFactory getThreadFactory() {
 		return threadFactory;

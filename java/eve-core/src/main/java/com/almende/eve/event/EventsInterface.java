@@ -199,4 +199,9 @@ public interface EventsInterface {
 	void trigger(@Name("event") String event, @Name("params") Object params)
 			throws IOException;
 	
+	/**
+	 * Clear all subscriptions.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	void clear();
 }

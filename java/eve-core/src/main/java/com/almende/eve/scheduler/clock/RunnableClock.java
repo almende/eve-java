@@ -98,7 +98,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	}
 	
 	/**
-	 * @return
+	 * @return AgentId
 	 */
 	public String getAgentId() {
 		return agentId;
@@ -112,7 +112,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	}
 	
 	/**
-	 * @return
+	 * @return Due date
 	 */
 	public DateTime getDue() {
 		return due;
@@ -126,7 +126,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	}
 	
 	/**
-	 * @return
+	 * @return This tasks callback.
 	 */
 	public Runnable getCallback() {
 		return callback;

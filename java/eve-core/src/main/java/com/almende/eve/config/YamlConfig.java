@@ -18,7 +18,7 @@ public final class YamlConfig {
 	
 	/**
 	 * @param inputStream
-	 * @return
+	 * @return Map<String,Object> filled with configuration data.
 	 */
 	public static final Map<String, Object> load(final InputStream inputStream) {
 		TypeUtil<Map<String, Object>> typeUtil = new TypeUtil<Map<String, Object>>(){};

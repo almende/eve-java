@@ -385,4 +385,10 @@ public class EventsFactory implements EventsInterface {
 		}
 		return result;
 	}
+
+	@Override
+	@Access(AccessType.UNAVAILABLE)
+	public void clear() {
+		myAgent.getState().remove(SUBSCRIPTIONS.getKey());
+	}
 }
