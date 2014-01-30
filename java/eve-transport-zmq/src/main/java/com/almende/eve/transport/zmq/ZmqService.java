@@ -48,6 +48,7 @@ public class ZmqService implements TransportService {
 		
 		if (params != null) {
 			baseUrl = (String) params.get("baseUrl");
+			baseUrl = baseUrl.replaceAll("(.*:[0-9]+).*$", "$1");
 		}
 		
 	}

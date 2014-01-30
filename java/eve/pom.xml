@@ -57,6 +57,7 @@
 
 	<modules>
 		<module>../eve-core</module>
+		<module>../eve-transport-zmq</module>
 		<module>../eve-android</module>
 		<module>../eve-gae</module>
 		<module>../eve-planning</module>

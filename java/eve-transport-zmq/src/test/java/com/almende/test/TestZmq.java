@@ -9,12 +9,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentHost;
@@ -73,7 +73,7 @@ public class TestZmq extends TestCase {
 	private void runTest(final Test2Agent test, final Test2Agent test2,
 			final String type) throws IOException, JSONRPCException,
 			InterruptedException {
-		final Set<String> results = new ConcurrentHashSet<String>();
+		final Set<String> results = new ConcurrentSkipListSet<String>();
 		
 		final AsyncCallback<String> callback = new AsyncCallback<String>() {
 			
