@@ -11,13 +11,14 @@ import com.almende.eve.agent.AgentHost;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.scheduler.ClockSchedulerFactory;
 import com.almende.eve.state.MemoryStateFactory;
+import com.almende.eve.transport.zmq.ZmqService;
 
 public class Goldemo {
 //	final static String BASE	= "inproc://";
-	//final static String	BASE	= "ipc:///tmp/zmq-socket-";
-//	final static String PATH	= "zmq:"+BASE;
+	final static String	BASE	= "ipc:///tmp/zmq-socket-";
+	final static String PATH	= "zmq:"+BASE;
 	
-	final static String PATH = "local:";
+//	final static String PATH = "local:";
 
 	
 	public static void main(String[] args) throws IOException,
@@ -25,14 +26,13 @@ public class Goldemo {
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		AgentHost host = AgentHost.getInstance();
-//		host.setDoesShortcut(false);
 		
 		// host.setStateFactory(new FileStateFactory(".eveagents_gol",true));
 		host.setStateFactory(new MemoryStateFactory());
 		
-//		HashMap<String, Object> params = new HashMap<String, Object>();
-//		params.put("baseUrl", BASE);
-//		host.addTransportService(new ZmqService(host, params));
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("baseUrl", BASE);
+		host.addTransportService(new ZmqService(host, params));
 	
 		host.setSchedulerFactory(new ClockSchedulerFactory(host,
 				"_myRunnableScheduler"));
@@ -51,6 +51,12 @@ public class Goldemo {
 		if (args.length > 3) {
 			annimate = Boolean.valueOf(args[3]);
 		}
+		Boolean shortcut = true;
+		if (args.length > 4) {
+			shortcut = Boolean.valueOf(args[4]);
+		}
+		host.setDoesShortcut(shortcut);
+
 		
 		boolean[][] grid = new boolean[N][M];
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

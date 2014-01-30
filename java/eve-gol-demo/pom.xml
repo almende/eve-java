@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-        <parent>
-                <groupId>com.almende.eve</groupId>
-                <artifactId>eve</artifactId>
-                <version>2.2.0-SNAPSHOT</version>
-                <relativePath>../eve/pom.xml</relativePath>
-        </parent>
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve</artifactId>
+		<version>2.3.0-SNAPSHOT</version>
+		<relativePath>../eve/pom.xml</relativePath>
+	</parent>
 	<artifactId>GameOfLiveDemo</artifactId>
 
 
@@ -15,12 +15,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-        <dependencies>
-                <dependency>
-                        <groupId>com.almende.eve</groupId>
-                        <artifactId>eve-core</artifactId>
-                        <version>${project.parent.version}</version>
-                </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-transport-zmq</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

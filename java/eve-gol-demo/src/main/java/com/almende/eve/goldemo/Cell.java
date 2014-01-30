@@ -43,15 +43,7 @@ public class Cell extends Agent {
 	}
 	
 	public void stop() throws IOException, JSONRPCException{
-		if (neighbors == null){
-			neighbors = getState().get("neighbors",
-					new TypeUtil<ArrayList<String>>() {
-					});
-		}
-		for (String neighbor : neighbors) {
-			getEventsFactory().unsubscribe(URI.create(neighbor),
-					"cycleCalculated", "askCycleState");
-		}
+		getEventsFactory().clear();
 	}
 	
 	public void start() throws IOException {
