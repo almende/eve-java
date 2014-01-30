@@ -19,7 +19,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import org.jivesoftware.smack.util.Base64;
+import org.apache.commons.codec.binary.Base64;
+
+
 
 /**
  * Utility to encrypt text/passwords
@@ -94,7 +96,7 @@ public final class EncryptionUtil {
 		pbeCipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParamSpec);
 		
 		final byte[] encryptedText = pbeCipher.doFinal(text.getBytes("UTF-8"));
-		return Base64.encodeBytes(encryptedText);
+		return Base64.encodeBase64String(encryptedText);
 	}
 	
 	/**
@@ -134,7 +136,7 @@ public final class EncryptionUtil {
 		final Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
 		pbeCipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParamSpec);
 		
-		final byte[] text = pbeCipher.doFinal(Base64.decode(encryptedText));
+		final byte[] text = pbeCipher.doFinal(Base64.decodeBase64(encryptedText));
 		return new String(text, "UTF-8");
 	}
 }

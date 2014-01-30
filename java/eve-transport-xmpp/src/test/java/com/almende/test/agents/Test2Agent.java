@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.almende.eve.agent.Agent;
+import com.almende.eve.agent.AgentHost;
 import com.almende.eve.agent.callback.AsyncCallback;
 import com.almende.eve.rpc.annotation.Access;
 import com.almende.eve.rpc.annotation.AccessType;
@@ -47,6 +48,7 @@ import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException.CODE;
 import com.almende.eve.rpc.jsonrpc.JSONRequest;
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
+import com.almende.eve.transport.xmpp.XmppService;
 import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -60,17 +62,14 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Ping.
-	 * 
-	 * @param message
-	 *            the message
-	 * @param sender
-	 *            the sender
+	 *
+	 * @param message the message
+	 * @param sender the sender
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
-	public String ping(@Name("message") final String message,
-			@Sender final String sender) throws Exception {
+	public String ping(@Name("message") final String message, @Sender final String sender)
+			throws Exception {
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("message", message);
 		params.put("sender", sender);
@@ -81,14 +80,11 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Slow ping.
-	 * 
-	 * @param message
-	 *            the message
-	 * @param sender
-	 *            the sender
+	 *
+	 * @param message the message
+	 * @param sender the sender
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public String slowPing(@Name("message") final String message,
 			@Sender final String sender) throws Exception {
@@ -103,9 +99,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		return message;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#onCreate()
 	 */
 	@Override
@@ -114,9 +108,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		super.onCreate();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#onDelete()
 	 */
 	@Override
@@ -125,9 +117,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		super.onDelete();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#onInit()
 	 */
 	@Override
@@ -136,9 +126,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		super.onInit();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#onDestroy()
 	 */
 	@Override
@@ -147,9 +135,10 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		super.onDestroy();
 	}
 	
+	
 	/**
 	 * Gets the my url.
-	 * 
+	 *
 	 * @return the my url
 	 */
 	private URI getMyUrl() {
@@ -158,18 +147,13 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Call myself.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
+	 *
+	 * @param method the method
+	 * @param params the params
 	 * @return the string
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
-	 * @throws Exception
-	 *             the exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException the jSONRPC exception
+	 * @throws Exception the exception
 	 */
 	public String callMyself(@Name("method") final String method,
 			@Name("params") final ObjectNode params) throws IOException,
@@ -182,17 +166,12 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Call myself async.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param method the method
+	 * @param params the params
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException the jSONRPC exception
+	 * @throws Exception the exception
 	 */
 	public void callMyselfAsync(@Name("method") final String method,
 			@Name("params") final ObjectNode params) throws IOException,
@@ -221,37 +200,26 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Call other agent.
-	 * 
-	 * @param url
-	 *            the url
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
+	 *
+	 * @param url the url
+	 * @param method the method
+	 * @param params the params
 	 * @return the string
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
-	 * @throws Exception
-	 *             the exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException the jSONRPC exception
+	 * @throws Exception the exception
 	 */
 	public String callOtherAgent(@Name("url") final String url,
-			@Name("method") final String method,
-			@Name("params") final ObjectNode params) throws IOException,
-			JSONRPCException, Exception {
+			@Name("method") final String method, @Name("params") final ObjectNode params)
+			throws IOException, JSONRPCException, Exception {
 		final String resp = send(URI.create(url), method, params, String.class);
 		System.out.println("callOtherAgent url=" + url + " method=" + method
 				+ ", params=" + params.toString() + ", resp=" + resp);
 		return resp;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.almende.test.agents.Test2AgentInterface#testEnum(com.almende.test
-	 * .agents.Test2AgentInterface.STATUS)
+	/* (non-Javadoc)
+	 * @see com.almende.test.agents.Test2AgentInterface#testEnum(com.almende.test.agents.Test2AgentInterface.STATUS)
 	 */
 	@Override
 	public STATUS testEnum(@Name("status") final STATUS status) {
@@ -261,7 +229,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test enum proxy.
-	 * 
+	 *
 	 * @return the status
 	 */
 	public STATUS testEnumProxy() {
@@ -275,11 +243,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test double non required.
-	 * 
-	 * @param testme
-	 *            the testme
-	 * @param testme2
-	 *            the testme2
+	 *
+	 * @param testme the testme
+	 * @param testme2 the testme2
 	 * @return the string
 	 */
 	public String testDoubleNonRequired(
@@ -291,11 +257,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test double required.
-	 * 
-	 * @param testme
-	 *            the testme
-	 * @param testme2
-	 *            the testme2
+	 *
+	 * @param testme the testme
+	 * @param testme2 the testme2
 	 * @return the string
 	 */
 	public String testDoubleRequired(@Name("testme") final String testme,
@@ -304,9 +268,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		return testme + ":" + testme2;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.test.agents.Test2AgentInterface#testVoid()
 	 */
 	@Override
@@ -326,10 +288,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test enum send.
-	 * 
+	 *
 	 * @return the status
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public STATUS testEnumSend() throws Exception {
 		final URI url = URI.create("http://eveagents.appspot.com/agents/test/");
@@ -342,14 +303,11 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Cascade.
-	 * 
+	 *
 	 * @return the string
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
-	 * @throws Exception
-	 *             the exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException the jSONRPC exception
+	 * @throws Exception the exception
 	 */
 	public String cascade() throws IOException, JSONRPCException, Exception {
 		final String name1 = get("name");
@@ -364,11 +322,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		return name1 + " " + name2;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.test.agents.Test2AgentInterface#add(java.lang.Double,
-	 * java.lang.Double)
+	
+	/* (non-Javadoc)
+	 * @see com.almende.test.agents.Test2AgentInterface#add(java.lang.Double, java.lang.Double)
 	 */
 	@Override
 	public Double add(@Name("a") final Double a, @Name("b") final Double b) {
@@ -377,23 +333,17 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Subtract.
-	 * 
-	 * @param a
-	 *            the a
-	 * @param b
-	 *            the b
+	 *
+	 * @param a the a
+	 * @param b the b
 	 * @return the double
 	 */
 	public Double subtract(@Name("a") final Double a, @Name("b") final Double b) {
 		return a - b;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.almende.test.agents.Test2AgentInterface#multiply(java.lang.Double,
-	 * java.lang.Double)
+	/* (non-Javadoc)
+	 * @see com.almende.test.agents.Test2AgentInterface#multiply(java.lang.Double, java.lang.Double)
 	 */
 	@Override
 	public Double multiply(final Double a, final Double b) {
@@ -402,11 +352,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Divide.
-	 * 
-	 * @param a
-	 *            the a
-	 * @param b
-	 *            the b
+	 *
+	 * @param a the a
+	 * @param b the b
 	 * @return the double
 	 */
 	public Double divide(@Name("a") final Double a, @Name("b") final Double b) {
@@ -415,9 +363,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Prints the params.
-	 * 
-	 * @param params
-	 *            the params
+	 *
+	 * @param params the params
 	 * @return the string
 	 */
 	public String printParams(final ObjectNode params) {
@@ -426,7 +373,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Return null string.
-	 * 
+	 *
 	 * @return the string
 	 */
 	public String returnNullString() {
@@ -435,9 +382,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Throw exception.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void throwException() throws Exception {
 		throw new Exception("Nothing went wrong...");
@@ -445,9 +391,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Throw jsonrpc exception.
-	 * 
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
+	 *
+	 * @throws JSONRPCException the jSONRPC exception
 	 */
 	public void throwJSONRPCException() throws JSONRPCException {
 		throw new JSONRPCException(CODE.NOT_FOUND);
@@ -456,9 +401,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	// TODO: get this working
 	/**
 	 * Sum.
-	 * 
-	 * @param values
-	 *            the values
+	 *
+	 * @param values the values
 	 * @return the double
 	 */
 	public Double sum(@Name("values") final List<Double> values) {
@@ -471,9 +415,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Sum array.
-	 * 
-	 * @param values
-	 *            the values
+	 *
+	 * @param values the values
 	 * @return the double
 	 */
 	public Double sumArray(@Name("values") final Double[] values) {
@@ -486,9 +429,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Complex parameter.
-	 * 
-	 * @param values
-	 *            the values
+	 *
+	 * @param values the values
 	 */
 	public void complexParameter(
 			@Name("values") final Map<String, List<Double>> values) {
@@ -502,7 +444,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Complex result.
-	 * 
+	 *
 	 * @return the map
 	 */
 	public Map<String, List<Double>> complexResult() {
@@ -518,45 +460,37 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test tf complex result.
-	 * 
-	 * @param url
-	 *            the url
+	 *
+	 * @param url the url
 	 * @return the double
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
-	public Double testTFComplexResult(@Name("url") final String url)
-			throws Exception {
+	public Double testTFComplexResult(@Name("url") final String url) throws Exception {
 		final TypeFactory tf = JOM.getTypeFactory();
-		final Map<String, List<Double>> res = send(URI.create(url),
-				"complexResult", JOM.createObjectNode(), tf.constructMapType(
-						HashMap.class,
-						JOM.getTypeFactory().constructType(String.class),
-						tf.constructCollectionType(List.class, Double.class)));
+		final Map<String, List<Double>> res = send(URI.create(url), "complexResult",
+				JOM.createObjectNode(), tf.constructMapType(HashMap.class, JOM
+						.getTypeFactory().constructType(String.class),
+						tf.constructCollectionType(List.class,
+								Double.class)));
 		return res.get("result").get(0);
 	}
 	
 	/**
 	 * Test complex result.
-	 * 
-	 * @param url
-	 *            the url
+	 *
+	 * @param url the url
 	 * @return the double
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
-	public Double testComplexResult(@Name("url") final String url)
-			throws Exception {
+	public Double testComplexResult(@Name("url") final String url) throws Exception {
 		
-		final Map<String, List<Double>> res = send(URI.create(url),
-				"complexResult", new TypeUtil<Map<String, List<Double>>>() {
+		final Map<String, List<Double>> res = send(URI.create(url), "complexResult",
+				new TypeUtil<Map<String, List<Double>>>() {
 				});
 		return res.get("result").get(0);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.test.agents.Test2AgentInterface#increment()
 	 */
 	@Override
@@ -573,10 +507,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test double ret.
-	 * 
+	 *
 	 * @return the double
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public Double testDoubleRet() throws Exception {
 		return send(getFirstUrl(), "increment", Double.class);
@@ -584,9 +517,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the.
-	 * 
-	 * @param key
-	 *            the key
+	 *
+	 * @param key the key
 	 * @return the string
 	 */
 	public String get(@Name("key") final String key) {
@@ -595,22 +527,18 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Put.
-	 * 
-	 * @param key
-	 *            the key
-	 * @param value
-	 *            the value
+	 *
+	 * @param key the key
+	 * @param value the value
 	 */
-	public void put(@Name("key") final String key,
-			@Name("value") final String value) {
+	public void put(@Name("key") final String key, @Name("value") final String value) {
 		getState().put(key, value);
 	}
 	
 	/**
 	 * Register ping event.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void registerPingEvent() throws Exception {
 		getEventsFactory().subscribe(getMyUrl(), "ping", "pingCallback");
@@ -618,9 +546,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Unregister ping event.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void unregisterPingEvent() throws Exception {
 		getEventsFactory().subscribe(getMyUrl(), "ping", "pingCallback");
@@ -628,9 +555,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Ping callback.
-	 * 
-	 * @param params
-	 *            the params
+	 *
+	 * @param params the params
 	 */
 	public void pingCallback(@Name("params") final ObjectNode params) {
 		System.out.println("pingCallback " + getId() + " " + params.toString());
@@ -638,11 +564,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Trigger ping event.
-	 * 
-	 * @param message
-	 *            the message
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param message the message
+	 * @throws Exception the exception
 	 */
 	public void triggerPingEvent(@Name("message") @Optional final String message)
 			throws Exception {
@@ -657,9 +581,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Cancel task.
-	 * 
-	 * @param id
-	 *            the id
+	 *
+	 * @param id the id
 	 */
 	public void cancelTask(@Name("id") final String id) {
 		getScheduler().cancelTask(id);
@@ -667,12 +590,10 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Creates the task.
-	 * 
-	 * @param delay
-	 *            the delay
+	 *
+	 * @param delay the delay
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public String createTask(@Name("delay") final long delay) throws Exception {
 		final ObjectNode params = JOM.createObjectNode();
@@ -684,11 +605,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * My task.
-	 * 
-	 * @param message
-	 *            the message
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param message the message
+	 * @throws Exception the exception
 	 */
 	public void myTask(@Name("message") final String message) throws Exception {
 		final ObjectNode params = JOM.createObjectNode();
@@ -699,14 +618,11 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test send.
-	 * 
-	 * @param url
-	 *            the url
-	 * @param method
-	 *            the method
+	 *
+	 * @param url the url
+	 * @param method the method
 	 * @return the object
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public Object testSend(@Name("url") @Optional String url,
 			@Name("method") @Optional String method) throws Exception {
@@ -723,10 +639,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test send non existing method.
-	 * 
+	 *
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public String testSendNonExistingMethod() throws Exception {
 		final String res = send(
@@ -738,12 +653,10 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Subscribe to agent.
-	 * 
-	 * @param url
-	 *            the url
+	 *
+	 * @param url the url
 	 * @return the string
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public String subscribeToAgent(@Optional @Name("url") String url)
 			throws Exception {
@@ -757,17 +670,13 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Unsubscribe from agent.
-	 * 
-	 * @param url
-	 *            the url
-	 * @param subscriptionId
-	 *            the subscription id
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param url the url
+	 * @param subscriptionId the subscription id
+	 * @throws Exception the exception
 	 */
 	public void unsubscribeFromAgent(@Optional @Name("url") String url,
-			@Name("subscriptionId") final String subscriptionId)
-			throws Exception {
+			@Name("subscriptionId") final String subscriptionId) throws Exception {
 		if (url == null) {
 			url = "http://localhost:8080/agents/testagent2/";
 		}
@@ -778,9 +687,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Trigger data changed.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void triggerDataChanged() throws Exception {
 		getEventsFactory().trigger("dataChanged", null);
@@ -788,7 +696,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the everything.
-	 * 
+	 *
 	 * @return the everything
 	 */
 	public Object getEverything() {
@@ -797,17 +705,12 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * On event.
-	 * 
-	 * @param subscriptionId
-	 *            the subscription id
-	 * @param agent
-	 *            the agent
-	 * @param event
-	 *            the event
-	 * @param params
-	 *            the params
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param subscriptionId the subscription id
+	 * @param agent the agent
+	 * @param event the event
+	 * @param params the params
+	 * @throws Exception the exception
 	 */
 	public void onEvent(
 			@Optional @Name("subscriptionId") final String subscriptionId,
@@ -828,7 +731,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Private method.
-	 * 
+	 *
 	 * @return the string
 	 */
 	private String privateMethod() {
@@ -846,9 +749,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Method version one.
-	 * 
-	 * @param param
-	 *            the param
+	 *
+	 * @param param the param
 	 */
 	public void methodVersionOne(@Name("param") final String param) {
 		privateMethod();
@@ -856,25 +758,20 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Invalid method.
-	 * 
-	 * @param param1
-	 *            the param1
-	 * @param param2
-	 *            the param2
+	 *
+	 * @param param1 the param1
+	 * @param param2 the param2
 	 * @return the string
 	 */
-	public String invalidMethod(@Name("param1") final String param1,
-			final int param2) {
+	public String invalidMethod(@Name("param1") final String param1, final int param2) {
 		return "This method is no valid JSON-RPC method: misses an @Name annotation.";
 	}
 	
 	/**
 	 * Test async xmpp.
-	 * 
-	 * @param url
-	 *            the url
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param url the url
+	 * @throws Exception the exception
 	 */
 	public void testAsyncXMPP(@Name("url") final String url) throws Exception {
 		System.out.println("testAsyncSend, url=" + url);
@@ -907,11 +804,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test sync xmpp.
-	 * 
-	 * @param url
-	 *            the url
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param url the url
+	 * @throws Exception the exception
 	 */
 	public void testSyncXMPP(@Name("url") final String url) throws Exception {
 		System.out.println("testSyncSend, url=" + url);
@@ -921,8 +816,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		params.put("b", new Double(4.5));
 		System.out.println("testSyncXMPP, request="
 				+ new JSONRequest(method, params));
-		final Double result = send(URI.create(url), method, params,
-				Double.class);
+		final Double result = send(URI.create(url), method, params, Double.class);
 		System.out.println("testSyncXMPP result=" + result);
 		try {
 			final ObjectNode messageParams = JOM.createObjectNode();
@@ -936,11 +830,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test get contacts.
-	 * 
-	 * @param url
-	 *            the url
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @param url the url
+	 * @throws Exception the exception
 	 */
 	public void testGetContacts(@Name("url") final String url) throws Exception {
 		System.out.println("testGetContacts, url=" + url);
@@ -973,9 +865,8 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test async http.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void testAsyncHTTP() throws Exception {
 		System.out.println("testAsyncHTTP start...");
@@ -1000,10 +891,43 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	}
 	
 	/**
+	 * Xmpp connect.
+	 *
+	 * @param username the username
+	 * @param password the password
+	 * @throws Exception the exception
+	 */
+	public void xmppConnect(@Name("username") final String username,
+			@Name("password") final String password) throws Exception {
+		final AgentHost host = getAgentHost();
+		
+		final XmppService service = (XmppService) host.getTransportService("xmpp");
+		if (service != null) {
+			service.connect(getId(), username, password);
+		} else {
+			throw new Exception("No XMPP service registered");
+		}
+	}
+	
+	/**
+	 * Xmpp disconnect.
+	 *
+	 * @throws Exception the exception
+	 */
+	public void xmppDisconnect() throws Exception {
+		final AgentHost host = getAgentHost();
+		final XmppService service = (XmppService) host.getTransportService("xmpp");
+		if (service != null) {
+			service.disconnect(getId());
+		} else {
+			throw new Exception("No XMPP service registered");
+		}
+	}
+	
+	/**
 	 * Delete my self.
-	 * 
-	 * @throws Exception
-	 *             the exception
+	 *
+	 * @throws Exception the exception
 	 */
 	public void deleteMySelf() throws Exception {
 		getAgentHost().deleteAgent(getId());
@@ -1011,7 +935,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test agent proxy.
-	 * 
+	 *
 	 * @return the double
 	 */
 	public Double testAgentProxy() {
@@ -1024,7 +948,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test agent proxy2.
-	 * 
+	 *
 	 * @return the double
 	 */
 	public Double testAgentProxy2() {
@@ -1038,7 +962,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test agent proxy3.
-	 * 
+	 *
 	 * @return the list
 	 */
 	public List<Object> testAgentProxy3() {
@@ -1052,7 +976,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Test agent proxy4.
-	 * 
+	 *
 	 * @return the double
 	 */
 	public Double testAgentProxy4() {
@@ -1067,10 +991,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the urls of gloria.
-	 * 
+	 *
 	 * @return the urls of gloria
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public ArrayNode getUrlsOfGloria() throws Exception {
 		final String url = "xmpp:gloria@openid.almende.org";
@@ -1120,10 +1043,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the urls of merlin.
-	 * 
+	 *
 	 * @return the urls of merlin
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public ArrayNode getUrlsOfMerlin() throws Exception {
 		final String url = "xmpp:merlin@openid.almende.org";
@@ -1135,10 +1057,9 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the urls of jos.
-	 * 
+	 *
 	 * @return the urls of jos
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public ArrayNode getUrlsOfJos() throws Exception {
 		final String url = "xmpp:jos@openid.almende.org";
@@ -1150,22 +1071,19 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 	
 	/**
 	 * Gets the list of merlin.
-	 * 
+	 *
 	 * @return the list of merlin
-	 * @throws Exception
-	 *             the exception
+	 * @throws Exception the exception
 	 */
 	public ArrayNode getListOfMerlin() throws Exception {
 		final String url = "xmpp:merlin@openid.almende.org";
-		final ArrayNode list = send(URI.create(url), "list",
-				JOM.createObjectNode(), ArrayNode.class);
+		final ArrayNode list = send(URI.create(url), "list", JOM.createObjectNode(),
+				ArrayNode.class);
 		System.out.println("merlins list=" + list);
 		return list;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#getVersion()
 	 */
 	@Override
@@ -1173,9 +1091,7 @@ public class Test2Agent extends Agent implements Test2AgentInterface {
 		return "1.0";
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#getDescription()
 	 */
 	@Override
