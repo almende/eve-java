@@ -29,9 +29,14 @@
 	</repositories>
 
 	<dependencies>
+                <dependency>
+                        <groupId>com.almende.eve</groupId>
+                        <artifactId>eve-core</artifactId>
+                        <version>${project.parent.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-core</artifactId>
+			<artifactId>eve-transport-http</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 

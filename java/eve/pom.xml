@@ -59,6 +59,9 @@
 		<module>../eve-core</module>
 		<module>../eve-transport-zmq</module>
 		<module>../eve-transport-xmpp</module>
+		<module>../eve-transport-http</module>
+		<module>../eve-bundled</module>
+		<module>../eve-tests</module>
 		<module>../eve-android</module>
 		<module>../eve-gae</module>
 		<module>../eve-planning</module>
