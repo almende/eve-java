@@ -40,12 +40,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @SuppressWarnings("serial")
 public class AgentServlet extends HttpServlet {
 	
-	private static final Logger	LOG			= Logger.getLogger(AgentServlet.class
-													.getSimpleName());
-	private static final String	RESOURCES	= "/com/almende/eve/resources/";
-	private static final String AGENTURLWARNING = "AgentServlet has a strange URL, can't find agentId!";
-	private static AgentHost	host;
-	private static HttpService	httpTransport;
+	private static final Logger	LOG				= Logger.getLogger(AgentServlet.class
+														.getSimpleName());
+	private static final String	RESOURCES		= "/com/almende/eve/resources/";
+	private static final String	AGENTURLWARNING	= "AgentServlet has a strange URL, can't find agentId!";
+	private AgentHost			host;
+	private HttpService			httpTransport;
+	private boolean				fromWebXML		= true;
+	
+	public AgentServlet() {
+	};
+	
+	public AgentServlet(final HttpService transport) {
+		this.fromWebXML = false;
+		httpTransport = transport;
+	};
 	
 	/*
 	 * (non-Javadoc)
@@ -54,28 +63,33 @@ public class AgentServlet extends HttpServlet {
 	 */
 	@Override
 	public void init() {
-		if (AgentHost.getInstance().getStateFactory() == null) {
-			LOG.severe("DEPRECATED SETUP: Please add com.almende.eve.transport.http.AgentListener as a Listener to your web.xml!");
-			AgentListener.init(getServletContext());
+		if (fromWebXML) {
+			if (AgentHost.getInstance().getStateFactory() == null) {
+				LOG.severe("DEPRECATED SETUP: Please add com.almende.eve.transport.http.AgentListener as a Listener to your web.xml!");
+				AgentListener.init(getServletContext());
+			}
+			final String environment = Config.getEnvironment();
+			final String envParam = "environment." + environment
+					+ ".servlet_url";
+			final String globalParam = "servlet_url";
+			String servletUrl = getInitParameter(envParam);
+			if (servletUrl == null) {
+				// if no environment specific servlet_url is defined, read
+				// the global servlet_url
+				servletUrl = getInitParameter(globalParam);
+			}
+			if (servletUrl == null) {
+				LOG.severe("Cannot initialize HttpTransport: "
+						+ "Init Parameter '" + globalParam + "' or '"
+						+ envParam + "' "
+						+ "missing in context configuration web.xml.");
+			} else {
+				host = AgentHost.getInstance();
+				httpTransport = new HttpService(host, servletUrl);
+				host.addTransportService(httpTransport);
+			}
 		}
 		host = AgentHost.getInstance();
-		
-		final String environment = Config.getEnvironment();
-		final String envParam = "environment." + environment + ".servlet_url";
-		final String globalParam = "servlet_url";
-		String servletUrl = getInitParameter(envParam);
-		if (servletUrl == null) {
-			// if no environment specific servlet_url is defined, read
-			// the global servlet_url
-			servletUrl = getInitParameter(globalParam);
-		}
-		if (servletUrl == null) {
-			LOG.severe("Cannot initialize HttpTransport: " + "Init Parameter '"
-					+ globalParam + "' or '" + envParam + "' "
-					+ "missing in context configuration web.xml.");
-		}
-		httpTransport = new HttpService(host, servletUrl);
-		host.addTransportService(httpTransport);
 	}
 	
 	/**
@@ -247,7 +261,7 @@ public class AgentServlet extends HttpServlet {
 		try {
 			agentId = httpTransport.getAgentId(new URI(uri));
 		} catch (URISyntaxException e) {
-			throw new ServletException(AGENTURLWARNING,e);
+			throw new ServletException(AGENTURLWARNING, e);
 		}
 		String resource = httpTransport.getAgentResource(uri);
 		
@@ -360,7 +374,7 @@ public class AgentServlet extends HttpServlet {
 		try {
 			agentId = httpTransport.getAgentId(new URI(agentUrl));
 		} catch (URISyntaxException e) {
-			throw new ServletException(AGENTURLWARNING,e);
+			throw new ServletException(AGENTURLWARNING, e);
 		}
 		if (agentId == null || agentId.equals("")) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -401,7 +415,7 @@ public class AgentServlet extends HttpServlet {
 		
 		final AsyncCallbackQueue<String> callbacks = host.getCallbackQueue(
 				"HttpTransport", String.class);
-		callbacks.push(tag,"", callback);
+		callbacks.push(tag, "", callback);
 		host.receive(agentId, body, URI.create(senderUrl), tag);
 		
 		try {
@@ -441,7 +455,7 @@ public class AgentServlet extends HttpServlet {
 		try {
 			agentId = httpTransport.getAgentId(new URI(agentUrl));
 		} catch (URISyntaxException e) {
-			throw new ServletException(AGENTURLWARNING,e);
+			throw new ServletException(AGENTURLWARNING, e);
 		}
 		String agentType = req.getParameter("type");
 		
@@ -500,7 +514,7 @@ public class AgentServlet extends HttpServlet {
 		try {
 			agentId = httpTransport.getAgentId(new URI(agentUrl));
 		} catch (URISyntaxException e) {
-			throw new ServletException(AGENTURLWARNING,e);
+			throw new ServletException(AGENTURLWARNING, e);
 		}
 		
 		if (!handleSession(req, resp)) {

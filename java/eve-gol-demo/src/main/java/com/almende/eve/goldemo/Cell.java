@@ -2,6 +2,7 @@ package com.almende.eve.goldemo;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import com.almende.eve.agent.Agent;
@@ -51,8 +52,9 @@ public class Cell extends Agent {
 	}
 	
 	public void askCycleState(@Sender final String neighbor) throws JSONRPCException,
-			IOException {
+			IOException, URISyntaxException {
 		
+		final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
 		ObjectNode params = JOM.createObjectNode();
 		params.put("cycle", getState().get("current_cycle", Integer.class) - 1);
 		sendAsync(URI.create(neighbor), "getCycleState", params, new AsyncCallback<CycleState>(){
@@ -60,8 +62,12 @@ public class Cell extends Agent {
 			@Override
 			public void onSuccess(CycleState state) {
 				if (state != null) {
-					getState().put(neighbor + "_" + state.getCycle(), state);
-					calcCycle();
+					getState().put(neighborId + "_" + state.getCycle(), state);
+					try {
+						calcCycle();
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -76,7 +82,7 @@ public class Cell extends Agent {
 	}
 	
 	//TODO: find a way to do this without synchronized
-	private synchronized void calcCycle() {
+	private synchronized void calcCycle() throws URISyntaxException {
 		if (getState().containsKey("current_cycle")) {
 			Integer currentCycle = getState().get("current_cycle",
 					Integer.class);
@@ -89,12 +95,14 @@ public class Cell extends Agent {
 
 			int aliveNeighbors = 0;
 			for (String neighbor : neighbors) {
+				final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
+						
 				if (!getState()
-						.containsKey(neighbor + "_" + (currentCycle - 1))) {
+						.containsKey(neighborId + "_" + (currentCycle - 1))) {
 					return;
 				}
 				CycleState nState = getState().get(
-						neighbor + "_" + (currentCycle - 1), CycleState.class);
+						neighborId + "_" + (currentCycle - 1), CycleState.class);
 				if (nState.isAlive()) aliveNeighbors++;
 			}
 			CycleState myState = getState().get("val_" + (currentCycle - 1),

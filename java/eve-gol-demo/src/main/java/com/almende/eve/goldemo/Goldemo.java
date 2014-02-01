@@ -11,15 +11,14 @@ import com.almende.eve.agent.AgentHost;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.scheduler.ClockSchedulerFactory;
 import com.almende.eve.state.MemoryStateFactory;
-import com.almende.eve.transport.zmq.ZmqService;
+import com.almende.eve.transport.http.HttpService;
 
 public class Goldemo {
-//	final static String BASE	= "inproc://";
-	final static String	BASE	= "ipc:///tmp/zmq-socket-";
-	final static String PATH	= "zmq:"+BASE;
+	// final static String BASE = "inproc://";
+	// final static String BASE = "ipc:///tmp/zmq-socket-";
+	// final static String PATH = "zmq:"+BASE;
 	
-//	final static String PATH = "local:";
-
+	final static String	PATH	= "local:";
 	
 	public static void main(String[] args) throws IOException,
 			JSONRPCException, ClassNotFoundException, InstantiationException,
@@ -31,9 +30,14 @@ public class Goldemo {
 		host.setStateFactory(new MemoryStateFactory());
 		
 		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("baseUrl", BASE);
-		host.addTransportService(new ZmqService(host, params));
-	
+		// params.put("baseUrl", BASE);
+		// host.addTransportService(new ZmqService(host, params));
+		
+		// params = new HashMap<String,Object>();
+		params.put("embedded", "JettyLauncher");
+		params.put("servlet_url", "http://localhost:8080/agents/");
+		host.addTransportService(new HttpService(host, params));
+		
 		host.setSchedulerFactory(new ClockSchedulerFactory(host,
 				"_myRunnableScheduler"));
 		// host.setSchedulerFactory(new RunnableSchedulerFactory(host,
@@ -56,7 +60,6 @@ public class Goldemo {
 			shortcut = Boolean.valueOf(args[4]);
 		}
 		host.setDoesShortcut(shortcut);
-
 		
 		boolean[][] grid = new boolean[N][M];
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -88,6 +91,7 @@ public class Goldemo {
 				cell.start();
 			}
 		}
+		System.err.println("Started!");
 		try {
 			Thread.sleep(X * 1000);
 		} catch (InterruptedException e) {
@@ -100,17 +104,18 @@ public class Goldemo {
 			}
 		}
 		HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
-		int max_full=0;
+		int max_full = 0;
 		for (cN = 0; cN < N; cN++) {
 			for (int cM = 0; cM < M; cM++) {
 				Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
 				ArrayList<CycleState> res = cell.getAllCycleStates();
-				max_full = (max_full==0||max_full>res.size()?res.size():max_full);
+				max_full = (max_full == 0 || max_full > res.size() ? res.size()
+						: max_full);
 				results.put(cell.getId(), res);
 			}
 		}
 		int cycle = 0;
-		for (int j=0; j<max_full; j++) {
+		for (int j = 0; j < max_full; j++) {
 			if (annimate) {
 				try {
 					Thread.sleep(500);
@@ -119,7 +124,7 @@ public class Goldemo {
 				final String ESC = "\033[";
 				System.out.print(ESC + "2J");
 			}
-			System.out.println("Cycle:" + cycle +"/"+(max_full-1));
+			System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
 			System.out.print("/");
 			for (int i = 0; i < M * 2; i++) {
 				System.out.print("-");

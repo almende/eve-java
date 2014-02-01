@@ -26,6 +26,11 @@
 			<artifactId>eve-transport-zmq</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-transport-http-embedded</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

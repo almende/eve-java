@@ -26,6 +26,7 @@ import com.almende.eve.agent.AgentHost;
 import com.almende.eve.agent.callback.AsyncCallback;
 import com.almende.eve.agent.callback.AsyncCallbackQueue;
 import com.almende.eve.transport.TransportService;
+import com.almende.util.ClassUtil;
 import com.almende.util.tokens.TokenStore;
 
 /**
@@ -63,6 +64,26 @@ public class HttpService implements TransportService {
 		host = agentHost;
 		if (params != null) {
 			setServletUrl((String) params.get("servlet_url"));
+			if (params.get("embedded") != null) {
+				String className = (String) params.get("embedded");
+				if (className.equals("JettyLauncher")) {
+					className = "com.almende.eve.transport.http.embed.JettyLauncher";
+				}
+				try {
+					final Class<?> launcherClass = Class.forName(className);
+					if (!ClassUtil.hasInterface(launcherClass, Launcher.class)) {
+						throw new IllegalArgumentException("Launcher class "
+								+ launcherClass.getName() + " must implement "
+								+ Launcher.class.getName());
+					}
+					
+					Launcher launcher = (Launcher) launcherClass.newInstance();
+					launcher.startServlet(new AgentServlet(this), URI.create(getServletUrl()), agentHost.getConfig());
+					
+				} catch (Exception e) {
+					LOG.log(Level.WARNING, "Failed to load launcher!", e);
+				}
+			}
 		}
 	}
 	
@@ -153,8 +174,7 @@ public class HttpService implements TransportService {
 						// callback
 						// and use it to send the message
 						final AsyncCallbackQueue<String> callbacks = host
-								.getCallbackQueue("HttpTransport",
-										String.class);
+								.getCallbackQueue("HttpTransport", String.class);
 						if (callbacks != null) {
 							final AsyncCallback<String> callback = callbacks
 									.pull(tag);

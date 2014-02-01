@@ -122,7 +122,7 @@ public class EventsFactory implements EventsInterface {
 		final String method = "event.createSubscription";
 		final ObjectNode params = JOM.createObjectNode();
 		params.put(EVENT, event);
-		params.put("callbackUrl", myAgent.getFirstUrl().toASCIIString());
+		params.put("callbackUrl", myAgent.getAgentHost().getSenderUrl(myAgent.getId(), url).toASCIIString());
 		params.put("callbackMethod", callbackMethod);
 		if (callbackParams != null) {
 			params.put("callbackParams", callbackParams);
@@ -164,7 +164,7 @@ public class EventsFactory implements EventsInterface {
 		final String method = "event.deleteSubscription";
 		final ObjectNode params = JOM.createObjectNode();
 		params.put(EVENT, event);
-		params.put("callbackUrl", myAgent.getFirstUrl().toASCIIString());
+		params.put("callbackUrl", myAgent.getAgentHost().getSenderUrl(myAgent.getId(), url).toASCIIString());
 		params.put("callbackMethod", callbackMethod);
 		myAgent.sendAsync(url, method, params);
 	}
