@@ -23,7 +23,7 @@ public class JettyLauncher implements Launcher {
 	
 	public void initServer(final Map<String, Object> params) {
 		int port = 8080;
-		if (params.containsKey("port")) {
+		if (params != null && params.containsKey("port")) {
 			port = Integer.parseInt((String) params.get(port));
 		}
 		server = new Server(port);
@@ -49,7 +49,7 @@ public class JettyLauncher implements Launcher {
 				initServer(new HashMap<String,Object>());
 			}
 		}
-		LOG.warning("Registering servlet:"+servletPath.getPath());
+		LOG.info("Registering servlet:"+servletPath.getPath());
 		context.addServlet(new ServletHolder(servlet), servletPath.getPath()+"*");
 	}
 }

@@ -9,57 +9,38 @@ import java.util.HashMap;
 
 import com.almende.eve.agent.AgentHost;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
-import com.almende.eve.scheduler.ClockSchedulerFactory;
-import com.almende.eve.state.MemoryStateFactory;
-import com.almende.eve.transport.http.HttpService;
 
 public class Goldemo {
 	// final static String BASE = "inproc://";
 	// final static String BASE = "ipc:///tmp/zmq-socket-";
-	// final static String PATH = "zmq:"+BASE;
-	
+	// final static String PATH = "zmq:"+BASE;	
 	final static String	PATH	= "local:";
 	
 	public static void main(String[] args) throws IOException,
 			JSONRPCException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
-		AgentHost host = AgentHost.getInstance();
-		
-		// host.setStateFactory(new FileStateFactory(".eveagents_gol",true));
-		host.setStateFactory(new MemoryStateFactory());
-		
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		// params.put("baseUrl", BASE);
-		// host.addTransportService(new ZmqService(host, params));
-		
-		// params = new HashMap<String,Object>();
-		params.put("embedded", "JettyLauncher");
-		params.put("servlet_url", "http://localhost:8080/agents/");
-		host.addTransportService(new HttpService(host, params));
-		
-		host.setSchedulerFactory(new ClockSchedulerFactory(host,
-				"_myRunnableScheduler"));
-		// host.setSchedulerFactory(new RunnableSchedulerFactory(host,
-		// "_myRunnableScheduler"));
-		
-		if (args.length < 3) {
+		if (args.length < 4) {
 			throw new IllegalArgumentException(
-					"Please use at least 3 arguments: X seconds & N rows & M columns");
+					"Please use at least 4 arguments: Y=yamlFile & X=seconds & N=rows & M=columns");
 		}
-		Integer X = Integer.valueOf(args[0]);
-		Integer N = Integer.valueOf(args[1]);
-		Integer M = Integer.valueOf(args[2]);
+		String path = args[0];
+		Integer X = Integer.valueOf(args[1]);
+		Integer N = Integer.valueOf(args[2]);
+		Integer M = Integer.valueOf(args[3]);
 		
 		Boolean annimate = false;
-		if (args.length > 3) {
-			annimate = Boolean.valueOf(args[3]);
-		}
-		Boolean shortcut = true;
 		if (args.length > 4) {
-			shortcut = Boolean.valueOf(args[4]);
+			annimate = Boolean.valueOf(args[4]);
 		}
-		host.setDoesShortcut(shortcut);
+		
+		AgentHost host = AgentHost.getInstance();
+		host.loadConfig(path);
+
+		if (args.length > 5) {
+			boolean shortcut = Boolean.valueOf(args[5]);
+			host.setDoesShortcut(shortcut);
+		}
 		
 		boolean[][] grid = new boolean[N][M];
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

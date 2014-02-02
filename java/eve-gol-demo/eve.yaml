@@ -1,0 +1,18 @@
+# Eve configuration
+
+# transport services
+transport_services:
+- class: HttpService
+  servlet_url: http://localhost:8080/agents/
+  embedded: JettyLauncher
+
+# state settings
+# the state is used to persist the agents state.
+state:
+  class: MemoryStateFactory
+
+# scheduler settings
+scheduler:
+  class: ClockSchedulerFactory
+
+
