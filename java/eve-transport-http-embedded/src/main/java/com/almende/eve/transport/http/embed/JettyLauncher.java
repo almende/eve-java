@@ -24,7 +24,7 @@ public class JettyLauncher implements Launcher {
 	public void initServer(final Map<String, Object> params) {
 		int port = 8080;
 		if (params != null && params.containsKey("port")) {
-			port = Integer.parseInt((String) params.get(port));
+			port = (Integer)params.get("port");
 		}
 		server = new Server(port);
 		
@@ -37,19 +37,21 @@ public class JettyLauncher implements Launcher {
 			server.start();
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Couldn't start embedded Jetty server!", e);
-		}		
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void startServlet(final Servlet servlet, final URI servletPath, final Config config) {
+	public void startServlet(final Servlet servlet, final URI servletPath,
+			final Config config) {
 		if (server == null) {
-			if (config != null){
-			initServer((Map<String, Object>) config.get("jetty"));
+			if (config != null) {
+				initServer((Map<String, Object>) config.get("jetty"));
 			} else {
-				initServer(new HashMap<String,Object>());
+				initServer(new HashMap<String, Object>());
 			}
 		}
-		LOG.info("Registering servlet:"+servletPath.getPath());
-		context.addServlet(new ServletHolder(servlet), servletPath.getPath()+"*");
+		LOG.info("Registering servlet:" + servletPath.getPath());
+		context.addServlet(new ServletHolder(servlet), servletPath.getPath()
+				+ "*");
 	}
 }

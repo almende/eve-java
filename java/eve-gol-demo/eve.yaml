@@ -3,7 +3,7 @@
 # transport services
 transport_services:
 - class: HttpService
-  servlet_url: http://localhost:8080/agents/
+  servlet_url: http://localhost:8081/agents/
   embedded: JettyLauncher
 
 # state settings
@@ -15,4 +15,6 @@ state:
 scheduler:
   class: ClockSchedulerFactory
 
+jetty:
+  port: 8081
 
