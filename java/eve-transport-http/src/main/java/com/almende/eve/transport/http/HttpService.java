@@ -64,21 +64,21 @@ public class HttpService implements TransportService {
 		host = agentHost;
 		if (params != null) {
 			setServletUrl((String) params.get("servlet_url"));
-			if (params.get("embedded") != null) {
-				String className = (String) params.get("embedded");
+			if (params.get("servlet_launcher") != null) {
+				String className = (String) params.get("servlet_launcher");
 				if (className.equals("JettyLauncher")) {
 					className = "com.almende.eve.transport.http.embed.JettyLauncher";
 				}
 				try {
 					final Class<?> launcherClass = Class.forName(className);
-					if (!ClassUtil.hasInterface(launcherClass, Launcher.class)) {
-						throw new IllegalArgumentException("Launcher class "
+					if (!ClassUtil.hasInterface(launcherClass, ServletLauncher.class)) {
+						throw new IllegalArgumentException("ServletLauncher class "
 								+ launcherClass.getName() + " must implement "
-								+ Launcher.class.getName());
+								+ ServletLauncher.class.getName());
 					}
 					
-					Launcher launcher = (Launcher) launcherClass.newInstance();
-					launcher.startServlet(new AgentServlet(this), URI.create(getServletUrl()), agentHost.getConfig());
+					ServletLauncher launcher = (ServletLauncher) launcherClass.newInstance();
+					launcher.add(new AgentServlet(this), URI.create(getServletUrl()), agentHost.getConfig());
 					
 				} catch (Exception e) {
 					LOG.log(Level.WARNING, "Failed to load launcher!", e);

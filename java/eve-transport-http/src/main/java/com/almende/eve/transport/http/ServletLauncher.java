@@ -6,6 +6,6 @@ import javax.servlet.Servlet;
 
 import com.almende.eve.config.Config;
 
-public interface Launcher {
-	public void startServlet(final Servlet servlet, final URI servletPath, final Config config);
+public interface ServletLauncher {
+	public void add(final Servlet servlet, final URI servletPath, final Config config);
 }

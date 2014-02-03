@@ -13,9 +13,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.almende.eve.config.Config;
-import com.almende.eve.transport.http.Launcher;
+import com.almende.eve.transport.http.ServletLauncher;
 
-public class JettyLauncher implements Launcher {
+public class JettyLauncher implements ServletLauncher {
 	private static final Logger				LOG		= Logger.getLogger(JettyLauncher.class
 															.getName());
 	private static Server					server	= null;
@@ -41,7 +41,7 @@ public class JettyLauncher implements Launcher {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void startServlet(final Servlet servlet, final URI servletPath,
+	public void add(final Servlet servlet, final URI servletPath,
 			final Config config) {
 		if (server == null) {
 			if (config != null) {

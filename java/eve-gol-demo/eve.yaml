@@ -4,7 +4,7 @@
 transport_services:
 - class: HttpService
   servlet_url: http://localhost:8081/agents/
-  embedded: JettyLauncher
+  servlet_launcher: JettyLauncher
 
 # state settings
 # the state is used to persist the agents state.
