@@ -45,14 +45,12 @@ public class AgentServlet extends HttpServlet {
 	private static final String	RESOURCES		= "/com/almende/eve/resources/";
 	private static final String	AGENTURLWARNING	= "AgentServlet has a strange URL, can't find agentId!";
 	private AgentHost			host;
-	private HttpService			httpTransport;
-	private boolean				fromWebXML		= true;
+	private HttpService			httpTransport = null;
 	
 	public AgentServlet() {
 	};
 	
 	public AgentServlet(final HttpService transport) {
-		this.fromWebXML = false;
 		httpTransport = transport;
 	};
 	
@@ -63,7 +61,8 @@ public class AgentServlet extends HttpServlet {
 	 */
 	@Override
 	public void init() {
-		if (fromWebXML) {
+		host = AgentHost.getInstance();
+		if (httpTransport == null) {
 			if (AgentHost.getInstance().getStateFactory() == null) {
 				LOG.severe("DEPRECATED SETUP: Please add com.almende.eve.transport.http.AgentListener as a Listener to your web.xml!");
 				AgentListener.init(getServletContext());
@@ -84,12 +83,10 @@ public class AgentServlet extends HttpServlet {
 						+ envParam + "' "
 						+ "missing in context configuration web.xml.");
 			} else {
-				host = AgentHost.getInstance();
 				httpTransport = new HttpService(host, servletUrl);
 				host.addTransportService(httpTransport);
 			}
 		}
-		host = AgentHost.getInstance();
 	}
 	
 	/**

@@ -119,12 +119,12 @@ public class TestStateLocking extends TestCase {
 	 */
 	@Test
 	public void testFileState() throws Exception {
-		final File dir = new File(".testStates");
+		final File dir = new File(".eveagents_testStates");
 		if ((!dir.exists() && !dir.mkdir()) || !dir.isDirectory()) {
-			fail("Couldn't create .testStates folder");
+			fail("Couldn't create .eveagents_testStates folder");
 		}
 		final State fc = new ConcurrentSerializableFileState("test",
-				".testStates/FileStateRun");
+				".eveagents_testStates/FileStateRun");
 		testRun(fc);
 	}
 	
@@ -136,14 +136,11 @@ public class TestStateLocking extends TestCase {
 	 */
 	@Test
 	public void testConcurrentFileState() throws Exception {
-		final File dir = new File(".testStates");
+		final File dir = new File(".eveagents_testStates");
 		if ((!dir.exists() && !dir.mkdir()) || !dir.isDirectory()) {
-			fail("Couldn't create .testStates folder");
+			fail("Couldn't create .eveagents_testStates folder");
 		}
-		final FileStateFactory sf = new FileStateFactory(".testStates"); // Defaults
-		// to
-		// ConcurrentFileState
-		
+		final FileStateFactory sf = new FileStateFactory(".eveagents_testStates");
 		final String agentId = "ConcurrentFileStateRun";
 		if (sf.exists(agentId)) {
 			sf.delete(agentId);
@@ -160,14 +157,11 @@ public class TestStateLocking extends TestCase {
 	 */
 	@Test
 	public void testConcurrentJsonFileState() throws Exception {
-		final File dir = new File(".testStates");
+		final File dir = new File(".eveagents_testStates");
 		if ((!dir.exists() && !dir.mkdir()) || !dir.isDirectory()) {
-			fail("Couldn't create .testStates folder");
+			fail("Couldn't create .eveagents_testStates folder");
 		}
-		final FileStateFactory sf = new FileStateFactory(".testStates", true); // Defaults
-																				// to
-																				// ConcurrentFileState
-		
+		final FileStateFactory sf = new FileStateFactory(".eveagents_testStates", true);
 		final String agentId = "ConcurrentJsonFileStateRun";
 		if (sf.exists(agentId)) {
 			sf.delete(agentId);
