@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 public class GoogleCalculatorAgent extends Agent {
-	static private String	CALC_API_URL	= "http://www.google.com/ig/calculator";
+	private static final String	CALC_API_URL	= "http://www.google.com/ig/calculator";
 	
 	/**
 	 * Evaluate given expression
@@ -82,7 +82,9 @@ public class GoogleCalculatorAgent extends Agent {
 		return rhs;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getVersion()
 	 */
 	@Override
@@ -90,7 +92,9 @@ public class GoogleCalculatorAgent extends Agent {
 		return "1.0";
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getDescription()
 	 */
 	@Override

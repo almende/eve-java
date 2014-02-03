@@ -34,11 +34,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 public class GoogleTaskAgent extends Agent implements TaskAgent {
-	private final Logger	logger			= Logger.getLogger(this.getClass()
-													.getName());
+	private static final Logger	LOG				= Logger.getLogger(GoogleTaskAgent.class
+														.getName());
 	
-	private final String	OAUTH_URI		= "https://accounts.google.com/o/oauth2";
-	private final String	CALENDAR_URI	= "https://www.googleapis.com/tasks/v1/";
+	private static final String	OAUTH_URI		= "https://accounts.google.com/o/oauth2";
+	private static final String	CALENDAR_URI	= "https://www.googleapis.com/tasks/v1/";
 	
 	/**
 	 * Set access token and refresh token, used to authorize the calendar agent.
@@ -61,7 +61,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 			@Name("expires_in") final Integer expires_in,
 			@Name("refresh_token") final String refresh_token)
 			throws IOException {
-		logger.info("setAuthorization");
+		LOG.info("setAuthorization");
 		
 		final State state = getState();
 		
@@ -185,7 +185,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 		final DateTime expires_at = (auth != null) ? auth.getExpiresAt() : null;
 		if (expires_at != null && expires_at.isBeforeNow()) {
 			// TODO: remove this logging
-			logger.info("access token is expired. refreshing now...");
+			LOG.info("access token is expired. refreshing now...");
 			refreshAuthorization(auth);
 			getState().put("auth", auth);
 		}
@@ -295,7 +295,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 			throw new JSONRPCException(error);
 		}
 		
-		logger.info("createTaskList="
+		LOG.info("createTaskList="
 				+ JOM.getInstance().writeValueAsString(createdTaskList));
 		
 		return createdTaskList;
@@ -429,7 +429,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 		final ObjectMapper mapper = JOM.getInstance();
 		final ObjectNode task = mapper.readValue(resp, ObjectNode.class);
 		
-		logger.info("getTask task="
+		LOG.info("getTask task="
 				+ (task != null ? JOM.getInstance().writeValueAsString(task)
 						: null));
 		
@@ -490,7 +490,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 			throw new JSONRPCException(error);
 		}
 		
-		logger.info("createTask="
+		LOG.info("createTask="
 				+ JOM.getInstance().writeValueAsString(createdTask));
 		
 		return createdTask;
@@ -539,7 +539,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 			throw new JSONRPCException(error);
 		}
 		
-		logger.info("updateTask="
+		LOG.info("updateTask="
 				+ JOM.getInstance().writeValueAsString(updatedTask)); // TODO:
 																		// cleanup
 		
@@ -563,8 +563,8 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 			taskListId = getDefaultTaskList();
 		}
 		
-		logger.info("deleteTask taskId=" + taskId + ", taskListId="
-				+ taskListId); // TODO: cleanup
+		LOG.info("deleteTask taskId=" + taskId + ", taskListId=" + taskListId); // TODO:
+																				// cleanup
 		
 		// built url
 		final String url = CALENDAR_URI + "lists/" + taskListId + "/tasks/"

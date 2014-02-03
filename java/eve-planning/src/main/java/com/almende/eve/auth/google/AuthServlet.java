@@ -37,8 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @SuppressWarnings("serial")
 public class AuthServlet extends HttpServlet {
-	private final Logger		logger			= Logger.getLogger(this
-														.getClass()
+	private static final Logger		LOG			= Logger.getLogger(AuthServlet.class
 														.getSimpleName());
 	
 	// Specify the correct client id and secret for web applications
@@ -53,11 +52,11 @@ public class AuthServlet extends HttpServlet {
 	String						REDIRECT_URI	= null;
 	
 	// hard coded uri's
-	private final String		AGENTS_METHOD	= "setAuthorization";
-	private final String		OAUTH_URI		= "https://accounts.google.com/o/oauth2";
-	private final String		CONFIG_FILENAME	= "/WEB-INF/eve.yaml";
-	private final String		SPACE			= " ";
-	private final String		SCOPE			= "https://www.googleapis.com/auth/userinfo.email"
+	private static final String		AGENTS_METHOD	= "setAuthorization";
+	private static final String		OAUTH_URI		= "https://accounts.google.com/o/oauth2";
+	private static final String		CONFIG_FILENAME	= "/WEB-INF/eve.yaml";
+	private static final String		SPACE			= " ";
+	private static final String		SCOPE			= "https://www.googleapis.com/auth/userinfo.email"
 														+ SPACE
 														+ "https://www.googleapis.com/auth/userinfo.profile"
 														+ SPACE
@@ -65,7 +64,7 @@ public class AuthServlet extends HttpServlet {
 														+ SPACE
 														+ "https://www.googleapis.com/auth/tasks";
 	
-	private final ObjectMapper	mapper			= new ObjectMapper();
+	private static final ObjectMapper	MAPPER			= new ObjectMapper();
 	
 	/* (non-Javadoc)
 	 * @see javax.servlet.GenericServlet#init()
@@ -97,7 +96,7 @@ public class AuthServlet extends HttpServlet {
 			if (REDIRECT_URI == null) {
 				REDIRECT_URI = config.get("auth_google_servlet_url");
 				if (REDIRECT_URI != null) {
-					logger.warning("Parameter 'auth_google_servlet_url' is deprecated. "
+					LOG.warning("Parameter 'auth_google_servlet_url' is deprecated. "
 							+ "Use 'google_auth_servlet_url' instead.");
 				}
 			}
@@ -168,12 +167,12 @@ public class AuthServlet extends HttpServlet {
 			
 			if (auth.has("error")) {
 				printPageStart(out);
-				printError(out, mapper.writeValueAsString(auth.get("error")));
+				printError(out, MAPPER.writeValueAsString(auth.get("error")));
 				printPageEnd(out);
 				return;
 			}
 			
-			final ObjectNode stateJson = mapper.readValue(state,
+			final ObjectNode stateJson = MAPPER.readValue(state,
 					ObjectNode.class);
 			final String statusAgentUrl = stateJson.has("agentUrl") ? stateJson
 					.get("agentUrl").asText() : null;
@@ -239,7 +238,7 @@ public class AuthServlet extends HttpServlet {
 		params.put("grant_type", "authorization_code");
 		final String res = HttpUtil.postForm(OAUTH_URI + "/token", params);
 		
-		final ObjectNode json = mapper.readValue(res, ObjectNode.class);
+		final ObjectNode json = MAPPER.readValue(res, ObjectNode.class);
 		return json;
 	}
 	

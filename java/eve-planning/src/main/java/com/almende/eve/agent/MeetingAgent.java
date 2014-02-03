@@ -127,12 +127,12 @@ public class MeetingAgent extends Agent {
 	private static final Logger	LOG								= Logger.getLogger(MeetingAgent.class
 																		.getName());
 	/* number of days to look ahead when planning a meeting */
-	private final int			LOOK_AHEAD_DAYS					= 7;
-	private final Double		WEIGHT_BUSY_OPTIONAL_ATTENDEE	= -1.0;
-	private final Double		WEIGHT_OFFICE_HOURS				= 10.0;
-	private final Double		WEIGHT_PREFERRED_INTERVAL		= 0.1;
-	// private final Double WEIGHT_UNDESIRED_INTERVAL = -0.1;
-	private final Double		WEIGHT_DELAY_PER_DAY			= -0.1;
+	private static final int	LOOK_AHEAD_DAYS					= 7;
+	private static final Double	WEIGHT_BUSY_OPTIONAL_ATTENDEE	= -1.0;
+	private static final Double	WEIGHT_OFFICE_HOURS				= 10.0;
+	private static final Double	WEIGHT_PREFERRED_INTERVAL		= 0.1;
+	// private static final Double WEIGHT_UNDESIRED_INTERVAL = -0.1;
+	private static final Double	WEIGHT_DELAY_PER_DAY			= -0.1;
 	
 	/**
 	 * Convenience method to quickly set a new activity.
@@ -1587,7 +1587,9 @@ public class MeetingAgent extends Agent {
 		return null;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getDescription()
 	 */
 	@Override
@@ -1595,7 +1597,9 @@ public class MeetingAgent extends Agent {
 		return "A MeetingAgent can dynamically plan and manage a meeting.";
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getVersion()
 	 */
 	@Override

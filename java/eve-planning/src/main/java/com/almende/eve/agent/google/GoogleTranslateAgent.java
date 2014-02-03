@@ -45,7 +45,7 @@ import com.almende.util.HttpUtil;
  */
 @Access(AccessType.PUBLIC)
 public class GoogleTranslateAgent extends Agent {
-	static private String	TRANSLATE_API_URL	= "https://www.googleapis.com/language/translate/v2";
+	private static final String	TRANSLATE_API_URL	= "https://www.googleapis.com/language/translate/v2";
 	
 	/**
 	 * Set the API Key for using the paid Google Translate service.
@@ -92,7 +92,9 @@ public class GoogleTranslateAgent extends Agent {
 		return resp;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getVersion()
 	 */
 	@Override
@@ -100,7 +102,9 @@ public class GoogleTranslateAgent extends Agent {
 		return "1.0";
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getDescription()
 	 */
 	@Override

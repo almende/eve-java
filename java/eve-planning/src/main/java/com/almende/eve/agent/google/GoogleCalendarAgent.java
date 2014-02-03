@@ -91,12 +91,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 public class GoogleCalendarAgent extends Agent implements CalendarAgent {
-	// private Logger logger = Logger.getLogger(this.getClass().getName());
-	
+
 	// note: config parameters google.client_id and google.client_secret
 	// are loaded from the eve configuration
-	private final String	OAUTH_URI		= "https://accounts.google.com/o/oauth2";
-	private final String	CALENDAR_URI	= "https://www.googleapis.com/calendar/v3/calendars/";
+	private static final String	OAUTH_URI		= "https://accounts.google.com/o/oauth2";
+	private static final String	CALENDAR_URI	= "https://www.googleapis.com/calendar/v3/calendars/";
 	
 	/**
 	 * Set access token and refresh token, used to authorize the calendar agent.
