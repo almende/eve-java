@@ -9,10 +9,11 @@ import org.joda.time.DateTime;
 
 @SuppressWarnings("serial")
 public class Authorization implements Serializable {
-	public Authorization() {}
+	public Authorization() {
+	}
 	
-	public Authorization(String accessToken, String tokenType, 
-			DateTime expiresAt, String refreshToken) {
+	public Authorization(final String accessToken, final String tokenType,
+			final DateTime expiresAt, final String refreshToken) {
 		this.accessToken = accessToken;
 		this.tokenType = tokenType;
 		this.expiresAt = expiresAt;
@@ -22,37 +23,37 @@ public class Authorization implements Serializable {
 	public String getAccessToken() {
 		return accessToken;
 	}
-
-	public void setAccessToken(String accessToken) {
+	
+	public void setAccessToken(final String accessToken) {
 		this.accessToken = accessToken;
 	}
-
+	
 	public String getRefreshToken() {
 		return refreshToken;
 	}
-
-	public void setRefreshToken(String refreshToken) {
+	
+	public void setRefreshToken(final String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
-
+	
 	public DateTime getExpiresAt() {
 		return expiresAt;
 	}
-
-	public void setExpiresAt(DateTime expiresAt) {
+	
+	public void setExpiresAt(final DateTime expiresAt) {
 		this.expiresAt = expiresAt;
 	}
 	
 	public String getTokenType() {
 		return tokenType;
 	}
-
-	public void setTokenType(String tokenType) {
+	
+	public void setTokenType(final String tokenType) {
 		this.tokenType = tokenType;
 	}
 	
-	private String accessToken = null;
-	private String tokenType = null;
-	private DateTime expiresAt = null;
-	private String refreshToken = null;
+	private String		accessToken		= null;
+	private String		tokenType		= null;
+	private DateTime	expiresAt		= null;
+	private String		refreshToken	= null;
 }

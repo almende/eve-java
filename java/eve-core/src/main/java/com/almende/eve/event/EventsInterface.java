@@ -22,13 +22,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public interface EventsInterface {
 	
 	/**
+	 * Static string EVENT
+	 */
+	static final String	EVENT	= "event";
+	
+	/**
 	 * Get existing even subscriptions for a given event.
 	 * 
 	 * @param event
 	 *            the event
 	 * @return the subscriptions
 	 */
-	List<Callback> getSubscriptions(@Name("event") String event);
+	List<Callback> getSubscriptions(@Name(EVENT) String event);
 	
 	/**
 	 * Subscribe to an event. The provided callback url and method will be
@@ -50,7 +55,7 @@ public interface EventsInterface {
 	 *            the params
 	 * @return subscriptionId
 	 */
-	String createSubscription(@Name("event") String event,
+	String createSubscription(@Name(EVENT) String event,
 			@Name("callbackUrl") String callbackUrl,
 			@Name("callbackMethod") String callbackMethod,
 			@Optional @Name("callbackParams") ObjectNode params);
@@ -76,7 +81,7 @@ public interface EventsInterface {
 	 */
 	void deleteSubscription(
 			@Optional @Name("subscriptionId") String subscriptionId,
-			@Optional @Name("event") String event,
+			@Optional @Name(EVENT) String event,
 			@Optional @Name("callbackUrl") String callbackUrl,
 			@Optional @Name("callbackMethod") String callbackMethod);
 	
@@ -183,7 +188,7 @@ public interface EventsInterface {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	void trigger(@Name("event") String event) throws IOException;
+	void trigger(@Name(EVENT) String event) throws IOException;
 	
 	/**
 	 * Trigger an event.
@@ -196,7 +201,7 @@ public interface EventsInterface {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	void trigger(@Name("event") String event, @Name("params") Object params)
+	void trigger(@Name(EVENT) String event, @Name("params") Object params)
 			throws IOException;
 	
 	/**

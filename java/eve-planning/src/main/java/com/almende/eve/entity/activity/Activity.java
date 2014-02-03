@@ -8,57 +8,59 @@ import org.joda.time.DateTime;
 @SuppressWarnings("serial")
 public class Activity implements Serializable, Cloneable {
 	
-	private String summary = null;
-	private String description= null;
-	private URI agent = null;   // The agent managing the activity
-	private Constraints constraints = null;
-	private Status status = null;
+	private String		summary		= null;
+	private String		description	= null;
+	private URI			agent		= null; // The agent managing the activity
+	private Constraints	constraints	= null;
+	private Status		status		= null;
 	
-	public Activity() {	}
-
-	public void setSummary(String summary) {
+	public Activity() {
+	}
+	
+	public void setSummary(final String summary) {
 		this.summary = summary;
 	}
 	
 	public String getSummary() {
 		return summary;
 	}
-
-	public void setDescription(String description) {
+	
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 	
 	public String getDescription() {
 		return description;
 	}
-
-	public void setAgent(URI agent) {
+	
+	public void setAgent(final URI agent) {
 		this.agent = agent;
 	}
 	
 	public URI getAgent() {
 		return agent;
 	}
-
-	public void setConstraints(Constraints constraints) {
-		this.constraints = constraints != null ? constraints : new Constraints();
+	
+	public void setConstraints(final Constraints constraints) {
+		this.constraints = constraints != null ? constraints
+				: new Constraints();
 	}
-
+	
 	public Constraints getConstraints() {
 		return constraints;
 	}
-
+	
 	public Constraints withConstraints() {
 		if (constraints == null) {
 			constraints = new Constraints();
 		}
 		return constraints;
 	}
-
-	public void setStatus(Status status) {
+	
+	public void setStatus(final Status status) {
 		this.status = status != null ? status : new Status();
 	}
-
+	
 	public Status withStatus() {
 		if (status == null) {
 			status = new Status();
@@ -69,8 +71,8 @@ public class Activity implements Serializable, Cloneable {
 	public Status getStatus() {
 		return status;
 	}
-
-	public void merge(Activity other) {
+	
+	public void merge(final Activity other) {
 		if (other.summary != null) {
 			summary = other.summary;
 		}
@@ -83,24 +85,23 @@ public class Activity implements Serializable, Cloneable {
 		if (other.constraints != null) {
 			if (constraints != null) {
 				constraints.merge(other.constraints);
-			}
-			else {
+			} else {
 				constraints = other.constraints.clone();
 			}
 		}
 		if (other.status != null) {
 			if (status != null) {
 				status.merge(other.status);
-			}
-			else {
+			} else {
 				status = other.status.clone();
 			}
 		}
 		status.merge(other.status);
 	}
 	
+	@Override
 	public Activity clone() {
-		Activity clone = new Activity();
+		final Activity clone = new Activity();
 		
 		clone.summary = summary;
 		clone.description = description;
@@ -117,56 +118,54 @@ public class Activity implements Serializable, Cloneable {
 	
 	/**
 	 * Check if this Activity is updated more recently than an other Activity
+	 * 
 	 * @param other
 	 * @return
 	 */
-	public boolean isNewerThan (Activity other) {
+	public boolean isNewerThan(final Activity other) {
 		DateTime updatedThis = null;
-		if (this.getStatus() != null && this.getStatus().getUpdated() != null) {
-			updatedThis = new DateTime(this.getStatus().getUpdated());
+		if (getStatus() != null && getStatus().getUpdated() != null) {
+			updatedThis = new DateTime(getStatus().getUpdated());
 		}
 		DateTime updatedOther = null;
 		if (other.getStatus() != null && other.getStatus().getUpdated() != null) {
 			updatedOther = new DateTime(other.getStatus().getUpdated());
 		}
-
+		
 		if (updatedOther == null) {
 			// take this as newest
 			return true;
-		}
-		else if (updatedThis == null) {
+		} else if (updatedThis == null) {
 			// take other as newest
 			return false;
-		}
-		else if (updatedThis.isAfter(updatedOther)) {
+		} else if (updatedThis.isAfter(updatedOther)) {
 			// take this as newest
-			return true;	
-		}
-		else {
+			return true;
+		} else {
 			// take other as newest
 			return false;
 		}
 	}
-
+	
 	/**
-	 * Synchronize two activities. 
+	 * Synchronize two activities.
 	 * The newest activity will be merged into a clone of the oldest activity.
+	 * 
 	 * @param a
 	 * @param b
 	 * @return
 	 */
-	public static Activity sync (Activity a, Activity b) {
+	public static Activity sync(final Activity a, final Activity b) {
 		Activity clone;
 		if (a.isNewerThan(b)) {
-			clone = b.clone(); 
+			clone = b.clone();
 			clone.merge(a);
-		}
-		else {
+		} else {
 			clone = a.clone();
 			clone.merge(b);
 		}
-
+		
 		return clone;
 	}
-
+	
 }

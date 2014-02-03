@@ -6,32 +6,34 @@ import com.almende.eve.entity.activity.Constraints;
 
 @SuppressWarnings("serial")
 public class Hint implements Serializable {
-	public Hint() {}
+	public Hint() {
+	}
 	
-	public void setCode(Integer code) {
+	public void setCode(final Integer code) {
 		this.code = code;
 	}
+	
 	public Integer getCode() {
 		return code;
 	}
-
-	public void setMessage(String message) {
+	
+	public void setMessage(final String message) {
 		this.message = message;
 	}
-
+	
 	public String getMessage() {
 		return message;
 	}
-
-	public void setConstraints(Constraints constraints) {
+	
+	public void setConstraints(final Constraints constraints) {
 		this.constraints = constraints;
 	}
-
+	
 	public Constraints getConstraints() {
 		return constraints;
 	}
-
-	private Integer code = null;
-	private String message = null;
-	private Constraints constraints = null;
+	
+	private Integer		code		= null;
+	private String		message		= null;
+	private Constraints	constraints	= null;
 }

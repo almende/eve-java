@@ -11,8 +11,8 @@ import org.joda.time.Interval;
  */
 @SuppressWarnings("serial")
 public class AgentData implements Serializable {
-	public String eventId = null;
-	public String activityUpdated = null;
-	public String eventUpdated = null;
-	public List<Interval> busy = null;
+	public String			eventId			= null;
+	public String			activityUpdated	= null;
+	public String			eventUpdated	= null;
+	public List<Interval>	busy			= null;
 }

@@ -16,11 +16,13 @@ import com.almende.util.TypeUtil;
  */
 public final class YamlConfig {
 	
+	private YamlConfig(){}
+	
 	/**
 	 * @param inputStream
 	 * @return Map<String,Object> filled with configuration data.
 	 */
-	public static final Map<String, Object> load(final InputStream inputStream) {
+	public static Map<String, Object> load(final InputStream inputStream) {
 		TypeUtil<Map<String, Object>> typeUtil = new TypeUtil<Map<String, Object>>(){};
 		final Yaml yaml = new Yaml();
 		return typeUtil.inject(yaml.loadAs(inputStream, Map.class));

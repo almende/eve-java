@@ -169,11 +169,12 @@ public class Config implements EveConfig {
 	/**
 	 * Map.
 	 * 
-	 * @param result
-	 *            the result
-	 * @return the string
+	 * @param input
+	 *            the input
+	 * @return the result with replaced labels.
 	 */
-	public static String map(String result) {
+	public static String map(final String input) {
+		String result = input;
 		if (LABELS.containsKey(result.toLowerCase())) {
 			result = LABELS.get(result.toLowerCase());
 		}

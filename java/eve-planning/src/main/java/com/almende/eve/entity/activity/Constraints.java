@@ -6,7 +6,8 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class Constraints implements Serializable, Cloneable {
-	public Constraints () {	}
+	public Constraints() {
+	}
 	
 	public List<Attendee> withAttendees() {
 		if (attendees == null) {
@@ -19,21 +20,22 @@ public class Constraints implements Serializable, Cloneable {
 		return attendees;
 	}
 	
-	public void setAttendees(List<Attendee> attendees) {
+	public void setAttendees(final List<Attendee> attendees) {
 		this.attendees = attendees;
 	}
 	
-	public Attendee withAttendee(String agent) {
+	public Attendee withAttendee(final String agent) {
 		Attendee attendee = getAttendee(agent);
 		if (attendee == null) {
 			attendee = new Attendee();
-			attendee.setAgent(agent);		}
+			attendee.setAgent(agent);
+		}
 		return attendee;
 	}
 	
-	public Attendee getAttendee(String agent) {
+	public Attendee getAttendee(final String agent) {
 		if (attendees != null) {
-			for (Attendee attendee : attendees) {
+			for (final Attendee attendee : attendees) {
 				if (attendee.getAgent().equals(agent)) {
 					return attendee;
 				}
@@ -53,7 +55,7 @@ public class Constraints implements Serializable, Cloneable {
 		return location;
 	}
 	
-	public void setLocation(Location location) {
+	public void setLocation(final Location location) {
 		this.location = location;
 	}
 	
@@ -68,7 +70,7 @@ public class Constraints implements Serializable, Cloneable {
 		return time;
 	}
 	
-	public void setTime(Time time) {
+	public void setTime(final Time time) {
 		this.time = time;
 	}
 	
@@ -76,12 +78,13 @@ public class Constraints implements Serializable, Cloneable {
 	 * Merge two Constraints objects.
 	 * Note that the complete attendee list will be replaced if other.attendees
 	 * is defined
+	 * 
 	 * @param other
 	 */
-	public void merge(Constraints other) {
+	public void merge(final Constraints other) {
 		if (other.attendees != null) {
 			attendees = new ArrayList<Attendee>();
-			for (Attendee attendee : other.attendees) {
+			for (final Attendee attendee : other.attendees) {
 				attendees.add(attendee != null ? attendee.clone() : null);
 			}
 		}
@@ -89,8 +92,7 @@ public class Constraints implements Serializable, Cloneable {
 		if (other.location != null) {
 			if (location != null) {
 				location.merge(other.location);
-			}
-			else {
+			} else {
 				location = other.location.clone();
 			}
 		}
@@ -98,19 +100,19 @@ public class Constraints implements Serializable, Cloneable {
 		if (other.time != null) {
 			if (time != null) {
 				time.merge(other.time);
-			}
-			else {
+			} else {
 				time = other.time.clone();
 			}
 		}
 	}
 	
+	@Override
 	public Constraints clone() {
-		Constraints clone = new Constraints ();
+		final Constraints clone = new Constraints();
 		
 		if (attendees != null) {
 			clone.attendees = new ArrayList<Attendee>();
-			for (Attendee attendee : attendees) {
+			for (final Attendee attendee : attendees) {
 				clone.attendees.add(attendee != null ? attendee.clone() : null);
 			}
 		}
@@ -124,7 +126,7 @@ public class Constraints implements Serializable, Cloneable {
 		return clone;
 	}
 	
-	private List<Attendee> attendees = null;
-	private Location location = null;
-	private Time time = null;
+	private List<Attendee>	attendees	= null;
+	private Location		location	= null;
+	private Time			time		= null;
 }
