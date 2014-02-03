@@ -40,6 +40,9 @@ import com.almende.eve.rpc.annotation.Name;
 import com.almende.eve.rpc.annotation.Optional;
 import com.almende.util.HttpUtil;
 
+/**
+ * The Class GoogleTranslateAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class GoogleTranslateAgent extends Agent {
 	static private String	TRANSLATE_API_URL	= "https://www.googleapis.com/language/translate/v2";
@@ -48,13 +51,14 @@ public class GoogleTranslateAgent extends Agent {
 	 * Set the API Key for using the paid Google Translate service.
 	 * 
 	 * @param key
+	 *            the new key
 	 */
 	public void setKey(@Name("key") final String key) {
 		getState().put("key", key);
 	}
 	
 	/**
-	 * Translate text
+	 * Translate text.
 	 * 
 	 * @param text
 	 *            The text to be translated
@@ -62,8 +66,9 @@ public class GoogleTranslateAgent extends Agent {
 	 *            The target language code, for example "en"
 	 * @param source
 	 *            The source language code, for example "nl". Optional
-	 * @return
+	 * @return the string
 	 * @throws Exception
+	 *             the exception
 	 */
 	public String translate(@Name("text") final String text,
 			@Name("target") final String target,
@@ -87,11 +92,17 @@ public class GoogleTranslateAgent extends Agent {
 		return resp;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getVersion()
+	 */
 	@Override
 	public String getVersion() {
 		return "1.0";
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getDescription()
+	 */
 	@Override
 	public String getDescription() {
 		return "GoogleTranslateAgent can translate text, "

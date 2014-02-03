@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.entity.activity;
 
 import java.io.Serializable;
@@ -5,6 +9,9 @@ import java.net.URI;
 
 import org.joda.time.DateTime;
 
+/**
+ * The Class Activity.
+ */
 @SuppressWarnings("serial")
 public class Activity implements Serializable, Cloneable {
 	
@@ -14,42 +21,94 @@ public class Activity implements Serializable, Cloneable {
 	private Constraints	constraints	= null;
 	private Status		status		= null;
 	
+	/**
+	 * Instantiates a new activity.
+	 */
 	public Activity() {
 	}
 	
+	/**
+	 * Sets the summary.
+	 * 
+	 * @param summary
+	 *            the new summary
+	 */
 	public void setSummary(final String summary) {
 		this.summary = summary;
 	}
 	
+	/**
+	 * Gets the summary.
+	 * 
+	 * @return the summary
+	 */
 	public String getSummary() {
 		return summary;
 	}
 	
+	/**
+	 * Sets the description.
+	 * 
+	 * @param description
+	 *            the new description
+	 */
 	public void setDescription(final String description) {
 		this.description = description;
 	}
 	
+	/**
+	 * Gets the description.
+	 * 
+	 * @return the description
+	 */
 	public String getDescription() {
 		return description;
 	}
 	
+	/**
+	 * Sets the agent.
+	 * 
+	 * @param agent
+	 *            the new agent
+	 */
 	public void setAgent(final URI agent) {
 		this.agent = agent;
 	}
 	
+	/**
+	 * Gets the agent.
+	 * 
+	 * @return the agent
+	 */
 	public URI getAgent() {
 		return agent;
 	}
 	
+	/**
+	 * Sets the constraints.
+	 * 
+	 * @param constraints
+	 *            the new constraints
+	 */
 	public void setConstraints(final Constraints constraints) {
 		this.constraints = constraints != null ? constraints
 				: new Constraints();
 	}
 	
+	/**
+	 * Gets the constraints.
+	 * 
+	 * @return the constraints
+	 */
 	public Constraints getConstraints() {
 		return constraints;
 	}
 	
+	/**
+	 * With constraints.
+	 * 
+	 * @return the constraints
+	 */
 	public Constraints withConstraints() {
 		if (constraints == null) {
 			constraints = new Constraints();
@@ -57,10 +116,21 @@ public class Activity implements Serializable, Cloneable {
 		return constraints;
 	}
 	
+	/**
+	 * Sets the status.
+	 * 
+	 * @param status
+	 *            the new status
+	 */
 	public void setStatus(final Status status) {
 		this.status = status != null ? status : new Status();
 	}
 	
+	/**
+	 * With status.
+	 * 
+	 * @return the status
+	 */
 	public Status withStatus() {
 		if (status == null) {
 			status = new Status();
@@ -68,10 +138,21 @@ public class Activity implements Serializable, Cloneable {
 		return status;
 	}
 	
+	/**
+	 * Gets the status.
+	 * 
+	 * @return the status
+	 */
 	public Status getStatus() {
 		return status;
 	}
 	
+	/**
+	 * Merge.
+	 * 
+	 * @param other
+	 *            the other
+	 */
 	public void merge(final Activity other) {
 		if (other.summary != null) {
 			summary = other.summary;
@@ -99,6 +180,9 @@ public class Activity implements Serializable, Cloneable {
 		status.merge(other.status);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	public Activity clone() {
 		final Activity clone = new Activity();
@@ -117,10 +201,11 @@ public class Activity implements Serializable, Cloneable {
 	}
 	
 	/**
-	 * Check if this Activity is updated more recently than an other Activity
+	 * Check if this Activity is updated more recently than an other Activity.
 	 * 
 	 * @param other
-	 * @return
+	 *            the other
+	 * @return true, if is newer than
 	 */
 	public boolean isNewerThan(final Activity other) {
 		DateTime updatedThis = null;
@@ -152,8 +237,10 @@ public class Activity implements Serializable, Cloneable {
 	 * The newest activity will be merged into a clone of the oldest activity.
 	 * 
 	 * @param a
+	 *            the a
 	 * @param b
-	 * @return
+	 *            the b
+	 * @return the activity
 	 */
 	public static Activity sync(final Activity a, final Activity b) {
 		Activity clone;

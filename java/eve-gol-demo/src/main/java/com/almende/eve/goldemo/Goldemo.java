@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.goldemo;
 
 import java.io.BufferedReader;
@@ -10,12 +14,38 @@ import java.util.HashMap;
 import com.almende.eve.agent.AgentHost;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 
+/**
+ * The Class Goldemo.
+ */
 public class Goldemo {
 	// final static String BASE = "inproc://";
 	// final static String BASE = "ipc:///tmp/zmq-socket-";
 	// final static String PATH = "zmq:"+BASE;	
+	/**
+	 * The Constant PATH.
+	 */
 	final static String	PATH	= "local:";
 	
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            the arguments
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 */
 	public static void main(String[] args) throws IOException,
 			JSONRPCException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,
@@ -134,6 +164,34 @@ public class Goldemo {
 		System.exit(0);
 	}
 	
+	/**
+	 * Creates the agent.
+	 * 
+	 * @param host
+	 *            the host
+	 * @param N
+	 *            the n
+	 * @param M
+	 *            the m
+	 * @param cN
+	 *            the c n
+	 * @param cM
+	 *            the c m
+	 * @param state
+	 *            the state
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public static void createAgent(AgentHost host, int N, int M, int cN,
 			int cM, boolean state) throws JSONRPCException,
 			InstantiationException, IllegalAccessException,

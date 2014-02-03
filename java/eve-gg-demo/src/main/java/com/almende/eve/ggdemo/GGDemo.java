@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.ggdemo;
 
 import java.io.IOException;
@@ -8,18 +12,32 @@ import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.scheduler.ClockSchedulerFactory;
 import com.almende.eve.state.MemoryStateFactory;
 
+/**
+ * The Class GGDemo.
+ */
 public class GGDemo {
 	
 	/**
+	 * The main method.
+	 * 
 	 * @param args
-	 * @throws IOException
-	 * @throws NoSuchMethodException
-	 * @throws InvocationTargetException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
+	 *            the arguments
 	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 * @throws InterruptedException
+	 *             the interrupted exception
 	 */
 	public static void main(String[] args) throws JSONRPCException,
 			InstantiationException, IllegalAccessException,

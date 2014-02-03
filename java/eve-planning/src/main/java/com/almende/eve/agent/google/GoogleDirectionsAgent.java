@@ -47,8 +47,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class GoogleDirectionsAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class GoogleDirectionsAgent extends Agent {
+	
+	/**
+	 * The Constant DIRECTIONS_SERVICE_URL.
+	 */
 	static final String	DIRECTIONS_SERVICE_URL	= "http://maps.googleapis.com/maps/api/directions/json";
 	
 	// TODO: get https working - requires SSL certificate
@@ -72,6 +79,23 @@ public class GoogleDirectionsAgent extends Agent {
 	// private static String keyString =
 	// "ABQIAAAAQOJzPEiBDTDlB2oHxRVmTxRSrjmNg-hdT5E1_a3uQ7J2AKkR7hTFenoJvK-F_h8dho7B4VXJZx1pdg";
 	
+	/**
+	 * Gets the directions.
+	 * 
+	 * @param origin
+	 *            the origin
+	 * @param destination
+	 *            the destination
+	 * @return the directions
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws InvalidKeyException
+	 *             the invalid key exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
+	 */
 	public ObjectNode getDirections(@Name("origin") final String origin,
 			@Name("destination") final String destination) throws IOException,
 			InvalidKeyException, NoSuchAlgorithmException, URISyntaxException {
@@ -135,13 +159,18 @@ public class GoogleDirectionsAgent extends Agent {
 	 * in seconds.
 	 * 
 	 * @param origin
+	 *            the origin
 	 * @param destination
+	 *            the destination
 	 * @return duration Duration in seconds
 	 * @throws IOException
-	 * @throws JSONException
-	 * @throws URISyntaxException
-	 * @throws NoSuchAlgorithmException
+	 *             Signals that an I/O exception has occurred.
 	 * @throws InvalidKeyException
+	 *             the invalid key exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
 	 */
 	public Integer getDuration(@Name("origin") final String origin,
 			@Name("destination") final String destination) throws IOException,
@@ -161,16 +190,21 @@ public class GoogleDirectionsAgent extends Agent {
 	
 	/**
 	 * Retrieve the duration of the directions from origin to destination
-	 * in readable text, for example "59 mins"
+	 * in readable text, for example "59 mins".
 	 * 
 	 * @param origin
+	 *            the origin
 	 * @param destination
+	 *            the destination
 	 * @return duration Duration in text
 	 * @throws IOException
-	 * @throws JSONException
-	 * @throws URISyntaxException
-	 * @throws NoSuchAlgorithmException
+	 *             Signals that an I/O exception has occurred.
 	 * @throws InvalidKeyException
+	 *             the invalid key exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
 	 */
 	public String getDurationHuman(@Name("origin") final String origin,
 			@Name("destination") final String destination) throws IOException,
@@ -189,16 +223,21 @@ public class GoogleDirectionsAgent extends Agent {
 	}
 	
 	/**
-	 * Retrieve the distance between origin to destination in meters
+	 * Retrieve the distance between origin to destination in meters.
 	 * 
 	 * @param origin
+	 *            the origin
 	 * @param destination
+	 *            the destination
 	 * @return duration Distance in meters
 	 * @throws IOException
-	 * @throws JSONException
-	 * @throws URISyntaxException
-	 * @throws NoSuchAlgorithmException
+	 *             Signals that an I/O exception has occurred.
 	 * @throws InvalidKeyException
+	 *             the invalid key exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
 	 */
 	public Integer getDistance(@Name("origin") final String origin,
 			@Name("destination") final String destination) throws IOException,
@@ -221,13 +260,18 @@ public class GoogleDirectionsAgent extends Agent {
 	 * for example "74.2 km"
 	 * 
 	 * @param origin
+	 *            the origin
 	 * @param destination
+	 *            the destination
 	 * @return duration Distance in meters
 	 * @throws IOException
-	 * @throws JSONException
-	 * @throws URISyntaxException
-	 * @throws NoSuchAlgorithmException
+	 *             Signals that an I/O exception has occurred.
 	 * @throws InvalidKeyException
+	 *             the invalid key exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
 	 */
 	public String getDistanceHuman(@Name("origin") final String origin,
 			@Name("destination") final String destination) throws IOException,
@@ -245,11 +289,17 @@ public class GoogleDirectionsAgent extends Agent {
 		return distance;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getVersion()
+	 */
 	@Override
 	public String getVersion() {
 		return "0.1";
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getDescription()
+	 */
 	@Override
 	public String getDescription() {
 		return "This agent is capable of providing directions information "

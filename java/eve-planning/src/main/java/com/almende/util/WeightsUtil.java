@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.util;
 
 import java.util.ArrayList;
@@ -10,15 +14,17 @@ import org.joda.time.DateTime;
 import com.almende.eve.entity.Weight;
 
 /**
+ * The Class WeightsUtil.
+ * 
  * @class WeightsUtil
  *        Can order and merge a list with weights: intervals in time with a
  *        weight
- * 
  * @author Jos de Jong, Almende B.V. 2012
  */
 public class WeightsUtil {
+	
 	/**
-	 * Order the intervals by start date
+	 * Order the intervals by start date.
 	 * 
 	 * @param intervals
 	 *            A list with time intervals
@@ -42,10 +48,11 @@ public class WeightsUtil {
 	}
 	
 	/**
-	 * Merge overlapping weighted intervals in given list
+	 * Merge overlapping weighted intervals in given list.
 	 * 
 	 * @param intervals
-	 * @return
+	 *            the intervals
+	 * @return the list
 	 */
 	public static List<Weight> merge(final List<Weight> intervals) {
 		// copy the intervals
@@ -136,9 +143,11 @@ public class WeightsUtil {
 					merged.add(i, interval);
 					interval = null;
 					i++;
-				} else {
-					// interval is after merged interval. check the next merged
-					// interval in the list
+					/*
+					 * } else {
+					 * interval is after merged interval. check the next merged
+					 * interval in the list
+					 */
 				}
 				
 				i++;
@@ -173,6 +182,12 @@ public class WeightsUtil {
 	}
 	
 	// TODO: move tests to a unittest
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            the arguments
+	 */
 	public static void main(final String[] args) {
 		final List<Weight> intervals = new ArrayList<Weight>();
 		

@@ -47,9 +47,18 @@ public class AgentServlet extends HttpServlet {
 	private AgentHost			host;
 	private HttpService			httpTransport = null;
 	
+	/**
+	 * Instantiates a new agent servlet.
+	 */
 	public AgentServlet() {
 	};
 	
+	/**
+	 * Instantiates a new agent servlet.
+	 * 
+	 * @param transport
+	 *            the transport
+	 */
 	public AgentServlet(final HttpService transport) {
 		httpTransport = transport;
 	};
@@ -357,6 +366,7 @@ public class AgentServlet extends HttpServlet {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 * @throws ServletException
+	 *             the servlet exception
 	 */
 	@Override
 	public void doPost(final HttpServletRequest req,

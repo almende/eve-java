@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.agent.google;
 
 import java.io.IOException;
@@ -25,6 +29,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class GoogleTaskAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class GoogleTaskAgent extends Agent implements TaskAgent {
 	private final Logger	logger			= Logger.getLogger(this.getClass()
@@ -38,10 +45,15 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	 * These tokens must be retrieved via Oauth 2.0 authorization.
 	 * 
 	 * @param access_token
+	 *            the access_token
 	 * @param token_type
+	 *            the token_type
 	 * @param expires_in
+	 *            the expires_in
 	 * @param refresh_token
+	 *            the refresh_token
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public void setAuthorization(
 			@Name("access_token") final String access_token,
@@ -182,7 +194,9 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Get the calendar agents version
+	 * Get the calendar agents version.
+	 * 
+	 * @return the description
 	 */
 	@Override
 	public String getDescription() {
@@ -192,7 +206,9 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Get the calendar agents description
+	 * Get the calendar agents description.
+	 * 
+	 * @return the version
 	 */
 	@Override
 	public String getVersion() {
@@ -200,7 +216,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Get the username associated with the tasks
+	 * Get the username associated with the tasks.
 	 * 
 	 * @return name
 	 */
@@ -210,7 +226,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Get the email associated with the tasks
+	 * Get the email associated with the tasks.
 	 * 
 	 * @return name
 	 */
@@ -251,11 +267,13 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Create a task list
+	 * Create a task list.
 	 * 
 	 * @param taskList
 	 *            JSON structure containing a taskList
 	 * @return JSON sturcture with created tasklist
+	 * @throws Exception
+	 *             the exception
 	 */
 	public ObjectNode createTaskList(@Name("taskList") final ObjectNode taskList)
 			throws Exception {
@@ -284,7 +302,11 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Retrieve a list with all task lists in this google tasks
+	 * Retrieve a list with all task lists in this google tasks.
+	 * 
+	 * @return the task list
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public ArrayNode getTaskList() throws Exception {
@@ -311,15 +333,17 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Retrieve a list of task on a certain task list
+	 * Retrieve a list of task on a certain task list.
 	 * 
 	 * @param dueMin
 	 *            Minimal due time (optional)
 	 * @param dueMax
 	 *            Maximal due time (optional)
-	 * @param calendarId
-	 *            Optional task listid. the default task list is
-	 *            used by default
+	 * @param taskListId
+	 *            the task list id
+	 * @return the tasks
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public ArrayNode getTasks(@Optional @Name("dueMin") final String dueMin,
@@ -378,13 +402,15 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Get a single task by id
+	 * Get a single task by id.
 	 * 
 	 * @param taskId
 	 *            Id of the task
-	 * @param taksListId
-	 *            Optional task listid. the default task list is
-	 *            used by default
+	 * @param taskListId
+	 *            the task list id
+	 * @return the task
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public ObjectNode getTask(@Name("taskId") final String taskId,
@@ -430,14 +456,15 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Create a task
+	 * Create a task.
 	 * 
 	 * @param task
 	 *            JSON structure containing the task
-	 * @param taksListId
-	 *            Optional task listid. the default task list is
-	 *            used by default
+	 * @param taskListId
+	 *            the task list id
 	 * @return createdTask JSON structure with the created task
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public ObjectNode createTask(@Name("task") final ObjectNode task,
@@ -470,15 +497,16 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Update an existing task
+	 * Update an existing task.
 	 * 
 	 * @param task
 	 *            JSON structure containing the task
 	 *            (task must have an id)
-	 * @param taksListId
-	 *            Optional task listid. the default task list is
-	 *            used by default
+	 * @param taskListId
+	 *            the task list id
 	 * @return updatedTask JSON structure with the updated task
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public ObjectNode updateTask(@Name("task") final ObjectNode task,
@@ -519,13 +547,14 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Delete an existing task
+	 * Delete an existing task.
 	 * 
 	 * @param taskId
 	 *            id of the task to be deleted
-	 * @param taksListId
-	 *            Optional task listid. the default task list is
-	 *            used by default
+	 * @param taskListId
+	 *            the task list id
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Override
 	public void deleteTask(@Name("taskId") final String taskId,
@@ -550,7 +579,7 @@ public class GoogleTaskAgent extends Agent implements TaskAgent {
 	}
 	
 	/**
-	 * Remove all stored data from this agent
+	 * Remove all stored data from this agent.
 	 */
 	public void clear() {
 		final State state = getState();

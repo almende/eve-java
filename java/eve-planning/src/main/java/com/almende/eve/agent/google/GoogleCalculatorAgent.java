@@ -42,6 +42,9 @@ import com.almende.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class GoogleCalculatorAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class GoogleCalculatorAgent extends Agent {
 	static private String	CALC_API_URL	= "http://www.google.com/ig/calculator";
@@ -51,8 +54,10 @@ public class GoogleCalculatorAgent extends Agent {
 	 * For example expr="2.5 + 3 / sqrt(16)" will return "3.25"
 	 * 
 	 * @param expr
+	 *            the expr
 	 * @return result
 	 * @throws Exception
+	 *             the exception
 	 */
 	public String eval(@Name("expr") final String expr) throws Exception {
 		final String url = CALC_API_URL + "?q="
@@ -77,11 +82,17 @@ public class GoogleCalculatorAgent extends Agent {
 		return rhs;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getVersion()
+	 */
 	@Override
 	public String getVersion() {
 		return "1.0";
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getDescription()
+	 */
 	@Override
 	public String getDescription() {
 		return "GoogleCalculatorEvent can evaluate mathematical expressions. "

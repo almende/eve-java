@@ -1,14 +1,30 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.entity.activity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Class Constraints.
+ */
 @SuppressWarnings("serial")
 public class Constraints implements Serializable, Cloneable {
+	
+	/**
+	 * Instantiates a new constraints.
+	 */
 	public Constraints() {
 	}
 	
+	/**
+	 * With attendees.
+	 * 
+	 * @return the list
+	 */
 	public List<Attendee> withAttendees() {
 		if (attendees == null) {
 			attendees = new ArrayList<Attendee>();
@@ -16,14 +32,32 @@ public class Constraints implements Serializable, Cloneable {
 		return attendees;
 	}
 	
+	/**
+	 * Gets the attendees.
+	 * 
+	 * @return the attendees
+	 */
 	public List<Attendee> getAttendees() {
 		return attendees;
 	}
 	
+	/**
+	 * Sets the attendees.
+	 * 
+	 * @param attendees
+	 *            the new attendees
+	 */
 	public void setAttendees(final List<Attendee> attendees) {
 		this.attendees = attendees;
 	}
 	
+	/**
+	 * With attendee.
+	 * 
+	 * @param agent
+	 *            the agent
+	 * @return the attendee
+	 */
 	public Attendee withAttendee(final String agent) {
 		Attendee attendee = getAttendee(agent);
 		if (attendee == null) {
@@ -33,6 +67,13 @@ public class Constraints implements Serializable, Cloneable {
 		return attendee;
 	}
 	
+	/**
+	 * Gets the attendee.
+	 * 
+	 * @param agent
+	 *            the agent
+	 * @return the attendee
+	 */
 	public Attendee getAttendee(final String agent) {
 		if (attendees != null) {
 			for (final Attendee attendee : attendees) {
@@ -44,6 +85,11 @@ public class Constraints implements Serializable, Cloneable {
 		return null;
 	}
 	
+	/**
+	 * With location.
+	 * 
+	 * @return the location
+	 */
 	public Location withLocation() {
 		if (location == null) {
 			location = new Location();
@@ -51,14 +97,30 @@ public class Constraints implements Serializable, Cloneable {
 		return location;
 	}
 	
+	/**
+	 * Gets the location.
+	 * 
+	 * @return the location
+	 */
 	public Location getLocation() {
 		return location;
 	}
 	
+	/**
+	 * Sets the location.
+	 * 
+	 * @param location
+	 *            the new location
+	 */
 	public void setLocation(final Location location) {
 		this.location = location;
 	}
 	
+	/**
+	 * With time.
+	 * 
+	 * @return the time
+	 */
 	public Time withTime() {
 		if (time == null) {
 			time = new Time();
@@ -66,10 +128,21 @@ public class Constraints implements Serializable, Cloneable {
 		return time;
 	}
 	
+	/**
+	 * Gets the time.
+	 * 
+	 * @return the time
+	 */
 	public Time getTime() {
 		return time;
 	}
 	
+	/**
+	 * Sets the time.
+	 * 
+	 * @param time
+	 *            the new time
+	 */
 	public void setTime(final Time time) {
 		this.time = time;
 	}
@@ -80,6 +153,7 @@ public class Constraints implements Serializable, Cloneable {
 	 * is defined
 	 * 
 	 * @param other
+	 *            the other
 	 */
 	public void merge(final Constraints other) {
 		if (other.attendees != null) {
@@ -106,6 +180,9 @@ public class Constraints implements Serializable, Cloneable {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	public Constraints clone() {
 		final Constraints clone = new Constraints();

@@ -71,24 +71,29 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Class HttpUtil.
+ */
 public final class HttpUtil {
 	
 	private HttpUtil() {
 	};
 	
 	/**
-	 * Send a get request
+	 * Send a get request.
 	 * 
 	 * @param url
+	 *            the url
 	 * @return response
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String get(final String url) throws IOException {
 		return get(url, null);
 	}
 	
 	/**
-	 * Send a get request
+	 * Send a get request.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -96,6 +101,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String get(final String url, final Map<String, String> headers)
 			throws IOException {
@@ -103,7 +109,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a post request
+	 * Send a post request.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -113,6 +119,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String post(final String url, final String body,
 			final Map<String, String> headers) throws IOException {
@@ -120,7 +127,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a post request
+	 * Send a post request.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -128,6 +135,7 @@ public final class HttpUtil {
 	 *            Request body as string
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String post(final String url, final String body)
 			throws IOException {
@@ -135,7 +143,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Post a form with parameters
+	 * Post a form with parameters.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -143,6 +151,7 @@ public final class HttpUtil {
 	 *            map with parameters/values
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String postForm(final String url,
 			final Map<String, String> params) throws IOException {
@@ -150,7 +159,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Post a form with parameters
+	 * Post a form with parameters.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -160,6 +169,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String postForm(final String url,
 			final Map<String, String> params, Map<String, String> headers)
@@ -190,7 +200,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a put request
+	 * Send a put request.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -200,6 +210,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String put(final String url, final String body,
 			final Map<String, String> headers) throws IOException {
@@ -207,12 +218,15 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a put request
+	 * Send a put request.
 	 * 
 	 * @param url
 	 *            Url as string
+	 * @param body
+	 *            the body
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String put(final String url, final String body)
 			throws IOException {
@@ -220,7 +234,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a delete request
+	 * Send a delete request.
 	 * 
 	 * @param url
 	 *            Url as string
@@ -228,6 +242,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String delete(final String url,
 			final Map<String, String> headers) throws IOException {
@@ -235,26 +250,28 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a delete request
+	 * Send a delete request.
 	 * 
 	 * @param url
 	 *            Url as string
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String delete(final String url) throws IOException {
 		return delete(url, null);
 	}
 	
 	/**
-	 * Append query parameters to given url
+	 * Append query parameters to given url.
 	 * 
-	 * @param url
-	 *            Url as string
+	 * @param fullUrl
+	 *            the full url
 	 * @param params
 	 *            Map with query parameters
 	 * @return url Url with query parameters appended
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String appendQueryParams(String fullUrl,
 			final Map<String, String> params) throws IOException {
@@ -278,12 +295,13 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Retrieve the query parameters from given url
+	 * Retrieve the query parameters from given url.
 	 * 
 	 * @param url
 	 *            Url containing query parameters
 	 * @return params Map with query parameters
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static Map<String, String> getQueryParams(final String url)
 			throws IOException {
@@ -367,8 +385,8 @@ public final class HttpUtil {
 	 * 
 	 * @param template
 	 *            A template url
-	 * @param url
-	 *            A url with parameters
+	 * @param params
+	 *            the params
 	 * @return params A map with all parameters defined in the template,
 	 *         with the value found in the url as value (can be null)
 	 */
@@ -425,12 +443,13 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Returns the url without query parameters
+	 * Returns the url without query parameters.
 	 * 
 	 * @param url
 	 *            Url containing query parameters
 	 * @return url Url without query parameters
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String removeQueryParams(final String url) throws IOException {
 		final int q = url.indexOf('?');
@@ -442,7 +461,7 @@ public final class HttpUtil {
 	}
 	
 	/**
-	 * Send a request
+	 * Send a request.
 	 * 
 	 * @param method
 	 *            HTTP method, for example "GET" or "POST"
@@ -454,6 +473,7 @@ public final class HttpUtil {
 	 *            Optional map with headers
 	 * @return response Response as string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String fetch(final String method, final String url,
 			final String body, final Map<String, String> headers)

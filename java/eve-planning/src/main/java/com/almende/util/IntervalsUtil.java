@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.util;
 
 import java.util.ArrayList;
@@ -13,14 +17,16 @@ import org.joda.time.Interval;
 import org.joda.time.MutableDateTime;
 
 /**
+ * The Class IntervalsUtil.
+ * 
  * @class IntervalUtil
  *        Can order and merge a list with intervals
- * 
  * @author Jos de Jong, Almende B.V. 2012
  */
 public class IntervalsUtil {
+	
 	/**
-	 * Order the intervals by start date
+	 * Order the intervals by start date.
 	 * 
 	 * @param intervals
 	 *            A list with time intervals
@@ -44,10 +50,11 @@ public class IntervalsUtil {
 	}
 	
 	/**
-	 * Merge overlapping intervals in given list
+	 * Merge overlapping intervals in given list.
 	 * 
 	 * @param intervals
-	 * @return
+	 *            the intervals
+	 * @return the list
 	 */
 	public static List<Interval> merge(final List<Interval> intervals) {
 		// copy the intervals
@@ -93,6 +100,7 @@ public class IntervalsUtil {
 	 * (to ensure all of this is ok, put the intervals through the method merge)
 	 * 
 	 * @param intervals
+	 *            the intervals
 	 * @param timeMin
 	 *            Optional start time of the intervals. If the first
 	 *            interval starts after timeMin, a gap from timeMin to
@@ -101,7 +109,7 @@ public class IntervalsUtil {
 	 *            Optional end time of the intervals. If the last
 	 *            interval ends before timeMax, a gap from the last
 	 *            interval to timeMax will be added to the inverse
-	 * @return
+	 * @return the list
 	 */
 	public static List<Interval> inverse(final List<Interval> intervals,
 			final DateTime timeMin, final DateTime timeMax) {
@@ -148,10 +156,12 @@ public class IntervalsUtil {
 	
 	/**
 	 * check if interval to be checked overlaps with any any of the intervals
-	 * in given list
+	 * in given list.
 	 * 
-	 * @param intervals
 	 * @param checkInterval
+	 *            the check interval
+	 * @param intervals
+	 *            the intervals
 	 * @return isOverlapping
 	 */
 	public static boolean overlaps(final Interval checkInterval,
@@ -171,7 +181,9 @@ public class IntervalsUtil {
 	 * time zone CET.
 	 * 
 	 * @param timeMin
+	 *            the time min
 	 * @param timeMax
+	 *            the time max
 	 * @return available
 	 */
 	public static List<Interval> getOfficeHours(final DateTime timeMin,
@@ -199,13 +211,15 @@ public class IntervalsUtil {
 	 * the available hours, inside office hours.
 	 * 
 	 * @param timeMin
+	 *            the time min
 	 * @param timeMax
+	 *            the time max
 	 * @param workingDays
 	 *            Set with working days. 1 = Monday, 7 = Sunday
 	 * @param hourStart
-	 *            start hour, for example 9
-	 * @param hourStart
 	 *            end hour, for example 17
+	 * @param hourEnd
+	 *            the hour end
 	 * @param timeZone
 	 *            the timezone to be used to determine the working hours
 	 * @return available

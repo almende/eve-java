@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.transport.http.embed;
 
 import java.net.URI;
@@ -15,12 +19,21 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import com.almende.eve.config.Config;
 import com.almende.eve.transport.http.ServletLauncher;
 
+/**
+ * The Class JettyLauncher.
+ */
 public class JettyLauncher implements ServletLauncher {
 	private static final Logger				LOG		= Logger.getLogger(JettyLauncher.class
 															.getName());
 	private static Server					server	= null;
 	private static ServletContextHandler	context	= null;
 	
+	/**
+	 * Inits the server.
+	 * 
+	 * @param params
+	 *            the params
+	 */
 	public void initServer(final Map<String, Object> params) {
 		int port = 8080;
 		if (params != null && params.containsKey("port")) {
@@ -40,6 +53,9 @@ public class JettyLauncher implements ServletLauncher {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet, java.net.URI, com.almende.eve.config.Config)
+	 */
 	@SuppressWarnings("unchecked")
 	public void add(final Servlet servlet, final URI servletPath,
 			final Config config) {

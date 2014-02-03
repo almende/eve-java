@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.ggdemo;
 
 import java.io.IOException;
@@ -16,9 +20,34 @@ import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class DemoAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class DemoAgent extends Agent {
 	
+	/**
+	 * Start goal.
+	 * 
+	 * @param goal
+	 *            the goal
+	 * @param startLamp
+	 *            the start lamp
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public void startGoal(@Name("goal") Goal goal,
 			@Name("startLamp") String startLamp) throws JSONRPCException,
 			ClassNotFoundException, InstantiationException,
@@ -28,6 +57,32 @@ public class DemoAgent extends Agent {
 		firstLamp.handleGoal(goal, "");
 	}
 	
+	/**
+	 * Gen topology.
+	 * 
+	 * @param type
+	 *            the type
+	 * @param agentCount
+	 *            the agent count
+	 * @param stepSize
+	 *            the step size
+	 * @param agentType
+	 *            the agent type
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 */
 	public void genTopology(@Name("type") String type,
 			@Name("size") Integer agentCount,
 			@Name("stepSize") Integer stepSize,
@@ -60,6 +115,25 @@ public class DemoAgent extends Agent {
 		}
 	}
 	
+	/**
+	 * Gets the lights.
+	 * 
+	 * @return the lights
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 * @throws InstantiationException
+	 *             the instantiation exception
+	 * @throws IllegalAccessException
+	 *             the illegal access exception
+	 * @throws InvocationTargetException
+	 *             the invocation target exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public ObjectNode getLights() throws JSONRPCException,
 			ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,

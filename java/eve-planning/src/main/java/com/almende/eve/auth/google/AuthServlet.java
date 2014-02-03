@@ -32,6 +32,9 @@ import com.almende.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class AuthServlet.
+ */
 @SuppressWarnings("serial")
 public class AuthServlet extends HttpServlet {
 	private final Logger		logger			= Logger.getLogger(this
@@ -43,6 +46,10 @@ public class AuthServlet extends HttpServlet {
 	// https://code.google.com/apis/console/
 	private String				CLIENT_ID		= null;
 	private String				CLIENT_SECRET	= null;
+	
+	/**
+	 * The redirect uri.
+	 */
 	String						REDIRECT_URI	= null;
 	
 	// hard coded uri's
@@ -60,6 +67,9 @@ public class AuthServlet extends HttpServlet {
 	
 	private final ObjectMapper	mapper			= new ObjectMapper();
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#init()
+	 */
 	@Override
 	public void init() {
 		try {
@@ -103,6 +113,9 @@ public class AuthServlet extends HttpServlet {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws IOException {

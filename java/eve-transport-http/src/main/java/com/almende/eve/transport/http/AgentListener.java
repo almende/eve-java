@@ -24,7 +24,7 @@ import com.almende.eve.config.Config;
  * component's <code>addAgentListener<code> method. When
  * the agent event occurs, that object's appropriate
  * method is invoked.
- *
+ * 
  */
 public class AgentListener implements ServletContextListener {
 	private static final Logger		LOG	= Logger.getLogger(AgentListener.class

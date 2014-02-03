@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.ggdemo;
 
 import java.io.IOException;
@@ -16,11 +20,17 @@ import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class LinPathAgent.
+ */
 @Access(AccessType.PUBLIC)
 @ThreadSafe(true)
 public class LinPathAgent extends Agent implements LampAgent  {
 	private ArrayList<String>	neighbours	= null;
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#create(java.util.ArrayList, java.lang.Integer)
+	 */
 	public void create(@Name("neighbours") ArrayList<String> neighbours,
 			@Name("stepSize") Integer stepSize) {
 		getState().put("neighbours", neighbours);
@@ -30,20 +40,32 @@ public class LinPathAgent extends Agent implements LampAgent  {
 		getState().put("stepSize", stepSize);
 	}
 	
+	/**
+	 * Lamp on.
+	 */
 	public void lampOn() {
 		getState().put("lamp", true);
 	}
 	
+	/**
+	 * Lamp off.
+	 */
 	public void lampOff() {
 		getState().put("lamp", false);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#isOn()
+	 */
 	public boolean isOn() {
 		Boolean isOn = getState().get("lamp", Boolean.class);
 		if (isOn == null) isOn = false;
 		return isOn;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#isOnBlock()
+	 */
 	public boolean isOnBlock() throws InterruptedException{
 		Boolean isOn = getState().get("lamp", Boolean.class);
 		while (isOn == null){
@@ -53,6 +75,9 @@ public class LinPathAgent extends Agent implements LampAgent  {
 		return isOn;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#getNeighbours()
+	 */
 	public ArrayList<String> getNeighbours(){
 		ArrayList<String> result = getState().get("neighbours", new TypeUtil<ArrayList<String>>(){});
 		if (result == null){
@@ -61,6 +86,9 @@ public class LinPathAgent extends Agent implements LampAgent  {
 		return result;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#handleGoal(com.almende.eve.ggdemo.Goal, java.lang.String)
+	 */
 	public void handleGoal(@Name("goal") Goal goal, @Sender String sender) throws IOException,
 			JSONRPCException, JsonProcessingException {
 		if (neighbours == null) {
@@ -143,6 +171,11 @@ public class LinPathAgent extends Agent implements LampAgent  {
 		getState().put("goal", goal);
 	}
 	
+	/**
+	 * Gets the goal.
+	 * 
+	 * @return the goal
+	 */
 	public Goal getGoal() {
 		return getState().get("goal", Goal.class);
 	}

@@ -119,6 +119,9 @@ import com.almende.util.WeightsUtil;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class MeetingAgent.
+ */
 @Access(AccessType.PUBLIC)
 public class MeetingAgent extends Agent {
 	private static final Logger	LOG								= Logger.getLogger(MeetingAgent.class
@@ -138,6 +141,7 @@ public class MeetingAgent extends Agent {
 	 * @param summary
 	 *            Description for the meeting
 	 * @param location
+	 *            the location
 	 * @param duration
 	 *            Duration in minutes
 	 * @param agents
@@ -163,8 +167,10 @@ public class MeetingAgent extends Agent {
 	 * Set a new activity. Currently stored activity will be removed.
 	 * 
 	 * @param activity
-	 * @return
+	 *            the activity
+	 * @return the activity
 	 * @throws Exception
+	 *             the exception
 	 */
 	public Activity setActivity(@Name("activity") final Activity activity)
 			throws Exception {
@@ -194,10 +200,13 @@ public class MeetingAgent extends Agent {
 	}
 	
 	/**
-	 * update the activity for meeting agent
+	 * update the activity for meeting agent.
 	 * 
-	 * @param activity
+	 * @param updatedActivity
+	 *            the updated activity
+	 * @return the activity
 	 * @throws Exception
+	 *             the exception
 	 */
 	public Activity updateActivity(
 			@Name("activity") final Activity updatedActivity) throws Exception {
@@ -244,9 +253,9 @@ public class MeetingAgent extends Agent {
 	}
 	
 	/**
-	 * Get meeting summary
+	 * Get meeting summary.
 	 * 
-	 * @return
+	 * @return the summary
 	 */
 	public String getSummary() {
 		final Activity activity = getState().get("activity", Activity.class);
@@ -722,7 +731,7 @@ public class MeetingAgent extends Agent {
 	}
 	
 	/**
-	 * Stop automatic updating
+	 * Stop automatic updating.
 	 */
 	public void stopAutoUpdate() {
 		final State state = getState();
@@ -831,7 +840,7 @@ public class MeetingAgent extends Agent {
 	 * Retrieve all current issues. If there are no issues, an empty array
 	 * is returned
 	 * 
-	 * @return
+	 * @return the issues
 	 */
 	public ArrayList<Issue> getIssues() {
 		ArrayList<Issue> issues = getState().get("issues",
@@ -1138,9 +1147,8 @@ public class MeetingAgent extends Agent {
 					
 					// activity.getConstraints().getTime().addPreference(preferred);
 				}
-			} else {
-				// events are in sync, nothing to do
 			}
+			// else events are in sync, nothing to do
 			
 			// update the activity
 			activity.merge(eventActivity);
@@ -1190,29 +1198,31 @@ public class MeetingAgent extends Agent {
 			for (final Attendee attendee : activity.withConstraints()
 					.withAttendees()) {
 				final String agent = attendee.getAgent();
-				if (attendee.getResponseStatus() == RESPONSE_STATUS.declined) {
-					// This attendee declined.
-					// Ignore this attendees busy interval
-				} else if (new Boolean(true).equals(attendee.getOptional())) {
-					// This attendee is optional.
-					// Add its busy intervals to the soft constraints
-					final List<Interval> attendeeBusy = getAgentBusy(agent);
-					if (attendeeBusy != null) {
-						for (final Interval i : attendeeBusy) {
-							final Weight wi = new Weight(i.getStart(),
-									i.getEnd(), WEIGHT_BUSY_OPTIONAL_ATTENDEE);
-							
-							preferredIntervals.add(wi);
+				if (attendee.getResponseStatus() != RESPONSE_STATUS.declined) {
+					if (new Boolean(true).equals(attendee.getOptional())) {
+						// This attendee is optional.
+						// Add its busy intervals to the soft constraints
+						final List<Interval> attendeeBusy = getAgentBusy(agent);
+						if (attendeeBusy != null) {
+							for (final Interval i : attendeeBusy) {
+								final Weight wi = new Weight(i.getStart(),
+										i.getEnd(),
+										WEIGHT_BUSY_OPTIONAL_ATTENDEE);
+								
+								preferredIntervals.add(wi);
+							}
+						}
+					} else {
+						// this attendee is required.
+						// Add its busy intervals to the hard constraints
+						final List<Interval> attendeeBusy = getAgentBusy(agent);
+						if (attendeeBusy != null) {
+							infeasibleIntervals.addAll(attendeeBusy);
 						}
 					}
-				} else {
-					// this attendee is required.
-					// Add its busy intervals to the hard constraints
-					final List<Interval> attendeeBusy = getAgentBusy(agent);
-					if (attendeeBusy != null) {
-						infeasibleIntervals.addAll(attendeeBusy);
-					}
 				}
+				// else This attendee declined. Ignore this attendees busy
+				// interval
 			}
 			
 			// read the time preferences and add them to the soft constraints
@@ -1329,9 +1339,9 @@ public class MeetingAgent extends Agent {
 	}
 	
 	/**
-	 * Retrieve the feasible and preferred intervals
+	 * Retrieve the feasible and preferred intervals.
 	 * 
-	 * @return
+	 * @return the intervals
 	 */
 	// TODO: remove this temporary method
 	public ObjectNode getIntervals() {
@@ -1467,7 +1477,7 @@ public class MeetingAgent extends Agent {
 	}
 	
 	/**
-	 * Delete everything of the agent
+	 * Delete everything of the agent.
 	 */
 	@Override
 	public void onDelete() {
@@ -1533,6 +1543,15 @@ public class MeetingAgent extends Agent {
 	}
 	
 	// TODO: cleanup this temporary method
+	/**
+	 * Gets the office hours.
+	 * 
+	 * @param timeMin
+	 *            the time min
+	 * @param timeMax
+	 *            the time max
+	 * @return the office hours
+	 */
 	public ArrayNode getOfficeHours(@Name("timeMin") final String timeMin,
 			@Name("timeMax") final String timeMax) {
 		final List<Interval> available = IntervalsUtil.getOfficeHours(
@@ -1568,11 +1587,17 @@ public class MeetingAgent extends Agent {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getDescription()
+	 */
 	@Override
 	public String getDescription() {
 		return "A MeetingAgent can dynamically plan and manage a meeting.";
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#getVersion()
+	 */
 	@Override
 	public String getVersion() {
 		return "0.1";

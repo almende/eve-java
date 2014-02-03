@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.goldemo;
 
 import java.io.IOException;
@@ -17,11 +21,22 @@ import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class Cell.
+ */
 @Access(AccessType.PUBLIC)
 @ThreadSafe(true)
 public class Cell extends Agent {
 	private ArrayList<String> neighbors = null;
 	
+	/**
+	 * Creates the.
+	 * 
+	 * @param neighbors
+	 *            the neighbors
+	 * @param initState
+	 *            the init state
+	 */
 	public void create(@Name("neighbors") ArrayList<String> neighbors,
 			@Name("state") Boolean initState) {
 		
@@ -31,6 +46,14 @@ public class Cell extends Agent {
 		
 	}
 	
+	/**
+	 * Register.
+	 * 
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public void register() throws JSONRPCException, IOException {
 		if (neighbors == null){
 			neighbors = getState().get("neighbors",
@@ -43,14 +66,40 @@ public class Cell extends Agent {
 		}
 	}
 	
+	/**
+	 * Stop.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 */
 	public void stop() throws IOException, JSONRPCException{
 		getEventsFactory().clear();
 	}
 	
+	/**
+	 * Start.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public void start() throws IOException {
 		getEventsFactory().trigger("cycleCalculated");
 	}
 	
+	/**
+	 * Ask cycle state.
+	 * 
+	 * @param neighbor
+	 *            the neighbor
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws URISyntaxException
+	 *             the uRI syntax exception
+	 */
 	public void askCycleState(@Sender final String neighbor) throws JSONRPCException,
 			IOException, URISyntaxException {
 		
@@ -127,6 +176,13 @@ public class Cell extends Agent {
 		}
 	}
 	
+	/**
+	 * Gets the cycle state.
+	 * 
+	 * @param cycle
+	 *            the cycle
+	 * @return the cycle state
+	 */
 	public CycleState getCycleState(@Name("cycle") Integer cycle) {
 		if (getState().containsKey("val_" + cycle)) {
 			return getState().get("val_" + cycle, CycleState.class);
@@ -134,6 +190,11 @@ public class Cell extends Agent {
 		return null;
 	}
 	
+	/**
+	 * Gets the all cycle states.
+	 * 
+	 * @return the all cycle states
+	 */
 	public ArrayList<CycleState> getAllCycleStates() {
 		ArrayList<CycleState> result = new ArrayList<CycleState>();
 		int count = 0;

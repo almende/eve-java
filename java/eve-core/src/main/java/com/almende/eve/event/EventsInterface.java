@@ -24,7 +24,7 @@ public interface EventsInterface {
 	/**
 	 * Static string EVENT
 	 */
-	static final String	EVENT	= "event";
+	static String	EVENT	= "event";
 	
 	/**
 	 * Get existing even subscriptions for a given event.

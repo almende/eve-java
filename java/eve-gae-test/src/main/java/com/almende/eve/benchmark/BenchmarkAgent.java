@@ -1,7 +1,5 @@
 package com.almende.eve.benchmark;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Date;
 
@@ -11,7 +9,6 @@ import com.almende.eve.rpc.annotation.Access;
 import com.almende.eve.rpc.annotation.AccessType;
 import com.almende.eve.rpc.annotation.Name;
 import com.almende.eve.rpc.annotation.Optional;
-import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.rpc.jsonrpc.JSONRequest;
 import com.almende.eve.state.State;
 import com.almende.eve.transport.TransportService;

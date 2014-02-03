@@ -37,33 +37,125 @@ import com.almende.eve.rpc.annotation.Optional;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Interface CalendarAgent.
+ */
 @Access(AccessType.PUBLIC)
 public interface CalendarAgent {
-	abstract public String getUsername();
 	
-	abstract public String getEmail();
+	/**
+	 * Gets the username.
+	 * 
+	 * @return the username
+	 */
+	String getUsername();
 	
-	public ArrayNode getCalendarList() throws Exception;
+	/**
+	 * Gets the email.
+	 * 
+	 * @return the email
+	 */
+	String getEmail();
 	
-	public ArrayNode getEvents(@Optional @Name("start") String start,
+	/**
+	 * Gets the calendar list.
+	 * 
+	 * @return the calendar list
+	 * @throws Exception
+	 *             the exception
+	 */
+	ArrayNode getCalendarList() throws Exception;
+	
+	/**
+	 * Gets the events.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param calendarId
+	 *            the calendar id
+	 * @return the events
+	 * @throws Exception
+	 *             the exception
+	 */
+	ArrayNode getEvents(@Optional @Name("start") String start,
 			@Optional @Name("end") String end,
 			@Optional @Name("calendarId") String calendarId) throws Exception;
 	
-	public ObjectNode getEvent(@Name("eventId") String eventId,
+	/**
+	 * Gets the event.
+	 * 
+	 * @param eventId
+	 *            the event id
+	 * @param calendarId
+	 *            the calendar id
+	 * @return the event
+	 * @throws Exception
+	 *             the exception
+	 */
+	ObjectNode getEvent(@Name("eventId") String eventId,
 			@Optional @Name("calendarId") String calendarId) throws Exception;
 	
-	public ArrayNode getBusy(@Name("timeMin") String timeMin,
+	/**
+	 * Gets the busy.
+	 * 
+	 * @param timeMin
+	 *            the time min
+	 * @param timeMax
+	 *            the time max
+	 * @param calendarId
+	 *            the calendar id
+	 * @param timeZone
+	 *            the time zone
+	 * @return the busy
+	 * @throws Exception
+	 *             the exception
+	 */
+	ArrayNode getBusy(@Name("timeMin") String timeMin,
 			@Name("timeMax") String timeMax,
 			@Optional @Name("calendarId") String calendarId,
 			@Optional @Name("timeZone") String timeZone) throws Exception;
 	
-	public ObjectNode createEvent(@Name("event") ObjectNode event,
+	/**
+	 * Creates the event.
+	 * 
+	 * @param event
+	 *            the event
+	 * @param calendarId
+	 *            the calendar id
+	 * @return the object node
+	 * @throws Exception
+	 *             the exception
+	 */
+	ObjectNode createEvent(@Name("event") ObjectNode event,
 			@Optional @Name("calendarId") String calendarId) throws Exception;
 	
-	public ObjectNode updateEvent(@Name("event") ObjectNode event,
+	/**
+	 * Update event.
+	 * 
+	 * @param event
+	 *            the event
+	 * @param calendarId
+	 *            the calendar id
+	 * @return the object node
+	 * @throws Exception
+	 *             the exception
+	 */
+	ObjectNode updateEvent(@Name("event") ObjectNode event,
 			@Optional @Name("calendarId") String calendarId) throws Exception;
 	
-	public void deleteEvent(@Name("eventId") String eventId,
+	/**
+	 * Delete event.
+	 * 
+	 * @param eventId
+	 *            the event id
+	 * @param calendarId
+	 *            the calendar id
+	 * @throws Exception
+	 *             the exception
+	 */
+	void deleteEvent(@Name("eventId") String eventId,
 			@Optional @Name("calendarId") String calendarId) throws Exception;
 	
 	/*

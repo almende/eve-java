@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.ggdemo;
 
 import java.io.IOException;
@@ -19,6 +23,9 @@ import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * The Class HolonAgent.
+ */
 @Access(AccessType.PUBLIC)
 @ThreadSafe(true)
 public class HolonAgent extends Agent implements LampAgent {
@@ -26,6 +33,9 @@ public class HolonAgent extends Agent implements LampAgent {
 	private static final TypeUtil<ArrayList<Sub>>	type		= new TypeUtil<ArrayList<Sub>>() {
 																};
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#create(java.util.ArrayList, java.lang.Integer)
+	 */
 	public void create(@Name("neighbours") ArrayList<String> nbs,
 			@Name("stepSize") Integer stepSize) throws JSONRPCException,
 			IOException {
@@ -42,20 +52,32 @@ public class HolonAgent extends Agent implements LampAgent {
 		System.out.println(getId()+ ": schedulertask created:"+taskId + " --> "+getScheduler());
 	}
 	
+	/**
+	 * Lamp on.
+	 */
 	public void lampOn() {
 		getState().put("lamp", true);
 	}
 	
+	/**
+	 * Lamp off.
+	 */
 	public void lampOff() {
 		getState().put("lamp", false);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#isOn()
+	 */
 	public boolean isOn() {
 		Boolean isOn = getState().get("lamp", Boolean.class);
 		if (isOn == null) isOn = false;
 		return isOn;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#isOnBlock()
+	 */
 	public boolean isOnBlock() throws InterruptedException {
 		Boolean isOn = getState().get("lamp", Boolean.class);
 		while (isOn == null) {
@@ -65,6 +87,9 @@ public class HolonAgent extends Agent implements LampAgent {
 		return isOn;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#getNeighbours()
+	 */
 	@Access(AccessType.UNAVAILABLE)
 	public Set<String> getNeighbours() {
 		Set<String> result = getState().get("neighbours",
@@ -76,6 +101,14 @@ public class HolonAgent extends Agent implements LampAgent {
 		return result;
 	}
 	
+	/**
+	 * Check merge.
+	 * 
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public void checkMerge() throws JSONRPCException, IOException {
 		System.out.println(getId() + ": checkMerge()");
 		if (getState().containsKey("parent")){
@@ -119,6 +152,19 @@ public class HolonAgent extends Agent implements LampAgent {
 		}
 	}
 	
+	/**
+	 * Merge.
+	 * 
+	 * @param size
+	 *            the size
+	 * @param sender
+	 *            the sender
+	 * @return the boolean
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public Boolean merge(@Name("size") int size, @Sender String sender)
 			throws JSONRPCException, IOException {
 		if (neighbours == null) {
@@ -156,6 +202,18 @@ public class HolonAgent extends Agent implements LampAgent {
 		return true;
 	}
 	
+	/**
+	 * Handle task.
+	 * 
+	 * @param count
+	 *            the count
+	 * @param sender
+	 *            the sender
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 */
 	public void handleTask(@Name("count") Integer count, @Sender String sender)
 			throws IOException, JSONRPCException {
 		if (sender != null
@@ -184,6 +242,9 @@ public class HolonAgent extends Agent implements LampAgent {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.ggdemo.LampAgent#handleGoal(com.almende.eve.ggdemo.Goal, java.lang.String)
+	 */
 	public void handleGoal(@Name("goal") Goal goal, @Sender String sender)
 			throws IOException, JSONRPCException, JsonProcessingException {
 		String parent = getState().get("parent", String.class);
@@ -285,29 +346,62 @@ public class HolonAgent extends Agent implements LampAgent {
 		}
 	}
 	
+	/**
+	 * Gets the goal.
+	 * 
+	 * @return the goal
+	 */
 	public Goal getGoal() {
 		return getState().get("goal", Goal.class);
 	}
 	
+	/**
+	 * The Class Sub.
+	 */
 	class Sub {
 		private int		size	= 0;
 		private String	address	= "";
 		
+		/**
+		 * Instantiates a new sub.
+		 */
 		public Sub() {
 		}
 		
+		/**
+		 * Gets the size.
+		 * 
+		 * @return the size
+		 */
 		public int getSize() {
 			return size;
 		}
 		
+		/**
+		 * Sets the size.
+		 * 
+		 * @param size
+		 *            the new size
+		 */
 		public void setSize(int size) {
 			this.size = size;
 		}
 		
+		/**
+		 * Gets the address.
+		 * 
+		 * @return the address
+		 */
 		public String getAddress() {
 			return address;
 		}
 		
+		/**
+		 * Sets the address.
+		 * 
+		 * @param address
+		 *            the new address
+		 */
 		public void setAddress(String address) {
 			this.address = address;
 		}
