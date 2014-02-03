@@ -3,7 +3,7 @@
 # transport services
 transport_services:
 - class: HttpService
-  servlet_url: http://localhost:8081/agents/
+  servlet_url: http://127.0.0.1:8081/agents/
   servlet_launcher: JettyLauncher
 
 # state settings

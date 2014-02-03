@@ -40,8 +40,7 @@ public class JettyLauncher implements ServletLauncher {
 			port = (Integer)params.get("port");
 		}
 		server = new Server(port);
-		
-		context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		context = new ServletContextHandler(ServletContextHandler.SESSIONS|ServletContextHandler.NO_SECURITY);
 		
 		context.setContextPath("/");
 		server.setHandler(context);

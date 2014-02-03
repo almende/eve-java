@@ -20,11 +20,13 @@ import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 public class Goldemo {
 	// final static String BASE = "inproc://";
 	// final static String BASE = "ipc:///tmp/zmq-socket-";
-	// final static String PATH = "zmq:"+BASE;	
+	// final static String PATH = "zmq:"+BASE;
+	
 	/**
 	 * The Constant PATH.
 	 */
-	final static String	PATH	= "local:";
+	//final static String	PATH	= "local:";
+	final static String	PATH	= "http://127.0.0.1:8081/agents/";
 	
 	/**
 	 * The main method.
