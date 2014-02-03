@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.almende.eve.agent.AgentHost;
 import com.almende.eve.state.FileStateFactory;
 import com.almende.eve.state.TypedKey;
-import com.almende.test.agents.Test2Agent;
+import com.almende.test.agents.TestAgent;
 
 /**
  * The Class TestReference.
@@ -35,12 +35,12 @@ public class TestReference extends TestCase {
 		if (host.hasAgent(TEST_AGENT)) {
 			host.deleteAgent(TEST_AGENT);
 		}
-		Test2Agent test = host.createAgent(Test2Agent.class, TEST_AGENT);
+		TestAgent test = host.createAgent(TestAgent.class, TEST_AGENT);
 		
 		test.putRef(new TypedKey<Object>("test") {
 		}, testObject);
 		
-		test = (Test2Agent) host.getAgent(TEST_AGENT);
+		test = (TestAgent) host.getAgent(TEST_AGENT);
 		
 		assertEquals(test.getRef(new TypedKey<Object>("test") {
 		}), testObject);

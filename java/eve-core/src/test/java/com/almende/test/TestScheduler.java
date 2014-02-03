@@ -16,7 +16,6 @@ import com.almende.eve.scheduler.ClockSchedulerFactory;
 import com.almende.eve.scheduler.RunnableSchedulerFactory;
 import com.almende.eve.scheduler.Scheduler;
 import com.almende.eve.state.FileStateFactory;
-import com.almende.eve.transport.http.HttpService;
 import com.almende.test.agents.TestSchedulerAgent;
 
 /**
@@ -35,7 +34,6 @@ public class TestScheduler extends TestCase {
 	public void testSingleShot() throws Exception {
 		final AgentHost host = AgentHost.getInstance();
 		host.setStateFactory(new FileStateFactory(".eveagents_schedulerTest"));
-		host.addTransportService(new HttpService(host));
 		host.setSchedulerFactory(new ClockSchedulerFactory(host, ""));
 		
 		if (host.hasAgent("SingleShot")) {
@@ -86,7 +84,6 @@ public class TestScheduler extends TestCase {
 	public void schedule(final boolean clock) throws Exception {
 		final AgentHost host = AgentHost.getInstance();
 		host.setStateFactory(new FileStateFactory(".eveagents_schedulerTest"));
-		host.addTransportService(new HttpService(host));
 		
 		if (clock) {
 			host.setSchedulerFactory(new ClockSchedulerFactory(host, ""));

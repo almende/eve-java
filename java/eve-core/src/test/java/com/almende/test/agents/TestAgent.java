@@ -74,5 +74,4 @@ public class TestAgent extends Agent implements TestInterface {
 	public String getVersion() {
 		return "1.0";
 	}
-	
 }
