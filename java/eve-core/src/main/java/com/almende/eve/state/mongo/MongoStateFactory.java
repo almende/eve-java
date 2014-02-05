@@ -25,6 +25,7 @@ import com.mongodb.MongoClient;
 public class MongoStateFactory implements StateFactory {
 	
 	private static final Logger	LOG			= Logger.getLogger("MongoStateFactory");
+	public static final String 	COLLECTION_NAME = "agents";
 	
 	private final Jongo jongo;
 	
@@ -84,7 +85,7 @@ public class MongoStateFactory implements StateFactory {
 	public State get(String agentId) {
 		MongoState result = null;
 		try {
-			result = jongo.getCollection(MongoState.COLLECTION_NAME).
+			result = jongo.getCollection(COLLECTION_NAME).
 							findOne("{_id: #}", agentId).as(MongoState.class);
 			if (result!=null) {
 				result.setConnection(jongo);
@@ -109,7 +110,7 @@ public class MongoStateFactory implements StateFactory {
 		
 		MongoState state = new MongoState(agentId);
 		try {
-			jongo.getCollection(MongoState.COLLECTION_NAME).insert(state);
+			jongo.getCollection(COLLECTION_NAME).insert(state);
 		} catch (final Exception e) {
 			LOG.log(Level.SEVERE, "create error {}", e);
 		}
@@ -125,7 +126,7 @@ public class MongoStateFactory implements StateFactory {
 	@Override
 	public void delete(String agentId) {
 		try {
-			jongo.getCollection(MongoState.COLLECTION_NAME).remove("{_id: #}", agentId);
+			jongo.getCollection(COLLECTION_NAME).remove("{_id: #}", agentId);
 		} catch (final Exception e) {
 			LOG.log(Level.SEVERE, "get error {}", e);
 		}
@@ -138,7 +139,7 @@ public class MongoStateFactory implements StateFactory {
 	 */
 	@Override
 	public boolean exists(String agentId) {
-		MongoState result = jongo.getCollection(MongoState.COLLECTION_NAME).
+		MongoState result = jongo.getCollection(COLLECTION_NAME).
 								findOne("{_id: #}", agentId).as(MongoState.class);
 		return (result != null);
 	}
@@ -152,7 +153,7 @@ public class MongoStateFactory implements StateFactory {
 	public Iterator<String> getAllAgentIds() {
 		List<String> agentIDs = new ArrayList<String>();
 		try {
-			Find find = jongo.getCollection(MongoState.COLLECTION_NAME).find().projection("{_id:1}");
+			Find find = jongo.getCollection(COLLECTION_NAME).find().projection("{_id:1}");
 			// :: there's probably a faster way to iterate over id fields
 	        for (Object map : find.as(Object.class)) {
 				String agentId = (String) ((LinkedHashMap) map).get("_id");

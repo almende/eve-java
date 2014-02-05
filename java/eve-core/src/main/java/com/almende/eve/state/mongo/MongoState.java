@@ -1,6 +1,5 @@
 package com.almende.eve.state.mongo;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,6 @@ import com.mongodb.WriteResult;
  */
 public class MongoState extends AbstractState<JsonNode> {
 	
-	public static final String 	COLLECTION_NAME = "agents";
 	private static final Logger	LOG			= Logger.getLogger("MongoState");
 	
 	private Map<String, JsonNode>	properties	= Collections.synchronizedMap(new HashMap<String, JsonNode>());
@@ -231,7 +229,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * Finer granularity update command, not working yet
 	 */
 	private synchronized boolean updateField(String field, JsonNode value) {
-		WriteResult result = connection.getCollection(COLLECTION_NAME).
+		WriteResult result = connection.getCollection(MongoStateFactory.COLLECTION_NAME).
 				update("{id: #}", getAgentId()).
 				with("{$set: {#, #}}", field, value);
 		if (!result.getLastError().ok()) { 
@@ -247,7 +245,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * 
 	 */
 	private synchronized boolean updateObject() {
-		 WriteResult result = connection.getCollection(COLLECTION_NAME).save(this);
+		 WriteResult result = connection.getCollection(MongoStateFactory.COLLECTION_NAME).save(this);
 		 if (!result.getLastError().ok()) { 
 			 LOG.log(Level.SEVERE, "update error", result.getError());
 			 return false;
