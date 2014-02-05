@@ -20,6 +20,8 @@
 		<joda-time.version>2.1</joda-time.version>
 		<snakeyaml.version>1.11</snakeyaml.version>
 		<ektorp.version>1.4.1</ektorp.version>
+		<mongodb.version>2.11.3</mongodb.version>
+		<jongo.version>1.0</jongo.version>
 	</properties>
 
 	<dependencies>
@@ -52,6 +54,16 @@
 			<groupId>org.ektorp</groupId>
 			<artifactId>org.ektorp</artifactId>
 			<version>${ektorp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>${mongodb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jongo</groupId>
+			<artifactId>jongo</artifactId>
+			<version>${jongo.version}</version>
 		</dependency>
 	</dependencies>
 </project>
