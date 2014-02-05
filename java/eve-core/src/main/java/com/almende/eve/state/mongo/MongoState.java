@@ -1,5 +1,6 @@
 package com.almende.eve.state.mongo;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,8 +8,9 @@ import java.util.Set;
 
 import org.jongo.Jongo;
 import org.jongo.marshall.jackson.oid.Id;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.eve.state.AbstractState;
@@ -25,9 +27,8 @@ import com.mongodb.WriteResult;
  */
 public class MongoState extends AbstractState<JsonNode> {
 	
-	public static final String COLLECTION_NAME = "agents";
-	
-	private static final Logger log = LoggerFactory.getLogger(MongoState.class);
+	public static final String 	COLLECTION_NAME = "agents";
+	private static final Logger	LOG			= Logger.getLogger("MongoState");
 	
 	private Map<String, JsonNode>	properties	= Collections.synchronizedMap(new HashMap<String, JsonNode>());
 	
@@ -94,7 +95,7 @@ public class MongoState extends AbstractState<JsonNode> {
 			result = properties.remove(key);
 			updateObject();
 		} catch (final Exception e) {
-			log.warn("remove error : "+e.getMessage());
+			LOG.log(Level.SEVERE, "remove error {}", e);
 		}
 		return result;
 	}
@@ -108,7 +109,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.containsKey(key);
 		} catch (final Exception e) {
-			log.warn("containsKey error : "+e.getMessage());
+			LOG.log(Level.WARNING, "containsKey error {}", e);
 		}
 		return result;
 	}
@@ -119,7 +120,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.keySet();
 		} catch (final Exception e) {
-			log.warn("keySet error : "+e.getMessage());
+			LOG.log(Level.WARNING, "keySet error {}", e);
 		}
 		return result;
 	}
@@ -132,7 +133,7 @@ public class MongoState extends AbstractState<JsonNode> {
 			properties.put(KEY_AGENT_TYPE, JOM.getInstance().valueToTree(agentType));
 			updateObject();
 		} catch (final Exception e) {
-			log.warn("clear error : "+e.getMessage());
+			LOG.log(Level.SEVERE, "clear error {}", e);
 		}	
 	}
 
@@ -143,7 +144,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.size();
 		} catch (final Exception e) {
-			log.warn("size error : "+e.getMessage());
+			LOG.log(Level.WARNING, "size error {}", e);
 		}
 		return result;
 	}
@@ -154,7 +155,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.get(key);
 		} catch (final Exception e) {
-			log.warn("get error : "+e.getMessage());
+			LOG.log(Level.WARNING, "get error {}", e);
 		}
 		return result;
 	}
@@ -169,7 +170,7 @@ public class MongoState extends AbstractState<JsonNode> {
 			result = properties.put(key, value);
 			updateObject();
 		} catch (final Exception e) {
-			log.warn("locPut error : "+e.getMessage());
+			LOG.log(Level.SEVERE, "locPut error {}", e);
 		}
 		
 		return result;
@@ -198,7 +199,7 @@ public class MongoState extends AbstractState<JsonNode> {
 				result = updateObject();
 			}
 		} catch (final Exception e) {
-			log.warn("locPutIfUnchanged error : "+e.getMessage());
+			LOG.log(Level.SEVERE, "locPutIfUnchanged error {}", e);
 		}
 		
 		return result;
@@ -234,7 +235,7 @@ public class MongoState extends AbstractState<JsonNode> {
 				update("{id: #}", getAgentId()).
 				with("{$set: {#, #}}", field, value);
 		if (!result.getLastError().ok()) { 
-			log.error("update error : "+result.getError());
+			LOG.log(Level.SEVERE, "update error", result.getError());
 			return false;
 		}
 		return true;
@@ -248,7 +249,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	private synchronized boolean updateObject() {
 		 WriteResult result = connection.getCollection(COLLECTION_NAME).save(this);
 		 if (!result.getLastError().ok()) { 
-			 log.error("update error : "+result.getError());
+			 LOG.log(Level.SEVERE, "update error", result.getError());
 			 return false;
 		 }
 		 return true;
