@@ -1,50 +1,65 @@
 package com.almende.eve.state.mongo;
 
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.jongo.Jongo;
+import org.jongo.MongoCollection;
 import org.jongo.marshall.jackson.oid.Id;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.eve.state.AbstractState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+
 import com.mongodb.WriteResult;
 
 /**
- * Representation of Eve agents state based on MongoDB
+ * Simple representation of Eve agents state based on MongoDB
  * 
  * @author ronny
  *
  */
 public class MongoState extends AbstractState<JsonNode> {
 	
-	private static final Logger	LOG			= Logger.getLogger("MongoState");
 	
-	private Map<String, JsonNode>	properties	= Collections.synchronizedMap(new HashMap<String, JsonNode>());
+	private static final Logger log = LoggerFactory.getLogger(MongoState.class);
+	
+	/* mapping object that contains variables used by the agent */
+	private Map<String, JsonNode> properties	= Collections.synchronizedMap(new HashMap<String, JsonNode>());
+	
+	/* metadata for agenthost : agent type and last update for a simple update conflict avoidance */
+	private Class<?> agentType;
+	private Date timestamp;
+	
 	
 	@JsonIgnore
 	private Jongo connection;
 	
+	
+	
 	/**
+	 * default constructor, used when instantiating state while fetching the appropriate agents
 	 * @see com.almende.eve.state.AbstractState#AbstractState()
 	 */
 	public MongoState() {
 	}
 	
 	/**
-	 * main constructor: with agentId as input parameter
+	 * the constructor used on creation of new state in the database
 	 * @param agentId
 	 */
 	public MongoState(final String agentId) {
 		super(agentId);
+		timestamp = Calendar.getInstance().getTime();
+		agentType = null;
 	}
 	
 	@JsonIgnore
@@ -57,6 +72,10 @@ public class MongoState extends AbstractState<JsonNode> {
 		return connection;
 	}
 	
+	public Date getTimestamp() {
+		return timestamp;
+	}
+	
 	/**
 	 * returns agent ID and adding @Id annotation to mark it as objectID in Mongo
 	 * otherwise mongo will generate new object each time
@@ -67,6 +86,21 @@ public class MongoState extends AbstractState<JsonNode> {
 	@Id
 	public synchronized String getAgentId() {
 		return super.getAgentId();
+	}
+	
+	/**
+	 * agent type is considered as a separate attribute, not a common property
+	 */
+	@Override
+	public synchronized void setAgentType(final Class<?> agentType) {
+		this.agentType = agentType;
+		// assuming this is called only once after creation, simply save the entire state
+		connection.getCollection(MongoStateFactory.COLLECTION_NAME).save(this);
+	}
+	
+	@Override
+	public synchronized Class<?> getAgentType() throws ClassNotFoundException {
+		return this.agentType;
 	}
 
 	/* (non-Javadoc)
@@ -91,9 +125,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		Object result = null;
 		try {
 			result = properties.remove(key);
-			updateObject();
+			updateProperties(false);
 		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "remove error {}", e);
+			log.warn("remove error : "+e.getMessage());
 		}
 		return result;
 	}
@@ -107,7 +141,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.containsKey(key);
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "containsKey error {}", e);
+			log.warn("containsKey error : "+e.getMessage());
 		}
 		return result;
 	}
@@ -118,7 +152,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.keySet();
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "keySet error {}", e);
+			log.warn("keySet error : "+e.getMessage());
 		}
 		return result;
 	}
@@ -126,12 +160,10 @@ public class MongoState extends AbstractState<JsonNode> {
 	@Override
 	public void clear() {
 		try {
-			final String agentType = properties.get(KEY_AGENT_TYPE).textValue();
 			properties.clear();
-			properties.put(KEY_AGENT_TYPE, JOM.getInstance().valueToTree(agentType));
-			updateObject();
+			updateProperties(false);
 		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "clear error {}", e);
+			log.warn("clear error : "+e.getMessage());
 		}	
 	}
 
@@ -142,7 +174,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.size();
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "size error {}", e);
+			log.warn("size error : "+e.getMessage());
 		}
 		return result;
 	}
@@ -153,7 +185,7 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.get(key);
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "get error {}", e);
+			log.warn("get error : "+e.getMessage());
 		}
 		return result;
 	}
@@ -166,9 +198,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		JsonNode result = null;
 		try {
 			result = properties.put(key, value);
-			updateObject();
+			updateProperties(false); // updateField(key, value);
 		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "locPut error {}", e);
+			log.warn("locPut error : "+e.getMessage());
 		}
 		
 		return result;
@@ -194,10 +226,10 @@ public class MongoState extends AbstractState<JsonNode> {
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
 				properties.put(key, newVal);
-				result = updateObject();
+				result = updateProperties(false); // updateField(key, newVal);
 			}
 		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "locPutIfUnchanged error {}", e);
+			log.warn("locPutIfUnchanged error : "+e.getMessage());
 		}
 		
 		return result;
@@ -218,39 +250,50 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * @param properties the properties
 	 */
 	public void setProperties(final Map<String, JsonNode> properties) {
-		final String agentType = properties.get(KEY_AGENT_TYPE).textValue();
-		properties.clear();
+		this.properties.clear();
 		this.properties.putAll(properties);
-		this.properties.put(KEY_AGENT_TYPE, JOM.getInstance().valueToTree(agentType));
-		updateObject();
+		updateProperties(false);
 	}
 	
 	/**
-	 * Finer granularity update command, not working yet
+	 * FIXME this method still has errors on serializing/deserializing <value> parameter, probably 
+	 * related with the mappers of Jongo
+	 * 
+	 * update a single field, by default will fail if there is a newer update from some other instance
+	 * @throws JsonProcessingException 
 	 */
-	private synchronized boolean updateField(String field, JsonNode value) {
+	private synchronized boolean updateField(String field, JsonNode value) throws JsonProcessingException {
+		Date now = Calendar.getInstance().getTime();
 		WriteResult result = connection.getCollection(MongoStateFactory.COLLECTION_NAME).
-				update("{id: #}", getAgentId()).
-				with("{$set: {#, #}}", field, value);
-		if (!result.getLastError().ok()) { 
-			LOG.log(Level.SEVERE, "update error", result.getError());
-			return false;
-		}
-		return true;
-	}
+				update("{_id: #, timestamp: #}", getAgentId(), timestamp).
+				with("{$set: {properties."+field+": #, timestamp: #}}", value, now);
+		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
+		if (updatedExisting) {
+			timestamp = now;
+		} 
+		return updatedExisting;
+	} 
 	
 	/**
-	 * in its current implementation, the whole object is being updated all at the same time.
-	 * probably will perform better on a finer granularity updates 
+	 * updating the entire properties object at the same time, with force flag to allow overwriting of updates
+	 * from other instances of the state
+	 * 
+	 * @param force
 	 * 
 	 */
-	private synchronized boolean updateObject() {
-		 WriteResult result = connection.getCollection(MongoStateFactory.COLLECTION_NAME).save(this);
-		 if (!result.getLastError().ok()) { 
-			 LOG.log(Level.SEVERE, "update error", result.getError());
-			 return false;
-		 }
-		 return true;
+	private synchronized boolean updateProperties(boolean force) {
+		Date now = Calendar.getInstance().getTime();
+		MongoCollection agents = connection.getCollection(MongoStateFactory.COLLECTION_NAME);
+		/* write to database */
+		WriteResult result = (force) ?
+				agents.update("{_id: #}", getAgentId()).with("{$set: {properties: #, timestamp: #}}", properties, now) :
+				agents.update("{_id: #, timestamp: #}", getAgentId(), timestamp).with("{$set: {properties: #, timestamp: #}}", properties, now);
+		/* check results */
+		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
+		if (updatedExisting) {
+			timestamp = now;
+		}
+		return updatedExisting;
 	}
 
 }
