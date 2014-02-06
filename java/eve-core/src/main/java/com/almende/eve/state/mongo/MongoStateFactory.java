@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jongo.Find;
 import org.jongo.Jongo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
@@ -26,7 +26,7 @@ public class MongoStateFactory implements StateFactory {
 	
 	public static final String COLLECTION_NAME = "agents";
 	
-	private static final Logger log = LoggerFactory.getLogger(MongoStateFactory.class);
+	private static final Logger		LOG			= Logger.getLogger("MongoState");
 	
 	private final Jongo jongo;
 	
@@ -92,7 +92,7 @@ public class MongoStateFactory implements StateFactory {
 				result.setConnection(jongo);
 			}
 		} catch (final Exception e) {
-			log.warn("get error:"+e.getMessage());
+			LOG.log(Level.WARNING, "get error", e);
 		}
 		return result;
 	}
@@ -113,7 +113,7 @@ public class MongoStateFactory implements StateFactory {
 		try {
 			jongo.getCollection(COLLECTION_NAME).insert(state);
 		} catch (final Exception e) {
-			log.warn("create error:"+e.getMessage());
+			LOG.log(Level.WARNING, "create error", e);
 		}
 		state.setConnection(jongo);
 		return state;
@@ -129,7 +129,7 @@ public class MongoStateFactory implements StateFactory {
 		try {
 			jongo.getCollection(COLLECTION_NAME).remove("{_id: #}", agentId);
 		} catch (final Exception e) {
-			log.warn("delete error : "+e.getMessage());
+			LOG.log(Level.WARNING, "delete error", e);
 		}
 	}
 
@@ -161,7 +161,7 @@ public class MongoStateFactory implements StateFactory {
 	        	agentIDs.add(agentId);
 	        }
 		} catch (final Exception e) {
-			log.warn("getAllAgentIds error : "+e.getMessage());
+			LOG.log(Level.WARNING, "getAllAgentIds error", e);
 		}
 		return agentIDs.iterator();
 	}
