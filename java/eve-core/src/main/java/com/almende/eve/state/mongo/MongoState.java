@@ -71,9 +71,6 @@ public class MongoState extends AbstractState<JsonNode> {
 		return connection;
 	}
 	
-	public Date getTimestamp() {
-		return timestamp;
-	}
 	
 	/**
 	 * returns agent ID and adding @Id annotation to mark it as objectID in Mongo
@@ -88,7 +85,10 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	/**
-	 * agent type is considered as a separate attribute, not a common property
+	 * sets the agent class definition that this state contains. In this variant,
+	 * agent type is considered as a separate attribute, not an overwritable common property.
+	 * 
+	 * @see com.almende.eve.state.State#setAgentType(java.lang.Class)
 	 */
 	@Override
 	public synchronized void setAgentType(final Class<?> agentType) {
@@ -97,6 +97,11 @@ public class MongoState extends AbstractState<JsonNode> {
 		connection.getCollection(MongoStateFactory.COLLECTION_NAME).save(this);
 	}
 	
+	/**
+	 * return the agent definition contained in this state object
+	 * 
+	 * @see com.almende.eve.state.State#getAgentType()
+	 */
 	@Override
 	public synchronized Class<?> getAgentType() throws ClassNotFoundException {
 		return this.agentType;

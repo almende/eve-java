@@ -26,7 +26,7 @@ public class MongoStateFactory implements StateFactory {
 	
 	public static final String COLLECTION_NAME = "agents";
 	
-	private static final Logger		LOG			= Logger.getLogger("MongoState");
+	private static final Logger LOG = Logger.getLogger("MongoStateFactory");
 	
 	private final Jongo jongo;
 	
