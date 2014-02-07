@@ -3,17 +3,20 @@ package com.almende.eve.state.mongo;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jongo.Find;
 import org.jongo.Jongo;
+import org.jongo.MongoCollection;
+import org.jongo.ResultHandler;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 /**
@@ -24,20 +27,21 @@ import com.mongodb.MongoClient;
  */
 public class MongoStateFactory implements StateFactory {
 	
-	public static final String COLLECTION_NAME = "agents";
+	private static final Logger		LOG			= Logger.getLogger("MongoStateFactory");
 	
-	private static final Logger LOG = Logger.getLogger("MongoStateFactory");
-	
+	/* internal attributes */
 	private final Jongo jongo;
+	private final String collectionName;
 	
 	/**
 	 * default constructor which will connect to default mongodb client
-	 * (localhost:27017) with "eve" as its default database
+	 * (localhost:27017) with "eve" as its default database and "agents"
+	 * as its collection name
 	 * 
 	 * @throws UnknownHostException 
 	 */
 	public MongoStateFactory() throws UnknownHostException {
-		this(new MongoClient(), "eve");
+		this(new HashMap<String, Object>());
 	}
 	
 	/**
@@ -46,27 +50,48 @@ public class MongoStateFactory implements StateFactory {
 	 * @param mongoUriHost
 	 * @param mongoPort
 	 * @param databaseName
+	 * @param collectionName
 	 * @throws UnknownHostException
 	 */
-	public MongoStateFactory(String mongoUriHost, int mongoPort, String databaseName) throws UnknownHostException {
-		this(new MongoClient(mongoUriHost, mongoPort), databaseName);
+	public MongoStateFactory(String mongoUriHost, int mongoPort, String databaseName, String collectionName) throws UnknownHostException {
+		this(new MongoClient(mongoUriHost, mongoPort), databaseName, collectionName);
 	}
 	
 	/**
 	 * constructor which uses readily available mongo client instance and database name
 	 * @param mongoClient
 	 * @param databaseName
+	 * @param collectionName
 	 */
-	public MongoStateFactory(MongoClient mongoClient, String databaseName) {
-		this(new Jongo(mongoClient.getDB(databaseName)));
+	public MongoStateFactory(MongoClient mongoClient, String databaseName, String collectionName) {
+		this(new Jongo(mongoClient.getDB(databaseName)), collectionName);
 	}
 	
 	/**
 	 * constructor which uses jongo instantiated elsewhere
 	 * @param jongo
+	 * @param collectionName
 	 */
-	public MongoStateFactory(Jongo jongo) {
+	public MongoStateFactory(Jongo jongo, String collectionName) {
 		this.jongo = jongo;
+		this.collectionName = collectionName;
+	}
+	
+	/**
+	 * constructor using configuration mapping provided through the YAML file
+	 * 
+	 * @param params
+	 * @throws UnknownHostException
+	 */
+	public MongoStateFactory(Map<String, Object> params) throws UnknownHostException {
+		// initialization of client & jongo
+		MongoClient client = new MongoClient(
+				((params.containsKey("uriHost")) ? (String) params.get("uriHost") : "localhost"),		// parse URI
+				((params.containsKey("port")) ? (Integer) params.get("port") : 27017)		// parse port
+			);
+		String databaseName = (params != null && params.containsKey("database")) ? (String) params.get("database") : "eve";
+		this.jongo = new Jongo(client.getDB(databaseName));
+		this.collectionName = (params != null && params.containsKey("collection")) ? (String) params.get("collection") : "agents";
 	}
 	
 	/**
@@ -75,6 +100,22 @@ public class MongoStateFactory implements StateFactory {
 	 */
 	public Jongo getJongo() {
 		return jongo;
+	}
+	
+	/**
+	 * returns collection name used in this mongo state factory
+	 * @return
+	 */
+	public String getCollectionName() {
+		return collectionName;
+	}
+	
+	/**
+	 * returns jongo collection used by this state factory
+	 * @return
+	 */
+	public MongoCollection getCollection() {
+		return jongo.getCollection(collectionName);
 	}
 
 	/*
@@ -86,10 +127,9 @@ public class MongoStateFactory implements StateFactory {
 	public State get(String agentId) {
 		MongoState result = null;
 		try {
-			result = jongo.getCollection(COLLECTION_NAME).
-							findOne("{_id: #}", agentId).as(MongoState.class);
+			result = getCollection().findOne("{_id: #}", agentId).as(MongoState.class);
 			if (result!=null) {
-				result.setConnection(jongo);
+				result.setCollection(getCollection());
 			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "get error", e);
@@ -111,11 +151,11 @@ public class MongoStateFactory implements StateFactory {
 		
 		MongoState state = new MongoState(agentId);
 		try {
-			jongo.getCollection(COLLECTION_NAME).insert(state);
+			getCollection().insert(state);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "create error", e);
 		}
-		state.setConnection(jongo);
+		state.setCollection(getCollection());
 		return state;
 	}
 
@@ -127,7 +167,7 @@ public class MongoStateFactory implements StateFactory {
 	@Override
 	public void delete(String agentId) {
 		try {
-			jongo.getCollection(COLLECTION_NAME).remove("{_id: #}", agentId);
+			getCollection().remove("{_id: #}", agentId);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "delete error", e);
 		}
@@ -140,7 +180,7 @@ public class MongoStateFactory implements StateFactory {
 	 */
 	@Override
 	public boolean exists(String agentId) {
-		MongoState result = jongo.getCollection(COLLECTION_NAME).
+		MongoState result = getCollection().
 								findOne("{_id: #}", agentId).as(MongoState.class);
 		return (result != null);
 	}
@@ -152,18 +192,20 @@ public class MongoStateFactory implements StateFactory {
 	 */
 	@Override
 	public Iterator<String> getAllAgentIds() {
-		List<String> agentIDs = new ArrayList<String>();
 		try {
-			Find find = jongo.getCollection(COLLECTION_NAME).find().projection("{_id:1}");
-			// :: there's probably a faster way to iterate over id fields
-	        for (Object map : find.as(Object.class)) {
-				String agentId = (String) ((LinkedHashMap) map).get("_id");
-	        	agentIDs.add(agentId);
-	        }
+			Find find = getCollection().find().projection("{_id:1}");
+			Iterable<String> agentIDs = find.map(
+				    new ResultHandler<String>() {
+						@Override
+						public String map(DBObject result) {
+							return (String) result.get("_id");
+						}
+				});
+			return agentIDs.iterator();
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "getAllAgentIds error", e);
 		}
-		return agentIDs.iterator();
+		return new ArrayList<String>().iterator();
 	}
 
 

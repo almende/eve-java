@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.marshall.jackson.oid.Id;
 
@@ -40,9 +39,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	
 	
 	@JsonIgnore
-	private Jongo connection;
-	
-	
+	private MongoCollection collection;
 	
 	/**
 	 * default constructor, used when instantiating state while fetching the appropriate agents
@@ -62,15 +59,18 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	@JsonIgnore
-	public void setConnection(Jongo connection) {
-		this.connection = connection;
+	public void setCollection(MongoCollection collection) {
+		this.collection = collection;
 	}
 	
 	@JsonIgnore
-	public Jongo getConnection() {
-		return connection;
+	public MongoCollection getCollection() {
+		return collection;
 	}
 	
+	public Date getTimestamp() {
+		return timestamp;
+	}
 	
 	/**
 	 * returns agent ID and adding @Id annotation to mark it as objectID in Mongo
@@ -85,23 +85,15 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	/**
-	 * sets the agent class definition that this state contains. In this variant,
-	 * agent type is considered as a separate attribute, not an overwritable common property.
-	 * 
-	 * @see com.almende.eve.state.State#setAgentType(java.lang.Class)
+	 * agent type is considered as a separate attribute, not a common property
 	 */
 	@Override
 	public synchronized void setAgentType(final Class<?> agentType) {
 		this.agentType = agentType;
 		// assuming this is called only once after creation, simply save the entire state
-		connection.getCollection(MongoStateFactory.COLLECTION_NAME).save(this);
+		collection.save(this);
 	}
 	
-	/**
-	 * return the agent definition contained in this state object
-	 * 
-	 * @see com.almende.eve.state.State#getAgentType()
-	 */
 	@Override
 	public synchronized Class<?> getAgentType() throws ClassNotFoundException {
 		return this.agentType;
@@ -119,6 +111,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 */
 	@Override
 	public void destroy() {
+		this.collection = null;
 	}
 
 	/* (non-Javadoc)
@@ -268,8 +261,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 */
 	private synchronized boolean updateField(String field, JsonNode value) throws JsonProcessingException {
 		Date now = Calendar.getInstance().getTime();
-		WriteResult result = connection.getCollection(MongoStateFactory.COLLECTION_NAME).
-				update("{_id: #, timestamp: #}", getAgentId(), timestamp).
+		WriteResult result = collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).
 				with("{$set: {properties."+field+": #, timestamp: #}}", value, now);
 		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
 		if (updatedExisting) {
@@ -287,11 +279,10 @@ public class MongoState extends AbstractState<JsonNode> {
 	 */
 	private synchronized boolean updateProperties(boolean force) {
 		Date now = Calendar.getInstance().getTime();
-		MongoCollection agents = connection.getCollection(MongoStateFactory.COLLECTION_NAME);
 		/* write to database */
 		WriteResult result = (force) ?
-				agents.update("{_id: #}", getAgentId()).with("{$set: {properties: #, timestamp: #}}", properties, now) :
-				agents.update("{_id: #, timestamp: #}", getAgentId(), timestamp).with("{$set: {properties: #, timestamp: #}}", properties, now);
+				collection.update("{_id: #}", getAgentId()).with("{$set: {properties: #, timestamp: #}}", properties, now) :
+				collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).with("{$set: {properties: #, timestamp: #}}", properties, now);
 		/* check results */
 		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
 		if (updatedExisting) {
