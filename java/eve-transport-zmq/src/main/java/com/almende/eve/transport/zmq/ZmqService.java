@@ -90,7 +90,7 @@ public class ZmqService implements TransportService {
 	 */
 	public void sendAsync(final byte[] zmqType, final String token,
 			final URI senderUrl, final URI receiverUrl,
-			final String message, final String tag) {
+			final byte[] message, final String tag) {
 		host.getPool().execute(new Runnable() {
 			@Override
 			public void run() {
@@ -101,7 +101,7 @@ public class ZmqService implements TransportService {
 					socket.send(zmqType, org.zeromq.ZMQ.SNDMORE);
 					socket.send(senderUrl.toString(), org.zeromq.ZMQ.SNDMORE);
 					socket.send(token, org.zeromq.ZMQ.SNDMORE);
-					socket.send(message);
+					socket.send(message, 0);
 					
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
@@ -118,6 +118,16 @@ public class ZmqService implements TransportService {
 	@Override
 	public void sendAsync(final URI senderUrl, final URI receiverUrl,
 			final String message, final String tag) {
+		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), senderUrl,
+				receiverUrl, message.getBytes(), tag);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.lang.String, java.lang.String, java.lang.Object, java.lang.String)
+	 */
+	@Override
+	public void sendAsync(final URI senderUrl, final URI receiverUrl,
+			final byte[] message, final String tag) {
 		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), senderUrl,
 				receiverUrl, message, tag);
 	}

@@ -423,6 +423,7 @@ public class AgentServlet extends HttpServlet {
 		final AsyncCallbackQueue<String> callbacks = host.getCallbackQueue(
 				"HttpTransport", String.class);
 		callbacks.push(tag, "", callback);
+		//TODO: check if it's base64 encoded data, decode to byte[] and call receive byte[].
 		host.receive(agentId, body, URI.create(senderUrl), tag);
 		
 		try {

@@ -226,7 +226,7 @@ public class ZmqConnection {
 			// Reply token corresponding to timestamp.
 			final String res = TokenStore.get(body);
 			service.sendAsync(ZMQ.HANDSHAKE_RESPONSE, res, zmqUrl, senderUrl,
-					res, null);
+					res.getBytes(), null);
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
@@ -250,7 +250,7 @@ public class ZmqConnection {
 				SyncCallback<String> callback = new SyncCallback<String>();
 				callbacks.push(key, "", callback);
 				service.sendAsync(ZMQ.HANDSHAKE, token.toString(), zmqUrl,
-						senderUrl, token.getTime(), null);
+						senderUrl, token.getTime().getBytes(), null);
 				
 				String retToken = null;
 				try {

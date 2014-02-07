@@ -24,6 +24,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.jivesoftware.smack.SmackConfiguration;
 
 import com.almende.eve.agent.AgentHost;
@@ -431,19 +432,18 @@ public class XmppService implements TransportService {
 		delConnections(agentId);
 	}
 	
-	/**
-	 * Asynchronously Send a message to an other agent.
-	 * 
-	 * @param senderUrl
-	 *            the sender url
-	 * @param receiverUrl
-	 *            the receiver
-	 * @param message
-	 *            the message
-	 * @param tag
-	 *            the tag
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI, java.net.URI, byte[], java.lang.String)
+	 */
+	@Override
+	public void sendAsync(URI senderUri, URI receiverUri, byte[] message,
+			String tag) throws IOException {
+		sendAsync(senderUri, receiverUri, Base64.encodeBase64String(message),tag);
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI, java.net.URI, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void sendAsync(final URI senderUrl, final URI receiverUrl,

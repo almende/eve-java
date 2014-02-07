@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -71,14 +73,19 @@ public class HttpService implements TransportService {
 				}
 				try {
 					final Class<?> launcherClass = Class.forName(className);
-					if (!ClassUtil.hasInterface(launcherClass, ServletLauncher.class)) {
-						throw new IllegalArgumentException("ServletLauncher class "
-								+ launcherClass.getName() + " must implement "
-								+ ServletLauncher.class.getName());
+					if (!ClassUtil.hasInterface(launcherClass,
+							ServletLauncher.class)) {
+						throw new IllegalArgumentException(
+								"ServletLauncher class "
+										+ launcherClass.getName()
+										+ " must implement "
+										+ ServletLauncher.class.getName());
 					}
 					
-					ServletLauncher launcher = (ServletLauncher) launcherClass.newInstance();
-					launcher.add(new AgentServlet(this), URI.create(getServletUrl()), agentHost.getConfig());
+					ServletLauncher launcher = (ServletLauncher) launcherClass
+							.newInstance();
+					launcher.add(new AgentServlet(this),
+							URI.create(getServletUrl()), agentHost.getConfig());
 					
 				} catch (Exception e) {
 					LOG.log(Level.WARNING, "Failed to load launcher!", e);
@@ -144,6 +151,19 @@ public class HttpService implements TransportService {
 		return protocols;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * java.net.URI, byte[], java.lang.String)
+	 */
+	@Override
+	public void sendAsync(URI senderUri, URI receiverUri, byte[] message,
+			String tag) throws IOException {
+		sendAsync(senderUri, receiverUri, Base64.encodeBase64String(message),
+				tag);
+	}
+	
 	/**
 	 * Send a JSON-RPC request to an agent via HTTP.
 	 * 
@@ -188,7 +208,7 @@ public class HttpService implements TransportService {
 						} else {
 							LOG.warning("Tag set, but no callbacks found!");
 						}
-						//Chicken out
+						// Chicken out
 						return;
 					}
 					httpPost = new HttpPost(receiverUrl);
@@ -199,13 +219,17 @@ public class HttpService implements TransportService {
 					httpPost.addHeader("X-Eve-Token", TokenStore.create()
 							.toString());
 					httpPost.addHeader("X-Eve-SenderUrl", senderUrl.toString());
-					
 					final HttpResponse webResp = ApacheHttpClient.get()
 							.execute(httpPost);
 					final String result = EntityUtils.toString(webResp
 							.getEntity());
-					host.receive(getAgentId(senderUrl), result, receiverUrl,
-							null);
+					if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+						LOG.warning("Received HTTP Error Status:"+webResp.getStatusLine().getStatusCode()+":"+webResp.getStatusLine().getReasonPhrase());
+						LOG.warning(result);
+					} else {
+						host.receive(getAgentId(senderUrl), result,
+								receiverUrl, null);
+					}
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING,
 							"HTTP roundtrip resulted in exception!", e);

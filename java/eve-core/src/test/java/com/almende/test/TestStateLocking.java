@@ -169,5 +169,4 @@ public class TestStateLocking extends TestCase {
 		final State fc = sf.create(agentId);
 		testRun(fc);
 	}
-	
 }

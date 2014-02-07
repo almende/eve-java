@@ -417,7 +417,7 @@ public final class AgentHostDefImpl extends AgentHost {
 			}
 			service = getTransportService(protocol);
 			if (service != null) {
-				// TODO: message should already be a String?
+				// TODO: Support byte[] at transport level, two types of transport?
 				service.sendAsync(senderUri, receiverUrl, message.toString(),
 						tag);
 			} else {
