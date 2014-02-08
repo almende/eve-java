@@ -2,11 +2,12 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.agent;
+package com.almende.eve.agent.system;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.annotation.Namespace;
 import com.almende.eve.state.State;
 
@@ -17,7 +18,7 @@ import com.almende.eve.state.State;
  * @param <T> the generic type
  * @author ludo
  */
-public class AspectAgent<T> extends Agent implements AgentInterface {
+public class AspectAgent<T> extends Agent {
 	
 	private static final Logger	LOG		= Logger.getLogger(AspectAgent.class
 												.getCanonicalName());

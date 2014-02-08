@@ -1074,11 +1074,12 @@ public abstract class Agent implements AgentInterface {
 						+ ": Received non-JSON message:'" + msg + "'");
 			}
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Exception in receiving message", e);
 			// generate JSON error response, skipped if it was an incoming
 			// notification i.s.o. request.
 			final JSONRPCException jsonError = new JSONRPCException(
 					JSONRPCException.CODE.INTERNAL_ERROR, e.getMessage(), e);
+			LOG.log(Level.WARNING, "Exception in receiving message", jsonError);
+
 			final JSONResponse response = new JSONResponse(jsonError);
 			response.setId(id);
 			signalAgent(new AgentSignal<JSONResponse>(AgentSignal.EXCEPTION,

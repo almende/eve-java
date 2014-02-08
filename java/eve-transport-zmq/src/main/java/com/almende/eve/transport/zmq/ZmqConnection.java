@@ -243,7 +243,7 @@ public class ZmqConnection {
 		} else {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key)
-					&& host.getAgent(agentId).hasPrivate()) {
+					&& host.hasPrivate(agentId)) {
 				final AsyncCallbackQueue<String> callbacks = host
 						.getCallbackQueue("zmqHandshakes", String.class);
 				

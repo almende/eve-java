@@ -12,6 +12,7 @@
 
 	<properties>
 		<jetty.version>9.1.0.v20131115</jetty.version>
+		<slf4j.version>1.7.5</slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -27,8 +28,34 @@
 			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>com.almende.test.TestRunListener</value>
+						</property>
+					</properties>
+				</configuration>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -37,14 +64,9 @@
 					<version>${jetty.version}</version>
 					<configuration>
 						<jettyXml>src/test/resources/jetty.xml,src/test/resources/jetty-http.xml,src/test/resources/jetty-ssl.xml,src/test/resources/jetty-https.xml</jettyXml>
-
-						<!-- TODO: http://blog.max.berger.name/2010/02/jetty-7-maven-plugin-authentication.html 
-							http://theholyjava.wordpress.com/2010/09/10/jetty-maven-plugin-running-a-webapp-with-a-datasource-and-security/ 
-							http://docs.oracle.com/cd/E19798-01/821-1841/bncck/index.html -->
-						<scanIntervalSeconds>10</scanIntervalSeconds>
 						<stopKey>testKey</stopKey>
 						<stopPort>9999</stopPort>
-						<daemon>false</daemon>
+						<daemon>true</daemon>
 						<reload>manual</reload>
 						<useTestClasspath>true</useTestClasspath>
 						<scanTargets>
@@ -68,47 +90,9 @@
 							</userRealm>
 						</userRealms>
 						<webAppXml>src/test/resources/jetty-test.xml</webAppXml>
-						<!-- <connectors> <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector"> 
-							<port>8080</port> <maxIdleTime>60000</maxIdleTime> </connector> <connector 
-							implementation="org.eclipse.jetty.server.ssl.SslSelectChannelConnector"> 
-							<port>8443</port> <maxIdleTime>60000</maxIdleTime> <keystore>${project.build.directory}/test-classes/jetty-ssl.keystore</keystore> 
-							<password>testKey</password> <keyPassword>testKey</keyPassword> </connector> 
-							</connectors> -->
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-	<profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>skipTests</name>
-					<value>false</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.jetty</groupId>
-						<artifactId>jetty-maven-plugin</artifactId>
-						<version>${jetty.version}</version>
-						<configuration>
-							<daemon>true</daemon>
-						</configuration>
-						<executions>
-							<execution>
-								<id>start-jetty</id>
-								<phase>test-compile</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 </project>

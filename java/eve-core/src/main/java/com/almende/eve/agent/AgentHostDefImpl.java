@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 
 import com.almende.eve.agent.annotation.ThreadSafe;
 import com.almende.eve.agent.callback.AsyncCallbackQueue;
-import com.almende.eve.agent.log.EventLogger;
+import com.almende.eve.agent.system.AspectAgent;
+import com.almende.eve.agent.system.HostManagerAgent;
 import com.almende.eve.config.Config;
 import com.almende.eve.event.EventsFactory;
 import com.almende.eve.event.EventsInterface;
@@ -53,8 +54,6 @@ public final class AgentHostDefImpl extends AgentHost {
 	private StateFactory																		stateFactory		= null;
 	private SchedulerFactory																	schedulerFactory	= null;
 	private Config																				config				= null;
-	private final EventLogger																	eventLogger			= new EventLogger(
-																															this);
 	private boolean																				doesShortcut		= true;
 	private ExecutorService																		pool				= Executors
 																															.newCachedThreadPool(Config
@@ -71,7 +70,6 @@ public final class AgentHostDefImpl extends AgentHost {
 	public ExecutorService getPool() {
 		return pool;
 	}
-	
 	
 	/*
 	 * (non-Javadoc)
@@ -102,6 +100,7 @@ public final class AgentHostDefImpl extends AgentHost {
 			host.setStateFactory(config);
 			host.addTransportServices(config);
 			host.setSchedulerFactory(config);
+			host.addManagementAgent();
 			host.addAgents(config);
 		}
 	}
@@ -353,14 +352,21 @@ public final class AgentHostDefImpl extends AgentHost {
 		return getStateFactory().exists(agentId);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.agent.AgentHost#getEventLogger()
+	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.agent.AgentHost#hasPrivate(java.lang.String)
 	 */
 	@Override
-	public EventLogger getEventLogger() {
-		return eventLogger;
+	public boolean hasPrivate(final String agentId){
+		if (!hasAgent(agentId)){
+			return false;
+		}
+		try {
+			Agent agent = getAgent(agentId);
+			return agent.hasPrivate();
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	/*
@@ -371,7 +377,7 @@ public final class AgentHostDefImpl extends AgentHost {
 	 */
 	@Override
 	public void receive(final String receiverId, final Object message,
-			final URI senderUri, final String tag) throws IOException {
+			final URI senderUri, final String tag) {
 		try {
 			AgentInterface receiver = getAgent(receiverId);
 			
@@ -386,8 +392,12 @@ public final class AgentHostDefImpl extends AgentHost {
 				throw new Exception();
 			}
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Couldn't getAgent(" + receiverId + ")", e);
-			throw new IOException(e);
+			try {
+				HostManagerAgent agent = (HostManagerAgent) getAgent(MANAGEMENTAGENTID);
+				agent.reportMissingAgent(receiverId, message, senderUri, tag);
+			} catch (Exception e1) {
+				LOG.log(Level.WARNING,"Failed to send error back.",e1);
+			}
 		}
 	}
 	
@@ -417,7 +427,8 @@ public final class AgentHostDefImpl extends AgentHost {
 			}
 			service = getTransportService(protocol);
 			if (service != null) {
-				// TODO: Support byte[] at transport level, two types of transport?
+				// TODO: Support byte[] at transport level, two types of
+				// transport?
 				service.sendAsync(senderUri, receiverUrl, message.toString(),
 						tag);
 			} else {

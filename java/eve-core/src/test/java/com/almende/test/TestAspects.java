@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentHost;
-import com.almende.eve.agent.AspectAgent;
+import com.almende.eve.agent.system.AspectAgent;
 import com.almende.eve.rpc.annotation.Access;
 import com.almende.eve.rpc.annotation.AccessType;
 import com.almende.eve.state.FileStateFactory;

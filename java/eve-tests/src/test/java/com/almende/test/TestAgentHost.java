@@ -5,6 +5,7 @@
 package com.almende.test;
 
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -12,7 +13,9 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentHost;
-import com.almende.eve.state.FileStateFactory;
+import com.almende.eve.agent.callback.AsyncCallback;
+import com.almende.eve.rpc.jsonrpc.JSONRequest;
+import com.almende.eve.rpc.jsonrpc.JSONResponse;
 import com.almende.test.agents.Test2Agent;
 import com.almende.test.agents.Test2AgentInterface;
 
@@ -32,11 +35,7 @@ public class TestAgentHost extends TestCase {
 	public void testAgentCall() throws Exception {
 		final String TESTAGENT = "hostTestAgent";
 		
-		LOG.warning(this.getClass().getName() + ":"
-				+ this.getClass().getClassLoader().hashCode());
 		final AgentHost host = AgentHost.getInstance();
-		final FileStateFactory stateFactory = new FileStateFactory(".eveagents");
-		host.setStateFactory(stateFactory);
 		
 		if (host.hasAgent(TESTAGENT)) {
 			host.deleteAgent(TESTAGENT);
@@ -66,7 +65,67 @@ public class TestAgentHost extends TestCase {
 		res = agent.multiply(3.1, 4.2);
 		assertEquals(new Double(13.020000000000001), res);
 		
+		agent = (Test2AgentInterface) host.getAgent(TESTAGENT);
+		JSONRequest request = new JSONRequest("someMethod", null);
+		AsyncCallback<JSONResponse> callback = new AsyncCallback<JSONResponse>() {
+			
+			@Override
+			public void onSuccess(JSONResponse result) {
+				LOG.log(Level.WARNING, "onSuccess called as expected:"+result);
+				if (result.getError() != null){
+					LOG.log(Level.WARNING, "contained error:",result.getError());
+				}
+				
+			}
+			
+			@Override
+			public void onFailure(Exception e) {
+				LOG.log(Level.WARNING, "onFailure called", e);
+			}
+		};
+		agent.send(request,
+				URI.create("https://localhost:8443/agents/nonExisting"),
+				callback, null);
+		
+		Thread.sleep(1000);
 		host.deleteAgent(TESTAGENT);
 	}
-	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testAgentMissing() throws Exception {
+		final AgentHost host = AgentHost.getInstance();
+		
+		final String TESTAGENT = "missingAgentTestAgent";
+
+		if (host.hasAgent(TESTAGENT)) {
+			host.deleteAgent(TESTAGENT);
+		}
+		Test2AgentInterface agent = host.createAgent(Test2Agent.class, TESTAGENT);
+
+		JSONRequest request = new JSONRequest("someMethod", null);
+		AsyncCallback<JSONResponse> callback = new AsyncCallback<JSONResponse>() {
+			
+			@Override
+			public void onSuccess(JSONResponse result) {
+				LOG.log(Level.WARNING, "onSuccess called as expected:"+result);
+				if (result.getError() != null){
+					LOG.log(Level.WARNING, "contained error:",result.getError());
+				}
+				
+			}
+			
+			@Override
+			public void onFailure(Exception e) {
+				LOG.log(Level.WARNING, "onFailure called", e);
+			}
+		};
+		agent.send(request,
+				URI.create("http://localhost:8080/agents/nonExisting"),
+				callback, null);
+		
+		Thread.sleep(1000);
+		host.deleteAgent(TESTAGENT);
+	}
 }

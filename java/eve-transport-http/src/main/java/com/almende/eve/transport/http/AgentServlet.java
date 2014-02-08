@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +24,6 @@ import com.almende.eve.agent.AgentHost;
 import com.almende.eve.agent.AgentSignal;
 import com.almende.eve.agent.callback.AsyncCallbackQueue;
 import com.almende.eve.agent.callback.SyncCallback;
-import com.almende.eve.agent.log.Log;
 import com.almende.eve.config.Config;
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.util.StreamingUtil;
@@ -318,28 +316,7 @@ public class AgentServlet extends HttpServlet {
 				.substring(resource.lastIndexOf('.') + 1);
 		
 		if (resource.equals("events")) {
-			// retrieve the agents logs
-			final String sinceStr = req.getParameter("since");
-			Long since = null;
-			if (sinceStr != null) {
-				try {
-					since = Long.valueOf(sinceStr);
-				} catch (final java.lang.NumberFormatException e) {
-					LOG.warning("Couldn't parse 'since' parameter:'" + since
-							+ "'");
-				}
-			}
-			
-			try {
-				final List<Log> logs = host.getEventLogger().getLogs(agentId,
-						since);
-				resp.addHeader("Content-type", "application/json");
-				JOM.getInstance().writer().writeValue(resp.getWriter(), logs);
-			} catch (final Exception e) {
-				LOG.log(Level.WARNING, "", e);
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-						e.getMessage());
-			}
+			//TODO: fix this again.
 		} else {
 			// load the resource
 			final String mimetype = StreamingUtil.getMimeType(extension);
@@ -389,20 +366,8 @@ public class AgentServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		Agent agent = null;
-		try {
-			agent = host.getAgent(agentId);
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Couldn't get agent:" + agentId, e);
-		}
-		if (agent == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-					"Agent not found at this host.");
-			resp.flushBuffer();
-			return;
-		}
 		
-		if (agent.hasPrivate() && !handleSession(req, resp)) {
+		if (host.hasPrivate(agentId) && !handleSession(req, resp)) {
 			if (!resp.isCommitted()) {
 				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			}

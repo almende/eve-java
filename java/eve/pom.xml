@@ -199,10 +199,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
+					<useSystemClassLoader>true</useSystemClassLoader>
+					<useManifestOnlyJar>false</useManifestOnlyJar>
+					<childDelegation>false</childDelegation>
 					<skipTests>${skipTests}</skipTests>
-					<forkMode>never</forkMode>
-					<parallel>methods</parallel>
+					<forkCount>1</forkCount>
 					<threadCount>10</threadCount>
 				</configuration>
 			</plugin>

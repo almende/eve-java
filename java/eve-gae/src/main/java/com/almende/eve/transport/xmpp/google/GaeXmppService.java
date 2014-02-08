@@ -126,14 +126,14 @@ public class GaeXmppService implements TransportService {
 	@Override
 	public void sendAsync(URI senderUri, URI receiverUri, String message,
 			String tag) throws IOException {
-		throw new IOException("Missing implemenation!");
+		throw new IOException("Missing implementation!");
 		//TODO / FIXME: WHy is this missing????
 	}
 	
 	@Override
 	public void sendAsync(URI senderUri, URI receiverUri, byte[] message,
 			String tag) throws IOException {
-		throw new IOException("Missing implemenation!");
+		throw new IOException("Missing implementation!");
 		//TODO / FIXME: WHy is this missing????
 	}
 

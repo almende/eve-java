@@ -10,9 +10,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 
 import com.almende.eve.agent.callback.AsyncCallbackQueue;
-import com.almende.eve.agent.log.EventLogger;
+import com.almende.eve.agent.system.AspectAgent;
+import com.almende.eve.agent.system.HostManagerAgent;
 import com.almende.eve.config.Config;
 import com.almende.eve.event.EventsInterface;
 import com.almende.eve.monitor.ResultMonitorFactoryInterface;
@@ -62,7 +64,14 @@ import com.almende.eve.transport.TransportService;
  * 
  */
 public abstract class AgentHost {
-	protected static AgentHost	host	= null;
+	private static final Logger	LOG					= Logger.getLogger(AgentHostDefImpl.class
+															.getSimpleName());
+	protected static AgentHost	host				= null;
+	
+	/**
+	 * The AgentId of this host's management agent.
+	 */
+	public static final String	MANAGEMENTAGENTID	= "_system";
 	
 	/**
 	 * Get the shared AgentHost instance.
@@ -71,6 +80,7 @@ public abstract class AgentHost {
 	 */
 	public static synchronized AgentHost getInstance() {
 		if (host == null) {
+			LOG.info("Creating new AgentHost!");
 			host = new AgentHostDefImpl();
 		}
 		return host;
@@ -83,7 +93,7 @@ public abstract class AgentHost {
 	 *            the config
 	 */
 	public abstract void loadConfig(Config config);
-
+	
 	/**
 	 * Instantiate the services from the given config.
 	 * 
@@ -282,12 +292,14 @@ public abstract class AgentHost {
 	public abstract boolean hasAgent(String agentId);
 	
 	/**
-	 * Get the event logger. The event logger is used to temporary log triggered
-	 * events, and display them on the agents web interface.
 	 * 
-	 * @return eventLogger
+	 * Test if an agent has a need for strict transport-level authentication.
+	 * Returns false if agent doesn't exists.
+	 * 
+	 * @param agentId
+	 * @return has Private methods, therefor requires authentication.
 	 */
-	public abstract EventLogger getEventLogger();
+	public abstract boolean hasPrivate(String agentId);
 	
 	/**
 	 * Receive a message for an agent.
@@ -585,5 +597,18 @@ public abstract class AgentHost {
 	 */
 	public abstract StateFactory getStateFactoryFromConfig(Config config,
 			String configName);
+	
+	/**
+	 * Ensures that there is an instance of the HostManagerAgent.
+	 */
+	protected void addManagementAgent() {
+		if (!hasAgent(MANAGEMENTAGENTID)) {
+			try {
+				createAgent(HostManagerAgent.class, MANAGEMENTAGENTID);
+			} catch (Exception e) {
+				LOG.warning("Failed to create HostManagerAgent!");
+			}
+		}
+	}
 	
 }
