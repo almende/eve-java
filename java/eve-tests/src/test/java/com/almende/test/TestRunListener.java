@@ -21,7 +21,7 @@ public class TestRunListener extends RunListener {
 	private static Server server= null;
 	
 	public void testRunStarted(final Description description) throws Exception {
-		LOG.warning("testRunStarted!");
+		LOG.info("Starting Jetty for test run");
 		System.setProperty("com.almende.eve.runtime.environment", "Development");
 		
 		Resource fileserver_xml = Resource
@@ -51,7 +51,7 @@ public class TestRunListener extends RunListener {
 	}
 	
 	public void testRunFinished(final Result result) throws Exception {
-		LOG.warning("testRunFinished!");
+		LOG.info("Test run finished, stopping Jetty.");
 		if (server != null){
 			server.stop();
 		}
