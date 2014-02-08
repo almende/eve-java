@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.state.mongo;
 
 import java.io.IOException;
@@ -20,10 +24,10 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 /**
- * An implementation of state factory using MongoDB & Jongo as database connection
+ * An implementation of state factory using MongoDB & Jongo as database
+ * connection.
  * 
  * @author ronny
- *
  */
 public class MongoStateFactory implements StateFactory {
 	
@@ -36,41 +40,55 @@ public class MongoStateFactory implements StateFactory {
 	/**
 	 * default constructor which will connect to default mongodb client
 	 * (localhost:27017) with "eve" as its default database and "agents"
-	 * as its collection name
+	 * as its collection name.
 	 * 
-	 * @throws UnknownHostException 
+	 * @throws UnknownHostException
+	 *             the unknown host exception
 	 */
 	public MongoStateFactory() throws UnknownHostException {
 		this(new HashMap<String, Object>());
 	}
 	
 	/**
-	 * constructor with the URI & database name as its parameter
+	 * constructor with the URI & database name as its parameter.
 	 * 
 	 * @param mongoUriHost
+	 *            the mongo uri host
 	 * @param mongoPort
+	 *            the mongo port
 	 * @param databaseName
+	 *            the database name
 	 * @param collectionName
+	 *            the collection name
 	 * @throws UnknownHostException
+	 *             the unknown host exception
 	 */
 	public MongoStateFactory(String mongoUriHost, int mongoPort, String databaseName, String collectionName) throws UnknownHostException {
 		this(new MongoClient(mongoUriHost, mongoPort), databaseName, collectionName);
 	}
 	
 	/**
-	 * constructor which uses readily available mongo client instance and database name
+	 * constructor which uses readily available mongo client instance and
+	 * database name.
+	 * 
 	 * @param mongoClient
+	 *            the mongo client
 	 * @param databaseName
+	 *            the database name
 	 * @param collectionName
+	 *            the collection name
 	 */
 	public MongoStateFactory(MongoClient mongoClient, String databaseName, String collectionName) {
 		this(new Jongo(mongoClient.getDB(databaseName)), collectionName);
 	}
 	
 	/**
-	 * constructor which uses jongo instantiated elsewhere
+	 * constructor which uses jongo instantiated elsewhere.
+	 * 
 	 * @param jongo
+	 *            the jongo
 	 * @param collectionName
+	 *            the collection name
 	 */
 	public MongoStateFactory(Jongo jongo, String collectionName) {
 		this.jongo = jongo;
@@ -78,10 +96,12 @@ public class MongoStateFactory implements StateFactory {
 	}
 	
 	/**
-	 * constructor using configuration mapping provided through the YAML file
+	 * constructor using configuration mapping provided through the YAML file.
 	 * 
 	 * @param params
+	 *            the params
 	 * @throws UnknownHostException
+	 *             the unknown host exception
 	 */
 	public MongoStateFactory(Map<String, Object> params) throws UnknownHostException {
 		// initialization of client & jongo
@@ -95,7 +115,8 @@ public class MongoStateFactory implements StateFactory {
 	}
 	
 	/**
-	 * returns jongo connection to the underlying mongo database
+	 * returns jongo connection to the underlying mongo database.
+	 * 
 	 * @return jongo
 	 */
 	public Jongo getJongo() {
@@ -103,16 +124,18 @@ public class MongoStateFactory implements StateFactory {
 	}
 	
 	/**
-	 * returns collection name used in this mongo state factory
-	 * @return
+	 * returns collection name used in this mongo state factory.
+	 * 
+	 * @return the collection name
 	 */
 	public String getCollectionName() {
 		return collectionName;
 	}
 	
 	/**
-	 * returns jongo collection used by this state factory
-	 * @return
+	 * returns jongo collection used by this state factory.
+	 * 
+	 * @return the collection
 	 */
 	public MongoCollection getCollection() {
 		return jongo.getCollection(collectionName);

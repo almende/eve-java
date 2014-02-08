@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.state.mongo;
 
 import java.util.Calendar;
@@ -21,10 +25,9 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.mongodb.WriteResult;
 
 /**
- * Simple representation of Eve agents state based on MongoDB
+ * Simple representation of Eve agents state based on MongoDB.
  * 
  * @author ronny
- *
  */
 public class MongoState extends AbstractState<JsonNode> {
 	
@@ -42,15 +45,19 @@ public class MongoState extends AbstractState<JsonNode> {
 	private MongoCollection collection;
 	
 	/**
-	 * default constructor, used when instantiating state while fetching the appropriate agents
+	 * default constructor, used when instantiating state while fetching the
+	 * appropriate agents.
+	 * 
 	 * @see com.almende.eve.state.AbstractState#AbstractState()
 	 */
 	public MongoState() {
 	}
 	
 	/**
-	 * the constructor used on creation of new state in the database
+	 * the constructor used on creation of new state in the database.
+	 * 
 	 * @param agentId
+	 *            the agent id
 	 */
 	public MongoState(final String agentId) {
 		super(agentId);
@@ -58,24 +65,42 @@ public class MongoState extends AbstractState<JsonNode> {
 		agentType = null;
 	}
 	
+	/**
+	 * Sets the collection.
+	 * 
+	 * @param collection
+	 *            the new collection
+	 */
 	@JsonIgnore
 	public void setCollection(MongoCollection collection) {
 		this.collection = collection;
 	}
 	
+	/**
+	 * Gets the collection.
+	 * 
+	 * @return the collection
+	 */
 	@JsonIgnore
 	public MongoCollection getCollection() {
 		return collection;
 	}
 	
+	/**
+	 * Gets the timestamp.
+	 * 
+	 * @return the timestamp
+	 */
 	public Date getTimestamp() {
 		return timestamp;
 	}
 	
 	/**
-	 * returns agent ID and adding @Id annotation to mark it as objectID in Mongo
-	 * otherwise mongo will generate new object each time
+	 * returns agent ID and adding @Id annotation to mark it as objectID in
+	 * Mongo
+	 * otherwise mongo will generate new object each time.
 	 * 
+	 * @return the agent id
 	 * @see com.almende.eve.state.State#getAgentId()
 	 */
 	@Override
@@ -85,7 +110,10 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	/**
-	 * agent type is considered as a separate attribute, not a common property
+	 * agent type is considered as a separate attribute, not a common property.
+	 * 
+	 * @param agentType
+	 *            the new agent type
 	 */
 	@Override
 	public synchronized void setAgentType(final Class<?> agentType) {
@@ -94,6 +122,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		collection.save(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.AbstractState#getAgentType()
+	 */
 	@Override
 	public synchronized Class<?> getAgentType() throws ClassNotFoundException {
 		return this.agentType;
@@ -143,6 +174,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.State#keySet()
+	 */
 	@Override
 	public Set<String> keySet() {
 		Set<String> result = null;
@@ -154,6 +188,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.State#clear()
+	 */
 	@Override
 	public void clear() {
 		try {
@@ -165,6 +202,9 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.State#size()
+	 */
 	@Override
 	public int size() {
 		int result = 0;
@@ -176,6 +216,9 @@ public class MongoState extends AbstractState<JsonNode> {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.AbstractState#get(java.lang.String)
+	 */
 	@Override
 	public JsonNode get(String key) {
 		JsonNode result = null;
@@ -233,8 +276,8 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	/**
-	 * returns agent properties as a mapped collection of JSON nodes
-	 *
+	 * returns agent properties as a mapped collection of JSON nodes.
+	 * 
 	 * @return the properties
 	 */
 	public Map<String, JsonNode> getProperties() {
@@ -242,9 +285,10 @@ public class MongoState extends AbstractState<JsonNode> {
 	}
 	
 	/**
-	 * set all property values from a collection
-	 *
-	 * @param properties the properties
+	 * set all property values from a collection.
+	 * 
+	 * @param properties
+	 *            the properties
 	 */
 	public void setProperties(final Map<String, JsonNode> properties) {
 		this.properties.clear();
@@ -259,6 +303,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * update a single field, by default will fail if there is a newer update from some other instance
 	 * @throws JsonProcessingException 
 	 */
+	@SuppressWarnings("unused")
 	private synchronized boolean updateField(String field, JsonNode value) throws JsonProcessingException {
 		Date now = Calendar.getInstance().getTime();
 		WriteResult result = collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).
