@@ -22,8 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public final class NamespaceUtil {
 	
-	// TODO: Default namespaces shoudl be quicker?
-	
 	private static Map<String, Method[]>	cache		= new HashMap<String, Method[]>();
 	private static NamespaceUtil			instance	= new NamespaceUtil();
 	private static final Pattern			PATTERN		= Pattern
@@ -53,6 +51,7 @@ public final class NamespaceUtil {
 	public static CallTuple get(final Object destination, final String path)
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
+		
 		return instance._get(destination, path);
 	}
 	
@@ -118,6 +117,14 @@ public final class NamespaceUtil {
 			return result;
 		}
 		
+		//If destination has a cache, use it.
+		if (destination instanceof RPCCallCache){
+			 final CallTuple res = ((RPCCallCache)destination).getCallTuple(path);
+			 if (res != null){
+				 return res;
+			 }
+		}
+		
 		path = destination.getClass().getName() + "." + path;
 		String[] steps = path.split("\\.");
 		final String reducedMethod = steps[steps.length - 1];
@@ -140,13 +147,18 @@ public final class NamespaceUtil {
 			}
 		}
 		final Method[] methods = cache.get(path);
+		Object newDestination = destination;
 		for (final Method method : methods) {
 			if (method != null) {
-				destination = method.invoke(destination, (Object[]) null);
+				newDestination = method.invoke(destination, (Object[]) null);
 			}
 		}
-		result.setDestination(destination);
+		result.setDestination(newDestination);
 		result.setMethodName(reducedMethod);
+		
+		if (destination instanceof RPCCallCache){
+			((RPCCallCache)destination).putCallTuple(path, result);
+		} 
 		return result;
 	}
 	

@@ -256,7 +256,7 @@ public class JSONRPCException extends Exception {
 		if (message != null) {
 			error.put(MESSAGE_S, message);
 		}
-		if (t != null){
+		if (t != null && getCause() == null){
 			initCause(t);
 		}
 	}

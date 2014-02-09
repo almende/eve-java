@@ -20,8 +20,9 @@ public class TestReference extends TestCase {
 	
 	/**
 	 * Test reference.
-	 *
-	 * @throws Exception the exception
+	 * 
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Test
 	public void testReference() throws Exception {

@@ -352,13 +352,14 @@ public final class AgentHostDefImpl extends AgentHost {
 		return getStateFactory().exists(agentId);
 	}
 	
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.AgentHost#hasPrivate(java.lang.String)
 	 */
 	@Override
-	public boolean hasPrivate(final String agentId){
-		if (!hasAgent(agentId)){
+	public boolean hasPrivate(final String agentId) {
+		if (!hasAgent(agentId)) {
 			return false;
 		}
 		try {
@@ -378,26 +379,34 @@ public final class AgentHostDefImpl extends AgentHost {
 	@Override
 	public void receive(final String receiverId, final Object message,
 			final URI senderUri, final String tag) {
+		AgentInterface receiver = null;
 		try {
-			AgentInterface receiver = getAgent(receiverId);
-			
-			if (receiver == null) {
-				// Check if there might be a proxy in the objectcache:
-				receiver = ObjectCache.get(AGENTS).get(receiverId,
-						AgentInterface.class);
-			}
-			if (receiver != null) {
-				receiver.receive(message, senderUri, tag);
-			} else {
-				throw new Exception();
-			}
+			receiver = getAgent(receiverId);
 		} catch (final Exception e) {
+			LOG.log(Level.WARNING, "error getting Agent:"+receiverId,e);
 			try {
 				HostManagerAgent agent = (HostManagerAgent) getAgent(MANAGEMENTAGENTID);
 				agent.reportMissingAgent(receiverId, message, senderUri, tag);
 			} catch (Exception e1) {
-				LOG.log(Level.WARNING,"Failed to send error back.",e1);
+				LOG.log(Level.WARNING, "Failed to send error back.", e1);
 			}
+		}
+		if (receiver == null) {
+			// Check if there might be a proxy in the objectcache:
+			receiver = ObjectCache.get(AGENTS).get(receiverId,
+					AgentInterface.class);
+		}
+		if (receiver != null) {
+			receiver.receive(message, senderUri, tag);
+		} else {
+			HostManagerAgent agent;
+			try {
+				agent = (HostManagerAgent) getAgent(MANAGEMENTAGENTID);
+				agent.reportMissingAgent(receiverId, message, senderUri, tag);
+			} catch (Exception e) {
+				LOG.log(Level.WARNING, "Failed to send error back.", e);
+			}
+			
 		}
 	}
 	

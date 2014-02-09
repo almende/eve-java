@@ -13,10 +13,22 @@ public interface Clock {
 	/**
 	 * Request trigger.
 	 *
-	 * @param agentId the agent id
+	 * @param triggerId the agent id
 	 * @param due the due
 	 * @param callback the callback
 	 */
-	void requestTrigger(String agentId, DateTime due, Runnable callback);
+	void requestTrigger(String triggerId, DateTime due, Runnable callback);
+
+	/**
+	 * Cancel a triggerRequest
+	 * 
+	 * @param triggerId
+	 */
+	void cancel(String triggerId);
+
+	/**
+	 * Clear all triggerRequests!
+	 */
+	void clear();
 	
 }

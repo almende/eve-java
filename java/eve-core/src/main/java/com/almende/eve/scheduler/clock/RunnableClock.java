@@ -38,17 +38,17 @@ public class RunnableClock implements Runnable, Clock {
 			while (!TIMELINE.isEmpty()) {
 				final ClockEntry ce = TIMELINE.firstEntry().getValue();
 				final DateTime now = DateTime.now();
-				if (ce.getDue().isBefore(now)) {
-					TIMELINE.remove(ce);
-					POOL.execute(ce.getCallback());
-					continue;
-				}
 				if (future != null) {
 					future.cancel(false);
 					future = null;
 				}
 				final long interval = new Interval(now, ce.getDue())
 						.toDurationMillis();
+				if (ce.getDue().isBefore(now)) {
+					TIMELINE.remove(ce);
+					POOL.execute(ce.getCallback());
+					continue;
+				}
 				future = POOL.schedule(this, interval, TimeUnit.MILLISECONDS);
 				break;
 			}
@@ -63,14 +63,33 @@ public class RunnableClock implements Runnable, Clock {
 	 * org.joda.time.DateTime, java.lang.Runnable)
 	 */
 	@Override
-	public void requestTrigger(final String agentId, final DateTime due,
+	public void requestTrigger(final String triggerId, final DateTime due,
 			final Runnable callback) {
 		synchronized (TIMELINE) {
-			final ClockEntry ce = new ClockEntry(agentId, due, callback);
+			final ClockEntry ce = new ClockEntry(triggerId, due, callback);
 			final ClockEntry oldVal = TIMELINE.get(ce);
 			if (oldVal == null || oldVal.getDue().isAfter(due)) {
 				TIMELINE.put(ce, ce);
 				run();
+			}
+		}
+	}
+	
+	@Override
+	public void cancel(final String triggerId){
+		synchronized (TIMELINE) {
+			final ClockEntry ce = new ClockEntry(triggerId,null, null);
+			TIMELINE.remove(ce);
+		}
+	}
+	
+	@Override
+	public void clear(){
+		synchronized (TIMELINE) {
+			TIMELINE.clear();
+			if (future != null) {
+				future.cancel(false);
+				future = null;
 			}
 		}
 	}
@@ -81,18 +100,18 @@ public class RunnableClock implements Runnable, Clock {
  * 
  */
 class ClockEntry implements Comparable<ClockEntry> {
-	private String		agentId;
+	private String		triggerId;
 	private DateTime	due;
 	private Runnable	callback;
 	
 	/**
-	 * @param agentId
+	 * @param triggerId
 	 * @param due
 	 * @param callback
 	 */
-	public ClockEntry(final String agentId, final DateTime due,
+	public ClockEntry(final String triggerId, final DateTime due,
 			final Runnable callback) {
-		this.agentId = agentId;
+		this.triggerId = triggerId;
 		this.due = due;
 		this.callback = callback;
 	}
@@ -101,14 +120,14 @@ class ClockEntry implements Comparable<ClockEntry> {
 	 * @return AgentId
 	 */
 	public String getAgentId() {
-		return agentId;
+		return triggerId;
 	}
 	
 	/**
 	 * @param agentId
 	 */
 	public void setAgentId(final String agentId) {
-		this.agentId = agentId;
+		this.triggerId = agentId;
 	}
 	
 	/**
@@ -153,7 +172,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 			return false;
 		}
 		final ClockEntry other = (ClockEntry) o;
-		return agentId.equals(other.agentId);
+		return triggerId.equals(other.triggerId);
 	}
 	
 	/*
@@ -163,7 +182,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	 */
 	@Override
 	public int hashCode() {
-		return agentId.hashCode();
+		return triggerId.hashCode();
 	}
 	
 	/*
@@ -173,6 +192,13 @@ class ClockEntry implements Comparable<ClockEntry> {
 	 */
 	@Override
 	public int compareTo(final ClockEntry o) {
+		if (due == null || o.due == null){
+			if (this.equals(o)){
+				return 0;
+			} else {
+				return -1;
+			}
+		}
 		if (due.equals(o.due)) {
 			return 0;
 		}

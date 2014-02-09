@@ -32,7 +32,6 @@ public final class HostManagerAgent extends Agent {
 		final JSONRPCException jsonError = new JSONRPCException(
 				JSONRPCException.CODE.NOT_FOUND, "Agent " + agentId
 						+ " is not found on this host.");
-		LOG.log(Level.WARNING, "Exception in receiving message", jsonError);
 		final JSONResponse response = new JSONResponse(jsonError);
 		
 		final JSONMessage jsonMsg = jsonConvert(msg);
