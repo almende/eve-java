@@ -67,6 +67,7 @@ import com.almende.eve.transport.TransportService;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.TypeUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -208,6 +209,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.UNAVAILABLE)
+	@JsonIgnore
 	public boolean isSelf(final String senderUrl) {
 		if (senderUrl.startsWith("web://")) {
 			return true;
@@ -411,6 +413,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.UNAVAILABLE)
+	@JsonIgnore
 	public final State getState() {
 		return state;
 	}
@@ -422,6 +425,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Namespace("scheduler")
+	@JsonIgnore
 	public final Scheduler getScheduler() {
 		if (scheduler == null) {
 			scheduler = host.getScheduler(this);
@@ -436,6 +440,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.UNAVAILABLE)
+	@JsonIgnore
 	public final AgentHost getAgentHost() {
 		return host;
 		
@@ -448,6 +453,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Namespace("monitor")
+	@JsonIgnore
 	public final ResultMonitorFactoryInterface getResultMonitorFactory() {
 		return monitorFactory;
 	}
@@ -459,6 +465,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Namespace("event")
+	@JsonIgnore
 	public final EventsInterface getEventsFactory() {
 		return eventsFactory;
 	}
@@ -470,6 +477,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.PUBLIC)
+	@JsonIgnore
 	public URI getFirstUrl() {
 		final List<String> urls = getUrls();
 		if (urls.size() > 0) {
@@ -485,6 +493,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.PUBLIC)
+	@JsonIgnore
 	public List<Object> getMethods() {
 		return JSONRPC.describe(this, EVEREQUESTPARAMS);
 	}
@@ -877,6 +886,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.PUBLIC)
+	@JsonIgnore
 	public List<String> getUrls() {
 		final List<String> urls = new ArrayList<String>();
 		if (host != null) {
@@ -902,6 +912,7 @@ public abstract class Agent implements AgentInterface {
 	 * )
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T getRef(final TypedKey<T> key) {
 		return host.getRef(getId(), key);
 	}
