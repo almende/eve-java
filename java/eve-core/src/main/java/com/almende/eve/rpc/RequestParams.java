@@ -17,7 +17,7 @@ public class RequestParams {
 	 * Map with full class path of an annotation type as key,
 	 * and an arbitrary object as value.
 	 */
-	private final Map<String, Object>	params	= new HashMap<String, Object>();
+	private final Map<String, Object>	params	= new HashMap<String, Object>(1);
 	
 	/**
 	 * Instantiates a new request params.

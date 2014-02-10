@@ -320,7 +320,7 @@ public class ClockScheduler extends AbstractScheduler implements Runnable {
 
 /**
  * @author Almende
- *
+ * 
  */
 class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	private static final Logger	LOG					= Logger.getLogger(TaskEntry.class
@@ -362,7 +362,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		this.sequential = sequential;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -377,7 +379,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		return taskId.equals(other.taskId);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -385,7 +389,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		return taskId.hashCode();
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
@@ -533,7 +539,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		return active;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

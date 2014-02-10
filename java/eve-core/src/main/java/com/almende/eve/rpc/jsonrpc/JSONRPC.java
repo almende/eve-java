@@ -153,6 +153,9 @@ public final class JSONRPC {
 			final Method method = annotatedMethod.getActualMethod();
 			final Object[] params = castParams(request.getParams(),
 					annotatedMethod.getParams(), requestParams);
+			
+			// Probably method.invoke() is expensive, trace doesn't really show
+			// this time, but it seems the issue:
 			Object result = method.invoke(realDest, params);
 			if (result == null) {
 				result = JOM.createNullNode();

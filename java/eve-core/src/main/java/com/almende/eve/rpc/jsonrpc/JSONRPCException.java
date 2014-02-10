@@ -200,7 +200,7 @@ public class JSONRPCException extends Exception {
 			List<StackTraceElement> trace = injector.inject(exception.get("stackTrace"));
 			cause.setStackTrace(trace.toArray(new StackTraceElement[0]));
 		}
-		init(CODE.REMOTE_EXCEPTION,"JSONRPCException received!",cause);
+		init(CODE.REMOTE_EXCEPTION,JSONRPCException.class.getSimpleName()+" received!",cause);
 	}
 	
 	/**

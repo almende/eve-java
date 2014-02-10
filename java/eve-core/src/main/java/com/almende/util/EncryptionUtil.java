@@ -139,6 +139,6 @@ public final class EncryptionUtil {
 		pbeCipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParamSpec);
 		
 		final byte[] text = pbeCipher.doFinal(Base64.decodeBase64(encryptedText));
-		return new String(text, "UTF-8");
+		return new String(text, "UTF-8").intern();
 	}
 }

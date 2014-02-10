@@ -22,10 +22,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public final class NamespaceUtil {
 	
-	private static Map<String, Method[]>	cache		= new HashMap<String, Method[]>();
-	private static NamespaceUtil			instance	= new NamespaceUtil();
-	private static final Pattern			PATTERN		= Pattern
-																.compile("\\.[^.]+$");
+	private static final Map<String, Method[]>	cache		= new HashMap<String, Method[]>();
+	private static final NamespaceUtil			instance	= new NamespaceUtil();
+	private static final Pattern				PATTERN		= Pattern
+																	.compile("\\.[^.]+$");
 	
 	/**
 	 * Instantiates a new namespace util.
@@ -117,12 +117,13 @@ public final class NamespaceUtil {
 			return result;
 		}
 		
-		//If destination has a cache, use it.
-		if (destination instanceof RPCCallCache){
-			 final CallTuple res = ((RPCCallCache)destination).getCallTuple(path);
-			 if (res != null){
-				 return res;
-			 }
+		// If destination has a cache, use it.
+		if (destination instanceof RPCCallCache) {
+			final CallTuple res = ((RPCCallCache) destination)
+					.getCallTuple(path);
+			if (res != null) {
+				return res;
+			}
 		}
 		
 		path = destination.getClass().getName() + "." + path;
@@ -156,9 +157,9 @@ public final class NamespaceUtil {
 		result.setDestination(newDestination);
 		result.setMethodName(reducedMethod);
 		
-		if (destination instanceof RPCCallCache){
-			((RPCCallCache)destination).putCallTuple(path, result);
-		} 
+		if (destination instanceof RPCCallCache) {
+			((RPCCallCache) destination).putCallTuple(path, result);
+		}
 		return result;
 	}
 	

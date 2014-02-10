@@ -37,18 +37,18 @@ public class RunnableClock implements Runnable, Clock {
 		synchronized (TIMELINE) {
 			while (!TIMELINE.isEmpty()) {
 				final ClockEntry ce = TIMELINE.firstEntry().getValue();
-				final DateTime now = DateTime.now();
 				if (future != null) {
 					future.cancel(false);
 					future = null;
 				}
-				final long interval = new Interval(now, ce.getDue())
-						.toDurationMillis();
+				final DateTime now = DateTime.now();
 				if (ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
 					POOL.execute(ce.getCallback());
 					continue;
 				}
+				final long interval = new Interval(now, ce.getDue())
+						.toDurationMillis();
 				future = POOL.schedule(this, interval, TimeUnit.MILLISECONDS);
 				break;
 			}
@@ -76,15 +76,15 @@ public class RunnableClock implements Runnable, Clock {
 	}
 	
 	@Override
-	public void cancel(final String triggerId){
+	public void cancel(final String triggerId) {
 		synchronized (TIMELINE) {
-			final ClockEntry ce = new ClockEntry(triggerId,null, null);
+			final ClockEntry ce = new ClockEntry(triggerId, null, null);
 			TIMELINE.remove(ce);
 		}
 	}
 	
 	@Override
-	public void clear(){
+	public void clear() {
 		synchronized (TIMELINE) {
 			TIMELINE.clear();
 			if (future != null) {
@@ -192,8 +192,8 @@ class ClockEntry implements Comparable<ClockEntry> {
 	 */
 	@Override
 	public int compareTo(final ClockEntry o) {
-		if (due == null || o.due == null){
-			if (this.equals(o)){
+		if (due == null || o.due == null) {
+			if (this.equals(o)) {
 				return 0;
 			} else {
 				return -1;

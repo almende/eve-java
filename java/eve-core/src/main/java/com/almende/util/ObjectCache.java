@@ -24,9 +24,11 @@ public class ObjectCache {
 	
 	/**
 	 * Instantiates a new object cache.
-	 *
-	 * @param label the label
-	 * @param config the config
+	 * 
+	 * @param label
+	 *            the label
+	 * @param config
+	 *            the config
 	 */
 	protected ObjectCache(final String label, final Config config) {
 		if (config != null) {
@@ -37,8 +39,9 @@ public class ObjectCache {
 	
 	/**
 	 * Instantiates a new object cache.
-	 *
-	 * @param label the label
+	 * 
+	 * @param label
+	 *            the label
 	 */
 	protected ObjectCache(final String label) {
 		this(label, null);
@@ -46,8 +49,9 @@ public class ObjectCache {
 	
 	/**
 	 * Gets the.
-	 *
-	 * @param label the label
+	 * 
+	 * @param label
+	 *            the label
 	 * @return the object cache
 	 */
 	public static ObjectCache get(final String label) {
@@ -60,8 +64,9 @@ public class ObjectCache {
 	/**
 	 * Reinitialize cache, using given configuration. (currently only
 	 * "ObjectCache"."maxSize" is used from config)
-	 *
-	 * @param config the config
+	 * 
+	 * @param config
+	 *            the config
 	 */
 	public void configCache(final Config config) {
 		synchronized (cache) {
@@ -69,8 +74,7 @@ public class ObjectCache {
 			if (max != null) {
 				maxSize = max;
 			}
-			cache = new ConcurrentHashMap<String, MetaInfo<?>>(
-					maxSize + 1);
+			cache = new ConcurrentHashMap<String, MetaInfo<?>>(maxSize + 1);
 			scores = new TreeSet<MetaInfo<?>>();
 		}
 	}
@@ -78,28 +82,30 @@ public class ObjectCache {
 	/**
 	 * Get value instance from cache, if exiting. Returns null if no va;ue is
 	 * stored in cache.
-	 *
-	 * @param <T> the generic type
-	 * @param key the key
-	 * @param type the type
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param key
+	 *            the key
+	 * @param type
+	 *            the type
 	 * @return the t
 	 */
 	public <T> T get(final String key, final Class<T> type) {
-		synchronized (cache) {
-			final MetaInfo<?> result = cache.get(key);
-			if (result != null
-					&& type.isAssignableFrom(result.getValue().getClass())) {
-				result.use();
-				return type.cast(result.getValue());
-			}
-			return null;
+		final MetaInfo<?> result = cache.get(key);
+		if (result != null
+				&& type.isAssignableFrom(result.getValue().getClass())) {
+			result.use();
+			return type.cast(result.getValue());
 		}
+		return null;
 	}
 	
 	/**
 	 * Contains key.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 * @return true, if successful
 	 */
 	public boolean containsKey(final String key) {
@@ -109,53 +115,55 @@ public class ObjectCache {
 	/**
 	 * Put agent instance into the cache from later retrieval. Runs eviction
 	 * policy after entry of agent.
-	 *
-	 * @param <T> the generic type
-	 * @param key the key
-	 * @param value the value
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param key
+	 *            the key
+	 * @param value
+	 *            the value
 	 */
 	public <T> void put(final String key, final T value) {
-		synchronized (cache) {
-			final MetaInfo<T> entry = new MetaInfo<T>(key, value);
-			cache.put(key, entry);
-			final int overshoot = cache.size() - maxSize;
-			if (overshoot > 0) {
-				evict(overshoot);
-			}
-			scores.add(entry);
+		final MetaInfo<T> entry = new MetaInfo<T>(key, value);
+		cache.put(key, entry);
+		final int overshoot = cache.size() - maxSize;
+		if (overshoot > 0) {
+			evict(overshoot);
 		}
+		scores.add(entry);
 	}
 	
 	/**
 	 * Evict.
-	 *
-	 * @param amount the amount
+	 * 
+	 * @param amount
+	 *            the amount
 	 */
 	protected void evict(final int amount) {
-		synchronized (cache) {
-			final ArrayList<MetaInfo<?>> toEvict = new ArrayList<MetaInfo<?>>(amount);
-			if (scores.size() <= amount) {
-				cache.clear();
-				scores.clear();
-				return;
+		final ArrayList<MetaInfo<?>> toEvict = new ArrayList<MetaInfo<?>>(
+				amount);
+		if (scores.size() <= amount) {
+			cache.clear();
+			scores.clear();
+			return;
+		}
+		for (int i = 0; i < amount; i++) {
+			if (scores.size() > 0) {
+				final MetaInfo<?> entry = scores.first();
+				toEvict.add(entry);
+				scores.remove(entry);
 			}
-			for (int i = 0; i < amount; i++) {
-				if (scores.size() > 0) {
-					final MetaInfo<?> entry = scores.first();
-					toEvict.add(entry);
-					scores.remove(entry);
-				}
-			}
-			for (final MetaInfo<?> entry : toEvict) {
-				cache.remove(entry.getKey());
-			}
+		}
+		for (final MetaInfo<?> entry : toEvict) {
+			cache.remove(entry.getKey());
 		}
 	}
 	
 	/**
 	 * Remove specific agent from cache.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public void delete(final String key) {
 		final MetaInfo<?> item = cache.remove(key);
@@ -166,7 +174,7 @@ public class ObjectCache {
 	
 	/**
 	 * Size.
-	 *
+	 * 
 	 * @return the int
 	 */
 	public int size() {
@@ -175,7 +183,7 @@ public class ObjectCache {
 	
 	/**
 	 * Checks if is empty.
-	 *
+	 * 
 	 * @return true, if is empty
 	 */
 	public boolean isEmpty() {
@@ -199,9 +207,9 @@ public class ObjectCache {
  */
 class MetaInfo<T> implements Comparable<MetaInfo<?>> {
 	private final String	key;
-	private T		value;
-	private int		count	= 0;
-	private final long	created;
+	private T				value;
+	private int				count	= 0;
+	private final long		created;
 	
 	/**
 	 * Instantiates a new meta info.
@@ -273,7 +281,9 @@ class MetaInfo<T> implements Comparable<MetaInfo<?>> {
 		this.value = value;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
