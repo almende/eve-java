@@ -106,42 +106,25 @@ public final class NamespaceUtil {
 	 * @throws NoSuchMethodException
 	 *             the no such method exception
 	 */
-	private CallTuple _get(Object destination, String path)
+	private CallTuple _get(final Object destination, final String path)
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		final CallTuple result = new CallTuple();
-		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
-		
-		if (path.indexOf('.') < 0) {
-			// Quick shortcut back
-			result.setDestination(destination);
-			List<AnnotatedMethod> methods = clazz.getMethods(path);
-			if (!methods.isEmpty()) {
-				result.setMethod(methods.get(0));
-			}
-			return result;
+		String reducedPath = "";
+		String reducedMethod = path;
+		if (path.indexOf('.') >= 0) {
+			reducedPath = destination.getClass().getName() + "." + path;
+			final Matcher matcher = PATTERN.matcher(reducedPath);
+			reducedPath = matcher.replaceFirst("");
+			reducedMethod = matcher.group().substring(1);
 		}
-		
-		// If destination has a cache, use it.
-		if (destination instanceof RPCCallCache) {
-			final CallTuple res = ((RPCCallCache) destination)
-					.getCallTuple(path);
-			if (res != null) {
-				return res;
-			}
-		}
-		
-		path = destination.getClass().getName() + "." + path;
-		final Matcher matcher = PATTERN.matcher(path);
-		path = matcher.replaceFirst("");
-		final String reducedMethod = matcher.group().substring(1);
-		
-		if (!cache.containsKey(path)) {
+		if (!cache.containsKey(reducedPath)) {
 			final AnnotatedMethod[] methods = new AnnotatedMethod[1];
 			final String newSteps = destination.getClass().getName();
+			cache.put("", new AnnotatedMethod[0]);
 			populateCache(destination, newSteps, methods);
 		}
-		if (!cache.containsKey(path)) {
+		if (!cache.containsKey(reducedPath)) {
 			try {
 				throw new IllegalStateException("Non resolveable path given:'"
 						+ path + "' \n checked:"
@@ -151,7 +134,7 @@ public final class NamespaceUtil {
 						+ path + "' \n checked:" + cache);
 			}
 		}
-		final AnnotatedMethod[] methodPath = cache.get(path);
+		final AnnotatedMethod[] methodPath = cache.get(reducedPath);
 		Object newDestination = destination;
 		for (final AnnotatedMethod method : methodPath) {
 			if (method != null) {
@@ -170,9 +153,6 @@ public final class NamespaceUtil {
 				.getMethods(reducedMethod);
 		if (!methods.isEmpty()) {
 			result.setMethod(methods.get(0));
-		}
-		if (destination instanceof RPCCallCache) {
-			((RPCCallCache) destination).putCallTuple(path, result);
 		}
 		return result;
 	}

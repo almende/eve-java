@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.annotation.ThreadSafe;
@@ -20,9 +18,7 @@ import com.almende.eve.rpc.annotation.Name;
 import com.almende.eve.rpc.annotation.Sender;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
-import com.almende.util.RPCCallCache;
 import com.almende.util.TypeUtil;
-import com.almende.util.NamespaceUtil.CallTuple;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -30,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 @ThreadSafe(true)
-public class Cell extends Agent implements RPCCallCache {
+public class Cell extends Agent {
 	private ArrayList<String> neighbors = null;
 	
 	/**
@@ -212,22 +208,5 @@ public class Cell extends Agent implements RPCCallCache {
 		}
 		return result;
 	}
-	
-	private final Map<String,CallTuple> callCache = new HashMap<String,CallTuple>();
-	/* (non-Javadoc)
-	 * @see com.almende.eve.rpc.jsonrpc.JSONCallCache#getCallTuple(java.lang.String)
-	 */
-	public CallTuple getCallTuple(String path){
-		if (callCache.containsKey(path)){
-			return callCache.get(path);
-		}
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.rpc.jsonrpc.JSONCallCache#setCallTuple(java.lang.String, com.almende.util.NamespaceUtil.CallTuple)
-	 */
-	public void putCallTuple(String path, CallTuple tuple){
-		callCache.put(path, tuple);
-	}
+
 }
