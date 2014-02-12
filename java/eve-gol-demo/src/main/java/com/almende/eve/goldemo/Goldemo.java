@@ -25,8 +25,8 @@ public class Goldemo {
 	/**
 	 * The Constant PATH.
 	 */
-	//final static String	PATH	= "local:";
-	final static String	PATH	= "http://127.0.0.1:8081/agents/";
+	final static String	PATH	= "local:";
+//	final static String	PATH	= "http://127.0.0.1:8081/agents/";
 	
 	/**
 	 * The main method.

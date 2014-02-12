@@ -158,6 +158,10 @@ public class Cell extends Agent implements RPCCallCache {
 						neighborId + "_" + (currentCycle - 1), CycleState.class);
 				if (nState.isAlive()) aliveNeighbors++;
 			}
+			for (String neighbor : neighbors) {
+				final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
+				getState().remove(neighborId + "_" + (currentCycle - 1));
+			}
 			CycleState myState = getState().get("val_" + (currentCycle - 1),
 					CycleState.class);
 			if (aliveNeighbors < 2 || aliveNeighbors > 3) {
@@ -187,7 +191,7 @@ public class Cell extends Agent implements RPCCallCache {
 	 *            the cycle
 	 * @return the cycle state
 	 */
-	public CycleState getCycleState(@Name("cycle") Integer cycle) {
+	public CycleState getCycleState(@Name("cycle") int cycle) {
 		if (getState().containsKey("val_" + cycle)) {
 			return getState().get("val_" + cycle, CycleState.class);
 		}
