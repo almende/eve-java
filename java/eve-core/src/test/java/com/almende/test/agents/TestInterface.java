@@ -29,6 +29,13 @@ public interface TestInterface extends AgentInterface {
 	 */
 	public void testVoid();
 	
+	
+	/**
+	 * @param msg1
+	 * @param msg2
+	 * @return the string
+	 */
+	public String helloWorld2(@Name("msg1") String msg1, @Name("msg2") String msg2);
 	/**
 	 * Test primitive.
 	 *

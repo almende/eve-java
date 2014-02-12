@@ -26,8 +26,6 @@ import com.almende.eve.rpc.jsonrpc.JSONRequest;
 import com.almende.eve.rpc.jsonrpc.JSONResponse;
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.eve.state.TypedKey;
-import com.almende.util.AnnotationUtil;
-import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.NamespaceUtil;
 import com.almende.util.NamespaceUtil.CallTuple;
@@ -43,57 +41,76 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 	private static final Logger										LOG			= Logger.getLogger(ResultMonitorFactory.class
 																						.getCanonicalName());
 	private static final TypedKey<HashMap<String, ResultMonitor>>	MONITORS	= new TypedKey<HashMap<String, ResultMonitor>>(
-			"_monitors") {
-	};
+																						"_monitors") {
+																				};
 	private AgentInterface											myAgent		= null;
 	
 	/**
 	 * Instantiates a new result monitor factory.
-	 *
-	 * @param agent the agent
+	 * 
+	 * @param agent
+	 *            the agent
 	 */
 	public ResultMonitorFactory(final AgentInterface agent) {
 		myAgent = agent;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#create(java.lang.String, java.net.URI, java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, java.lang.String, com.almende.eve.monitor.ResultMonitorConfigType[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#create(java.lang
+	 * .String, java.net.URI, java.lang.String,
+	 * com.fasterxml.jackson.databind.node.ObjectNode, java.lang.String,
+	 * com.almende.eve.monitor.ResultMonitorConfigType[])
 	 */
 	@Override
-	public String create(final String monitorId, final URI url, final String method,
-			final ObjectNode params, final String callbackMethod,
-			final ResultMonitorConfigType... confs) {
+	public String create(final String monitorId, final URI url,
+			final String method, final ObjectNode params,
+			final String callbackMethod, final ResultMonitorConfigType... confs) {
 		
 		final ResultMonitor old = getMonitorById(monitorId);
 		if (old != null) {
 			old.cancel();
 		}
 		
-		final ResultMonitor monitor = new ResultMonitor(monitorId, myAgent.getId(),
-				url, method, params, callbackMethod);
+		final ResultMonitor monitor = new ResultMonitor(monitorId,
+				myAgent.getId(), url, method, params, callbackMethod);
 		for (final ResultMonitorConfigType config : confs) {
 			monitor.add(config);
 		}
 		return store(monitor);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#getResult(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#getResult(java.
+	 * lang.String, com.fasterxml.jackson.databind.node.ObjectNode,
+	 * java.lang.Class)
 	 */
 	@Override
-	public <T> T getResult(final String monitorId, final ObjectNode filterParms,
-			final Class<T> returnType) throws IOException, JSONRPCException {
+	public <T> T getResult(final String monitorId,
+			final ObjectNode filterParms, final Class<T> returnType)
+			throws IOException, JSONRPCException {
 		return getResult(monitorId, filterParms, JOM.getTypeFactory()
 				.constructSimpleType(returnType, new JavaType[0]));
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#getResult(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, com.fasterxml.jackson.databind.JavaType)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#getResult(java.
+	 * lang.String, com.fasterxml.jackson.databind.node.ObjectNode,
+	 * com.fasterxml.jackson.databind.JavaType)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T getResult(final String monitorId, final ObjectNode filterParms,
-			final JavaType returnType) throws JSONRPCException, IOException {
+	public <T> T getResult(final String monitorId,
+			final ObjectNode filterParms, final JavaType returnType)
+			throws JSONRPCException, IOException {
 		T result = null;
 		final ResultMonitor monitor = getMonitorById(monitorId);
 		if (monitor != null) {
@@ -116,8 +133,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#cancel(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#cancel(java.lang
+	 * .String)
 	 */
 	@Override
 	public void cancel(final String monitorId) {
@@ -131,8 +152,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#doPoll(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#doPoll(java.lang
+	 * .String)
 	 */
 	@Access(AccessType.SELF)
 	@Override
@@ -143,7 +168,8 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 			if (monitor.getUrl() == null || monitor.getMethod() == null) {
 				LOG.warning("Monitor data invalid:" + monitor);
 			}
-			final Object result = myAgent.send(monitor.getUrl(), monitor.getMethod(),
+			final Object result = myAgent.send(monitor.getUrl(),
+					monitor.getMethod(),
 					JOM.getInstance().readTree(monitor.getParams()),
 					TypeFactory.unknownType());
 			if (monitor.getCallbackMethod() != null) {
@@ -163,8 +189,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 	/** The last res. */
 	private JsonNode	lastRes	= null;
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#doPush(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#doPush(java.lang
+	 * .String, com.fasterxml.jackson.databind.node.ObjectNode)
 	 */
 	@Access(AccessType.SELF)
 	@Override
@@ -183,8 +213,8 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 			final String method = pushParams.get("method").textValue();
 			final ObjectNode params = (ObjectNode) JOM.getInstance().readTree(
 					pushParams.get("params").textValue());
-			final JSONResponse res = JSONRPC.invoke(myAgent, new JSONRequest(method,
-					params), myAgent);
+			final JSONResponse res = JSONRPC.invoke(myAgent, new JSONRequest(
+					method, params), myAgent);
 			
 			final JsonNode result = res.getResult();
 			if (pushParams.has("onChange")
@@ -212,8 +242,13 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#callbackPush(java.lang.Object, java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#callbackPush(java
+	 * .lang.Object, java.lang.String,
+	 * com.fasterxml.jackson.databind.node.ObjectNode)
 	 */
 	@Access(AccessType.PUBLIC)
 	@Override
@@ -258,13 +293,19 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#registerPush(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#registerPush(java
+	 * .lang.String, com.fasterxml.jackson.databind.node.ObjectNode,
+	 * java.lang.String)
 	 */
 	@Access(AccessType.PUBLIC)
 	@Override
 	public final void registerPush(@Name("pushId") final String id,
-			@Name("config") final ObjectNode pushParams, @Sender final String senderUrl) {
+			@Name("config") final ObjectNode pushParams,
+			@Sender final String senderUrl) {
 		final String pushKey = "_push_" + senderUrl + "_" + id;
 		pushParams.put("url", senderUrl);
 		pushParams.put("pushId", id);
@@ -286,7 +327,8 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		LOG.info("Register Push:" + pushKey);
 		if (pushParams.has("interval")) {
 			final int interval = pushParams.get("interval").intValue();
-			final JSONRequest request = new JSONRequest("monitor.doPush", params);
+			final JSONRequest request = new JSONRequest("monitor.doPush",
+					params);
 			result.put(
 					"taskId",
 					myAgent.getScheduler().createTask(request, interval, true,
@@ -299,22 +341,18 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 		if (pushParams.has("onChange")
 				&& pushParams.get("onChange").booleanValue()) {
-			AnnotatedClass ac = null;
 			event = "change";
 			try {
-				final CallTuple res = NamespaceUtil.get(myAgent,
-						pushParams.get("method").textValue());
+				final CallTuple res = NamespaceUtil.get(myAgent, pushParams
+						.get("method").textValue());
 				
-				ac = AnnotationUtil.get(res.getDestination().getClass());
-				for (final AnnotatedMethod method : ac
-						.getMethods(res.getMethodName())) {
-					final EventTriggered annotation = method
-							.getAnnotation(EventTriggered.class);
-					if (annotation != null) {
-						// If no Event param, get it from annotation, else
-						// use default.
-						event = annotation.value();
-					}
+				final AnnotatedMethod method = res.getMethod();
+				final EventTriggered annotation = method
+						.getAnnotation(EventTriggered.class);
+				if (annotation != null) {
+					// If no Event param, get it from annotation, else
+					// use default.
+					event = annotation.value();
 				}
 			} catch (final Exception e) {
 				LOG.log(Level.WARNING, "", e);
@@ -335,8 +373,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		myAgent.getState().put(pushKey, result.toString());
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#unregisterPush(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#unregisterPush(
+	 * java.lang.String, java.lang.String)
 	 */
 	@Access(AccessType.PUBLIC)
 	@Override
@@ -367,8 +409,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#store(com.almende.eve.monitor.ResultMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#store(com.almende
+	 * .eve.monitor.ResultMonitor)
 	 */
 	@Override
 	public String store(final ResultMonitor monitor) {
@@ -392,8 +438,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		return monitor.getId();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#delete(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#delete(java.lang
+	 * .String)
 	 */
 	@Override
 	public void delete(final String monitorId) {
@@ -418,8 +468,12 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#getMonitorById(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.monitor.ResultMonitorFactoryInterface#getMonitorById(
+	 * java.lang.String)
 	 */
 	@Override
 	public ResultMonitor getMonitorById(final String monitorId) {
@@ -441,7 +495,9 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		return null;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#cancelAll()
 	 */
 	@Override
@@ -451,7 +507,9 @@ public class ResultMonitorFactory implements ResultMonitorFactoryInterface {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.monitor.ResultMonitorFactoryInterface#getMonitors()
 	 */
 	@Access(AccessType.PUBLIC)

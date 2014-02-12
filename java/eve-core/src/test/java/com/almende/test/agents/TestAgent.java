@@ -19,7 +19,9 @@ import com.almende.test.agents.entity.Person;
 @Access(AccessType.PUBLIC)
 public class TestAgent extends Agent implements TestInterface {
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.test.agents.TestInterface#helloWorld(java.lang.String)
 	 */
 	@Override
@@ -27,7 +29,19 @@ public class TestAgent extends Agent implements TestInterface {
 		return "Hello world, you said: " + msg;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.test.agents.TestInterface#helloWorld(java.lang.String)
+	 */
+	@Override
+	public String helloWorld2(final String msg1, final String msg2) {
+		return "Hello world, you said: " + msg1 + " and " + msg2;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.test.agents.TestInterface#testVoid()
 	 */
 	@Override
@@ -35,15 +49,20 @@ public class TestAgent extends Agent implements TestInterface {
 		System.out.println("testVoid called!");
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.test.agents.TestInterface#testPrimitive(int, java.lang.Integer)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.test.agents.TestInterface#testPrimitive(int,
+	 * java.lang.Integer)
 	 */
 	@Override
 	public int testPrimitive(final int num, final Integer num2) {
 		return num + num2;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.test.agents.TestInterface#complexResult()
 	 */
 	@Override
@@ -59,7 +78,9 @@ public class TestAgent extends Agent implements TestInterface {
 		return result;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getDescription()
 	 */
 	@Override
@@ -67,7 +88,9 @@ public class TestAgent extends Agent implements TestInterface {
 		return "Simple TestAgent, returning some data for Proxy test";
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.agent.Agent#getVersion()
 	 */
 	@Override

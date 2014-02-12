@@ -5,10 +5,11 @@
 package com.almende.util;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.almende.eve.agent.annotation.Namespace;
@@ -22,10 +23,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public final class NamespaceUtil {
 	
-	private static final Map<String, Method[]>	cache		= new HashMap<String, Method[]>();
-	private static final NamespaceUtil			instance	= new NamespaceUtil();
-	private static final Pattern				PATTERN		= Pattern
-																	.compile("\\.[^.]+$");
+	private static final Map<String, AnnotatedMethod[]>	cache		= new HashMap<String, AnnotatedMethod[]>();
+	private static final NamespaceUtil					instance	= new NamespaceUtil();
+	private static final Pattern						PATTERN		= Pattern
+																			.compile("\\.[^.]+$");
 	
 	/**
 	 * Instantiates a new namespace util.
@@ -70,14 +71,14 @@ public final class NamespaceUtil {
 	 *             the invocation target exception
 	 */
 	private void populateCache(final Object destination, final String steps,
-			final Method[] methods) throws IllegalAccessException,
+			final AnnotatedMethod[] methods) throws IllegalAccessException,
 			InvocationTargetException {
 		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		for (final AnnotatedMethod method : clazz
 				.getAnnotatedMethods(Namespace.class)) {
 			final String path = steps + "."
 					+ method.getAnnotation(Namespace.class).value();
-			methods[methods.length - 1] = method.getActualMethod();
+			methods[methods.length - 1] = method;
 			cache.put(path, Arrays.copyOf(methods, methods.length));
 			
 			final Object newDest = method.getActualMethod().invoke(destination,
@@ -109,11 +110,15 @@ public final class NamespaceUtil {
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		final CallTuple result = new CallTuple();
+		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		
-		if (!path.contains(".")) {
+		if (path.indexOf('.') < 0) {
 			// Quick shortcut back
 			result.setDestination(destination);
-			result.setMethodName(path);
+			List<AnnotatedMethod> methods = clazz.getMethods(path);
+			if (!methods.isEmpty()) {
+				result.setMethod(methods.get(0));
+			}
 			return result;
 		}
 		
@@ -127,13 +132,12 @@ public final class NamespaceUtil {
 		}
 		
 		path = destination.getClass().getName() + "." + path;
-		String[] steps = path.split("\\.");
-		final String reducedMethod = steps[steps.length - 1];
-		steps = Arrays.copyOf(steps, steps.length - 1);
-		path = PATTERN.matcher(path).replaceFirst("");
+		final Matcher matcher = PATTERN.matcher(path);
+		path = matcher.replaceFirst("");
+		final String reducedMethod = matcher.group().substring(1);
 		
 		if (!cache.containsKey(path)) {
-			final Method[] methods = new Method[1];
+			final AnnotatedMethod[] methods = new AnnotatedMethod[1];
 			final String newSteps = destination.getClass().getName();
 			populateCache(destination, newSteps, methods);
 		}
@@ -147,16 +151,26 @@ public final class NamespaceUtil {
 						+ path + "' \n checked:" + cache);
 			}
 		}
-		final Method[] methods = cache.get(path);
+		final AnnotatedMethod[] methodPath = cache.get(path);
 		Object newDestination = destination;
-		for (final Method method : methods) {
+		for (final AnnotatedMethod method : methodPath) {
 			if (method != null) {
-				newDestination = method.invoke(destination, (Object[]) null);
+				newDestination = method.getActualMethod().invoke(destination,
+						(Object[]) null);
 			}
 		}
+		if (newDestination == null) {
+			// Oops, namespace getter returned null pointer!
+			return result;
+		}
 		result.setDestination(newDestination);
-		result.setMethodName(reducedMethod);
-		
+		final AnnotatedClass newClazz = AnnotationUtil.get(newDestination
+				.getClass());
+		final List<AnnotatedMethod> methods = newClazz
+				.getMethods(reducedMethod);
+		if (!methods.isEmpty()) {
+			result.setMethod(methods.get(0));
+		}
 		if (destination instanceof RPCCallCache) {
 			((RPCCallCache) destination).putCallTuple(path, result);
 		}
@@ -169,10 +183,10 @@ public final class NamespaceUtil {
 	public class CallTuple {
 		
 		/** The destination. */
-		private Object	destination;
+		private Object			destination;
 		
 		/** The method name. */
-		private String	methodName;
+		private AnnotatedMethod	method;
 		
 		/**
 		 * Gets the destination.
@@ -198,18 +212,18 @@ public final class NamespaceUtil {
 		 * 
 		 * @return the method name
 		 */
-		public String getMethodName() {
-			return methodName;
+		public AnnotatedMethod getMethod() {
+			return method;
 		}
 		
 		/**
 		 * Sets the method name.
 		 * 
-		 * @param methodName
-		 *            the new method name
+		 * @param method
+		 *            The method
 		 */
-		public void setMethodName(final String methodName) {
-			this.methodName = methodName;
+		public void setMethod(final AnnotatedMethod method) {
+			this.method = method;
 		}
 	}
 }
