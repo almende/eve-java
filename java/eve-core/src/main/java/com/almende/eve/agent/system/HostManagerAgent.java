@@ -13,9 +13,10 @@ import com.almende.eve.rpc.jsonrpc.JSONResponse;
  * @author Almende
  * 
  */
-public final class HostManagerAgent extends Agent {
+public class HostManagerAgent extends Agent {
 	private static final Logger	LOG	= Logger.getLogger(HostManagerAgent.class
 											.getName());
+	
 	
 	/**
 	 * Utility method that is called by the agentHost to report original
