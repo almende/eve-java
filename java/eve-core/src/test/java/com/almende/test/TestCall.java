@@ -27,7 +27,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestProxy.
  */
 public class TestCall extends TestCase {
-	private static final Logger LOG = Logger.getLogger(TestCall.class.getName());
+	private static final Logger	LOG	= Logger.getLogger(TestCall.class.getName());
+	
 	/**
 	 * Test proxy.
 	 * 
@@ -40,41 +41,46 @@ public class TestCall extends TestCase {
 		final AgentHost host = AgentHost.getInstance();
 		final FileStateFactory stateFactory = new FileStateFactory(".eveagents");
 		host.setStateFactory(stateFactory);
-		host.setSchedulerFactory(new ClockSchedulerFactory(host,new HashMap<String,Object>()));
+		host.setSchedulerFactory(new ClockSchedulerFactory(host,
+				new HashMap<String, Object>()));
 		if (host.hasAgent("TestAgent")) {
 			host.deleteAgent("TestAgent");
 		}
 		final TestAgent agent = host.createAgent(TestAgent.class, "TestAgent");
-		final AsyncCallback<JSONResponse> callback = new AsyncCallback<JSONResponse>(){
-
+		final AsyncCallback<JSONResponse> callback = new AsyncCallback<JSONResponse>() {
+			
 			@Override
 			public void onSuccess(JSONResponse result) {
-				LOG.info("received:"+result);
+				LOG.info("received result:" + result);
 			}
-
+			
 			@Override
 			public void onFailure(Exception exception) {
-				LOG.log(Level.WARNING,"Failure:",exception);
+				LOG.log(Level.WARNING, "Failure:", exception);
+				fail("Failure:" + exception.getLocalizedMessage());
 			}
 		};
 		
+		agent.send(new JSONRequest("helloWorld", (ObjectNode) JOM.getInstance()
+				.readTree("{\"msg\":\"hi there!\"}")), URI
+				.create("local:TestAgent"), callback, null);
 		
 		agent.send(
-				new JSONRequest("helloWorld", (ObjectNode) JOM.getInstance().readTree(
-						"{\"msg\":\"hi there!\"}")),
+				new JSONRequest("helloWorld2", (ObjectNode) JOM.getInstance()
+						.readTree("{\"msg1\":\"hi there!\",\"msg2\":\"Bye!\"}")),
 				URI.create("local:TestAgent"), callback, null);
-
-		agent.send(
-				new JSONRequest("helloWorld2", (ObjectNode) JOM.getInstance().readTree(
-						"{\"msg1\":\"hi there!\",\"msg2\":\"Bye!\"}")),
-				URI.create("local:TestAgent"), callback, null);
-
-		agent.send(
-				new JSONRequest("scheduler.getTasks",JOM.createObjectNode()),
-				URI.create("local:TestAgent"), callback, null);
-
 		
-		Thread.sleep(1000);
+		agent.send(
+				new JSONRequest("scheduler.getTasks", JOM.createObjectNode()),
+				URI.create("local:TestAgent"), callback, null);
+		
+		agent.send(new JSONRequest("testVoid", JOM.createObjectNode()),
+				URI.create("local:TestAgent"), callback, null);
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
 	}
 	
 }
