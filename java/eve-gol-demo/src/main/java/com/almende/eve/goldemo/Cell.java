@@ -17,6 +17,7 @@ import com.almende.eve.rpc.annotation.AccessType;
 import com.almende.eve.rpc.annotation.Name;
 import com.almende.eve.rpc.annotation.Sender;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
+import com.almende.eve.rpc.jsonrpc.JSONRequest;
 import com.almende.eve.rpc.jsonrpc.jackson.JOM;
 import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Access(AccessType.PUBLIC)
 @ThreadSafe(true)
 public class Cell extends Agent {
-	private ArrayList<String> neighbors = null;
+	private ArrayList<String>	neighbors	= null;
 	
 	/**
 	 * Creates the.
@@ -47,6 +48,65 @@ public class Cell extends Agent {
 	}
 	
 	/**
+	 * @param odd
+	 * @param even
+	 * @param initState
+	 * @param totalSize
+	 */
+	public void new_create(@Name("pathOdd") String odd,
+			@Name("pathEven") String even, @Name("state") Boolean initState,
+			@Name("totalSize") int totalSize) {
+		getState().put("val_0", new CycleState(0, initState));
+		getState().put("current_cycle", 1);
+		String id = getId();
+		int agentNo = Integer.parseInt(id.substring(id.indexOf('_') + 1));
+		calcNeighbours(odd, even, agentNo, totalSize);
+	}
+	
+	/**
+	 * @param agentNo
+	 * @param totalSize
+	 */
+	private void calcNeighbours(String odd, String even, int agentNo,
+			int totalSize) {
+		int N = (int) Math.floor(Math.sqrt(totalSize));
+		int M = N;
+		int cN = 0;
+		int cM = 0;
+		String path = even;
+		if (agentNo % 2 > 0) {
+			path = odd;
+		}
+		if (agentNo != 0) {
+			cN = agentNo % N;
+			cM = (int) Math.floor(agentNo / M);
+		}
+		
+		neighbors = new ArrayList<String>(8);
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN - 1) % N), ((M + cM - 1) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN) % N), ((M + cM - 1) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN + 1) % N), ((M + cM - 1) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN - 1) % N), ((M + cM) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN + 1) % N), ((M + cM) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN - 1) % N), ((M + cM + 1) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN) % N), ((M + cM + 1) % M), N));
+		neighbors.add(path + "Agent_"
+				+ calcBack(((N + cN + 1) % N), ((M + cM + 1) % M), N));
+		getState().put("neighbors", neighbors);
+	}
+	
+	private int calcBack(int cN, int cM, int N) {
+		return cM * N + cN;
+	}
+	
+	/**
 	 * Register.
 	 * 
 	 * @throws JSONRPCException
@@ -55,7 +115,7 @@ public class Cell extends Agent {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void register() throws JSONRPCException, IOException {
-		if (neighbors == null){
+		if (neighbors == null) {
 			neighbors = getState().get("neighbors",
 					new TypeUtil<ArrayList<String>>() {
 					});
@@ -74,7 +134,7 @@ public class Cell extends Agent {
 	 * @throws JSONRPCException
 	 *             the jSONRPC exception
 	 */
-	public void stop() throws IOException, JSONRPCException{
+	public void stop() throws IOException, JSONRPCException {
 		getEventsFactory().clear();
 	}
 	
@@ -89,6 +149,31 @@ public class Cell extends Agent {
 	}
 	
 	/**
+	 * 
+	 */
+	public void new_start() {
+		if (neighbors == null) {
+			neighbors = getState().get("neighbors",
+					new TypeUtil<ArrayList<String>>() {
+					});
+		}
+		CycleState myState = getState().get("val_0", CycleState.class);
+		final ObjectNode params = JOM.createObjectNode();
+		params.put("alive", myState.isAlive());
+		params.put("cycle", 0);
+		params.put("from", getId().substring(6));
+		for (String neighbor : neighbors) {
+			final URI uri = URI.create(neighbor);
+			try {
+				send(new JSONRequest("collect", params), uri, null, null);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return;
+	}
+	
+	/**
 	 * Ask cycle state.
 	 * 
 	 * @param neighbor
@@ -100,82 +185,121 @@ public class Cell extends Agent {
 	 * @throws URISyntaxException
 	 *             the uRI syntax exception
 	 */
-	public void askCycleState(@Sender final String neighbor) throws JSONRPCException,
-			IOException, URISyntaxException {
+	public void askCycleState(@Sender final String neighbor)
+			throws JSONRPCException, IOException, URISyntaxException {
 		
-		final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
+		final String neighborId = getAgentHost().getAgentId(
+				URI.create(neighbor));
 		ObjectNode params = JOM.createObjectNode();
 		params.put("cycle", getState().get("current_cycle", Integer.class) - 1);
-		sendAsync(URI.create(neighbor), "getCycleState", params, new AsyncCallback<CycleState>(){
-
-			@Override
-			public void onSuccess(CycleState state) {
-				if (state != null) {
-					getState().put(neighborId + "_" + state.getCycle(), state);
-					try {
-						calcCycle();
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
+		sendAsync(URI.create(neighbor), "getCycleState", params,
+				new AsyncCallback<CycleState>() {
+					
+					@Override
+					public void onSuccess(CycleState state) {
+						if (state != null) {
+							getState().put(neighborId + "_" + state.getCycle(),
+									state);
+							try {
+								calcCycle(false);
+							} catch (URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
 					}
-				}
-			}
-
-			@Override
-			public void onFailure(Exception exception) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		},
-		CycleState.class);
+					
+					@Override
+					public void onFailure(Exception exception) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+				}, CycleState.class);
 	}
 	
-	//TODO: find a way to do this without synchronized
-	private synchronized void calcCycle() throws URISyntaxException {
-		if (getState().containsKey("current_cycle")) {
-			Integer currentCycle = getState().get("current_cycle",
-					Integer.class);
-
-			if (neighbors == null){
-				neighbors = getState().get("neighbors",
-						new TypeUtil<ArrayList<String>>() {
-						});
-			}
-
+	/**
+	 * @param alive
+	 * @param cycle
+	 * @param neighborNo
+	 */
+	public void collect(@Name("alive") boolean alive, @Name("cycle") int cycle,
+			@Name("from") int neighborNo) {
+		if (neighbors == null) {
+			neighbors = getState().get("neighbors",
+					new TypeUtil<ArrayList<String>>() {
+					});
+		}
+		CycleState state = new CycleState(cycle, alive);
+		getState().put(neighborNo + "_" + state.getCycle(), state);
+		try {
+			calcCycle(true);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+	private void calcCycle(final boolean NEW) throws URISyntaxException {
+		final Integer currentCycle = getState().get("current_cycle",
+				Integer.class);
+		if (currentCycle != null && currentCycle != 0) {
 			int aliveNeighbors = 0;
 			for (String neighbor : neighbors) {
-				final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
-						
-				if (!getState()
-						.containsKey(neighborId + "_" + (currentCycle - 1))) {
-					return;
+				String neighborId = getAgentHost().getAgentId(
+						URI.create(neighbor));
+				if (NEW) {
+					neighborId = neighborId.replaceFirst(".*_", "");
 				}
-				CycleState nState = getState().get(
-						neighborId + "_" + (currentCycle - 1), CycleState.class);
-				if (nState.isAlive()) aliveNeighbors++;
-			}
-			for (String neighbor : neighbors) {
-				final String neighborId = getAgentHost().getAgentId(URI.create(neighbor));
-				getState().remove(neighborId + "_" + (currentCycle - 1));
+				CycleState nState = getState()
+						.get(neighborId + "_" + (currentCycle - 1),
+								CycleState.class);
+				if (nState == null){
+					return;
+				} else if (nState.isAlive()) {
+					aliveNeighbors++;
+				}
 			}
 			CycleState myState = getState().get("val_" + (currentCycle - 1),
 					CycleState.class);
+			CycleState newState = null;
 			if (aliveNeighbors < 2 || aliveNeighbors > 3) {
-				getState().put("val_" + currentCycle,
-						new CycleState(currentCycle, false));
+				newState = new CycleState(currentCycle, false);
 			} else if (aliveNeighbors == 3) {
-				getState().put("val_" + currentCycle,
-						new CycleState(currentCycle, true));
+				newState = new CycleState(currentCycle, true);
 			} else {
-				getState().put("val_" + currentCycle,
-						new CycleState(currentCycle, myState.isAlive()));
+				newState = new CycleState(currentCycle, myState.isAlive());
 			}
-			getState().put("current_cycle", currentCycle + 1);
-			try {
-				getEventsFactory().trigger("cycleCalculated");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (getState()
+					.putIfUnchanged("val_" + currentCycle, newState, null)) {
+				getState().put("current_cycle", currentCycle + 1);
+				if (NEW) {
+					final ObjectNode params = JOM.createObjectNode();
+					params.put("alive", myState.isAlive());
+					params.put("cycle", currentCycle);
+					params.put("from", getId().substring(6));
+					for (String neighbor : neighbors) {
+						final URI uri = URI.create(neighbor);
+						try {
+							send(new JSONRequest("collect", params), uri, null,
+									null);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					try {
+						getEventsFactory().trigger("cycleCalculated");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				for (String neighbor : neighbors) {
+					String neighborId = getAgentHost().getAgentId(
+							URI.create(neighbor));
+					if (NEW) {
+						neighborId = neighborId.replaceFirst(".*_", "");
+					}
+					getState().remove(neighborId + "_" + (currentCycle - 1));
+				}
 			}
 		}
 	}
@@ -208,5 +332,5 @@ public class Cell extends Agent {
 		}
 		return result;
 	}
-
+	
 }

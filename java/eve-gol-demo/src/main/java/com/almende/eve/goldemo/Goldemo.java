@@ -25,8 +25,12 @@ public class Goldemo {
 	/**
 	 * The Constant PATH.
 	 */
-	final static String	PATH	= "local:";
-//	final static String	PATH	= "http://127.0.0.1:8081/agents/";
+	final static String		PATHodd		= "local:";
+	final static String		PATHeven	= "local:";
+	// final static String PATHodd = "http://127.0.0.1:8081/agents/";
+	// final static String PATHeven = "http://127.0.0.1:8080/agents/";
+	
+	final static boolean	NEW			= true;
 	
 	/**
 	 * The main method.
@@ -68,63 +72,94 @@ public class Goldemo {
 		
 		AgentHost host = AgentHost.getInstance();
 		host.loadConfig(path);
-
+		
 		if (args.length > 5) {
 			boolean shortcut = Boolean.valueOf(args[5]);
 			host.setDoesShortcut(shortcut);
 		}
 		
-		boolean[][] grid = new boolean[N][M];
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
 		String input;
 		
 		int cN = 0;
+		int no = 0;
 		while ((input = br.readLine()) != null && cN < N) {
 			String trimmedInput = input.trim();
 			if (trimmedInput.isEmpty()) break;
 			if (trimmedInput.length() != M) throw new IllegalArgumentException(
 					"Incorrect input line detected:" + input);
 			for (int cM = 0; cM < M; cM++) {
-				grid[cN][cM] = (trimmedInput.charAt(cM) == '+');
-				createAgent(host, N, M, cN, cM,
-						(trimmedInput.charAt(cM) == '+'));
+				if (NEW) {
+					String agentId = "Agent_" + no++;
+					Cell cell = host.createAgent(Cell.class, agentId);
+					cell.new_create(PATHodd, PATHeven,
+							(trimmedInput.charAt(cM) == '+'), M * N);
+				} else {
+					createAgent(host, N, M, cN, cM,
+							(trimmedInput.charAt(cM) == '+'));
+				}
 			}
 			cN++;
 		}
-		for (cN = 0; cN < N; cN++) {
-			for (int cM = 0; cM < M; cM++) {
-				Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
-				cell.register();
+		if (NEW) {
+			for (no = 0; no < (N * M); no++) {
+				Cell cell = (Cell) host.getAgent("Agent_" + no);
+				cell.new_start();
+			}
+		} else {
+			for (cN = 0; cN < N; cN++) {
+				for (int cM = 0; cM < M; cM++) {
+					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					cell.register();
+				}
+			}
+			for (cN = 0; cN < N; cN++) {
+				for (int cM = 0; cM < M; cM++) {
+					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					cell.start();
+				}
 			}
 		}
-		for (cN = 0; cN < N; cN++) {
-			for (int cM = 0; cM < M; cM++) {
-				Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
-				cell.start();
-			}
-		}
+		
 		System.err.println("Started!");
 		try {
 			Thread.sleep(X * 1000);
 		} catch (InterruptedException e) {
 			System.err.println("Early interrupt");
 		}
-		for (cN = 0; cN < N; cN++) {
-			for (int cM = 0; cM < M; cM++) {
-				Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+		if (NEW) {
+			for (no = 0; no < (N * M); no++) {
+				Cell cell = (Cell) host.getAgent("Agent_" + no);
 				cell.stop();
+			}
+		} else {
+			for (cN = 0; cN < N; cN++) {
+				for (int cM = 0; cM < M; cM++) {
+					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					cell.stop();
+				}
 			}
 		}
 		HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
 		int max_full = 0;
-		for (cN = 0; cN < N; cN++) {
-			for (int cM = 0; cM < M; cM++) {
-				Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+		if (NEW) {
+			for (no = 0; no < (N * M); no++) {
+				Cell cell = (Cell) host.getAgent("Agent_" + no);
 				ArrayList<CycleState> res = cell.getAllCycleStates();
 				max_full = (max_full == 0 || max_full > res.size() ? res.size()
 						: max_full);
 				results.put(cell.getId(), res);
+			}
+		} else {
+			for (cN = 0; cN < N; cN++) {
+				for (int cM = 0; cM < M; cM++) {
+					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					ArrayList<CycleState> res = cell.getAllCycleStates();
+					max_full = (max_full == 0 || max_full > res.size() ? res
+							.size() : max_full);
+					results.put(cell.getId(), res);
+				}
 			}
 		}
 		int cycle = 0;
@@ -143,10 +178,14 @@ public class Goldemo {
 				System.out.print("-");
 			}
 			System.out.println("-\\");
+			no = 0;
 			for (cN = 0; cN < N; cN++) {
 				System.out.print("| ");
 				for (int cM = 0; cM < M; cM++) {
 					String id = ("agent_" + cN + "_" + cM);
+					if (NEW) {
+						id = "Agent_" + no++;
+					}
 					ArrayList<CycleState> states = results.get(id);
 					if (states.size() <= cycle) {
 						break;
@@ -198,6 +237,7 @@ public class Goldemo {
 			int cM, boolean state) throws JSONRPCException,
 			InstantiationException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException, IOException {
+		final String PATH = PATHeven;
 		
 		String agentId = "agent_" + cN + "_" + cM;
 		ArrayList<String> neighbors = new ArrayList<String>(8);
