@@ -112,8 +112,9 @@ public final class ApacheHttpClient {
 		params.setParameter(ClientPNames.COOKIE_POLICY,
 				CookiePolicy.BROWSER_COMPATIBILITY);
 		params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-		params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+		params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
 		params.setParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
+		params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
 		httpClient.setParams(params);
 	}
 	
