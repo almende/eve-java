@@ -18,18 +18,26 @@ import com.almende.eve.rpc.jsonrpc.JSONRPCException;
  * The Class Goldemo.
  */
 public class Goldemo {
-	// final static String BASE = "inproc://";
-	// final static String BASE = "ipc:///tmp/zmq-socket-";
-	// final static String PATH = "zmq:"+BASE;
+/**
+ * 
+ */
+//	 final static String BASE = "inproc://";
+//	 final static String BASE = "ipc:///tmp/zmq-socket-";
+//	 final static String PATH = "zmq:"+BASE;
+	
+	public final static String AGENTPREFIX = "Agent_";
 	
 	/**
 	 * The Constant PATH.
 	 */
-	final static String		PATHodd		= "local:";
-	final static String		PATHeven	= "local:";
-	// final static String PATHodd = "http://127.0.0.1:8081/agents/";
-	// final static String PATHeven = "http://127.0.0.1:8080/agents/";
+	// final static String PATHodd = "local:";
+	// final static String PATHeven = "local:";
+	final static String		PATHodd		= "http://127.0.0.1:8081/agents/";
+	final static String		PATHeven	= "http://127.0.0.1:8081/agents/";
 	
+//	final static String PATHodd = PATH;
+//	final static String PATHeven = PATH;
+	 
 	final static boolean	NEW			= true;
 	
 	/**
@@ -91,7 +99,7 @@ public class Goldemo {
 					"Incorrect input line detected:" + input);
 			for (int cM = 0; cM < M; cM++) {
 				if (NEW) {
-					String agentId = "Agent_" + no++;
+					String agentId = AGENTPREFIX + no++;
 					Cell cell = host.createAgent(Cell.class, agentId);
 					cell.new_create(PATHodd, PATHeven,
 							(trimmedInput.charAt(cM) == '+'), M * N);
@@ -104,19 +112,19 @@ public class Goldemo {
 		}
 		if (NEW) {
 			for (no = 0; no < (N * M); no++) {
-				Cell cell = (Cell) host.getAgent("Agent_" + no);
+				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
 				cell.new_start();
 			}
 		} else {
 			for (cN = 0; cN < N; cN++) {
 				for (int cM = 0; cM < M; cM++) {
-					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					Cell cell = (Cell) host.getAgent(AGENTPREFIX + cN + "_" + cM);
 					cell.register();
 				}
 			}
 			for (cN = 0; cN < N; cN++) {
 				for (int cM = 0; cM < M; cM++) {
-					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					Cell cell = (Cell) host.getAgent(AGENTPREFIX + cN + "_" + cM);
 					cell.start();
 				}
 			}
@@ -130,13 +138,13 @@ public class Goldemo {
 		}
 		if (NEW) {
 			for (no = 0; no < (N * M); no++) {
-				Cell cell = (Cell) host.getAgent("Agent_" + no);
+				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
 				cell.stop();
 			}
 		} else {
 			for (cN = 0; cN < N; cN++) {
 				for (int cM = 0; cM < M; cM++) {
-					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					Cell cell = (Cell) host.getAgent(AGENTPREFIX + cN + "_" + cM);
 					cell.stop();
 				}
 			}
@@ -145,7 +153,7 @@ public class Goldemo {
 		int max_full = 0;
 		if (NEW) {
 			for (no = 0; no < (N * M); no++) {
-				Cell cell = (Cell) host.getAgent("Agent_" + no);
+				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
 				ArrayList<CycleState> res = cell.getAllCycleStates();
 				max_full = (max_full == 0 || max_full > res.size() ? res.size()
 						: max_full);
@@ -154,7 +162,7 @@ public class Goldemo {
 		} else {
 			for (cN = 0; cN < N; cN++) {
 				for (int cM = 0; cM < M; cM++) {
-					Cell cell = (Cell) host.getAgent("agent_" + cN + "_" + cM);
+					Cell cell = (Cell) host.getAgent(AGENTPREFIX + cN + "_" + cM);
 					ArrayList<CycleState> res = cell.getAllCycleStates();
 					max_full = (max_full == 0 || max_full > res.size() ? res
 							.size() : max_full);
@@ -182,9 +190,9 @@ public class Goldemo {
 			for (cN = 0; cN < N; cN++) {
 				System.out.print("| ");
 				for (int cM = 0; cM < M; cM++) {
-					String id = ("agent_" + cN + "_" + cM);
+					String id = (AGENTPREFIX + cN + "_" + cM);
 					if (NEW) {
-						id = "Agent_" + no++;
+						id = AGENTPREFIX + no++;
 					}
 					ArrayList<CycleState> states = results.get(id);
 					if (states.size() <= cycle) {
@@ -239,23 +247,23 @@ public class Goldemo {
 			InvocationTargetException, NoSuchMethodException, IOException {
 		final String PATH = PATHeven;
 		
-		String agentId = "agent_" + cN + "_" + cM;
+		String agentId = AGENTPREFIX + cN + "_" + cM;
 		ArrayList<String> neighbors = new ArrayList<String>(8);
-		neighbors.add(PATH + "agent_" + ((N + cN - 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN - 1) % N) + "_"
 				+ ((M + cM - 1) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN) % N) + "_"
 				+ ((M + cM - 1) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN + 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN + 1) % N) + "_"
 				+ ((M + cM - 1) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN - 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN - 1) % N) + "_"
 				+ ((M + cM) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN + 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN + 1) % N) + "_"
 				+ ((M + cM) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN - 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN - 1) % N) + "_"
 				+ ((M + cM + 1) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN) % N) + "_"
 				+ ((M + cM + 1) % M));
-		neighbors.add(PATH + "agent_" + ((N + cN + 1) % N) + "_"
+		neighbors.add(PATH + AGENTPREFIX + ((N + cN + 1) % N) + "_"
 				+ ((M + cM + 1) % M));
 		Cell cell = host.createAgent(Cell.class, agentId);
 		cell.create(neighbors, state);

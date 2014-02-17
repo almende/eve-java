@@ -40,7 +40,7 @@ public class Cell extends Agent {
 	 */
 	public void create(@Name("neighbors") ArrayList<String> neighbors,
 			@Name("state") Boolean initState) {
-		
+		getState().put("Stopped",false);
 		getState().put("neighbors", neighbors);
 		getState().put("val_0", new CycleState(0, initState));
 		getState().put("current_cycle", 1);
@@ -56,6 +56,7 @@ public class Cell extends Agent {
 	public void new_create(@Name("pathOdd") String odd,
 			@Name("pathEven") String even, @Name("state") Boolean initState,
 			@Name("totalSize") int totalSize) {
+		getState().put("Stopped",false);
 		getState().put("val_0", new CycleState(0, initState));
 		getState().put("current_cycle", 1);
 		String id = getId();
@@ -83,21 +84,21 @@ public class Cell extends Agent {
 		}
 		
 		neighbors = new ArrayList<String>(8);
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN - 1) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN + 1) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN - 1) % N), ((M + cM) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN + 1) % N), ((M + cM) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN - 1) % N), ((M + cM + 1) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN) % N), ((M + cM + 1) % M), N));
-		neighbors.add(path + "Agent_"
+		neighbors.add(path + Goldemo.AGENTPREFIX
 				+ calcBack(((N + cN + 1) % N), ((M + cM + 1) % M), N));
 		getState().put("neighbors", neighbors);
 	}
@@ -135,6 +136,7 @@ public class Cell extends Agent {
 	 *             the jSONRPC exception
 	 */
 	public void stop() throws IOException, JSONRPCException {
+		getState().put("Stopped",true);
 		getEventsFactory().clear();
 	}
 	
@@ -270,6 +272,9 @@ public class Cell extends Agent {
 			if (getState()
 					.putIfUnchanged("val_" + currentCycle, newState, null)) {
 				getState().put("current_cycle", currentCycle + 1);
+				if (getState().get("Stopped",Boolean.class)){
+					return;
+				}
 				if (NEW) {
 					final ObjectNode params = JOM.createObjectNode();
 					params.put("alive", myState.isAlive());

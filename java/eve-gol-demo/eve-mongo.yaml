@@ -1,0 +1,20 @@
+# Eve configuration
+
+# transport services
+transport_services:
+- class: HttpService
+  servlet_url: http://127.0.0.1:8081/agents/
+  servlet_launcher: JettyLauncher
+
+# state settings
+# the state is used to persist the agents state.
+state:
+  class: com.almende.eve.state.mongo.MongoStateFactory
+
+# scheduler settings
+scheduler:
+  class: ClockSchedulerFactory
+
+jetty:
+  port: 8081
+

@@ -1,0 +1,21 @@
+# Eve configuration
+
+# transport services
+transport_services:
+- class: ZmqService
+  baseUrl: ipc:///tmp/zmq-socket-
+
+# state settings
+# the state is used to persist the agents state.
+state:
+  class: FileStateFactory
+  path: .eveagents_gol
+  json: true
+
+# scheduler settings
+scheduler:
+  class: ClockSchedulerFactory
+
+jetty:
+  port: 8081
+

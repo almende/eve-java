@@ -1,0 +1,19 @@
+# Eve configuration
+
+# transport services
+transport_services:
+- class: ZmqService
+  baseUrl: ipc:///tmp/zmq-socket-
+
+# state settings
+# the state is used to persist the agents state.
+state:
+  class: com.almende.eve.state.mongo.MongoStateFactory
+
+# scheduler settings
+scheduler:
+  class: ClockSchedulerFactory
+
+jetty:
+  port: 8081
+
