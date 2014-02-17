@@ -307,14 +307,20 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	@Override
 	public synchronized JsonNode get(final String key) {
 		JsonNode result = NullNode.getInstance();
+		boolean open = false;
 		try {
-			openFile();
-			read();
+			if (properties == null) {
+				open=true;
+				openFile();
+				read();
+			}
 			result = properties.get(key);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
-		closeFile();
+		if (open){
+			closeFile();
+		}
 		return result;
 	}
 	
