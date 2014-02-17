@@ -41,6 +41,8 @@ public class Config implements EveConfig {
 	static {
 		LABELS.put("couchdbstatefactory",
 				"com.almende.eve.state.couchdb.CouchDBStateFactory");
+		LABELS.put("mongostatefactory",
+				"com.almende.eve.state.mongo.MongoStateFactory");
 		LABELS.put("filestatefactory", "com.almende.eve.state.FileStateFactory");
 		LABELS.put("memorystatefactory",
 				"com.almende.eve.state.MemoryStateFactory");
