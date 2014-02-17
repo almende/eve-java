@@ -22,6 +22,8 @@ import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 
 /**
  * An implementation of state factory using MongoDB & Jongo as database
@@ -31,11 +33,11 @@ import com.mongodb.MongoClient;
  */
 public class MongoStateFactory implements StateFactory {
 	
-	private static final Logger		LOG			= Logger.getLogger("MongoStateFactory");
+	private static final Logger	LOG	= Logger.getLogger("MongoStateFactory");
 	
 	/* internal attributes */
-	private final Jongo jongo;
-	private final String collectionName;
+	private final Jongo			jongo;
+	private final String		collectionName;
 	
 	/**
 	 * default constructor which will connect to default mongodb client
@@ -63,8 +65,11 @@ public class MongoStateFactory implements StateFactory {
 	 * @throws UnknownHostException
 	 *             the unknown host exception
 	 */
-	public MongoStateFactory(String mongoUriHost, int mongoPort, String databaseName, String collectionName) throws UnknownHostException {
-		this(new MongoClient(mongoUriHost, mongoPort), databaseName, collectionName);
+	public MongoStateFactory(String mongoUriHost, int mongoPort,
+			String databaseName, String collectionName)
+			throws UnknownHostException {
+		this(createClient(mongoUriHost, mongoPort), databaseName,
+				collectionName);
 	}
 	
 	/**
@@ -78,7 +83,8 @@ public class MongoStateFactory implements StateFactory {
 	 * @param collectionName
 	 *            the collection name
 	 */
-	public MongoStateFactory(MongoClient mongoClient, String databaseName, String collectionName) {
+	public MongoStateFactory(MongoClient mongoClient, String databaseName,
+			String collectionName) {
 		this(new Jongo(mongoClient.getDB(databaseName)), collectionName);
 	}
 	
@@ -103,15 +109,31 @@ public class MongoStateFactory implements StateFactory {
 	 * @throws UnknownHostException
 	 *             the unknown host exception
 	 */
-	public MongoStateFactory(Map<String, Object> params) throws UnknownHostException {
+	public MongoStateFactory(Map<String, Object> params)
+			throws UnknownHostException {
 		// initialization of client & jongo
-		MongoClient client = new MongoClient(
-				((params.containsKey("uriHost")) ? (String) params.get("uriHost") : "localhost"),		// parse URI
-				((params.containsKey("port")) ? (Integer) params.get("port") : 27017)		// parse port
-			);
-		String databaseName = (params != null && params.containsKey("database")) ? (String) params.get("database") : "eve";
+		MongoClient client = createClient(
+				((params.containsKey("uriHost")) ? (String) params.get("uriHost")
+						: "localhost"), // parse URI
+				((params.containsKey("port")) ? (Integer) params.get("port")
+						: 27017) // parse port
+		);
+		String databaseName = (params != null && params.containsKey("database")) ? (String) params
+				.get("database") : "eve";
 		this.jongo = new Jongo(client.getDB(databaseName));
-		this.collectionName = (params != null && params.containsKey("collection")) ? (String) params.get("collection") : "agents";
+		this.collectionName = (params != null && params
+				.containsKey("collection")) ? (String) params.get("collection")
+				: "agents";
+	}
+	
+	private static MongoClient createClient(String databaseUri, int port)
+			throws UnknownHostException {
+		MongoClientOptions options = MongoClientOptions.builder()
+				.connectionsPerHost(100)
+				.threadsAllowedToBlockForConnectionMultiplier(1500).build();
+		MongoClient client = new MongoClient(new ServerAddress(databaseUri,
+				port), options);
+		return client;
 	}
 	
 	/**
@@ -140,7 +162,7 @@ public class MongoStateFactory implements StateFactory {
 	public MongoCollection getCollection() {
 		return jongo.getCollection(collectionName);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -150,8 +172,9 @@ public class MongoStateFactory implements StateFactory {
 	public State get(String agentId) {
 		MongoState result = null;
 		try {
-			result = getCollection().findOne("{_id: #}", agentId).as(MongoState.class);
-			if (result!=null) {
+			result = getCollection().findOne("{_id: #}", agentId).as(
+					MongoState.class);
+			if (result != null) {
 				result.setCollection(getCollection());
 			}
 		} catch (final Exception e) {
@@ -159,7 +182,7 @@ public class MongoStateFactory implements StateFactory {
 		}
 		return result;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -181,7 +204,7 @@ public class MongoStateFactory implements StateFactory {
 		state.setCollection(getCollection());
 		return state;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -195,7 +218,7 @@ public class MongoStateFactory implements StateFactory {
 			LOG.log(Level.WARNING, "delete error", e);
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -203,11 +226,11 @@ public class MongoStateFactory implements StateFactory {
 	 */
 	@Override
 	public boolean exists(String agentId) {
-		MongoState result = getCollection().
-								findOne("{_id: #}", agentId).as(MongoState.class);
+		MongoState result = getCollection().findOne("{_id: #}", agentId).as(
+				MongoState.class);
 		return (result != null);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -217,19 +240,17 @@ public class MongoStateFactory implements StateFactory {
 	public Iterator<String> getAllAgentIds() {
 		try {
 			Find find = getCollection().find().projection("{_id:1}");
-			Iterable<String> agentIDs = find.map(
-				    new ResultHandler<String>() {
-						@Override
-						public String map(DBObject result) {
-							return (String) result.get("_id");
-						}
-				});
+			Iterable<String> agentIDs = find.map(new ResultHandler<String>() {
+				@Override
+				public String map(DBObject result) {
+					return (String) result.get("_id");
+				}
+			});
 			return agentIDs.iterator();
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "getAllAgentIds error", e);
 		}
 		return new ArrayList<String>().iterator();
 	}
-
-
+	
 }
