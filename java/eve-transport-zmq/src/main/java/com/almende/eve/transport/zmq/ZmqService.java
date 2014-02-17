@@ -106,6 +106,7 @@ public class ZmqService implements TransportService {
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
 				}
+				socket.setTCPKeepAlive(-1);
 				socket.setLinger(-1);
 				socket.close();
 			}
