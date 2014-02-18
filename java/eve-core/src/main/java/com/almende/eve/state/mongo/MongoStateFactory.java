@@ -16,8 +16,10 @@ import org.jongo.ResultHandler;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
+import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 
 /**
  * An implementation of state factory using MongoDB & Jongo as database connection
@@ -84,13 +86,29 @@ public class MongoStateFactory implements StateFactory {
 	 * @throws UnknownHostException
 	 */
 	public MongoStateFactory(Map<String, Object> params) throws UnknownHostException {
-		// initialization of client & jongo
+		
+		// initialization of mongo client server/port
 		MongoClient client = new MongoClient(
-				((params.containsKey("uriHost")) ? (String) params.get("uriHost") : "localhost"),		// parse URI
-				((params.containsKey("port")) ? (Integer) params.get("port") : 27017)		// parse port
+				((params.containsKey("uriHost")) ? (String) params.get("uriHost") : "localhost"),
+				((params.containsKey("port")) ? (Integer) params.get("port") : 27017)		
 			);
+		
+		// select database
 		String databaseName = (params != null && params.containsKey("database")) ? (String) params.get("database") : "eve";
-		this.jongo = new Jongo(client.getDB(databaseName));
+		DB database = client.getDB(databaseName);
+		
+		// authenticate if username and password is available
+		String username = (params.containsKey("username")) ? (String) params.get("username") : null;
+		if (username != null) {
+			if (params.containsKey("password")) {
+				throw new MongoException("Password for username not configured.");
+			}
+			String password = (String) params.get("password");
+			database.authenticate(username, password.toCharArray()); // will also throw exception if username/password incorrect
+		}
+		
+		// setup jongo and collection
+		this.jongo = new Jongo(database);
 		this.collectionName = (params != null && params.containsKey("collection")) ? (String) params.get("collection") : "agents";
 	}
 	
