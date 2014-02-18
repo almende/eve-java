@@ -8,11 +8,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.almende.eve.agent.AgentHost;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
+import com.almende.util.TypeUtil;
 
 /**
  * The Class Goldemo.
@@ -32,7 +34,7 @@ public class Goldemo {
 	 */
 	// final static String PATHodd = "local:";
 	// final static String PATHeven = "local:";
-	final static String		PATHodd		= "http://127.0.0.1:8081/agents/";
+	final static String		PATHodd		= "http://127.0.0.1:8082/agents/";
 	final static String		PATHeven	= "http://127.0.0.1:8081/agents/";
 	
 //	final static String PATHodd = PATH;
@@ -111,7 +113,7 @@ public class Goldemo {
 			cN++;
 		}
 		if (NEW) {
-			for (no = 0; no < (N * M); no++) {
+			for (no = 0; no < (N * M); no=no+2) {
 				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
 				cell.new_start();
 			}
@@ -152,12 +154,20 @@ public class Goldemo {
 		HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
 		int max_full = 0;
 		if (NEW) {
+			Cell cell = (Cell) host.getAgent(AGENTPREFIX + 0);
+			TypeUtil<ArrayList<CycleState>> type = new TypeUtil<ArrayList<CycleState>>(){};
 			for (no = 0; no < (N * M); no++) {
-				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
-				ArrayList<CycleState> res = cell.getAllCycleStates();
+				String locpath;
+				if (no % 2 == 0){
+					locpath = PATHeven;
+				} else {
+					locpath = PATHodd;
+				}
+				System.err.println("Getting results:"+locpath+AGENTPREFIX+no);
+				ArrayList<CycleState> res =  cell.send(URI.create(locpath+AGENTPREFIX+no), "getAllCycleStates", type);
 				max_full = (max_full == 0 || max_full > res.size() ? res.size()
 						: max_full);
-				results.put(cell.getId(), res);
+				results.put(AGENTPREFIX+no, res);
 			}
 		} else {
 			for (cN = 0; cN < N; cN++) {

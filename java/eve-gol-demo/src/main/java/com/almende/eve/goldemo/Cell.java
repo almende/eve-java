@@ -40,7 +40,7 @@ public class Cell extends Agent {
 	 */
 	public void create(@Name("neighbors") ArrayList<String> neighbors,
 			@Name("state") Boolean initState) {
-		getState().put("Stopped",false);
+		getState().put("Stopped", false);
 		getState().put("neighbors", neighbors);
 		getState().put("val_0", new CycleState(0, initState));
 		getState().put("current_cycle", 1);
@@ -56,7 +56,7 @@ public class Cell extends Agent {
 	public void new_create(@Name("pathOdd") String odd,
 			@Name("pathEven") String even, @Name("state") Boolean initState,
 			@Name("totalSize") int totalSize) {
-		getState().put("Stopped",false);
+		getState().put("Stopped", false);
 		getState().put("val_0", new CycleState(0, initState));
 		getState().put("current_cycle", 1);
 		String id = getId();
@@ -74,37 +74,49 @@ public class Cell extends Agent {
 		int M = N;
 		int cN = 0;
 		int cM = 0;
-		String path = even;
-		if (agentNo % 2 > 0) {
-			path = odd;
-		}
 		if (agentNo != 0) {
-			cN = agentNo % N;
-			cM = (int) Math.floor(agentNo / M);
+			cM = agentNo % M;
+			cN = (int) Math.floor(agentNo / N);
 		}
-		
 		neighbors = new ArrayList<String>(8);
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN - 1) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN + 1) % N), ((M + cM - 1) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN - 1) % N), ((M + cM) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN + 1) % N), ((M + cM) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN - 1) % N), ((M + cM + 1) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN) % N), ((M + cM + 1) % M), N));
-		neighbors.add(path + Goldemo.AGENTPREFIX
-				+ calcBack(((N + cN + 1) % N), ((M + cM + 1) % M), N));
+		
+		for (int id = 0; id < 8; id++) {
+			int neighborNo = getNeighborNo(id, cN, cM, N, M);
+			neighbors.add(addPath(odd, even, Goldemo.AGENTPREFIX + neighborNo,
+					neighborNo));
+		}
 		getState().put("neighbors", neighbors);
 	}
 	
-	private int calcBack(int cN, int cM, int N) {
-		return cM * N + cN;
+	private String addPath(String odd, String even, String path, int agentNo) {
+		return (agentNo % 2 == 0 ? even : odd) + path;
+	}
+	
+	private int calcBack(int cN, int cM, int M) {
+		return cM + cN * M;
+	}
+	
+	private int getNeighborNo(int id, int cN, int cM, int N, int M) {
+		switch (id) {
+			case 0:
+				return calcBack(((N + cN - 1) % N), ((M + cM - 1) % M), M);
+			case 1:
+				return calcBack(((N + cN) % N), ((M + cM - 1) % M), M);
+			case 2:
+				return calcBack(((N + cN + 1) % N), ((M + cM - 1) % M), M);
+			case 3:
+				return calcBack(((N + cN - 1) % N), ((M + cM) % M), M);
+			case 4:
+				return calcBack(((N + cN + 1) % N), ((M + cM) % M), M);
+			case 5:
+				return calcBack(((N + cN - 1) % N), ((M + cM + 1) % M), M);
+			case 6:
+				return calcBack(((N + cN) % N), ((M + cM + 1) % M), M);
+			case 7:
+				return calcBack(((N + cN + 1) % N), ((M + cM + 1) % M), M);
+		}
+		System.err.println("SHould never happen!");
+		return 0;
 	}
 	
 	/**
@@ -136,7 +148,7 @@ public class Cell extends Agent {
 	 *             the jSONRPC exception
 	 */
 	public void stop() throws IOException, JSONRPCException {
-		getState().put("Stopped",true);
+		getState().put("Stopped", true);
 		getEventsFactory().clear();
 	}
 	
@@ -232,6 +244,7 @@ public class Cell extends Agent {
 					});
 		}
 		CycleState state = new CycleState(cycle, alive);
+//		System.out.println(getId()+": Received state:" + state + " from:" + neighborNo);
 		getState().put(neighborNo + "_" + state.getCycle(), state);
 		try {
 			calcCycle(true);
@@ -239,25 +252,34 @@ public class Cell extends Agent {
 			e.printStackTrace();
 		}
 	}
+	
 	private void calcCycle(final boolean NEW) throws URISyntaxException {
 		final Integer currentCycle = getState().get("current_cycle",
 				Integer.class);
 		if (currentCycle != null && currentCycle != 0) {
 			int aliveNeighbors = 0;
+			int knownNeighbors = 0;
 			for (String neighbor : neighbors) {
-				String neighborId = getAgentHost().getAgentId(
-						URI.create(neighbor));
+				
+				String neighborId = URI.create(neighbor).getPath()
+						.replaceFirst("agents/", "");
 				if (NEW) {
 					neighborId = neighborId.replaceFirst(".*_", "");
 				}
 				CycleState nState = getState()
 						.get(neighborId + "_" + (currentCycle - 1),
 								CycleState.class);
-				if (nState == null){
+				if (nState == null) {
 					return;
+//					continue;
 				} else if (nState.isAlive()) {
 					aliveNeighbors++;
 				}
+				knownNeighbors++;
+			}
+			if (knownNeighbors < 8){
+//				System.out.println(getId()+"/"+currentCycle+" has seen: "+knownNeighbors+" neighbors.");
+				return;
 			}
 			CycleState myState = getState().get("val_" + (currentCycle - 1),
 					CycleState.class);
@@ -271,13 +293,14 @@ public class Cell extends Agent {
 			}
 			if (getState()
 					.putIfUnchanged("val_" + currentCycle, newState, null)) {
+//				System.out.println(getId()+" :"+newState);
 				getState().put("current_cycle", currentCycle + 1);
-				if (getState().get("Stopped",Boolean.class)){
+				if (getState().get("Stopped", Boolean.class)) {
 					return;
 				}
 				if (NEW) {
 					final ObjectNode params = JOM.createObjectNode();
-					params.put("alive", myState.isAlive());
+					params.put("alive", newState.isAlive());
 					params.put("cycle", currentCycle);
 					params.put("from", getId().substring(6));
 					for (String neighbor : neighbors) {
@@ -298,13 +321,14 @@ public class Cell extends Agent {
 					}
 				}
 				for (String neighbor : neighbors) {
-					String neighborId = getAgentHost().getAgentId(
-							URI.create(neighbor));
+					String neighborId = URI.create(neighbor).getPath()
+							.replaceFirst("agents/", "");
 					if (NEW) {
 						neighborId = neighborId.replaceFirst(".*_", "");
 					}
 					getState().remove(neighborId + "_" + (currentCycle - 1));
 				}
+				calcCycle(NEW);
 			}
 		}
 	}
