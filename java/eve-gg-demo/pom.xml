@@ -18,8 +18,9 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-core</artifactId>
+			<artifactId>eve-bundled</artifactId>
 			<version>${project.parent.version}</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 
