@@ -1,4 +1,4 @@
-package com.almende.test.agents;
+package com.almende.eve.test.agents;
 
 import com.almende.eve.agent.Agent;
 import com.almende.eve.rpc.annotation.Access;
@@ -25,6 +25,10 @@ public class TestStateAgent extends Agent {
 	public synchronized void push(Object value) {
 		int index = getState().size() + 1;
 		String key = "attr"+index+"-"+value.hashCode();
+		if (getState().containsKey(key)) {
+			// simply append extra identifier when collision happens :: outlier case of double collision is ignored for now
+			key = key + "-1"; 
+		}
 		getState().put(key, value);
 	}
 	

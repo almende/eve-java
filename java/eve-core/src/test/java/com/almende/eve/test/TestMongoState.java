@@ -1,4 +1,4 @@
-package com.almende.test;
+package com.almende.eve.test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,23 +23,56 @@ import com.almende.eve.agent.AgentHost;
 import com.almende.eve.scheduler.RunnableSchedulerFactory;
 import com.almende.eve.state.State;
 import com.almende.eve.state.mongo.MongoStateFactory;
-import com.almende.test.agents.TestStateAgent;
+import com.almende.eve.test.agents.TestStateAgent;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
+
+/**
+ * Unit testing State integrity in multiple instance of a single agent.
+ * 
+ * These test cases will spawn 16, 32 and 64 concurrent update threads. The Agent
+ * will then save the update into different document field, making it behave like
+ * a Vector/ArrayList.
+ * 
+ * @author ronny
+ *
+ */
 public class TestMongoState {
 	
 	private static final String AGENT_ID = TestMongoState.class.getCanonicalName();
 	private static final Logger	LOG	= Logger.getLogger("TestMongoState");
 	
+	/* mongo daemon representations for unit testing */
+	private static MongodExecutable _mongodExe;
+	private static MongodProcess _mongod;
+	
 	@BeforeClass
 	public static void setupEve() throws Exception {
 		
 		// another precondition here: mongodb daemon must be running
+		Integer portNumber = 12345;
+		MongodStarter runtime = MongodStarter.getDefaultInstance();
+        _mongodExe = runtime.prepare(new MongodConfigBuilder()
+            .version(Version.Main.PRODUCTION)
+            .net(new Net(portNumber, Network.localhostIsIPv6()))
+            .build());
+        _mongod = _mongodExe.start();
 		
 		// setup separate database for unit testing
 		Map<String, Object> config = new HashMap<String, Object>();
-		config.put("database", "junit"); 
+		config.put("uriHost", "localhost");
+		config.put("port", portNumber);
+		config.put("database", "junit");
+		config.put("collection", "agents");
+		
 		MongoStateFactory mongo = new MongoStateFactory(config);
 		
 		// 
@@ -75,12 +108,14 @@ public class TestMongoState {
 	 
 	private void test(final int threadCount) throws Exception {
 		
+		// define the update task
 	    Callable<Long> updateTask = new Callable<Long>() {
 	        @Override
 	        public Long call() throws Exception {
 	        	TestStateAgent agent = (TestStateAgent) AgentHost.getInstance().getAgent(AGENT_ID);
-	            agent.push((Long) System.nanoTime());
-	            return (long) agent.getState().size();
+	        	Long timestamp = System.nanoTime();
+	            agent.push(timestamp);
+	            return timestamp;
 	        }
 	    };
 	    
@@ -88,26 +123,40 @@ public class TestMongoState {
 	    
 	    ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 	    List<Future<Long>> futures = executorService.invokeAll(tasks);
-	    List<Long> resultList = new ArrayList<Long>(futures.size());
+	    List<Long> results = new ArrayList<Long>(futures.size());
 	    
-	    // Check for exceptions
 	    for (Future<Long> future : futures) {
-	        // Throws an exception if an exception was thrown by the task.
+	        // will forward exception to the unit test when any of the task throws one.
 	    	Long version = future.get();
-	    	resultList.add(version);
+	    	results.add(version);
 	    }
-	    // Validate the IDs
+	    
+	    // Validate the futures list
 	    Assert.assertEquals(threadCount, futures.size());
 	    
 	    TestStateAgent agent = (TestStateAgent) AgentHost.getInstance().getAgent(AGENT_ID);
+	    Map<String, Object> state = new HashMap<String, Object>();
+	    for (String key : agent.getState().keySet()) {
+			state.put(key, agent.getState().get(key, Object.class));
+		}
+	    
+	    // validate state contents
 	    Assert.assertEquals(threadCount, agent.getState().size()); 
+	    Assert.assertEquals(results.size(), state.size()); 
+	    
+	    LOG.log(Level.INFO, "results: " + results);
+	    LOG.log(Level.INFO, "agent state:" + state);
+	    
+	    for (Long timestamp : results) {
+			Assert.assertTrue(state.containsValue(timestamp));
+		}
 	}
 	
 	@AfterClass
 	public static void wrapUp() {
 		
 		MongoStateFactory mongo = (MongoStateFactory) AgentHost.getInstance().getStateFactory();
-		// print all result
+		// print the contents of the agents' state
 		Iterator<String> iterator = mongo.getAllAgentIds();
 		while(iterator.hasNext()) {
 			String agentId = iterator.next();
@@ -127,6 +176,9 @@ public class TestMongoState {
 		database.dropDatabase();
 		client.close(); 
 		
+		// stop the mongo daemon & executables
+		_mongod.stop();
+		_mongodExe.stop();
 	}
 
 
