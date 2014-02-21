@@ -93,20 +93,25 @@ public class TestMongoState {
 	 
 	@Test
 	public void test16UpdateThreads() throws Exception {
-	    test(16);
+	    testConcurrentUpdate(16);
 	}
 	
 	@Test
 	public void test32UpdateThreads() throws Exception {
-	    test(32);
+	    testConcurrentUpdate(32);
 	}
 
 	@Test
 	public void test64UpdateThreads() throws Exception {
-	    test(64);
+	    testConcurrentUpdate(64);
+	}
+	
+	@Test
+	public void test128UpdateThreads() throws Exception {
+	    testConcurrentUpdate(128);
 	}
 	 
-	private void test(final int threadCount) throws Exception {
+	private void testConcurrentUpdate(final int threadCount) throws Exception {
 		
 		// define the update task
 	    Callable<Long> updateTask = new Callable<Long>() {
@@ -140,12 +145,14 @@ public class TestMongoState {
 			state.put(key, agent.getState().get(key, Object.class));
 		}
 	    
+	    if (results.size() != state.size()) {
+	    	LOG.log(Level.WARNING, "results: " + results);
+		    LOG.log(Level.WARNING, "agent state:" + state);
+	    }
+	    
 	    // validate state contents
 	    Assert.assertEquals(threadCount, agent.getState().size()); 
 	    Assert.assertEquals(results.size(), state.size()); 
-	    
-	    LOG.log(Level.INFO, "results: " + results);
-	    LOG.log(Level.INFO, "agent state:" + state);
 	    
 	    for (Long timestamp : results) {
 			Assert.assertTrue(state.containsValue(timestamp));
@@ -158,18 +165,25 @@ public class TestMongoState {
 		MongoStateFactory mongo = (MongoStateFactory) AgentHost.getInstance().getStateFactory();
 		// print the contents of the agents' state
 		Iterator<String> iterator = mongo.getAllAgentIds();
+		StringBuilder builder = new StringBuilder();
 		while(iterator.hasNext()) {
 			String agentId = iterator.next();
 			State agentState = mongo.get(agentId);
 			try {
-				LOG.log(Level.INFO, "> " + agentState.getAgentType().getCanonicalName()+" ("+ agentId+")");
+				builder.append("\n$ ");
+				builder.append(agentState.getAgentType().getCanonicalName());
+				builder.append(" ("+agentId+")");
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace(); // should not happen
 			}
 			for (String key : agentState.keySet()) {
-				LOG.log(Level.INFO, "    > " + key +" : "+ agentState.get(key, String.class));
+				builder.append("\n    > ");
+				builder.append(key);
+				builder.append(" : ");
+				builder.append(agentState.get(key, String.class));
 			}
 		}
+		LOG.log(Level.INFO, builder.toString());
 		// clean up database after operation
 		DB database = mongo.getJongo().getDatabase();
 		Mongo client = database.getMongo();

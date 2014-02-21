@@ -22,6 +22,7 @@ import com.almende.eve.state.AbstractState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 
 /**
@@ -375,9 +376,11 @@ public class MongoState extends AbstractState<JsonNode> {
 				collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).with("{$set: {properties: #, timestamp: #}}", properties, now);
 		/* check results */
 		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
-		if (!updatedExisting) {
+		if (result.getN() == 0 && result.getError() == null) {
 			throw new UpdateConflictException(timestamp);
-		} 
+		} else if (result.getN() != 1) {
+			throw new MongoException(result.getError());
+		}
 		timestamp = now;
 		return updatedExisting;
 	}
