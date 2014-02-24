@@ -1,5 +1,9 @@
 package com.almende.eve.test.agents;
 
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.almende.eve.agent.Agent;
 import com.almende.eve.rpc.annotation.Access;
 import com.almende.eve.rpc.annotation.AccessType;
@@ -13,25 +17,25 @@ import com.almende.eve.rpc.annotation.AccessType;
  */
 public class TestStateAgent extends Agent {
 	
+	private static final Logger	LOG = Logger.getLogger("TestStateAgent");
+	
 	public TestStateAgent() {
 		// 
 	}
-	
+
 	/**
 	 * a simple method to push the values onto the agent state, with roughly unique id for each new value added
 	 * @param value
 	 */
 	@Access(AccessType.PUBLIC) 
-	public synchronized void push(Object value) {
+	public synchronized Object push(Object value) {
 		int index = getState().size() + 1;
-		// :: creating pseudo-unique key
-		String key = "attr"+index+"-"+System.nanoTime();
-		if (getState().containsKey(key)) {
-			// :: collision avoidance by using relative slowness of recursion
-			push(value); 
-		} else {
-			getState().put(key, value);
-		}
+		String key = "a"+index+"-"+UUID.randomUUID();
+		LOG.log(Level.INFO, "put ["+key+"] = "+value);
+		return getState().put(key, value);
 	}
 	
 }
+
+
+
