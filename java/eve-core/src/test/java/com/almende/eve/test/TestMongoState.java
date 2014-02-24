@@ -109,10 +109,10 @@ public class TestMongoState {
 		object.setTimestamp(Calendar.getInstance().getTime());
 		object.setMessage("Serialized object creation.");
 		 
+		mongo.get(SERIALIZER_AGENT_ID).put("key", object);
 		
-		MongoState state = (MongoState) mongo.get(SERIALIZER_AGENT_ID);
-		state.put("key", object);
-		SerializedObject objectAcc = (SerializedObject) state.get("key", SerializedObject.class);
+		SerializedObject objectAcc = mongo.get(SERIALIZER_AGENT_ID)
+				.get("key", SerializedObject.class);
 		 
 		Assert.assertNotNull(objectAcc);
 		 
