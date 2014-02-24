@@ -4,11 +4,7 @@
  */
 package com.almende.eve.state.mongo;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -45,26 +41,21 @@ public class MongoState extends AbstractState<JsonNode> {
 		private static final long serialVersionUID = -8714877645567521282L;
 		
 		/**
-		 * timestamp of 
+		 * timestamp of last update
 		 */
-		private Date timestamp;
-		
-		/**
-		 * constant for print formatting the timestamp
-		 */
-		private final DateFormat format = new SimpleDateFormat("dd/MM/yy hh:mm:ss:SSS");
+		private Long timestamp;
 		
 		/**
 		 * default constructor for class specific exception
 		 * @param timestamp
 		 */
-		public UpdateConflictException(Date timestamp) {
+		public UpdateConflictException(Long timestamp) {
 			this.timestamp = timestamp;
 		}
 		
 		@Override
 		public String getMessage() {
-			return "Document updated on ["+format.format(timestamp)+"] is no longer the latest version.";
+			return "Document updated on ["+timestamp+"] is no longer the latest version.";
 		}
 		
 	}
@@ -76,7 +67,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	
 	/* metadata for agenthost : agent type and last update for a simple update conflict avoidance */
 	private Class<?> agentType;
-	private Date timestamp;
+	private Long timestamp;
 	
 	
 	@JsonIgnore
@@ -99,7 +90,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 */
 	public MongoState(final String agentId) {
 		super(agentId);
-		timestamp = Calendar.getInstance().getTime();
+		timestamp = System.nanoTime();
 		agentType = null;
 	}
 	
@@ -129,7 +120,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * 
 	 * @return the timestamp
 	 */
-	public Date getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 	
@@ -369,7 +360,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * @throws UpdateConflictException | will not throw anything when $force flag is true
 	 */
 	private synchronized boolean updateProperties(boolean force) throws UpdateConflictException {
-		Date now = Calendar.getInstance().getTime();
+		Long now = System.nanoTime();
 		/* write to database */
 		WriteResult result = (force) ?
 				collection.update("{_id: #}", getAgentId()).with("{$set: {properties: #, timestamp: #}}", properties, now) :
