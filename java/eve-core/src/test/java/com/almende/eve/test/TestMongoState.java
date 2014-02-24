@@ -19,20 +19,15 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.text.DateFormatter;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentHost;
 import com.almende.eve.scheduler.RunnableSchedulerFactory;
 import com.almende.eve.state.State;
-import com.almende.eve.state.mongo.MongoState;
 import com.almende.eve.state.mongo.MongoStateFactory;
 import com.almende.eve.test.agents.TestStateAgent;
 import com.mongodb.DB;
@@ -49,7 +44,7 @@ import de.flapdoodle.embed.process.runtime.Network;
 /**
  * Unit testing State integrity in multiple instance of a single agent.
  * 
- * These test cases will spawn 16, 32 and 64 concurrent update threads. The Agent
+ * These test cases will spawn 64 concurrent update threads. The Agent
  * will then save the update into different document field, making it behave like
  * a Vector/ArrayList.
  * 
@@ -62,8 +57,6 @@ public class TestMongoState {
 	
 	private static final String CONCURRENT_AGENT_ID = "TestConcurrent";
 	private static final String SERIALIZER_AGENT_ID = "TestSerializer";
-	
-	
 	
 	/* mongo daemon representations for unit testing */
 	private static MongodExecutable _mongodExe;
@@ -235,8 +228,8 @@ class SerializedObject implements Serializable {
 	 */
 	private static final long serialVersionUID = 5948607234036024288L;
 	
-	private Date timestamp;
-	private String message;
+	private Date timestamp = Calendar.getInstance().getTime();
+	private String message = "Default message values.";
 	
 	public SerializedObject() {
 	}
