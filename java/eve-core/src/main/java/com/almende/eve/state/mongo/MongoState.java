@@ -4,9 +4,7 @@
  */
 package com.almende.eve.state.mongo;
 
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +16,9 @@ import org.jongo.marshall.jackson.oid.Id;
 
 import com.almende.eve.state.AbstractState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 
 /**
@@ -31,6 +28,38 @@ import com.mongodb.WriteResult;
  */
 public class MongoState extends AbstractState<JsonNode> {
 	
+	/**
+	 * internal exception signifying update conflict
+	 * @author ronny
+	 *
+	 */
+	class UpdateConflictException extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8714877645567521282L;
+		
+		/**
+		 * timestamp of last update
+		 */
+		private Long timestamp;
+		
+		/**
+		 * default constructor for class specific exception
+		 * @param timestamp
+		 */
+		public UpdateConflictException(Long timestamp) {
+			this.timestamp = timestamp;
+		}
+		
+		@Override
+		public String getMessage() {
+			return "Document updated on ["+timestamp+"] is no longer the latest version.";
+		}
+		
+	}
+	
 	private static final Logger		LOG			= Logger.getLogger("MongoState");
 	
 	/* mapping object that contains variables used by the agent */
@@ -38,7 +67,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	
 	/* metadata for agenthost : agent type and last update for a simple update conflict avoidance */
 	private Class<?> agentType;
-	private Date timestamp;
+	private Long timestamp;
 	
 	
 	@JsonIgnore
@@ -61,7 +90,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 */
 	public MongoState(final String agentId) {
 		super(agentId);
-		timestamp = Calendar.getInstance().getTime();
+		timestamp = System.nanoTime();
 		agentType = null;
 	}
 	
@@ -91,7 +120,7 @@ public class MongoState extends AbstractState<JsonNode> {
 	 * 
 	 * @return the timestamp
 	 */
-	public Date getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 	
@@ -239,6 +268,11 @@ public class MongoState extends AbstractState<JsonNode> {
 		try {
 			result = properties.put(key, value);
 			updateProperties(false); // updateField(key, value);
+		} catch (final UpdateConflictException e) {
+			LOG.log(Level.WARNING, e.getMessage() +" Adding ["+key+"="+value+"]");
+			reloadProperties();
+			// go recursive if update conflict occurs
+			result = locPut(key, value);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "locPut error", e);
 		}
@@ -268,6 +302,11 @@ public class MongoState extends AbstractState<JsonNode> {
 				properties.put(key, newVal);
 				result = updateProperties(false); // updateField(key, newVal);
 			}
+		} catch (final UpdateConflictException e) {
+			LOG.log(Level.WARNING, e.getMessage());
+			reloadProperties();
+			// recur if update conflict occurs
+			locPutIfUnchanged(key, newVal, oldVal);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "locPutIfUnchanged error", e);
 		}
@@ -293,46 +332,48 @@ public class MongoState extends AbstractState<JsonNode> {
 	public void setProperties(final Map<String, JsonNode> properties) {
 		this.properties.clear();
 		this.properties.putAll(properties);
-		updateProperties(false);
-	}
+		try {
+			updateProperties(true);
+		} catch (UpdateConflictException e) {
+			// should never happen
+			LOG.log(Level.WARNING, "setProperties error", e); 
+		}
+	} 
 	
 	/**
-	 * FIXME this method still has errors on serializing/deserializing <value> parameter, probably 
-	 * related with the mappers of Jongo
+	 * Refreshes the state according to the latest version as a preceding step before recursive call.
+	 * With this mechanism, changes on different State property will be safely merged. However, with
+	 * interwoven execution order among multiple threads, multiple updates on the same State property 
+	 * is not guaranteed to be executed properly.
 	 * 
-	 * update a single field, by default will fail if there is a newer update from some other instance
-	 * @throws JsonProcessingException 
 	 */
-	@SuppressWarnings("unused")
-	private synchronized boolean updateField(String field, JsonNode value) throws JsonProcessingException {
-		Date now = Calendar.getInstance().getTime();
-		WriteResult result = collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).
-				with("{$set: {properties."+field+": #, timestamp: #}}", value, now);
-		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
-		if (updatedExisting) {
-			timestamp = now;
-		} 
-		return updatedExisting;
-	} 
+	private synchronized void reloadProperties() {
+		final MongoState updatedState = collection.findOne("{_id: #}", getAgentId()).as(MongoState.class);
+		this.timestamp = updatedState.timestamp;
+		this.properties = updatedState.properties;
+	}
 	
 	/**
 	 * updating the entire properties object at the same time, with force flag to allow overwriting of updates
 	 * from other instances of the state
 	 * 
 	 * @param force
-	 * 
+	 * @throws UpdateConflictException | will not throw anything when $force flag is true
 	 */
-	private synchronized boolean updateProperties(boolean force) {
-		Date now = Calendar.getInstance().getTime();
+	private synchronized boolean updateProperties(boolean force) throws UpdateConflictException {
+		Long now = System.nanoTime();
 		/* write to database */
 		WriteResult result = (force) ?
 				collection.update("{_id: #}", getAgentId()).with("{$set: {properties: #, timestamp: #}}", properties, now) :
 				collection.update("{_id: #, timestamp: #}", getAgentId(), timestamp).with("{$set: {properties: #, timestamp: #}}", properties, now);
 		/* check results */
 		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
-		if (updatedExisting) {
-			timestamp = now;
+		if (result.getN() == 0 && result.getError() == null) {
+			throw new UpdateConflictException(timestamp);
+		} else if (result.getN() != 1) {
+			throw new MongoException(result.getError());
 		}
+		timestamp = now;
 		return updatedExisting;
 	}
 
