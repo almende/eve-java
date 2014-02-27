@@ -5,10 +5,6 @@
 package com.almende.eve.transport.http;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,10 +47,6 @@ public final class ApacheHttpClient {
 	/**
 	 * Instantiates a new apache http client.
 	 *
-	 * @throws KeyManagementException the key management exception
-	 * @throws UnrecoverableKeyException the unrecoverable key exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws KeyStoreException the key store exception
 	 */
 	private ApacheHttpClient() {
 		
@@ -122,14 +114,8 @@ public final class ApacheHttpClient {
 	 * Gets the.
 	 *
 	 * @return the default http client
-	 * @throws KeyManagementException the key management exception
-	 * @throws UnrecoverableKeyException the unrecoverable key exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws KeyStoreException the key store exception
 	 */
-	static DefaultHttpClient get() throws KeyManagementException,
-			UnrecoverableKeyException, NoSuchAlgorithmException,
-			KeyStoreException {
+	static DefaultHttpClient get() {
 		return httpClient;
 	}
 	
