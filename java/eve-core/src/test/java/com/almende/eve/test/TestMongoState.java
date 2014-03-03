@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.test;
 
 import java.io.Serializable;
@@ -62,6 +66,12 @@ public class TestMongoState {
 	private static MongodExecutable _mongodExe;
 	private static MongodProcess _mongod;
 	
+	/**
+	 * Setup eve.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
 	@BeforeClass
 	public static void setupEve() throws Exception {
 		
@@ -94,6 +104,12 @@ public class TestMongoState {
 		host.createAgent(TestStateAgent.class, SERIALIZER_AGENT_ID);
 	}
 	 
+	/**
+	 * Test serializing.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
 	@Test
 	public void testSerializing() throws Exception {
 		MongoStateFactory mongo = (MongoStateFactory) AgentHost.getInstance().getStateFactory();
@@ -113,6 +129,12 @@ public class TestMongoState {
 		Assert.assertEquals(object.getMessage(), objectAcc.getMessage());
 	}
 	 
+	/**
+	 * Test concurrent update.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
 	@Test
 	public void testConcurrentUpdate() throws Exception {
 		final int threadCount = 64;
@@ -171,6 +193,12 @@ public class TestMongoState {
 	    Assert.assertEquals(results.size(), state.size()); 
 	}
 	
+	/**
+	 * After.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
 	@After
 	public void after() throws Exception {
 		MongoStateFactory mongo = (MongoStateFactory) AgentHost.getInstance().getStateFactory();
@@ -198,6 +226,9 @@ public class TestMongoState {
 		LOG.log(Level.INFO, builder.toString());
 	}
 	
+	/**
+	 * Wrap up.
+	 */
 	@AfterClass
 	public static void wrapUp() {
 		// clean up database after operation

@@ -1,3 +1,7 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.test.agents;
 
 import java.util.UUID;
@@ -19,13 +23,20 @@ public class TestStateAgent extends Agent {
 	
 	private static final Logger	LOG = Logger.getLogger("TestStateAgent");
 	
+	/**
+	 * Instantiates a new test state agent.
+	 */
 	public TestStateAgent() {
 		// 
 	}
 
 	/**
-	 * a simple method to push the values onto the agent state, with roughly unique id for each new value added
+	 * a simple method to push the values onto the agent state, with roughly
+	 * unique id for each new value added.
+	 * 
 	 * @param value
+	 *            the value
+	 * @return the object
 	 */
 	@Access(AccessType.PUBLIC) 
 	public synchronized Object push(Object value) {
