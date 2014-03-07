@@ -244,13 +244,29 @@ public class Cell extends Agent {
 					});
 		}
 		CycleState state = new CycleState(cycle, alive);
-//		System.out.println(getId()+": Received state:" + state + " from:" + neighborNo);
+		// System.out.println(getId()+": Received state:" + state + " from:" +
+		// neighborNo);
 		getState().put(neighborNo + "_" + state.getCycle(), state);
 		try {
 			calcCycle(true);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getNeighborId(final String neighbor, final boolean NEW){
+		String neighborId = null;
+		if (neighbor.startsWith("local:")) {
+			neighborId = neighbor.replace("local:", "");
+		} else {
+			URI neighborUrl = URI.create(neighbor);
+			neighborId = neighborUrl.getPath().replaceFirst("agents/",
+					"");
+		}
+		if (NEW) {
+			neighborId = neighborId.replaceFirst(".*_", "");
+		}
+		return neighborId;
 	}
 	
 	private void calcCycle(final boolean NEW) throws URISyntaxException {
@@ -260,25 +276,20 @@ public class Cell extends Agent {
 			int aliveNeighbors = 0;
 			int knownNeighbors = 0;
 			for (String neighbor : neighbors) {
-				
-				String neighborId = URI.create(neighbor).getPath()
-						.replaceFirst("agents/", "");
-				if (NEW) {
-					neighborId = neighborId.replaceFirst(".*_", "");
-				}
+				String neighborId = getNeighborId(neighbor,NEW);
 				CycleState nState = getState()
 						.get(neighborId + "_" + (currentCycle - 1),
 								CycleState.class);
 				if (nState == null) {
 					return;
-//					continue;
+					// continue;
 				} else if (nState.isAlive()) {
 					aliveNeighbors++;
 				}
 				knownNeighbors++;
 			}
-			if (knownNeighbors < 8){
-//				System.out.println(getId()+"/"+currentCycle+" has seen: "+knownNeighbors+" neighbors.");
+			if (knownNeighbors < 8) {
+				// System.out.println(getId()+"/"+currentCycle+" has seen: "+knownNeighbors+" neighbors.");
 				return;
 			}
 			CycleState myState = getState().get("val_" + (currentCycle - 1),
@@ -293,7 +304,7 @@ public class Cell extends Agent {
 			}
 			if (getState()
 					.putIfUnchanged("val_" + currentCycle, newState, null)) {
-//				System.out.println(getId()+" :"+newState);
+				// System.out.println(getId()+" :"+newState);
 				getState().put("current_cycle", currentCycle + 1);
 				if (getState().get("Stopped", Boolean.class)) {
 					return;
@@ -321,11 +332,7 @@ public class Cell extends Agent {
 					}
 				}
 				for (String neighbor : neighbors) {
-					String neighborId = URI.create(neighbor).getPath()
-							.replaceFirst("agents/", "");
-					if (NEW) {
-						neighborId = neighborId.replaceFirst(".*_", "");
-					}
+					String neighborId = getNeighborId(neighbor,NEW);
 					getState().remove(neighborId + "_" + (currentCycle - 1));
 				}
 				calcCycle(NEW);

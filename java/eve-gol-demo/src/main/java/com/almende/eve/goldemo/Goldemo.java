@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.almende.eve.agent.AgentHost;
+import com.almende.eve.config.Config;
 import com.almende.eve.rpc.jsonrpc.JSONRPCException;
 import com.almende.util.TypeUtil;
 
@@ -34,13 +35,13 @@ public class Goldemo {
 	 */
 	// final static String PATHodd = "local:";
 	// final static String PATHeven = "local:";
-	final static String		PATHodd		= "http://127.0.0.1:8082/agents/";
-	final static String		PATHeven	= "http://127.0.0.1:8081/agents/";
+	private static String		PATHodd		= "http://127.0.0.1:8082/agents/";
+	private static String		PATHeven	= "http://127.0.0.1:8081/agents/";
+	private static boolean		NEW			= true;
 	
 //	final static String PATHodd = PATH;
 //	final static String PATHeven = PATH;
 	 
-	final static boolean	NEW			= true;
 	
 	/**
 	 * The main method.
@@ -66,25 +67,45 @@ public class Goldemo {
 			JSONRPCException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
-		if (args.length < 4) {
-			throw new IllegalArgumentException(
-					"Please use at least 4 arguments: Y=yamlFile & X=seconds & N=rows & M=columns");
+		
+		if (args.length == 0){
+			System.err.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath>");
+			return;
 		}
 		String path = args[0];
-		Integer X = Integer.valueOf(args[1]);
-		Integer N = Integer.valueOf(args[2]);
-		Integer M = Integer.valueOf(args[3]);
-		
-		Boolean annimate = false;
-		if (args.length > 4) {
-			annimate = Boolean.valueOf(args[4]);
-		}
-		
 		AgentHost host = AgentHost.getInstance();
 		host.loadConfig(path);
 		
-		if (args.length > 5) {
-			boolean shortcut = Boolean.valueOf(args[5]);
+		Config config = host.getConfig(); 
+		Integer runTime = config.get("gol","runTime");
+		Integer N = config.get("gol","columns");
+		Integer M = config.get("gol","rows");
+		
+		String oddUrl = config.get("gol","OddUrl");
+		if (oddUrl != null){
+			PATHodd = oddUrl;
+		}
+		String evenUrl = config.get("gol","EvenUrl");
+		if (evenUrl != null){
+			PATHeven = evenUrl;
+		}
+		Boolean oldVersion = config.get("gol","oldVersion");
+		if (oldVersion != null){
+			NEW = !oldVersion;
+		}
+		
+		if (runTime == null || N == null || M == null ){
+			System.err.println("Configuration missing in yaml.");
+			return;
+
+		}
+			
+		Boolean annimate = config.get("gol","annimate");
+		if (annimate == null){
+			annimate=true;
+		}
+		Boolean shortcut = config.get("gol","doesShortcut");
+		if (shortcut != null){
 			host.setDoesShortcut(shortcut);
 		}
 		
@@ -113,7 +134,7 @@ public class Goldemo {
 			cN++;
 		}
 		if (NEW) {
-			for (no = 0; no < (N * M); no=no+2) {
+			for (no = 0; no < (N * M); no=no+(PATHodd.equals(PATHeven)?1:2)) {
 				Cell cell = (Cell) host.getAgent(AGENTPREFIX + no);
 				cell.new_start();
 			}
@@ -134,7 +155,7 @@ public class Goldemo {
 		
 		System.err.println("Started!");
 		try {
-			Thread.sleep(X * 1000);
+			Thread.sleep(runTime * 1000);
 		} catch (InterruptedException e) {
 			System.err.println("Early interrupt");
 		}
@@ -163,7 +184,6 @@ public class Goldemo {
 				} else {
 					locpath = PATHodd;
 				}
-				System.err.println("Getting results:"+locpath+AGENTPREFIX+no);
 				ArrayList<CycleState> res =  cell.send(URI.create(locpath+AGENTPREFIX+no), "getAllCycleStates", type);
 				max_full = (max_full == 0 || max_full > res.size() ? res.size()
 						: max_full);
