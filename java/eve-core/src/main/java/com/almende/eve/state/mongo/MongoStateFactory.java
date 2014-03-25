@@ -124,6 +124,7 @@ public class MongoStateFactory implements StateFactory {
 		this.collectionName = (params != null && params
 				.containsKey("collection")) ? (String) params.get("collection")
 				: "agents";
+		this.jongo.runCommand("{collMod: '"+this.collectionName+"', usePowerOf2Sizes : true }");
 	}
 	
 	private static MongoClient createClient(String databaseUri, int port)

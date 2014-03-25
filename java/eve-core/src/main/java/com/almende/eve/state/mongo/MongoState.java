@@ -149,6 +149,8 @@ public class MongoState extends AbstractState<JsonNode> {
 		this.agentType = agentType;
 		// assuming this is called only once after creation, simply save the entire state
 		collection.save(this);
+		collection.ensureIndex("{ _id: 1}");
+		collection.ensureIndex("{ _id: 1, timestamp:1 }");
 	}
 	
 	/* (non-Javadoc)
