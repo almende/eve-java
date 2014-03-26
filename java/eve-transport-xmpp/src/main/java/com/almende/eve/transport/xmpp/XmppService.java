@@ -129,6 +129,10 @@ public class XmppService implements TransportService {
 	private ArrayNode getConns(final String agentId) throws IOException {
 		final State state = agentHost.getStateFactory().get(agentId);
 		
+		if (state == null){
+			LOG.warning("getConns(): Couldn't find agent with agentId:"+agentId);
+			return null;
+		}
 		ArrayNode conns = null;
 		if (state.containsKey(CONNKEY)) {
 			conns = (ArrayNode) JOM.getInstance().readTree(
