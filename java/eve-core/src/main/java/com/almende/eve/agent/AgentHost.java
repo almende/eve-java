@@ -139,6 +139,7 @@ public abstract class AgentHost {
 	
 	/**
 	 * Create an agent proxy from an java interface.
+	 * @deprecated Use Agent.createAgentProxy instead, because sender is now required.
 	 * 
 	 * @param <T>
 	 *            the generic type
@@ -150,6 +151,7 @@ public abstract class AgentHost {
 	 *            A java Interface, extending AgentInterface
 	 * @return the t
 	 */
+	@Deprecated
 	public abstract <T extends AgentInterface> T createAgentProxy(
 			final AgentInterface sender, final URI receiverUrl,
 			Class<T> agentInterface);

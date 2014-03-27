@@ -696,7 +696,8 @@ public abstract class Agent implements AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	public final <T extends AgentInterface> T createAgentProxy(final URI url,
 			final Class<T> agentInterface) {
-		return getAgentHost().createAgentProxy(this, url, agentInterface);
+		final AgentProxyFactory pf = new AgentProxyFactory();
+		return pf.genProxy(this, url, agentInterface);
 	}
 	
 	/*

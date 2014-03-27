@@ -22,6 +22,7 @@ import com.almende.eve.test.agents.Test2AgentInterface;
 /**
  * The Class TestAgentHost.
  */
+@SuppressWarnings("deprecation")
 public class TestAgentHost extends TestCase {
 	private static final Logger	LOG	= Logger.getLogger("testAgentHost");
 	

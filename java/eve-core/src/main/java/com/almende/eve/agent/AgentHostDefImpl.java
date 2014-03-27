@@ -200,24 +200,13 @@ public final class AgentHostDefImpl extends AgentHost {
 	 * .AgentInterface, java.net.URI, java.lang.Class)
 	 */
 	@Override
+	@Deprecated
 	public <T extends AgentInterface> T createAgentProxy(
 			final AgentInterface sender, final URI receiverUrl,
 			final Class<T> agentInterface) {
 		
-		// TODO: In the new model the proxy agents need to have an adres as
-		// well! This will enforce usage of the agentCache!
-		final String proxyId = "proxy_"
-				+ (sender != null ? sender.getId() + "_" : "")
-				+ agentInterface.getCanonicalName().replace(' ', '_');
-		
-		T proxy = ObjectCache.get(AGENTS).get(proxyId, agentInterface);
-		if (proxy != null) {
-			return proxy;
-		}
 		final AgentProxyFactory pf = new AgentProxyFactory();
-		proxy = pf.genProxy(sender, receiverUrl, agentInterface, proxyId);
-		
-		ObjectCache.get(AGENTS).put(proxyId, proxy);
+		T proxy = pf.genProxy(sender, receiverUrl, agentInterface);
 		
 		return proxy;
 	}

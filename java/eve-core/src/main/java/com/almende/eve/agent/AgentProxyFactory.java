@@ -33,14 +33,11 @@ public class AgentProxyFactory {
 	 *            the receiver url
 	 * @param agentInterface
 	 *            the agent interface
-	 * @param proxyId
-	 *            the proxy id
 	 * @return the t
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends AgentInterface> T genProxy(final AgentInterface sender,
-			final URI receiverUrl, final Class<T> agentInterface,
-			final String proxyId) {
+			final URI receiverUrl, final Class<T> agentInterface) {
 		// http://docs.oracle.com/javase/1.4.2/docs/guide/reflection/proxy.html
 		final T proxy = (T) Proxy.newProxyInstance(
 				agentInterface.getClassLoader(),
