@@ -708,6 +708,7 @@ public abstract class Agent implements AgentInterface {
 	 */
 	@Override
 	@Access(AccessType.UNAVAILABLE)
+	@Deprecated
 	public final <T extends AgentInterface> AsyncProxy<T> createAsyncAgentProxy(
 			final URI url, final Class<T> agentInterface) {
 		return getAgentHost().createAsyncAgentProxy(this, url, agentInterface);

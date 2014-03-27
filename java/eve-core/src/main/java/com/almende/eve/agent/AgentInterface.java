@@ -496,6 +496,7 @@ public interface AgentInterface extends AgentBaseInterface {
 	 *            A Java Interface, extending AgentInterface
 	 * @return agentProxy
 	 */
+	@Deprecated
 	<T extends AgentInterface> AsyncProxy<T> createAsyncAgentProxy(URI url,
 			Class<T> agentInterface);
 	

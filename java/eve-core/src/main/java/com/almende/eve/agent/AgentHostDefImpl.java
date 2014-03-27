@@ -230,6 +230,7 @@ public final class AgentHostDefImpl extends AgentHost {
 	 * .agent.AgentInterface, java.net.URI, java.lang.Class)
 	 */
 	@Override
+	@Deprecated
 	public <T extends AgentInterface> AsyncProxy<T> createAsyncAgentProxy(
 			final AgentInterface sender, final URI receiverUrl,
 			final Class<T> agentInterface) {

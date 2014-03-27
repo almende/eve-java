@@ -19,10 +19,15 @@ import com.almende.util.ClassUtil;
 
 /**
  * Asynchronous proxy wrapper, which can be used to decorate a generated proxy.
- *
- * @param <T> the generic type
+ * 
+ * @deprecated This method leads to an unnecessary complex setup, without the
+ *             benefit of compile time checking and a strange non-blocking over
+ *             blocking approach.
+ * @param <T>
+ *            the generic type
  * @author ludo
  */
+@Deprecated
 public class AsyncProxy<T> {
 	private final ScheduledExecutorService	pool	= Executors
 															.newScheduledThreadPool(50);
@@ -30,8 +35,9 @@ public class AsyncProxy<T> {
 	
 	/**
 	 * Instantiates a new async proxy.
-	 *
-	 * @param proxy the proxy
+	 * 
+	 * @param proxy
+	 *            the proxy
 	 */
 	public AsyncProxy(final T proxy) {
 		this.proxy = proxy;
@@ -40,11 +46,14 @@ public class AsyncProxy<T> {
 	/**
 	 * Call the given method on the wrapped proxy, returning a Future which can
 	 * be used to wait for the result and/or cancel the task.
-	 *
-	 * @param functionName the function name
-	 * @param args the args
+	 * 
+	 * @param functionName
+	 *            the function name
+	 * @param args
+	 *            the args
 	 * @return Future<?>
-	 * @throws NoSuchMethodException the no such method exception
+	 * @throws NoSuchMethodException
+	 *             the no such method exception
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Future<?> call(final String functionName, final Object... args)
@@ -67,8 +76,9 @@ public class AsyncProxy<T> {
 	
 	/**
 	 * The Class DecoratedFuture.
-	 *
-	 * @param <V> the value type
+	 * 
+	 * @param <V>
+	 *            the value type
 	 */
 	class DecoratedFuture<V> implements Future<V> {
 		
@@ -80,16 +90,20 @@ public class AsyncProxy<T> {
 		
 		/**
 		 * Instantiates a new decorated future.
-		 *
-		 * @param future the future
-		 * @param type the type
+		 * 
+		 * @param future
+		 *            the future
+		 * @param type
+		 *            the type
 		 */
 		DecoratedFuture(final Future<?> future, final Class<V> type) {
 			this.future = future;
 			this.myType = type;
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.concurrent.Future#cancel(boolean)
 		 */
 		@Override
@@ -97,7 +111,9 @@ public class AsyncProxy<T> {
 			return future.cancel(mayInterruptIfRunning);
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.concurrent.Future#isCancelled()
 		 */
 		@Override
@@ -105,7 +121,9 @@ public class AsyncProxy<T> {
 			return future.isCancelled();
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.concurrent.Future#isDone()
 		 */
 		@Override
@@ -113,7 +131,9 @@ public class AsyncProxy<T> {
 			return future.isDone();
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.concurrent.Future#get()
 		 */
 		@Override
@@ -121,8 +141,11 @@ public class AsyncProxy<T> {
 			return myType.cast(future.get());
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.concurrent.Future#get(long,
+		 * java.util.concurrent.TimeUnit)
 		 */
 		@Override
 		public V get(final long timeout, final TimeUnit unit)

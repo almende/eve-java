@@ -170,6 +170,7 @@ public abstract class AgentHost {
 	 *            A java Interface, extending AgentInterface
 	 * @return the async proxy
 	 */
+	@Deprecated
 	public abstract <T extends AgentInterface> AsyncProxy<T> createAsyncAgentProxy(
 			final AgentInterface sender, final URI receiverUrl,
 			Class<T> agentInterface);

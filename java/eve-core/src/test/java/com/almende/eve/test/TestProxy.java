@@ -23,6 +23,7 @@ import com.almende.eve.test.agents.entity.Person;
 /**
  * The Class TestProxy.
  */
+@SuppressWarnings("deprecation")
 public class TestProxy extends TestCase {
 	
 	/**
