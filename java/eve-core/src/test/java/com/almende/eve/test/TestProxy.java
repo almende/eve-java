@@ -41,11 +41,10 @@ public class TestProxy extends TestCase {
 		if (host.hasAgent("TestAgent")) {
 			host.deleteAgent("TestAgent");
 		}
-		@SuppressWarnings("unused")
 		final TestAgent agent = host.createAgent(TestAgent.class, "TestAgent");
 		
 		// generate sync proxy from TestInterface
-		final TestInterface proxy = host.createAgentProxy(null,
+		final TestInterface proxy = host.createAgentProxy(agent,
 				URI.create("local:TestAgent"), TestInterface.class);
 		assertEquals("Hello world, you said: nice weather, isn't it?",
 				proxy.helloWorld("nice weather, isn't it?"));
@@ -57,7 +56,7 @@ public class TestProxy extends TestCase {
 		
 		// Generate asyncproxy from TestInterface
 		final AsyncProxy<TestInterface> aProxy = host.createAsyncAgentProxy(
-				null, URI.create("local:TestAgent"), TestInterface.class);
+				agent, URI.create("local:TestAgent"), TestInterface.class);
 		final Future<?> res = aProxy.call("helloWorld", "hi");
 		assertEquals("Hello world, you said: hi", res.get());
 		final Future<?> voidRes = aProxy.call("testVoid");
