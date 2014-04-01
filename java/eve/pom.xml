@@ -144,15 +144,6 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-
-				<!-- Specify version of Eclipse IDE's Maven integration plugin e.g. m2e(clipse), 
-					for Kind=4 errors see http://stackoverflow.com/questions/10564684/how-to-fix-error-updating-maven-project-unsupported-iclasspathentry-kind-4 -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>${maven-eclipse-plugin.version}</version>
-				</plugin>
-
 			</plugins>
 		</pluginManagement>
 
@@ -176,6 +167,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${maven-eclipse-plugin.version}</version>
 				<configuration>
 					<downloadSources>true</downloadSources>
 					<downloadJavadocs>true</downloadJavadocs>
