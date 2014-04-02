@@ -1026,6 +1026,67 @@ public abstract class Agent implements AgentInterface {
 		return jsonMsg;
 	}
 	
+	
+	/**
+	 * Receive request, creating a new thread for each incoming request.
+	 * 
+	 * @param request
+	 * @param senderUrl
+	 * @param tag
+	 */
+	public void receiveJSONRPCRequest(final JSONRequest request, final URI senderUrl, final String tag){
+		final RequestParams params = new RequestParams();
+		params.put(Sender.class, senderUrl.toASCIIString());
+		
+		final AgentInterface me = this;
+		host.getPool().execute(new Runnable() {
+			@Override
+			public void run() {
+				final Object[] signalData = new Object[2];
+				signalData[0] = request;
+				signalData[1] = params;
+				signalAgent(new AgentSignal<Object[]>(
+						AgentSignal.INVOKE, signalData));
+				
+				final JSONResponse response = JSONRPC.invoke(me,
+						request, params, me);
+				
+				signalAgent(new AgentSignal<JSONResponse>(
+						AgentSignal.RESPOND, response));
+				try {
+					send(response, senderUrl, null, tag);
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, getId()
+							+ ": Failed to send response.", e);
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Receive response, creating a new thread for running the potential callback methods.
+	 * 
+	 * @param response
+	 */
+	public void receiveJSONRPCResponse(final JSONResponse response){
+		final JsonNode id = response.getId();
+		final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
+		if (callback != null) {
+			host.getPool().execute(new Runnable() {
+				@Override
+				public void run() {
+					signalAgent(new AgentSignal<JSONResponse>(
+							AgentSignal.RESPONSE, response));
+					if (response.getError() != null) {
+						callback.onFailure(response.getError());
+					} else {
+						callback.onSuccess(response);
+					}
+				}
+			});
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1040,52 +1101,12 @@ public abstract class Agent implements AgentInterface {
 			if (jsonMsg != null) {
 				id = jsonMsg.getId();
 				if (jsonMsg instanceof JSONRequest) {
-					final RequestParams params = new RequestParams();
-					params.put(Sender.class, senderUrl.toASCIIString());
-					
 					final JSONRequest request = (JSONRequest) jsonMsg;
-					final AgentInterface me = this;
-					host.getPool().execute(new Runnable() {
-						@Override
-						public void run() {
-							final Object[] signalData = new Object[2];
-							signalData[0] = request;
-							signalData[1] = params;
-							signalAgent(new AgentSignal<Object[]>(
-									AgentSignal.INVOKE, signalData));
-							
-							final JSONResponse response = JSONRPC.invoke(me,
-									request, params, me);
-							
-							signalAgent(new AgentSignal<JSONResponse>(
-									AgentSignal.RESPOND, response));
-							try {
-								send(response, senderUrl, null, tag);
-							} catch (final IOException e) {
-								LOG.log(Level.WARNING, getId()
-										+ ": Failed to send response.", e);
-							}
-						}
-					});
-					
+					receiveJSONRPCRequest(request,senderUrl,tag);
 				} else if (jsonMsg instanceof JSONResponse && callbacks != null
 						&& id != null && !id.isNull()) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
-					final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
-					if (callback != null) {
-						host.getPool().execute(new Runnable() {
-							@Override
-							public void run() {
-								signalAgent(new AgentSignal<JSONResponse>(
-										AgentSignal.RESPONSE, response));
-								if (response.getError() != null) {
-									callback.onFailure(response.getError());
-								} else {
-									callback.onSuccess(response);
-								}
-							}
-						});
-					}
+					receiveJSONRPCResponse(response);
 				}
 			} else {
 				LOG.log(Level.WARNING, getId()
