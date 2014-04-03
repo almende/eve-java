@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A factory for creating MemoryState objects.
+ * A service for managing MemoryState objects.
  */
-public class MemoryStateFactory implements StateFactory {
+public class MemoryStateService implements StateService {
 	/** Singleton containing all states, stored per id. */
 	private final Map<String, State>	states	= new ConcurrentHashMap<String, State>();
 	
@@ -22,13 +22,13 @@ public class MemoryStateFactory implements StateFactory {
 	 * @param params
 	 *            the params
 	 */
-	public MemoryStateFactory(final Map<String, Object> params) {
+	public MemoryStateService(final Map<String, Object> params) {
 	}
 	
 	/**
 	 * Instantiates a new memory state factory.
 	 */
-	public MemoryStateFactory() {
+	public MemoryStateService() {
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class MemoryStateFactory implements StateFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.state.StateFactory#getAllAgentIds()
+	 * @see com.almende.eve.state.StateService#getAllAgentIds()
 	 */
 	@Override
 	public Iterator<String> getAllAgentIds() {

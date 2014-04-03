@@ -1,54 +1,97 @@
-/*
- * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
- * License: The Apache Software License, Version 2.0
- */
 package com.almende.eve.state;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.almende.util.ClassUtil;
 
 /**
- * A factory for creating State objects.
+ * 
+ * A utility class that can initialize StateServices and provides a default StateService.
+ * @author ludo
+ *
  */
-public interface StateFactory {
+public class StateFactory implements StateService {
+	private static final Logger LOG = Logger.getLogger(StateService.class.getName());
+	private static StateService defaultStateService = null;
+	
 	
 	/**
-	 * Get state with given id. Returns null if not found
-	 *
-	 * @param agentId the agent id
-	 * @return state
+	 * @param className
+	 * @param params
 	 */
-	State get(String agentId);
+	public static void initDefault(final String className, final Map<String,Object> params){
+		defaultStateService = getStateService(className,params);
+	}
 	
 	/**
-	 * Create a state with given id. Will throw an exception when already
-	 * existing.
-	 *
-	 * @param agentId the agent id
-	 * @return state
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @param className
+	 * @param params
+	 * @return Stateservice
 	 */
-	State create(String agentId) throws IOException;
-	
-	/**
-	 * Delete a state. If the state does not exist, nothing will happen.
-	 *
-	 * @param agentId the agent id
-	 */
-	void delete(String agentId);
-	
-	/**
-	 * Test if a state with given id exists.
-	 *
-	 * @param agentId the agent id
-	 * @return exists
-	 */
-	boolean exists(String agentId);
-	
-	/**
-	 * Get an interator on all agents.
-	 *
-	 * @return Iterator<Agent>
-	 */
-	Iterator<String> getAllAgentIds();
+	public static StateService getStateService(final String className, final Map<String,Object> params){
+		StateService result = null;
+		if (className == null) {
+			throw new IllegalArgumentException("ClassName for state may not be empty.");
+		}
+		try {
+			// get the class
+			final Class<?> stateClass = Class.forName(className);
+			if (!ClassUtil.hasInterface(stateClass, StateFactory.class)) {
+				throw new IllegalArgumentException("State factory class "
+						+ stateClass.getName() + " must extend "
+						+ State.class.getName());
+			}
+			result = (StateFactory) stateClass.getConstructor(Map.class)
+					.newInstance(params);
+			
+			LOG.info("Initialized state factory: " + result.toString());
+		} catch (final Exception e) {
+			LOG.log(Level.WARNING, "", e);
+		}
+		return result;
+	}
+
+	@Override
+	public State get(String agentId) {
+		if (defaultStateService == null){
+			throw new IllegalStateException("Default State Service not set, please call initDefault() first!");
+		}
+		return defaultStateService.get(agentId);
+	}
+
+	@Override
+	public State create(String agentId) throws IOException {
+		if (defaultStateService == null){
+			throw new IllegalStateException("Default State Service not set, please call initDefault() first!");
+		}
+		return defaultStateService.create(agentId);
+	}
+
+	@Override
+	public void delete(String agentId) {
+		if (defaultStateService == null){
+			throw new IllegalStateException("Default State Service not set, please call initDefault() first!");
+		}
+		defaultStateService.delete(agentId);
+	}
+
+	@Override
+	public boolean exists(String agentId) {
+		if (defaultStateService == null){
+			throw new IllegalStateException("Default State Service not set, please call initDefault() first!");
+		}
+		return defaultStateService.exists(agentId);
+	}
+
+	@Override
+	public Iterator<String> getAllAgentIds() {
+		if (defaultStateService == null){
+			throw new IllegalStateException("Default State Service not set, please call initDefault() first!");
+		}
+		return defaultStateService.getAllAgentIds();
+	}
 }
