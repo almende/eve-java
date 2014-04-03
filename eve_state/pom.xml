@@ -9,14 +9,19 @@
 		<relativePath>../eve_parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-capabilities</artifactId>
+	<artifactId>eve-state</artifactId>
 
-	<name>EVE Agent Capability framework</name>
+	<name>EVE Agent State Capability</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 </project>

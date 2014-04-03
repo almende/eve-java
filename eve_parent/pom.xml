@@ -56,7 +56,7 @@
 	</developers>
 
 	<modules>
-		<module>../eve_capabilities</module>
+		<module>../eve_state</module>
 		<module>../eve_agents</module>
 	</modules>
 
