@@ -57,8 +57,14 @@
 
 	<modules>
 		<module>../eve_common</module>
+		<module>../eve_capability</module>
 		<module>../eve_state</module>
-		<module>../eve_transport</module>
+<!--		<module>../eve_transport</module>
+		<module>../eve_transport_http</module>
+		<module>../eve_transport_http_jetty</module>
+		<module>../eve_transport_zmq</module>
+		<module>../eve_transport_xmpp</module>
+-->
 		<module>../eve_agents</module>
 	</modules>
 

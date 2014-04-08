@@ -4,51 +4,20 @@
  */
 package com.almende.eve.state;
 
-import java.io.IOException;
-import java.util.Iterator;
+import com.almende.eve.capabilities.Capability;
 
 /**
  * A service for managing State objects.
  */
-public interface StateService {
+public interface StateService extends Capability {
 	
+
 	/**
-	 * Get state with given id. Returns null if not found
-	 *
-	 * @param agentId the agent id
-	 * @return state
+	 * Delete.
+	 * 
+	 * @param instance
+	 *            the instance
 	 */
-	State get(String agentId);
+	void delete(State instance);
 	
-	/**
-	 * Create a state with given id. Will throw an exception when already
-	 * existing.
-	 *
-	 * @param agentId the agent id
-	 * @return state
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	State create(String agentId) throws IOException;
-	
-	/**
-	 * Delete a state. If the state does not exist, nothing will happen.
-	 *
-	 * @param agentId the agent id
-	 */
-	void delete(String agentId);
-	
-	/**
-	 * Test if a state with given id exists.
-	 *
-	 * @param agentId the agent id
-	 * @return exists
-	 */
-	boolean exists(String agentId);
-	
-	/**
-	 * Get an interator on all agents.
-	 *
-	 * @return Iterator<Agent>
-	 */
-	Iterator<String> getAllAgentIds();
 }

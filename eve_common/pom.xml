@@ -15,7 +15,7 @@
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
-		<jackson.version>2.2.3</jackson.version>
+		<jackson.version>2.3.2</jackson.version>
 		<jodah.version>0.3.0</jodah.version>
 		<codec.version>1.9</codec.version>
 	</properties>
