@@ -19,21 +19,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TestState extends TestCase {
 	
-	
-	private State		myState		= null;
-	private State		myState2	= null;
-	private ObjectNode	params		= null;
-	
 	/**
 	 * Create new agent.
 	 */
 	public TestState() {
-		params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.state.MemoryStateService");
-		params.put("id", "TestAgent");
 		
-		myState = CapabilityFactory.get(params, null, State.class);
-		myState2 = StateFactory.getState(params);
+	}
+	
+	/**
+	 * Run test.
+	 * 
+	 * @param myState
+	 *            the my state
+	 * @param myState2
+	 *            the my state2
+	 */
+	public void runTest(final State myState, final State myState2) {
+		myState.put("msg", "Hi There!");
+		assertEquals(myState2.get("msg", String.class), "Hi There!");
+		
+		myState.delete();
+		assertNull(myState.get("msg", String.class));
 	}
 	
 	/**
@@ -41,17 +47,38 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testState() {
-		myState.put("msg", "Hi There!");
-		assertEquals(myState2.get("msg",String.class),"Hi There!");
+		ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
+		params.put("id", "TestAgent");
 		
-		myState.delete();
-		
+		State myState = CapabilityFactory.get(params, null, State.class);
+		State myState2 = StateFactory.getState(params);
+		runTest(myState, myState2);
 		myState = CapabilityFactory.get(params, null, State.class);
 		myState2 = StateFactory.getState(params);
-		assertNull(myState2.get("msg",String.class));
+		runTest(myState, myState2);
+	}
+	
+	/**
+	 * Test file state.
+	 */
+	@Test
+	public void testFileState() {
+		ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.state.file.FileStateService");
+		params.put("id", "TestAgent");
 		
-		myState.put("msg", "Hi There!");
-		assertEquals(myState2.get("msg",String.class),"Hi There!");
+		State myState = CapabilityFactory.get(params, null, State.class);
+		State myState2 = StateFactory.getState(params);
+		runTest(myState, myState2);
+		myState = CapabilityFactory.get(params, null, State.class);
+		myState2 = StateFactory.getState(params);
+		runTest(myState, myState2);
 		
-	}	
+		params.put("json", true);
+		myState = CapabilityFactory.get(params, null, State.class);
+		myState2 = StateFactory.getState(params);
+		runTest(myState, myState2);
+		
+	}
 }

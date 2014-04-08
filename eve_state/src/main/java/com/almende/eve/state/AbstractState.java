@@ -85,19 +85,6 @@ public abstract class AbstractState<V> implements State {
 		this.service = service;
 	}
 
-
-	/**
-	 * Set the configured agents class.
-	 *
-	 * @param agentType the new agent type
-	 */
-	@Override
-	public synchronized void setAgentType(final Class<?> agentType) {
-		// TODO: dangerous to use a generic state parameter to store the agent
-		// class, can be accidentally overwritten
-		put(KEY_AGENT_TYPE, agentType.getName());
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.almende.eve.state.State#put(java.lang.String, java.lang.Object)
 	 */
@@ -129,30 +116,6 @@ public abstract class AbstractState<V> implements State {
 		} else {
 			LOG.severe("Can't handle input that is not Serializable nor JsonNode.");
 			throw new IllegalArgumentException();
-		}
-	}
-	
-	/**
-	 * Get the configured agents type (the full class path).
-	 *
-	 * @return type
-	 * @throws ClassNotFoundException the class not found exception
-	 */
-	@Override
-	public synchronized Class<?> getAgentType() throws ClassNotFoundException {
-		String agentType = get(KEY_AGENT_TYPE, String.class);
-		if (agentType == null) {
-			// try deprecated "class"
-			agentType = get("class", String.class);
-			if (agentType != null) {
-				put(KEY_AGENT_TYPE, agentType);
-				remove("class");
-			}
-		}
-		if (agentType != null) {
-			return Class.forName(agentType);
-		} else {
-			return null;
 		}
 	}
 	
@@ -265,6 +228,7 @@ public abstract class AbstractState<V> implements State {
 	@Override
 	public void delete(){
 		if (service != null){
+			clear();
 			service.delete(this);
 		}
 	}

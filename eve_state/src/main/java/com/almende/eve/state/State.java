@@ -14,10 +14,6 @@ import com.fasterxml.jackson.databind.JavaType;
  * The Interface State.
  */
 public interface State {
-	/** key name for agent type. */
-	String	KEY_AGENT_TYPE	= "_type";
-	
-
 	/**
 	 * Delete.
 	 */
@@ -29,23 +25,6 @@ public interface State {
 	 * @return the agent id
 	 */
 	String getAgentId();
-	
-	/**
-	 * Sets the agent type.
-	 * 
-	 * @param agentType
-	 *            the new agent type
-	 */
-	void setAgentType(Class<?> agentType);
-	
-	/**
-	 * Gets the agent type.
-	 * 
-	 * @return the agent type
-	 * @throws ClassNotFoundException
-	 *             the class not found exception
-	 */
-	Class<?> getAgentType() throws ClassNotFoundException;
 	
 	/**
 	 * Put.

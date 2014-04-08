@@ -2,12 +2,14 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.state;
+package com.almende.eve.state.memory;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.almende.eve.state.State;
+import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.state;
+package com.almende.eve.state.memory;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -11,6 +11,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.almende.eve.state.AbstractState;
+import com.almende.eve.state.State;
+import com.almende.eve.state.StateService;
 
 /**
  * The Class MemoryState.
@@ -64,10 +68,7 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	 */
 	@Override
 	public void clear() {
-		
-		final String agentType = (String) properties.get(KEY_AGENT_TYPE);
 		properties.clear();
-		properties.put(KEY_AGENT_TYPE, agentType);
 	}
 	
 	/*
