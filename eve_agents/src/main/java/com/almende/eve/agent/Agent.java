@@ -17,19 +17,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class Agent {
 	
-	private State	myState		= null;
-	private State	myState2	= null;
+	private State		myState		= null;
+	private State		myState2	= null;
+	private ObjectNode	params		= null;
 	
 	/**
 	 * Create new agent.
 	 */
 	public Agent() {
-		ObjectNode params = JOM.createObjectNode();
+		params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.state.MemoryStateService");
 		params.put("id", "TestAgent");
 		
 		myState = CapabilityFactory.get(params, null, State.class);
-		
 		myState2 = StateFactory.getState(params);
 	}
 	
@@ -37,6 +37,14 @@ public class Agent {
 	 * Test me.
 	 */
 	public void testMe() {
+		myState.put("msg", "Hi There!");
+		System.out.println("Agent said:" + myState2.get("msg", String.class));
+		
+		myState.delete();
+		
+		myState = CapabilityFactory.get(params, null, State.class);
+		myState2 = StateFactory.getState(params);
+		System.out.println("Agent said:" + myState2.get("msg", String.class));
 		myState.put("msg", "Hi There!");
 		System.out.println("Agent said:" + myState2.get("msg", String.class));
 	}

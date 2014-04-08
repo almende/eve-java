@@ -36,7 +36,7 @@ public class MemoryStateService implements StateService {
 		if (states.containsKey(agentId)){
 			return TypeUtil.inject(states.get(agentId),type);
 		} else {
-			MemoryState result = new MemoryState(agentId);
+			MemoryState result = new MemoryState(agentId, this);
 			states.put(agentId, result);
 			return TypeUtil.inject(result,type);
 		}

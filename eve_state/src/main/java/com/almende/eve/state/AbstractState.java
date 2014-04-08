@@ -17,14 +17,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class AbstractState.
- *
- * @param <V> the value type
+ * 
  * @author Almende
+ * @param <V>
+ *            the value type
  */
 public abstract class AbstractState<V> implements State {
 	private static final Logger	LOG		= Logger.getLogger(AbstractState.class
 												.getCanonicalName());
 	private String				agentId	= null;
+	private StateService		service = null;
 	
 	/**
 	 * The implemented classes must have a public constructor.
@@ -37,9 +39,11 @@ public abstract class AbstractState<V> implements State {
 	 * parameters AgentHost, and agentId.
 	 *
 	 * @param agentId the agent id
+	 * @param service the service in which this instance is created
 	 */
-	public AbstractState(final String agentId) {
+	public AbstractState(final String agentId, final StateService service) {
 		this.agentId = agentId;
+		this.service = service;
 	}
 	
 	/**
@@ -52,6 +56,36 @@ public abstract class AbstractState<V> implements State {
 		return agentId;
 	}
 	
+	/**
+	 * Sets the agent id.
+	 * 
+	 * @param agentId
+	 *            the new agent id
+	 */
+	public void setAgentId(String agentId) {
+		this.agentId = agentId;
+	}	
+	
+	/**
+	 * Gets the service.
+	 * 
+	 * @return the service
+	 */
+	public StateService getService() {
+		return service;
+	}
+
+	/**
+	 * Sets the service.
+	 * 
+	 * @param service
+	 *            the new service
+	 */
+	public void setService(StateService service) {
+		this.service = service;
+	}
+
+
 	/**
 	 * Set the configured agents class.
 	 *
@@ -226,6 +260,13 @@ public abstract class AbstractState<V> implements State {
 		final ObjectMapper om = JOM.getInstance();
 		return locPutIfUnchanged(key, om.valueToTree(newVal),
 				om.valueToTree(oldVal));
+	}
+	
+	@Override
+	public void delete(){
+		if (service != null){
+			service.delete(this);
+		}
 	}
 	
 	/* (non-Javadoc)

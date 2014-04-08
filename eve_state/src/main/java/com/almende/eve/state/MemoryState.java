@@ -51,9 +51,10 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	 * 
 	 * @param agentId
 	 *            the agent id
+	 * @param service 
 	 */
-	public MemoryState(final String agentId) {
-		super(agentId);
+	public MemoryState(final String agentId, final StateService service) {
+		super(agentId, service);
 	}
 	
 	/*
@@ -165,20 +166,6 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	@Override
 	public int size() {
 		return properties.size();
-	}
-	
-	/**
-	 * init is executed once before the agent method is invoked.
-	 */
-	@Override
-	public void init() {
-	}
-	
-	/**
-	 * destroy is executed once after the agent method is invoked.
-	 */
-	@Override
-	public void destroy() {
 	}
 	
 }

@@ -17,15 +17,11 @@ public interface State {
 	/** key name for agent type. */
 	String	KEY_AGENT_TYPE	= "_type";
 	
+
 	/**
-	 * Inits the State
+	 * Delete.
 	 */
-	void init();
-	
-	/**
-	 * Destroy's the State
-	 */
-	void destroy();
+	void delete();
 	
 	/**
 	 * Gets the agent id.
@@ -174,4 +170,5 @@ public interface State {
 	 * @return the t
 	 */
 	<T> T get(TypedKey<T> key);
+
 }
