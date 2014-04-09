@@ -17,14 +17,14 @@ import java.util.logging.Logger;
 
 import org.zeromq.ZMQ.Socket;
 
-import com.almende.eve.transport.TransportService;
+import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.threads.ThreadPool;
 
 /**
  * The Class ZmqService.
  */
-public class ZmqService implements TransportService {
+public class ZmqService implements Transport {
 	private static final Logger					LOG				= Logger.getLogger(ZmqService.class
 																		.getCanonicalName());
 	private String								baseUrl			= "";
@@ -35,7 +35,7 @@ public class ZmqService implements TransportService {
 	
 	/**
 	 * Construct an ZmqService
-	 * This constructor is called when the TransportService is constructed
+	 * This constructor is called when the Transport is constructed
 	 * by the AgentHost.
 	 * 
 	 * @param params
@@ -55,7 +55,7 @@ public class ZmqService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#getAgentUrl(java.lang.String)
+	 * com.almende.eve.transport.Transport#getAgentUrl(java.lang.String)
 	 */
 	@Override
 	public URI getAgentUrl(final String agentId) {
@@ -69,7 +69,7 @@ public class ZmqService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#getAgentId(java.lang.String)
+	 * com.almende.eve.transport.Transport#getAgentId(java.lang.String)
 	 */
 	@Override
 	public String getAgentId(final URI agentUrl) {
@@ -128,7 +128,7 @@ public class ZmqService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#sendAsync(java.lang.String,
+	 * com.almende.eve.transport.Transport#sendAsync(java.lang.String,
 	 * java.lang.String, java.lang.Object, java.lang.String)
 	 */
 	@Override
@@ -142,7 +142,7 @@ public class ZmqService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#sendAsync(java.lang.String,
+	 * com.almende.eve.transport.Transport#sendAsync(java.lang.String,
 	 * java.lang.String, java.lang.Object, java.lang.String)
 	 */
 	@Override
@@ -155,7 +155,7 @@ public class ZmqService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#getProtocols()
+	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
@@ -200,7 +200,7 @@ public class ZmqService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#reconnect(java.lang.String)
+	 * com.almende.eve.transport.Transport#reconnect(java.lang.String)
 	 */
 	@Override
 	public synchronized void reconnect(final String agentId) throws IOException {
@@ -230,7 +230,7 @@ public class ZmqService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#getKey()
+	 * @see com.almende.eve.transport.Transport#getKey()
 	 */
 	@Override
 	public String getKey() {

@@ -24,7 +24,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
-import com.almende.eve.transport.TransportService;
+import com.almende.eve.transport.Transport;
 import com.almende.util.ClassUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
@@ -33,7 +33,7 @@ import com.almende.util.threads.ThreadPool;
 /**
  * The Class HttpService.
  */
-public class HttpService implements TransportService {
+public class HttpService implements Transport {
 	private static final Logger	LOG			= Logger.getLogger(HttpService.class
 													.getCanonicalName());
 	private String				servletUrl	= null;
@@ -81,7 +81,7 @@ public class HttpService implements TransportService {
 	
 	/**
 	 * Construct an HttpService This constructor is called when the
-	 * TransportService is constructed by the AgentHost.
+	 * Transport is constructed by the AgentHost.
 	 * 
 	 * @param servletUrl
 	 *            the servlet url
@@ -139,7 +139,7 @@ public class HttpService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * @see com.almende.eve.transport.Transport#sendAsync(java.net.URI,
 	 * java.net.URI, byte[], java.lang.String)
 	 */
 	@Override
@@ -366,7 +366,7 @@ public class HttpService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#reconnect(java.lang.String)
+	 * com.almende.eve.transport.Transport#reconnect(java.lang.String)
 	 */
 	@Override
 	public void reconnect(final String agentId) {
@@ -376,7 +376,7 @@ public class HttpService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#getKey()
+	 * @see com.almende.eve.transport.Transport#getKey()
 	 */
 	@Override
 	public String getKey() {

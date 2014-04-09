@@ -30,7 +30,7 @@ import org.jivesoftware.smack.SmackConfiguration;
 import com.almende.eve.defaults.Config;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
-import com.almende.eve.transport.TransportService;
+import com.almende.eve.transport.Transport;
 import com.almende.util.EncryptionUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class XmppService.
  */
-public class XmppService implements TransportService {
+public class XmppService implements Transport {
 	private static final String				CONNKEY				= "_XMPP_Connections";
 	private String							host				= null;
 	private Integer							port				= null;
@@ -68,7 +68,7 @@ public class XmppService implements TransportService {
 	
 	/**
 	 * Construct an XmppService
-	 * This constructor is called when the TransportService is constructed
+	 * This constructor is called when the Transport is constructed
 	 * by the AgentHost.
 	 * 
 	 * @param params
@@ -449,7 +449,7 @@ public class XmppService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * @see com.almende.eve.transport.Transport#sendAsync(java.net.URI,
 	 * java.net.URI, byte[], java.lang.String)
 	 */
 	@Override
@@ -462,7 +462,7 @@ public class XmppService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * @see com.almende.eve.transport.Transport#sendAsync(java.net.URI,
 	 * java.net.URI, java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -540,7 +540,7 @@ public class XmppService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#reconnect(java.lang.String)
+	 * com.almende.eve.transport.Transport#reconnect(java.lang.String)
 	 */
 	@Override
 	public void reconnect(final String agentId) throws IOException {
@@ -579,7 +579,7 @@ public class XmppService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#getKey()
+	 * @see com.almende.eve.transport.Transport#getKey()
 	 */
 	@Override
 	public String getKey() {
