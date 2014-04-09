@@ -57,7 +57,6 @@
 
 	<modules>
 		<module>../eve_common</module>
-		<module>../eve_capability</module>
 		<module>../states</module>
 <!--		<module>../transports</module> -->
 		<module>../eve_agents</module>
