@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-state</artifactId>
+			<artifactId>eve-state-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
