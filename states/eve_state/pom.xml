@@ -4,12 +4,12 @@
 
 	<parent>
 		<groupId>com.almende.eve</groupId>
-		<artifactId>eve</artifactId>
+		<artifactId>eve-state</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>../eve_parent/pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-state</artifactId>
+	<artifactId>eve-state-common</artifactId>
 
 	<name>EVE Agent State Capability</name>
 	<url>http://almende.github.com/eve</url>
