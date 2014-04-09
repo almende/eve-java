@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 
 import org.zeromq.ZMQ.Socket;
 
+import com.almende.eve.transport.tokens.TokenRet;
+import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ObjectCache;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;

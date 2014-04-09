@@ -18,6 +18,8 @@ import java.util.logging.Logger;
 import org.zeromq.ZMQ.Socket;
 
 import com.almende.eve.transport.TransportService;
+import com.almende.eve.transport.tokens.TokenStore;
+import com.almende.util.threads.ThreadPool;
 
 /**
  * The Class ZmqService.
@@ -36,8 +38,6 @@ public class ZmqService implements TransportService {
 	 * This constructor is called when the TransportService is constructed
 	 * by the AgentHost.
 	 * 
-	 * @param agentHost
-	 *            the agent host
 	 * @param params
 	 *            Available parameters:
 	 *            {String} baseUrl
@@ -101,7 +101,7 @@ public class ZmqService implements TransportService {
 	public void sendAsync(final byte[] zmqType, final String token,
 			final URI senderUrl, final URI receiverUrl, final byte[] message,
 			final String tag) {
-		host.getPool().execute(new Runnable() {
+		ThreadPool.getPool().execute(new Runnable() {
 			@Override
 			public void run() {
 				final String addr = receiverUrl.toString().replaceFirst(

@@ -28,6 +28,7 @@ import com.almende.eve.transport.TransportService;
 import com.almende.util.ClassUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
+import com.almende.util.threads.ThreadPool;
 
 /**
  * The Class HttpService.
@@ -166,7 +167,7 @@ public class HttpService implements TransportService {
 	public void sendAsync(final URI senderUrl, final URI receiverUrl,
 			final String message, final String tag) throws IOException {
 		
-		host.getPool().execute(new Runnable() {
+		ThreadPool.getPool().execute(new Runnable() {
 			
 			@Override
 			public void run() {

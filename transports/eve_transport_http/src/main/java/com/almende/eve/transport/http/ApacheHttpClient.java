@@ -32,7 +32,8 @@ import org.apache.http.params.HttpParams;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
-import com.almende.eve.state.StateService;
+import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class ApacheHttpClient.
@@ -44,28 +45,27 @@ public final class ApacheHttpClient {
 	static {
 		new ApacheHttpClient();
 	}
+	
 	/**
 	 * Instantiates a new apache http client.
-	 *
+	 * 
 	 */
 	private ApacheHttpClient() {
 		
 		// Allow self-signed SSL certificates:
 		final TrustStrategy trustStrategy = new TrustSelfSignedStrategy();
 		final X509HostnameVerifier hostnameVerifier = new AllowAllHostnameVerifier();
-		final SchemeRegistry schemeRegistry = SchemeRegistryFactory.createDefault();
-
+		final SchemeRegistry schemeRegistry = SchemeRegistryFactory
+				.createDefault();
+		
 		SSLSocketFactory sslSf;
 		try {
-			sslSf = new SSLSocketFactory(trustStrategy,
-					hostnameVerifier);
+			sslSf = new SSLSocketFactory(trustStrategy, hostnameVerifier);
 			final Scheme https = new Scheme("https", 443, sslSf);
 			schemeRegistry.register(https);
 		} catch (Exception e) {
 			LOG.warning("Couldn't init SSL socket, https not supported!");
 		}
-		
-		
 		
 		// Work with PoolingClientConnectionManager
 		final ClientConnectionManager connection = new PoolingClientConnectionManager(
@@ -112,7 +112,7 @@ public final class ApacheHttpClient {
 	
 	/**
 	 * Gets the.
-	 *
+	 * 
 	 * @return the default http client
 	 */
 	static DefaultHttpClient get() {
@@ -123,7 +123,7 @@ public final class ApacheHttpClient {
 	 * The Class MyCookieStore.
 	 */
 	class MyCookieStore implements CookieStore {
-		// TODO: make StateFactory and COOKIESTORE config parameters
+		// TODO: make COOKIESTORE config parameters
 		
 		/** The Constant COOKIESTORE. */
 		static final String	COOKIESTORE	= "_CookieStore";
@@ -133,27 +133,25 @@ public final class ApacheHttpClient {
 		
 		/**
 		 * Instantiates a new my cookie store.
-		 *
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * 
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		MyCookieStore() throws IOException {
-			StateService stateService = null;
-			if (!StateFactory.hasDefault()){
-				LOG.warning("The HTTP client's cookie store requires that the default State service has been initialized! Initializing it to Memory state now.");
-				StateFactory.initDefault("com.almende.eve.state.MemoryStateService", null);
-			}
-			stateService = StateFactory.getDefault();
+			//TODO: use Defaults service
+			ObjectNode params = JOM.createObjectNode();
+			params.put("class", "com.almende.eve.state.memory.MemoryStateService");
+			params.put("id", COOKIESTORE);
 			
-			if (stateService.exists(COOKIESTORE)) {
-				myState = stateService.get(COOKIESTORE);
-			} else {
-				myState = stateService.create(COOKIESTORE);
-				myState.setAgentType(CookieStore.class);
-			}
+			myState = StateFactory.getState(params);
 		}
 		
-		/* (non-Javadoc)
-		 * @see org.apache.http.client.CookieStore#addCookie(org.apache.http.cookie.Cookie)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.apache.http.client.CookieStore#addCookie(org.apache.http.cookie
+		 * .Cookie)
 		 */
 		@Override
 		public void addCookie(final Cookie cookie) {
@@ -161,21 +159,23 @@ public final class ApacheHttpClient {
 					cookie);
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.apache.http.client.CookieStore#getCookies()
 		 */
 		@Override
 		public List<Cookie> getCookies() {
 			final List<Cookie> result = new ArrayList<Cookie>(myState.size());
 			for (final String entryKey : myState.keySet()) {
-				if (!entryKey.equals(State.KEY_AGENT_TYPE)) {
-					result.add(myState.get(entryKey, Cookie.class));
-				}
+				result.add(myState.get(entryKey, Cookie.class));
 			}
 			return result;
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.apache.http.client.CookieStore#clearExpired(java.util.Date)
 		 */
 		@Override
@@ -183,18 +183,18 @@ public final class ApacheHttpClient {
 			boolean result = false;
 			
 			for (final String entryKey : myState.keySet()) {
-				if (!entryKey.equals(State.KEY_AGENT_TYPE)) {
-					final Cookie cookie = myState.get(entryKey, Cookie.class);
-					if (cookie.isExpired(date)) {
-						myState.remove(entryKey);
-						result = true;
-					}
+				final Cookie cookie = myState.get(entryKey, Cookie.class);
+				if (cookie.isExpired(date)) {
+					myState.remove(entryKey);
+					result = true;
 				}
 			}
 			return result;
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.apache.http.client.CookieStore#clear()
 		 */
 		@Override
@@ -204,7 +204,7 @@ public final class ApacheHttpClient {
 		
 		/**
 		 * Gets the my state.
-		 *
+		 * 
 		 * @return the my state
 		 */
 		public State getMyState() {
@@ -213,8 +213,9 @@ public final class ApacheHttpClient {
 		
 		/**
 		 * Sets the my state.
-		 *
-		 * @param myState the new my state
+		 * 
+		 * @param myState
+		 *            the new my state
 		 */
 		public void setMyState(final State myState) {
 			this.myState = myState;

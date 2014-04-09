@@ -22,11 +22,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-state-common</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>jivesoftware</groupId>
 			<artifactId>smackx</artifactId>
 			<version>${smack.version}</version>
