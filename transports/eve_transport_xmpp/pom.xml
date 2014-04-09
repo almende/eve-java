@@ -5,20 +5,20 @@
 		<groupId>com.almende.eve</groupId>
 		<artifactId>eve</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>../eve_parent/pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eve-transport-http</artifactId>
-	<name>EVE HTTP Transport</name>
+	<artifactId>eve-transport-xmpp</artifactId>
+	<name>EVE XMPP Transport</name>
+	<packaging>jar</packaging>
 
 	<properties>
-		<javax.servlet-api.version>3.0.1</javax.servlet-api.version>
-		<httpclient.version>4.2.3</httpclient.version>
+		<smack.version>3.1.0</smack.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-transport</artifactId>
+			<artifactId>eve-transport-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -27,17 +27,9 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${javax.servlet-api.version}</version>
-			<scope>provided</scope>
+			<groupId>jivesoftware</groupId>
+			<artifactId>smackx</artifactId>
+			<version>${smack.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
-
 	</dependencies>
-
 </project>

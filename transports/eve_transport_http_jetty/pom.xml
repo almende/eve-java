@@ -5,7 +5,7 @@
 		<groupId>com.almende.eve</groupId>
 		<artifactId>eve</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>../eve_parent</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>eve-transport-http-jetty</artifactId>
 	<name>EVE HTTP Transport - Embedded Jetty Setup</name>
