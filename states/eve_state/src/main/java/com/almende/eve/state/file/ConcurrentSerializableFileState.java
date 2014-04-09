@@ -75,7 +75,7 @@ public class ConcurrentSerializableFileState extends
 	 *            the agent id
 	 * @param filename
 	 *            the filename
-	 * @param service 
+	 * @param service
 	 */
 	public ConcurrentSerializableFileState(final String agentId,
 			final String filename, final FileStateService service) {
@@ -232,6 +232,8 @@ public class ConcurrentSerializableFileState extends
 			openFile();
 			properties.clear();
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -251,6 +253,8 @@ public class ConcurrentSerializableFileState extends
 			read();
 			result = new HashSet<String>(properties.keySet());
 			
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -271,6 +275,8 @@ public class ConcurrentSerializableFileState extends
 			read();
 			result = properties.containsKey(key);
 			
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -290,6 +296,8 @@ public class ConcurrentSerializableFileState extends
 			openFile();
 			read();
 			result = properties.get(key);
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -312,6 +320,8 @@ public class ConcurrentSerializableFileState extends
 			read();
 			result = properties.put(key, value);
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -341,6 +351,8 @@ public class ConcurrentSerializableFileState extends
 				write();
 				result = true;
 			}
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 			// Don't let users loop if exception is thrown. They
@@ -364,6 +376,8 @@ public class ConcurrentSerializableFileState extends
 			read();
 			result = properties.remove(key);
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -383,6 +397,8 @@ public class ConcurrentSerializableFileState extends
 			openFile();
 			read();
 			result = properties.size();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}

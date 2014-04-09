@@ -138,7 +138,7 @@ public final class ApacheHttpClient {
 		 *             Signals that an I/O exception has occurred.
 		 */
 		MyCookieStore() throws IOException {
-			//TODO: use Defaults service
+			//TODO: use Config service
 			ObjectNode params = JOM.createObjectNode();
 			params.put("class", "com.almende.eve.state.memory.MemoryStateService");
 			params.put("id", COOKIESTORE);

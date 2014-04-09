@@ -77,9 +77,10 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 *            the agent id
 	 * @param filename
 	 *            the filename
-	 * @param service 
+	 * @param service
 	 */
-	public ConcurrentJsonFileState(final String agentId, final String filename, FileStateService service) {
+	public ConcurrentJsonFileState(final String agentId, final String filename,
+			FileStateService service) {
 		super(agentId, service);
 		this.filename = filename;
 		om = JOM.getInstance();
@@ -227,7 +228,6 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			// empty file, new agent?
 		}
 	}
-
 	
 	/*
 	 * (non-Javadoc)
@@ -240,6 +240,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			openFile();
 			properties.clear();
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -258,6 +260,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			openFile();
 			read();
 			result = new HashSet<String>(properties.keySet());
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -277,6 +281,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			openFile();
 			read();
 			result = properties.containsKey(key);
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -296,6 +302,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			openFile();
 			read();
 			result = properties.get(key);
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -320,6 +328,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			}
 			result = properties.put(key, value);
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -358,6 +368,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 				write();
 				result = true;
 			}
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 			// Don't let users loop if exception is thrown. They
@@ -382,6 +394,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			result = properties.remove(key);
 			
 			write();
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -402,6 +416,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			read();
 			result = properties.size();
 			
+		} catch (final IllegalStateException e) {
+			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}

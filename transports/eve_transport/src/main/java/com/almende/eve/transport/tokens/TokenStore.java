@@ -35,7 +35,7 @@ public final class TokenStore {
 	private static final String	TOKENSTORE	= "_TokenStore";
 	
 	static {
-		//TODO: use Defaults service
+		//TODO: use Config service
 		ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
 		params.put("id", TOKENSTORE);

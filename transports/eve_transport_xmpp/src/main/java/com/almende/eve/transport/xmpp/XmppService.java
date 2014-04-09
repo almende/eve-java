@@ -27,6 +27,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.apache.commons.codec.binary.Base64;
 import org.jivesoftware.smack.SmackConfiguration;
 
+import com.almende.eve.defaults.Config;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
 import com.almende.eve.transport.TransportService;
@@ -77,8 +78,7 @@ public class XmppService implements TransportService {
 	 *            {String} serviceName
 	 *            {String} id
 	 */
-	public XmppService(
-			final Map<String, Object> params) {
+	public XmppService(final Map<String, Object> params) {
 		
 		if (params != null) {
 			host = (String) params.get("host");
@@ -99,8 +99,8 @@ public class XmppService implements TransportService {
 	 * @param service
 	 *            service name
 	 */
-	public XmppService(final String host,
-			final Integer port, final String service) {
+	public XmppService(final String host, final Integer port,
+			final String service) {
 		this.host = host;
 		this.port = port;
 		this.service = service;
@@ -118,11 +118,13 @@ public class XmppService implements TransportService {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	private ArrayNode getConns(final String agentId) throws IOException {
-		//FIXME
-		final State state = StateFactory.getDefault().get(agentId);
+		final ObjectNode defaultConfig = Config.getConfig("state", "default");
+		defaultConfig.put("id", agentId);
+		final State state = StateFactory.getState(defaultConfig);
 		
-		if (state == null){
-			LOG.warning("getConns(): Couldn't find agent with agentId:"+agentId);
+		if (state == null) {
+			LOG.warning("getConns(): Couldn't find agent with agentId:"
+					+ agentId);
 			return null;
 		}
 		ArrayNode conns = null;
@@ -132,41 +134,41 @@ public class XmppService implements TransportService {
 		}
 		return conns;
 	}
-
-  /**
-   * Get the XMPP status for a specific agentUrl (String)
-   *
-   * @param agentUrl
-   *            The url of the agent as a astring
-   * @return connectionStatus
-   */
-  public Boolean isConnected(final String agentUrl) {
-    return isConnected( URI.create( agentUrl ) );
-  }
-
-  /**
-   * Get the first XMPP url of an agent from its id.
-   * If the agent exists (is not null) retrieve the current 'isConnected'
-   * status and return it.
-   *
-   * As of EVE 2.2.1: Parameter agentUrl shoulod be a URI object
-   *                  Backwards compatible via: isConnected(String agentUrl)
-   *
-   * @param agentUrl
-   *            The url of the agent as a URI
-   * @return connectionStatus
-   */
-  public Boolean isConnected(final URI agentUrl) {
-    final AgentConnection connection = connectionsByUrl.get(agentUrl);
-
-    if (connection == null) {
-      return false;
-    }
-
-    LOG.info("Current connection of agent " + agentUrl + " is: "
-            + connection.isConnected());
-    return connection.isConnected();
-  }
+	
+	/**
+	 * Get the XMPP status for a specific agentUrl (String)
+	 * 
+	 * @param agentUrl
+	 *            The url of the agent as a astring
+	 * @return connectionStatus
+	 */
+	public Boolean isConnected(final String agentUrl) {
+		return isConnected(URI.create(agentUrl));
+	}
+	
+	/**
+	 * Get the first XMPP url of an agent from its id.
+	 * If the agent exists (is not null) retrieve the current 'isConnected'
+	 * status and return it.
+	 * 
+	 * As of EVE 2.2.1: Parameter agentUrl shoulod be a URI object
+	 * Backwards compatible via: isConnected(String agentUrl)
+	 * 
+	 * @param agentUrl
+	 *            The url of the agent as a URI
+	 * @return connectionStatus
+	 */
+	public Boolean isConnected(final URI agentUrl) {
+		final AgentConnection connection = connectionsByUrl.get(agentUrl);
+		
+		if (connection == null) {
+			return false;
+		}
+		
+		LOG.info("Current connection of agent " + agentUrl + " is: "
+				+ connection.isConnected());
+		return connection.isConnected();
+	}
 	
 	/**
 	 * Get the first XMPP url of an agent from its id.
@@ -291,7 +293,7 @@ public class XmppService implements TransportService {
 			LOG.warning("Warning, agent was already connected, reconnecting.");
 			connection = connectionsByUrl.get(agentUrl);
 		} else {
-			//FIXME instantiate open the connection
+			// FIXME instantiate open the connection
 			connection = new AgentConnection();
 		}
 		
@@ -339,8 +341,9 @@ public class XmppService implements TransportService {
 			NoSuchPaddingException, IllegalBlockSizeException,
 			BadPaddingException {
 		
-		//FIXME
-		final State state = StateFactory.getDefault().get(agentId);
+		final ObjectNode defaultConfig = Config.getConfig("state", "default");
+		defaultConfig.put("id", agentId);
+		final State state = StateFactory.getState(defaultConfig);
 		
 		final String conns = state.get(CONNKEY, String.class);
 		ArrayNode newConns;
@@ -376,8 +379,10 @@ public class XmppService implements TransportService {
 	 *            the agent id
 	 */
 	private void delConnections(final String agentId) {
-		//FIXME
-		final State state = StateFactory.getDefault().get(agentId);
+		final ObjectNode defaultConfig = Config.getConfig("state", "default");
+		defaultConfig.put("id", agentId);
+		final State state = StateFactory.getState(defaultConfig);
+
 		if (state != null) {
 			state.remove(CONNKEY);
 		}
@@ -441,18 +446,24 @@ public class XmppService implements TransportService {
 		delConnections(agentId);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI, java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * java.net.URI, byte[], java.lang.String)
 	 */
 	@Override
 	public void sendAsync(URI senderUri, URI receiverUri, byte[] message,
 			String tag) throws IOException {
-		sendAsync(senderUri, receiverUri, Base64.encodeBase64String(message),tag);
+		sendAsync(senderUri, receiverUri, Base64.encodeBase64String(message),
+				tag);
 	}
 	
-
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI, java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.TransportService#sendAsync(java.net.URI,
+	 * java.net.URI, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void sendAsync(final URI senderUrl, final URI receiverUrl,
