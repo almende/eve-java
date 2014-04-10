@@ -54,11 +54,15 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		URI address = super.getAddress();
 		host = address.getHost();
 		port = address.getPort();
+		if (port < 0){
+			port = 5222;
+		}
 		username = address.getUserInfo();
-		resource = address.getPath();
+		resource = address.getPath().substring(1);
 		if (serviceName == null) {
 			serviceName = host;
 		}
+		password = params.get("password").asText();
 	}
 	
 	@Override
@@ -96,7 +100,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			// this is a reconnect.
 			disconnect();
 		}
-		
+		LOG.warning("Reconnect called:"+toString());
 		// configure and connect
 		final ConnectionConfiguration connConfig = new ConnectionConfiguration(
 				host, port, serviceName);
@@ -123,6 +127,10 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			// set acceptance to all
 			conn.getRoster().setSubscriptionMode(
 					Roster.SubscriptionMode.accept_all);
+			
+			// instantiate a packet listener
+			conn.addPacketListener(this, null);
+			
 		} catch (final XMPPException e) {
 			LOG.log(Level.WARNING, "", e);
 			throw new IOException("Failed to connect to messenger", e);
@@ -160,5 +168,47 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		if (body != null) {
 			super.getHandle().get().receive(body, senderUrl, null);
 		}
+	}
+	
+	/**
+	 * Checks if is available.
+	 * 
+	 * @param receiver
+	 *            the receiver
+	 * @return true, if is available
+	 */
+	public boolean isAvailable(String receiver) {
+		// split url (xmpp:user/resource) into parts
+		if (receiver.startsWith("xmpp:")) {
+			receiver = receiver.substring(5, receiver.length());
+		}
+		final int slash = receiver.indexOf('/');
+		if (slash <= 0) {
+			return false;
+		}
+		final String res = receiver.substring(slash + 1, receiver.length());
+		final String user = receiver.substring(0, slash);
+		
+		final Roster roster = conn.getRoster();
+		
+		final org.jivesoftware.smack.RosterEntry re = roster.getEntry(user);
+		if (re == null) {
+			LOG.info("subscribing to " + receiver);
+			final Presence subscribe = new Presence(Presence.Type.subscribe);
+			subscribe.setTo(receiver);
+			conn.sendPacket(subscribe);
+		}
+		
+		final Presence p = roster.getPresenceResource(user + "/" + res);
+		LOG.info("Presence for " + user + "/" + res + " : " + p.getType());
+		if (p.isAvailable()) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString(){
+		return "XmppTransport:"+super.getAddress().toASCIIString()+ " ("+username+"@"+host+":"+port+"/"+resource+")";
 	}
 }
