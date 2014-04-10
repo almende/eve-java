@@ -4,8 +4,7 @@
  */
 package com.almende.eve.capabilities;
 
-import java.lang.invoke.MethodHandle;
-
+import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -25,5 +24,5 @@ public interface Capability {
 	 * @param type 
 	 * @return the t
 	 */
-	<T> T get(JsonNode params, MethodHandle handle, Class<T> type); 
+	<T,V> T get(JsonNode params, Handler<V> handle, Class<T> type); 
 }

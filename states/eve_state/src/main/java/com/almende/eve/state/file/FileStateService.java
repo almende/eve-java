@@ -6,7 +6,6 @@ package com.almende.eve.state.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
@@ -260,7 +260,7 @@ public class FileStateService implements StateService {
 	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, java.lang.invoke.MethodHandle, java.lang.Class)
 	 */
 	@Override
-	public <T> T get(JsonNode params, MethodHandle handle, Class<T> type) {
+	public <T,V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
 		String agentId = params.get("id").asText();
 		if (exists(agentId)) {
 			return TypeUtil.inject(get(agentId, json), type);

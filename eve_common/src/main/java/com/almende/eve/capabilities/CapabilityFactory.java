@@ -4,12 +4,12 @@
  */
 package com.almende.eve.capabilities;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -30,7 +30,7 @@ public abstract class CapabilityFactory {
 	 *            the capability type (e.g. State, Transport, etc.)
 	 * @return the t
 	 */
-	public static <T> T get(JsonNode params, MethodHandle handle, Class<T> type){
+	public static <T,V> T get(JsonNode params, Handler<V> handle, Class<T> type){
 		if (params.has("class")){
 			String className = params.get("class").asText();
 			try {

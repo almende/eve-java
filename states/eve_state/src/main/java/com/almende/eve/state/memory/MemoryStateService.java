@@ -4,10 +4,10 @@
  */
 package com.almende.eve.state.memory;
 
-import java.lang.invoke.MethodHandle;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
@@ -33,7 +33,7 @@ public class MemoryStateService implements StateService {
 	}
 
 	@Override
-	public <T> T get(JsonNode params, MethodHandle handle, Class<T> type) {
+	public <T,V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
 		String agentId = params.get("id").asText();
 		if (states.containsKey(agentId)){
 			return TypeUtil.inject(states.get(agentId),type);
