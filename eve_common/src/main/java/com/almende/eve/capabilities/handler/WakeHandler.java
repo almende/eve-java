@@ -39,6 +39,8 @@ public class WakeHandler<T> implements Handler<T> {
 	@JsonIgnore
 	public synchronized T get() {
 		while (referent == null) {
+			//TODO: call Wake service with wakeKey. Currently it will deadlock:)
+			
 			try {
 				wakeLock.wait();
 			} catch (InterruptedException e) {}

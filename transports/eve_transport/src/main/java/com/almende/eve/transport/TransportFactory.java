@@ -1,8 +1,7 @@
 package com.almende.eve.transport;
 
-import java.lang.invoke.MethodHandle;
-
 import com.almende.eve.capabilities.CapabilityFactory;
+import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -19,7 +18,7 @@ public class TransportFactory {
 	 * @param handle 
 	 * @return the state
 	 */
-	public static Transport getTransport(JsonNode params, MethodHandle handle) {
+	public static Transport getTransport(JsonNode params, Handler<Receiver> handle) {
 		return CapabilityFactory.get(params, handle, Transport.class);
 	}
 }
