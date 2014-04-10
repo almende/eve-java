@@ -7,10 +7,19 @@ package com.almende.eve.transport;
 import java.io.IOException;
 import java.net.URI;
 
+import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.TypeUtil;
+
 /**
  * The Interface Transport.
  */
 public interface Transport {
+	
+	/**
+	 * The Constant TYPEUTIL.
+	 */
+	static final TypeUtil<Handler<Receiver>> TYPEUTIL = new TypeUtil<Handler<Receiver>>(){};
+	
 	
 	/**
 	 * Send a message to an other agent.
@@ -54,4 +63,27 @@ public interface Transport {
 	 */
 	void reconnect() throws IOException;
 	
+	/**
+	 * Disconnect transport.
+	 */
+	void disconnect();
+	
+	/**
+	 * Delete this transport instance.
+	 */
+	void delete();
+	
+	/**
+	 * Gets the receive handler.
+	 * 
+	 * @return the handler
+	 */
+	Handler<Receiver> getHandle();
+
+	/**
+	 * Gets the address of this transport instance.
+	 * 
+	 * @return the address
+	 */
+	URI getAddress();
 }
