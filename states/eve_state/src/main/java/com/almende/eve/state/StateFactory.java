@@ -8,8 +8,9 @@ import com.almende.eve.capabilities.CapabilityFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * @author ludo
+ * A factory for creating State objects.
  * 
+ * @author ludo
  */
 public class StateFactory {
 	

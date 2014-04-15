@@ -36,6 +36,8 @@ import com.fasterxml.jackson.databind.node.NullNode;
 /**
  * The Class ConcurrentJsonFileState.
  * 
+ * @author jos
+ * @author ludo
  * @class FileState
  * 
  *        A persistent state for an Eve Agent, which stores the data on disk.
@@ -55,8 +57,6 @@ import com.fasterxml.jackson.databind.node.NullNode;
  *        ConcurrentFileState("agentId",".eveagents");<br>
  *        state.put("key", "value");<br>
  *        System.out.println(state.get("key")); // "value"<br>
- * @author jos
- * @author ludo
  */
 public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	private static final Logger			LOG			= Logger.getLogger("ConcurrentFileState");
@@ -78,6 +78,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @param filename
 	 *            the filename
 	 * @param service
+	 *            the service
 	 */
 	public ConcurrentJsonFileState(final String agentId, final String filename,
 			final FileStateService service) {

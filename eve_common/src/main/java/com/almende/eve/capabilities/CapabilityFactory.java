@@ -20,10 +20,12 @@ public abstract class CapabilityFactory {
 											.getName());
 	
 	/**
-	 * Gets an instance of the provided capability
+	 * Gets an instance of the provided capability.
 	 * 
 	 * @param <T>
 	 *            the generic type
+	 * @param <V>
+	 *            the value type
 	 * @param params
 	 *            the params
 	 * @param handle

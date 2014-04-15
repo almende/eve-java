@@ -34,6 +34,9 @@ public abstract class AbstractTransport implements Transport {
 		this.handle = handle;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#delete()
+	 */
 	@Override
 	public void delete() {
 		if (service != null) {
@@ -52,6 +55,9 @@ public abstract class AbstractTransport implements Transport {
 		return handle;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getAddress()
+	 */
 	@Override
 	public URI getAddress() {
 		return address;

@@ -144,6 +144,9 @@ public final class ClassUtil {
 	 * for any combination of
 	 * primitive types, boxed types and normal objects.
 	 * 
+	 * @author PSpeed
+	 *         http://stackoverflow.com/questions/1894740/any-solution-for
+	 *         -class-getmethod-reflection-and-autoboxing
 	 * @param type
 	 *            Class in which the method is searched
 	 * @param name
@@ -151,9 +154,6 @@ public final class ClassUtil {
 	 * @param parms
 	 *            Class types of the requested arguments
 	 * @return Method
-	 * @author PSpeed
-	 *         http://stackoverflow.com/questions/1894740/any-solution-for
-	 *         -class-getmethod-reflection-and-autoboxing
 	 */
 	public static Method searchForMethod(final Class<?> type,
 			final String name, final Class<?>[] parms) {

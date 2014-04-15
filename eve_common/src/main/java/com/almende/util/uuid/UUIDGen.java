@@ -50,9 +50,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * The MAC address code has been tested extensively in Microsoft Windows, Linux,
  * Solaris 8, HP-UX 11, but should work in MacOS X and BSDs, too.
  * 
- * @see <a href="http://johannburkard.de/software/uuid/">UUID</a>
  * @author <a href="mailto:jb@eaio.de">Johann Burkard</a>
  * @version UUIDGen.java 4714 2012-03-16 11:43:28Z johann $
+ * @see <a href="http://johannburkard.de/software/uuid/">UUID</a>
  */
 public final class UUIDGen {
 	

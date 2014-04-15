@@ -36,6 +36,9 @@ public class WakeHandler<T> implements Handler<T> {
 		this.setWakeKey(wakeKey);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#get()
+	 */
 	@Override
 	@JsonIgnore
 	public synchronized T get() {
@@ -51,6 +54,9 @@ public class WakeHandler<T> implements Handler<T> {
 		return referent;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.capabilities.handler.Handler)
+	 */
 	@Override
 	public void update(final Handler<T> newHandler) {
 		this.referent = newHandler.get();

@@ -17,11 +17,14 @@ public interface Capability {
 	 * 
 	 * @param <T>
 	 *            the generic type
+	 * @param <V>
+	 *            the value type
 	 * @param params
 	 *            the params
 	 * @param handle
 	 *            the handle
 	 * @param type
+	 *            the type
 	 * @return the t
 	 */
 	<T, V> T get(JsonNode params, Handler<V> handle, Class<T> type);

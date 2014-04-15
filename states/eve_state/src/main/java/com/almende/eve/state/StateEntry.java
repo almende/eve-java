@@ -19,13 +19,13 @@ import com.fasterxml.jackson.databind.JavaType;
 /**
  * The Class StateEntry.
  * 
+ * @author <a href="mailto:rick@almende.org">Rick van Krevelen</a>
+ * @version $Revision: 911 $ $Author: a4g.almende $
  * @param <T>
  *            the type of value stored in this state entry {@link StateEntry}
  *            wraps agent state entry key and provides respective value
  *            type meta data
  * @date $Date: 2013-05-28 17:31:07 +0200 (Tue, 28 May 2013) $
- * @version $Revision: 911 $ $Author: a4g.almende $
- * @author <a href="mailto:rick@almende.org">Rick van Krevelen</a>
  */
 public abstract class StateEntry<T extends Serializable> {
 	private static final Logger	LOG	= Logger.getLogger(StateEntry.class

@@ -45,6 +45,9 @@ public class XmppService implements TransportService {
 		return singleton;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	 */
 	@Override
 	public <T, V> T get(final JsonNode params, final Handler<V> handle,
 			final Class<T> type) {
@@ -61,6 +64,9 @@ public class XmppService implements TransportService {
 		return TypeUtil.inject(result, type);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	 */
 	@Override
 	public void delete(final Transport instance) {
 		instances.remove(instance.getAddress());

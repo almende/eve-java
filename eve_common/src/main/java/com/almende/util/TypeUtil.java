@@ -22,6 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *            the generic type
  */
 public abstract class TypeUtil<T> {
+	
+	/**
+	 * The Constant LOG.
+	 */
 	static final Logger		LOG	= Logger.getLogger(TypeUtil.class.getName());
 	private final JavaType	valueType;
 	

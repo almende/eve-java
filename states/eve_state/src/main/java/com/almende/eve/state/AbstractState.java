@@ -256,6 +256,9 @@ public abstract class AbstractState<V> implements State {
 				om.valueToTree(oldVal));
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.State#delete()
+	 */
 	@Override
 	public void delete() {
 		if (service != null) {

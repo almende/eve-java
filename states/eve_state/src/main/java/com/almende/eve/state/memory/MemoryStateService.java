@@ -32,6 +32,9 @@ public class MemoryStateService implements StateService {
 		return singleton;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	 */
 	@Override
 	public <T, V> T get(final JsonNode params, final Handler<V> handle,
 			final Class<T> type) {
@@ -45,6 +48,9 @@ public class MemoryStateService implements StateService {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+	 */
 	@Override
 	public void delete(final State instance) {
 		states.remove(instance.getAgentId());

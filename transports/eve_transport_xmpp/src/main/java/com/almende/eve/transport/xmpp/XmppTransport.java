@@ -42,10 +42,14 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	/**
 	 * Instantiates a new xmpp transport.
 	 * 
+	 * @param <V>
+	 *            the value type
+	 * @param params
+	 *            the params
+	 * @param handle
+	 *            the handle
 	 * @param service
 	 *            the service
-	 * @param params
-	 * @param handle
 	 */
 	public <V> XmppTransport(final JsonNode params,
 			final Handler<Receiver> handle, final TransportService service) {
@@ -66,6 +70,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		password = params.get("password").asText();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
@@ -85,6 +92,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
@@ -95,6 +105,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		return (conn != null) ? conn.isConnected() : false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 		if (isConnected()) {
@@ -138,6 +151,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 		if (isConnected()) {
@@ -146,6 +162,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.smack.packet.Packet)
+	 */
 	@Override
 	public void processPacket(final Packet packet) {
 		final Message message = (Message) packet;
@@ -208,6 +227,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "XmppTransport:" + super.getAddress().toASCIIString() + " ("

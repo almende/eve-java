@@ -279,6 +279,9 @@ public class FileStateService implements StateService {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+	 */
 	@Override
 	public void delete(final State instance) {
 		final String agentId = instance.getAgentId();

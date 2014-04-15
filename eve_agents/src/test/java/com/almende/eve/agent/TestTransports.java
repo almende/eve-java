@@ -27,9 +27,10 @@ public class TestTransports extends TestCase {
 											.getName());
 	
 	/**
-	 * Test Xmpp
+	 * Test Xmpp.
 	 * 
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
 	public void testXmpp() throws IOException {
@@ -52,9 +53,10 @@ public class TestTransports extends TestCase {
 	}
 	
 	/**
-	 * Test Xmpp
+	 * Test Xmpp.
 	 * 
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
 	public void testZmq() throws IOException {
@@ -74,6 +76,10 @@ public class TestTransports extends TestCase {
 	 * The Class myReceiver.
 	 */
 	public class myReceiver implements Receiver, Handler<Receiver> {
+		
+		/* (non-Javadoc)
+		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+		 */
 		@Override
 		public void receive(final Object msg, final URI senderUrl, final String tag) {
 			
@@ -81,11 +87,17 @@ public class TestTransports extends TestCase {
 					+ senderUrl.toASCIIString());
 		}
 		
+		/* (non-Javadoc)
+		 * @see com.almende.eve.capabilities.handler.Handler#get()
+		 */
 		@Override
 		public Receiver get() {
 			return this;
 		}
 		
+		/* (non-Javadoc)
+		 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.capabilities.handler.Handler)
+		 */
 		@Override
 		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.

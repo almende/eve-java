@@ -40,6 +40,8 @@ import java.io.ObjectOutput;
  * UUID	u	= new UUID();
  * </pre>
  * 
+ * @author <a href="mailto:jb@eaio.de">Johann Burkard</a>
+ * @version UUID.java 4688 2012-03-09 14:49:49Z johann $
  * @see <a href="http://www.opengroup.org/onlinepubs/9629399/apdxa.htm">
  *      http://www.opengroup.org/onlinepubs/9629399/apdxa.htm
  </a>
@@ -47,8 +49,6 @@ import java.io.ObjectOutput;
  *      http://www.uddi.org/pubs/draft-leach-uuids-guids-01.txt
  </a>
  * @see <a href="http://johannburkard.de/software/uuid/">UUID</a>
- * @author <a href="mailto:jb@eaio.de">Johann Burkard</a>
- * @version UUID.java 4688 2012-03-09 14:49:49Z johann $
  */
 public class UUID implements Comparable<UUID>, Externalizable, Cloneable {
 	

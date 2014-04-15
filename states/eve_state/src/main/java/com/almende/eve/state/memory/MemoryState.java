@@ -19,6 +19,7 @@ import com.almende.eve.state.StateService;
 /**
  * The Class MemoryState.
  * 
+ * @author jos
  * @class MemoryState
  * 
  *        A state for an Eve Agent, which stores the data in memory.
@@ -37,7 +38,6 @@ import com.almende.eve.state.StateService;
  *        FileState state = new State("agentId");<br>
  *        state.put("key", "value");<br>
  *        System.out.println(state.get("key")); // "value"<br>
- * @author jos
  */
 public class MemoryState extends AbstractState<Serializable> implements State {
 	private static final Logger				LOG			= Logger.getLogger(MemoryState.class
@@ -56,6 +56,7 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	 * @param agentId
 	 *            the agent id
 	 * @param service
+	 *            the service
 	 */
 	public MemoryState(final String agentId, final StateService service) {
 		super(agentId, service);

@@ -420,7 +420,9 @@ public final class AnnotationUtil {
 		 * @param method
 		 *            the method
 		 * @throws IllegalAccessException
+		 *             the illegal access exception
 		 * @throws WrongMethodTypeException
+		 *             the wrong method type exception
 		 */
 		public AnnotatedMethod(final Method method)
 				throws IllegalAccessException, WrongMethodTypeException {

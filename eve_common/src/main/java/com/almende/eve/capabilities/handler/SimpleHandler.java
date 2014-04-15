@@ -23,11 +23,17 @@ public class SimpleHandler<T> implements Handler<T> {
 		this.referent = referent;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#get()
+	 */
 	@Override
 	public T get() {
 		return referent;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.capabilities.handler.Handler)
+	 */
 	@Override
 	public void update(final Handler<T> newHandler) {
 		this.referent = newHandler.get();
