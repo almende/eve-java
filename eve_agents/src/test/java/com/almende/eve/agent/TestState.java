@@ -32,6 +32,7 @@ public class TestState extends TestCase {
 		params.put("json", false);
 		Config.addConfig(params, "state","fileTest");
 		
+		System.out.println(Config.getConfig());
 	}
 	
 	/**
@@ -61,6 +62,7 @@ public class TestState extends TestCase {
 		State myState = CapabilityFactory.get(params, null, State.class);
 		State myState2 = StateFactory.getState(params);
 		runTest(myState, myState2);
+		
 		myState = CapabilityFactory.get(params, null, State.class);
 		myState2 = StateFactory.getState(params);
 		runTest(myState, myState2);

@@ -55,4 +55,14 @@ public abstract class AbstractTransport implements Transport {
 	public URI getAddress(){
 		return address;
 	}
+
+	/**
+	 * Sets the address.
+	 * 
+	 * @param address
+	 *            the new address
+	 */
+	public void setAddress(URI address) {
+		this.address = address;
+	}
 }

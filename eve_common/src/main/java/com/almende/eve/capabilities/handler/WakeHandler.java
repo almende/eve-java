@@ -56,6 +56,7 @@ public class WakeHandler<T> implements Handler<T> {
 		if (newHandler instanceof WakeHandler){
 			WakeHandler<T> other = (WakeHandler<T>) newHandler;
 			this.wakeKey = other.getWakeKey();
+			wakeLock.notifyAll();
 		}
 	}
 

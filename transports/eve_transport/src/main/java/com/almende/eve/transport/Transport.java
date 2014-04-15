@@ -61,7 +61,7 @@ public interface Transport {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	void reconnect() throws IOException;
+	void connect() throws IOException;
 	
 	/**
 	 * Disconnect transport.

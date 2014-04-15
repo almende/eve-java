@@ -49,6 +49,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 */
 	public <V> XmppTransport(final JsonNode params,
 			final Handler<Receiver> handle, final TransportService service) {
+		//TODO: support more parameter structures.
 		super(URI.create(params.get("address").asText()), handle, service);
 		
 		URI address = super.getAddress();
@@ -69,7 +70,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	public void send(URI receiverUri, String message, String tag)
 			throws IOException {
 		if (!isConnected()) {
-			reconnect();
+			connect();
 		}
 		if (isConnected()) {
 			
@@ -95,7 +96,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	}
 	
 	@Override
-	public void reconnect() throws IOException {
+	public void connect() throws IOException {
 		if (isConnected()) {
 			// this is a reconnect.
 			disconnect();

@@ -23,7 +23,7 @@ public class Config {
 		//Add default memory state:
 		ObjectNode defaultState = JOM.createObjectNode();
 		defaultState.put("class", "com.almende.eve.state.memory.MemoryStateService");
-		addConfig(defaultState,"state", "default");
+		addConfig(defaultState,"state", "default"); 
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class Config {
 	 * @return the config
 	 */
 	public static ObjectNode getConfig() {
-		return getConfig((String) null);
+		return configTree.deepCopy();
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class Config {
 						new NoSuchElementException());
 			}
 		}
-		return result;
+		return result.deepCopy();
 	}
 	
 	/**
@@ -75,17 +75,18 @@ public class Config {
 	public static void addConfig(ObjectNode config, String... configPath) {
 		switch (configPath.length) {
 			case 0:
-				configTree = config;
+				configTree = config.deepCopy();
 				break;
 			case 1:
-				configTree.put(configPath[0], config);
+				configTree.put(configPath[0], config.deepCopy());
 				break;
 			default:
 				ObjectNode position = configTree;
 				for (int i = 0; i < configPath.length - 1; i++) {
 					position = position.with(configPath[i]);
 				}
-				position.put(configPath[configPath.length-1], config);
+				position.put(configPath[configPath.length-1], config.deepCopy());
 		}
 	}
+
 }

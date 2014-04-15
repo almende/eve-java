@@ -15,6 +15,10 @@ import java.util.logging.Logger;
 
 import org.zeromq.ZMQ.Socket;
 
+import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.transport.AbstractTransport;
+import com.almende.eve.transport.Receiver;
+import com.almende.eve.transport.TransportService;
 import com.almende.eve.transport.tokens.TokenRet;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ObjectCache;
@@ -22,102 +26,127 @@ import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
+import com.almende.util.threads.ThreadPool;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * The Class ZmqConnection.
+ * The Class ZmqTransport.
  */
-public class ZmqConnection {
-	private static final Logger	LOG		= Logger.getLogger(ZmqConnection.class
-												.getCanonicalName());
-	private final Socket		socket;
-	private final ZmqService	service;
-	private URI					zmqUrl	= null;
-	private String				agentId	= null;
+public class ZmqTransport extends AbstractTransport {
+	private static final Logger						LOG					= Logger.getLogger(ZmqTransport.class
+																				.getCanonicalName());
+	private String									zmqUrl;
+	private Thread									listeningThread;
+	private boolean									doesAuthentication	= false;
+	private boolean									doDisconnect		= false;
+	private static final AsyncCallbackQueue<String>	callbacks			= new AsyncCallbackQueue<String>();
 	
 	/**
-	 * Instantiates a new zmq connection.
+	 * Instantiates a new zmq transport.
 	 * 
-	 * @param socket
-	 *            the socket
+	 * @param params
+	 *            the params
+	 * @param handle
+	 *            the handle
 	 * @param service
 	 *            the service
 	 */
-	public ZmqConnection(final Socket socket, final ZmqService service) {
-		this.socket = socket;
-		this.service = service;
+	public ZmqTransport(JsonNode params, Handler<Receiver> handle,
+			TransportService service) {
+		super(URI.create(params.get("address").asText()), handle, service);
+		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
+		
 	}
 	
 	/**
-	 * Gets the socket.
+	 * Send async.
 	 * 
-	 * @return the socket
+	 * @param zmqType
+	 *            the zmq type
+	 * @param token
+	 *            the token
+	 * @param receiverUrl
+	 *            the receiver url
+	 * @param message
+	 *            the message
+	 * @param tag
+	 *            the tag
 	 */
-	public Socket getSocket() {
-		return socket;
+	public void sendAsync(final byte[] zmqType, final String token,
+			final URI receiverUrl, final byte[] message, final String tag) {
+		final String senderUrl = super.getAddress().toString();
+		ThreadPool.getPool().execute(new Runnable() {
+			@Override
+			public void run() {
+				final String addr = receiverUrl.toString().replaceFirst(
+						"zmq:/?/?", "");
+				final Socket socket = ZMQ.getSocket(org.zeromq.ZMQ.PUSH);
+				LOG.warning("trying to connect to:" + addr);
+				try {
+					socket.connect(addr);
+					socket.send(zmqType, org.zeromq.ZMQ.SNDMORE);
+					socket.send(senderUrl, org.zeromq.ZMQ.SNDMORE);
+					socket.send(token, org.zeromq.ZMQ.SNDMORE);
+					socket.send(message, 0);
+					
+				} catch (final Exception e) {
+					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
+				}
+				socket.setTCPKeepAlive(-1);
+				socket.setLinger(-1);
+				socket.close();
+			}
+		});
 	}
 	
-	/**
-	 * Gets the zmq url.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return the zmq url
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
-	public URI getZmqUrl() {
-		return zmqUrl;
+	@Override
+	public void send(URI receiverUri, String message, String tag)
+			throws IOException {
+		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
+				message.getBytes(), tag);
 	}
 	
-	/**
-	 * Sets the zmq url.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param zmqUrl
-	 *            the new zmq url
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
-	public void setZmqUrl(final URI zmqUrl) {
-		this.zmqUrl = zmqUrl;
+	@Override
+	public void send(final URI receiverUri, final byte[] message,
+			final String tag) throws IOException {
+		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
+				message, tag);
 	}
 	
-	/**
-	 * Gets the agent id.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return the agent id
+	 * @see com.almende.eve.transport.Transport#connect()
 	 */
-	public String getAgentId() {
-		return agentId;
-	}
-	
-	/**
-	 * Sets the agent id.
-	 * 
-	 * @param agentId
-	 *            the new agent id
-	 */
-	public void setAgentId(final String agentId) {
-		this.agentId = agentId;
-	}
-	
-	/**
-	 * Gets the agent url.
-	 * 
-	 * @return the agent url
-	 */
-	public URI getAgentUrl() {
-		try {
-			return new URI("zmq:" + getZmqUrl());
-		} catch (URISyntaxException e) {
-			LOG.warning("Strange, couldn't form agentUrl:" + "zmq:"
-					+ getZmqUrl());
-			return null;
+	@Override
+	public void connect() throws IOException {
+		if (listeningThread != null) {
+			disconnect();
 		}
+		listen();
 	}
 	
-	/**
-	 * Sets the agent url.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param agentUrl
-	 *            the new agent url
-	 * @throws URISyntaxException
+	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
-	public void setAgentUrl(final URI agentUrl) throws URISyntaxException {
-		zmqUrl = new URI(agentUrl.toString().replaceFirst("zmq:/?/?", ""));
+	@Override
+	public void disconnect() {
+		doDisconnect = true;
+		listeningThread.interrupt();
 	}
 	
 	/**
@@ -147,9 +176,11 @@ public class ZmqConnection {
 	 * 
 	 */
 	public void listen() {
-		new Thread(new Runnable() {
+		listeningThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				Socket socket = ZMQ.getSocket(org.zeromq.ZMQ.PULL);
+				socket.bind(zmqUrl);
 				while (true) {
 					try {
 						final ByteBuffer[] msg = getRequest(socket);
@@ -158,12 +189,18 @@ public class ZmqConnection {
 							handleMsg(msg);
 							continue;
 						}
+						if (doDisconnect) {
+							socket.disconnect(zmqUrl);
+							doDisconnect = false;
+							return;
+						}
 					} catch (final Exception e) {
 						LOG.log(Level.SEVERE, "Caught error:", e);
 					}
 				}
 			}
-		}).start();
+		});
+		listeningThread.start();
 	}
 	
 	/**
@@ -204,13 +241,11 @@ public class ZmqConnection {
 		if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE)) {
 			// Reply token corresponding to timestamp.
 			final String res = TokenStore.get(body);
-			service.sendAsync(ZMQ.HANDSHAKE_RESPONSE, res, zmqUrl, senderUrl,
-					res.getBytes(), null);
+			sendAsync(ZMQ.HANDSHAKE_RESPONSE, res, senderUrl, res.getBytes(),
+					null);
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
-			final AsyncCallbackQueue<String> callbacks = host.getCallbackQueue(
-					"zmqHandshakes", String.class);
 			AsyncCallback<String> callback = callbacks.pull(key);
 			if (callback != null) {
 				callback.onSuccess(body);
@@ -221,15 +256,11 @@ public class ZmqConnection {
 			return;
 		} else {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
-			if (!sessionCache.containsKey(key)
-					&& host.hasPrivate(agentId)) {
-				final AsyncCallbackQueue<String> callbacks = host
-						.getCallbackQueue("zmqHandshakes", String.class);
-				
+			if (!sessionCache.containsKey(key) && doesAuthentication) {
 				SyncCallback<String> callback = new SyncCallback<String>();
 				callbacks.push(key, "", callback);
-				service.sendAsync(ZMQ.HANDSHAKE, token.toString(), zmqUrl,
-						senderUrl, token.getTime().getBytes(), null);
+				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
+						.getTime().getBytes(), null);
 				
 				String retToken = null;
 				try {
@@ -246,14 +277,7 @@ public class ZmqConnection {
 		}
 		
 		if (body != null) {
-			try {
-				host.receive(agentId, body, senderUrl, null);
-			} catch (final IOException e) {
-				LOG.log(Level.WARNING,
-						"Host threw an IOException, probably agent '" + agentId
-								+ "' doesn't exist? ", e);
-				return;
-			}
+			super.getHandle().get().receive(body, senderUrl, null);
 		}
 	}
 	

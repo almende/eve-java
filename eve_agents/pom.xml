@@ -28,6 +28,11 @@
 			<artifactId>eve-transport-xmpp</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+                <dependency>
+                        <groupId>${project.parent.groupId}</groupId>
+                        <artifactId>eve-transport-zmq</artifactId>
+                        <version>${project.parent.version}</version>
+                </dependency>
 	</dependencies>
 
 	<build>
