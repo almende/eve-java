@@ -15,10 +15,11 @@ public class TransportFactory {
 	 * 
 	 * @param params
 	 *            the params
-	 * @param handle 
+	 * @param handle
 	 * @return the state
 	 */
-	public static Transport getTransport(JsonNode params, Handler<Receiver> handle) {
+	public static Transport getTransport(final JsonNode params,
+			final Handler<Receiver> handle) {
 		return CapabilityFactory.get(params, handle, Transport.class);
 	}
 }

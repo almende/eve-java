@@ -120,7 +120,8 @@ public final class UUIDGen {
 								new String[] { "dladm", "show-phys", "-m" },
 								null);
 					} else {
-						final String hostName = getFirstLineOfCommand("uname", "-n");
+						final String hostName = getFirstLineOfCommand("uname",
+								"-n");
 						if (hostName != null) {
 							p = Runtime.getRuntime().exec(
 									new String[] { "/usr/sbin/arp", hostName },
@@ -268,12 +269,15 @@ public final class UUIDGen {
 	
 	/**
 	 * Returns the first line of the shell command.
-	 *
-	 * @param commands the commands to run
+	 * 
+	 * @param commands
+	 *            the commands to run
 	 * @return the first line of the command
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	static String getFirstLineOfCommand(final String... commands) throws IOException {
+	static String getFirstLineOfCommand(final String... commands)
+			throws IOException {
 		
 		Process p = null;
 		BufferedReader reader = null;
@@ -305,7 +309,7 @@ public final class UUIDGen {
 		
 		/**
 		 * To string.
-		 *
+		 * 
 		 * @return the string
 		 * @see java.lang.Object#toString()
 		 */

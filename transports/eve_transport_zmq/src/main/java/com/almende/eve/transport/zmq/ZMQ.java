@@ -27,7 +27,7 @@ public class ZMQ extends org.zeromq.ZMQ {
 	
 	/**
 	 * Gets the single instance of ZMQ.
-	 *
+	 * 
 	 * @return single instance of ZMQ
 	 */
 	public static Context getInstance() {
@@ -36,8 +36,9 @@ public class ZMQ extends org.zeromq.ZMQ {
 	
 	/**
 	 * Gets the socket.
-	 *
-	 * @param type the type
+	 * 
+	 * @param type
+	 *            the type
 	 * @return the socket
 	 */
 	public static Socket getSocket(final int type) {

@@ -35,9 +35,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ZmqTransport extends AbstractTransport {
 	private static final Logger						LOG					= Logger.getLogger(ZmqTransport.class
 																				.getCanonicalName());
-	private String									zmqUrl;
+	private final String									zmqUrl;
 	private Thread									listeningThread;
-	private boolean									doesAuthentication	= false;
+	private final boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
 	private static final AsyncCallbackQueue<String>	callbacks			= new AsyncCallbackQueue<String>();
 	
@@ -51,8 +51,8 @@ public class ZmqTransport extends AbstractTransport {
 	 * @param service
 	 *            the service
 	 */
-	public ZmqTransport(JsonNode params, Handler<Receiver> handle,
-			TransportService service) {
+	public ZmqTransport(final JsonNode params, final Handler<Receiver> handle,
+			final TransportService service) {
 		super(URI.create(params.get("address").asText()), handle, service);
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
 		
@@ -106,7 +106,7 @@ public class ZmqTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
 		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
 				message.getBytes(), tag);
@@ -179,7 +179,7 @@ public class ZmqTransport extends AbstractTransport {
 		listeningThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Socket socket = ZMQ.getSocket(org.zeromq.ZMQ.PULL);
+				final Socket socket = ZMQ.getSocket(org.zeromq.ZMQ.PULL);
 				socket.bind(zmqUrl);
 				while (true) {
 					try {
@@ -246,7 +246,7 @@ public class ZmqTransport extends AbstractTransport {
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
-			AsyncCallback<String> callback = callbacks.pull(key);
+			final AsyncCallback<String> callback = callbacks.pull(key);
 			if (callback != null) {
 				callback.onSuccess(body);
 			} else {
@@ -257,7 +257,7 @@ public class ZmqTransport extends AbstractTransport {
 		} else {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key) && doesAuthentication) {
-				SyncCallback<String> callback = new SyncCallback<String>();
+				final SyncCallback<String> callback = new SyncCallback<String>();
 				callbacks.push(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
 						.getTime().getBytes(), null);
@@ -265,7 +265,7 @@ public class ZmqTransport extends AbstractTransport {
 				String retToken = null;
 				try {
 					retToken = callback.get();
-				} catch (Exception e) {
+				} catch (final Exception e) {
 				}
 				if (token.getToken().equals(retToken)) {
 					sessionCache.put(key, true);

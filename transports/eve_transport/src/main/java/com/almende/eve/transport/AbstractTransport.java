@@ -14,7 +14,7 @@ import com.almende.eve.capabilities.handler.Handler;
 public abstract class AbstractTransport implements Transport {
 	private TransportService	service	= null;
 	private Handler<Receiver>	handle	= null;
-	private URI					address = null;
+	private URI					address	= null;
 	
 	/**
 	 * Instantiates a new abstract transport.
@@ -27,7 +27,8 @@ public abstract class AbstractTransport implements Transport {
 	 *            the service that created this transport instance
 	 */
 	
-	public AbstractTransport(URI address, Handler<Receiver> handle, TransportService service) {
+	public AbstractTransport(final URI address, final Handler<Receiver> handle,
+			final TransportService service) {
 		this.address = address;
 		this.service = service;
 		this.handle = handle;
@@ -40,7 +41,7 @@ public abstract class AbstractTransport implements Transport {
 			service.delete(this);
 		}
 	}
-
+	
 	/**
 	 * Gets the handle.
 	 * 
@@ -52,17 +53,17 @@ public abstract class AbstractTransport implements Transport {
 	}
 	
 	@Override
-	public URI getAddress(){
+	public URI getAddress() {
 		return address;
 	}
-
+	
 	/**
 	 * Sets the address.
 	 * 
 	 * @param address
 	 *            the new address
 	 */
-	public void setAddress(URI address) {
+	public void setAddress(final URI address) {
 		this.address = address;
 	}
 }

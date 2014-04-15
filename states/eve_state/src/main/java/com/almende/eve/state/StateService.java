@@ -11,7 +11,6 @@ import com.almende.eve.capabilities.Capability;
  */
 public interface StateService extends Capability {
 	
-
 	/**
 	 * Delete.
 	 * 

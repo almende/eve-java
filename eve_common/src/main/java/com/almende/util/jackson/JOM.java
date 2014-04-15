@@ -22,12 +22,13 @@ public final class JOM {
 	static {
 		MAPPER = createInstance();
 	}
+	
 	protected JOM() {
 	}
 	
 	/**
 	 * Gets the single instance of JOM.
-	 *
+	 * 
 	 * @return single instance of JOM
 	 */
 	public static ObjectMapper getInstance() {
@@ -36,7 +37,7 @@ public final class JOM {
 	
 	/**
 	 * Creates the object node.
-	 *
+	 * 
 	 * @return the object node
 	 */
 	public static ObjectNode createObjectNode() {
@@ -45,7 +46,7 @@ public final class JOM {
 	
 	/**
 	 * Creates the array node.
-	 *
+	 * 
 	 * @return the array node
 	 */
 	public static ArrayNode createArrayNode() {
@@ -54,7 +55,7 @@ public final class JOM {
 	
 	/**
 	 * Creates the null node.
-	 *
+	 * 
 	 * @return the null node
 	 */
 	public static NullNode createNullNode() {
@@ -63,7 +64,7 @@ public final class JOM {
 	
 	/**
 	 * Creates the instance.
-	 *
+	 * 
 	 * @return the object mapper
 	 */
 	private static synchronized ObjectMapper createInstance() {
@@ -86,7 +87,7 @@ public final class JOM {
 	
 	/**
 	 * Gets the type factory.
-	 *
+	 * 
 	 * @return the type factory
 	 */
 	public static TypeFactory getTypeFactory() {
@@ -95,10 +96,10 @@ public final class JOM {
 	
 	/**
 	 * Gets the void.
-	 *
+	 * 
 	 * @return the void
 	 * @deprecated This method is no longer needed, you can directly use
-	 * Void.class
+	 *             Void.class
 	 */
 	@Deprecated
 	public static JavaType getVoid() {
@@ -107,11 +108,12 @@ public final class JOM {
 	
 	/**
 	 * Gets the simple type.
-	 *
-	 * @param c the c
+	 * 
+	 * @param c
+	 *            the c
 	 * @return the simple type
 	 * @deprecated This method is no longer needed, you can directly use
-	 * <Class>.class, e.g. String.class
+	 *             <Class>.class, e.g. String.class
 	 */
 	@Deprecated
 	public static JavaType getSimpleType(final Class<?> c) {

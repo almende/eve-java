@@ -55,7 +55,7 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	 * 
 	 * @param agentId
 	 *            the agent id
-	 * @param service 
+	 * @param service
 	 */
 	public MemoryState(final String agentId, final StateService service) {
 		super(agentId, service);

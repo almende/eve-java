@@ -24,13 +24,13 @@ public class TestState extends TestCase {
 	 * Create new agent.
 	 */
 	public TestState() {
-		ObjectNode params = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
-		Config.addConfig(params, "state","memTest");
+		Config.addConfig(params, "state", "memTest");
 		
 		params.put("class", "com.almende.eve.state.file.FileStateService");
 		params.put("json", false);
-		Config.addConfig(params, "state","fileTest");
+		Config.addConfig(params, "state", "fileTest");
 		
 		System.out.println(Config.getConfig());
 	}
@@ -56,7 +56,7 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testState() {
-		ObjectNode params = Config.getConfig("state","memTest");
+		final ObjectNode params = Config.getConfig("state", "memTest");
 		params.put("id", "TestAgent");
 		
 		State myState = CapabilityFactory.get(params, null, State.class);
@@ -73,7 +73,7 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testFileState() {
-		ObjectNode params = Config.getConfig("state","fileTest");
+		final ObjectNode params = Config.getConfig("state", "fileTest");
 		params.put("id", "TestAgent");
 		
 		State myState = CapabilityFactory.get(params, null, State.class);

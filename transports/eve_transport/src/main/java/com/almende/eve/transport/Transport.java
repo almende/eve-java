@@ -18,8 +18,8 @@ public interface Transport {
 	/**
 	 * The Constant TYPEUTIL.
 	 */
-	static final TypeUtil<Handler<Receiver>> TYPEUTIL = new TypeUtil<Handler<Receiver>>(){};
-	
+	static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
+															};
 	
 	/**
 	 * Send a message to an other agent.
@@ -79,7 +79,7 @@ public interface Transport {
 	 * @return the handler
 	 */
 	Handler<Receiver> getHandle();
-
+	
 	/**
 	 * Gets the address of this transport instance.
 	 * 

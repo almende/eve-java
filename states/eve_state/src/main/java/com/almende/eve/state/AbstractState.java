@@ -26,7 +26,7 @@ public abstract class AbstractState<V> implements State {
 	private static final Logger	LOG		= Logger.getLogger(AbstractState.class
 												.getCanonicalName());
 	private String				agentId	= null;
-	private StateService		service = null;
+	private StateService		service	= null;
 	
 	/**
 	 * The implemented classes must have a public constructor.
@@ -37,9 +37,11 @@ public abstract class AbstractState<V> implements State {
 	/**
 	 * The implemented classes must have this public constructor with
 	 * parameters AgentHost, and agentId.
-	 *
-	 * @param agentId the agent id
-	 * @param service the service in which this instance is created
+	 * 
+	 * @param agentId
+	 *            the agent id
+	 * @param service
+	 *            the service in which this instance is created
 	 */
 	public AbstractState(final String agentId, final StateService service) {
 		this.agentId = agentId;
@@ -48,7 +50,7 @@ public abstract class AbstractState<V> implements State {
 	
 	/**
 	 * Get the agents id.
-	 *
+	 * 
 	 * @return agentId
 	 */
 	@Override
@@ -62,9 +64,9 @@ public abstract class AbstractState<V> implements State {
 	 * @param agentId
 	 *            the new agent id
 	 */
-	public void setAgentId(String agentId) {
+	public void setAgentId(final String agentId) {
 		this.agentId = agentId;
-	}	
+	}
 	
 	/**
 	 * Gets the service.
@@ -74,18 +76,20 @@ public abstract class AbstractState<V> implements State {
 	public StateService getService() {
 		return service;
 	}
-
+	
 	/**
 	 * Sets the service.
 	 * 
 	 * @param service
 	 *            the new service
 	 */
-	public void setService(StateService service) {
+	public void setService(final StateService service) {
 		this.service = service;
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#put(java.lang.String, java.lang.Object)
 	 */
 	@Override
@@ -101,8 +105,11 @@ public abstract class AbstractState<V> implements State {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.State#putIfUnchanged(java.lang.String, java.lang.Object, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.state.State#putIfUnchanged(java.lang.String,
+	 * java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public synchronized boolean putIfUnchanged(final String key,
@@ -121,13 +128,16 @@ public abstract class AbstractState<V> implements State {
 	
 	/**
 	 * Gets the.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 * @return the v
 	 */
 	public abstract V get(String key);
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#get(java.lang.String, java.lang.Class)
 	 */
 	@Override
@@ -135,31 +145,42 @@ public abstract class AbstractState<V> implements State {
 		return TypeUtil.inject(get(key), type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.State#get(java.lang.String, java.lang.reflect.Type)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.state.State#get(java.lang.String,
+	 * java.lang.reflect.Type)
 	 */
 	@Override
 	public <T> T get(final String key, final Type type) {
 		return TypeUtil.inject(get(key), type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.State#get(java.lang.String, com.fasterxml.jackson.databind.JavaType)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.state.State#get(java.lang.String,
+	 * com.fasterxml.jackson.databind.JavaType)
 	 */
 	@Override
 	public <T> T get(final String key, final JavaType type) {
 		return TypeUtil.inject(get(key), type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.State#get(java.lang.String, com.almende.util.TypeUtil)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.state.State#get(java.lang.String,
+	 * com.almende.util.TypeUtil)
 	 */
 	@Override
 	public <T> T get(final String key, final TypeUtil<T> type) {
 		return type.inject(get(key));
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#get(com.almende.eve.state.TypedKey)
 	 */
 	@Override
@@ -169,9 +190,11 @@ public abstract class AbstractState<V> implements State {
 	
 	/**
 	 * Loc put.
-	 *
-	 * @param key the key
-	 * @param value the value
+	 * 
+	 * @param key
+	 *            the key
+	 * @param value
+	 *            the value
 	 * @return the json node
 	 */
 	public JsonNode locPut(final String key, final JsonNode value) {
@@ -184,10 +207,13 @@ public abstract class AbstractState<V> implements State {
 	// override their own typed version.
 	/**
 	 * Loc put if unchanged.
-	 *
-	 * @param key the key
-	 * @param newVal the new val
-	 * @param oldVal the old val
+	 * 
+	 * @param key
+	 *            the key
+	 * @param newVal
+	 *            the new val
+	 * @param oldVal
+	 *            the old val
 	 * @return true, if successful
 	 */
 	public boolean locPutIfUnchanged(final String key, final JsonNode newVal,
@@ -198,9 +224,11 @@ public abstract class AbstractState<V> implements State {
 	
 	/**
 	 * Loc put.
-	 *
-	 * @param key the key
-	 * @param value the value
+	 * 
+	 * @param key
+	 *            the key
+	 * @param value
+	 *            the value
 	 * @return the serializable
 	 */
 	public synchronized Serializable locPut(final String key,
@@ -212,10 +240,13 @@ public abstract class AbstractState<V> implements State {
 	
 	/**
 	 * Loc put if unchanged.
-	 *
-	 * @param key the key
-	 * @param newVal the new val
-	 * @param oldVal the old val
+	 * 
+	 * @param key
+	 *            the key
+	 * @param newVal
+	 *            the new val
+	 * @param oldVal
+	 *            the old val
 	 * @return true, if successful
 	 */
 	public boolean locPutIfUnchanged(final String key,
@@ -226,14 +257,16 @@ public abstract class AbstractState<V> implements State {
 	}
 	
 	@Override
-	public void delete(){
-		if (service != null){
+	public void delete() {
+		if (service != null) {
 			clear();
 			service.delete(this);
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

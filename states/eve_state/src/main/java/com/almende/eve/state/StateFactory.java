@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author ludo
- *
+ * 
  */
 public class StateFactory {
 	
@@ -20,7 +20,7 @@ public class StateFactory {
 	 *            the params
 	 * @return the state
 	 */
-	public static State getState(JsonNode params){
-		return CapabilityFactory.get(params,null,State.class);
+	public static State getState(final JsonNode params) {
+		return CapabilityFactory.get(params, null, State.class);
 	}
 }

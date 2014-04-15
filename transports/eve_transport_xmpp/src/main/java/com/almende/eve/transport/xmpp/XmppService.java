@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class XmppService.
  */
 public class XmppService implements TransportService {
-	private Map<URI, Transport>		instances	= new ConcurrentHashMap<URI, Transport>();
+	private final Map<URI, Transport>			instances	= new ConcurrentHashMap<URI, Transport>();
 	private static final XmppService	singleton	= new XmppService();
 	
 	// Needed to force Android loading the ReconnectionManager....
@@ -41,15 +41,15 @@ public class XmppService implements TransportService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static XmppService getInstanceByParams(JsonNode params) {
+	public static XmppService getInstanceByParams(final JsonNode params) {
 		return singleton;
 	}
 	
 	@Override
 	public <T, V> T get(final JsonNode params, final Handler<V> handle,
 			final Class<T> type) {
-		Handler<Receiver> newHandle = XmppTransport.TYPEUTIL.inject(handle);
-		URI address = URI.create(params.get("address").asText());
+		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
+		final URI address = URI.create(params.get("address").asText());
 		Transport result = instances.get(address);
 		
 		if (result == null) {
@@ -62,8 +62,8 @@ public class XmppService implements TransportService {
 	}
 	
 	@Override
-	public void delete(Transport instance) {
-		instances.remove(instance.getAddress());	
+	public void delete(final Transport instance) {
+		instances.remove(instance.getAddress());
 	}
 	
 }

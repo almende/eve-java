@@ -10,8 +10,8 @@ package com.almende.eve.capabilities.handler;
  * @param <T>
  *            the generic type
  */
-public class SimpleHandler<T>  implements Handler<T> {
-	private T referent = null;
+public class SimpleHandler<T> implements Handler<T> {
+	private T	referent	= null;
 	
 	/**
 	 * Instantiates a new simple handler.
@@ -19,7 +19,7 @@ public class SimpleHandler<T>  implements Handler<T> {
 	 * @param referent
 	 *            the referent
 	 */
-	public SimpleHandler(final T referent){
+	public SimpleHandler(final T referent) {
 		this.referent = referent;
 	}
 	
@@ -27,7 +27,7 @@ public class SimpleHandler<T>  implements Handler<T> {
 	public T get() {
 		return referent;
 	}
-
+	
 	@Override
 	public void update(final Handler<T> newHandler) {
 		this.referent = newHandler.get();

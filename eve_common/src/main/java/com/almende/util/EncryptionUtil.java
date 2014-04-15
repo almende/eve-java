@@ -21,8 +21,6 @@ import javax.crypto.spec.PBEParameterSpec;
 
 import org.apache.commons.codec.binary.Base64;
 
-
-
 /**
  * Utility to encrypt text/passwords
  * 
@@ -51,7 +49,7 @@ public final class EncryptionUtil {
 											+ "which should definetely NOT be stored in the code!")
 											.toCharArray();
 	
-	private static final String ENC = "PBEWithMD5AndDES";
+	private static final String	ENC	= "PBEWithMD5AndDES";
 	
 	/** salt */
 	private static final byte[]	S	= { (byte) 0xc7, (byte) 0x73, (byte) 0x21,
@@ -90,8 +88,7 @@ public final class EncryptionUtil {
 			UnsupportedEncodingException {
 		final PBEParameterSpec pbeParamSpec = new PBEParameterSpec(S, C);
 		final PBEKeySpec pbeKeySpec = new PBEKeySpec(P);
-		final SecretKeyFactory keyFac = SecretKeyFactory
-				.getInstance(ENC);
+		final SecretKeyFactory keyFac = SecretKeyFactory.getInstance(ENC);
 		final SecretKey pbeKey = keyFac.generateSecret(pbeKeySpec);
 		
 		final Cipher pbeCipher = Cipher.getInstance(ENC);
@@ -131,14 +128,14 @@ public final class EncryptionUtil {
 			BadPaddingException, UnsupportedEncodingException {
 		final PBEParameterSpec pbeParamSpec = new PBEParameterSpec(S, C);
 		final PBEKeySpec pbeKeySpec = new PBEKeySpec(P);
-		final SecretKeyFactory keyFac = SecretKeyFactory
-				.getInstance(ENC);
+		final SecretKeyFactory keyFac = SecretKeyFactory.getInstance(ENC);
 		final SecretKey pbeKey = keyFac.generateSecret(pbeKeySpec);
 		
 		final Cipher pbeCipher = Cipher.getInstance(ENC);
 		pbeCipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParamSpec);
 		
-		final byte[] text = pbeCipher.doFinal(Base64.decodeBase64(encryptedText));
+		final byte[] text = pbeCipher.doFinal(Base64
+				.decodeBase64(encryptedText));
 		return new String(text, "UTF-8").intern();
 	}
 }

@@ -4,7 +4,6 @@
  */
 package com.almende.eve.agent;
 
-
 /**
  * The Class Agent.
  * 
@@ -12,5 +11,4 @@ package com.almende.eve.agent;
  */
 public class Agent {
 	
-
 }

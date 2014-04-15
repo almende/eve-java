@@ -28,16 +28,20 @@ public class TokenRet {
 	
 	/**
 	 * Instantiates a new token ret.
-	 *
-	 * @param token the token
-	 * @param time the time
+	 * 
+	 * @param token
+	 *            the token
+	 * @param time
+	 *            the time
 	 */
 	public TokenRet(final String token, final DateTime time) {
 		this.token = token;
 		this.time = time.toString();
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -52,7 +56,7 @@ public class TokenRet {
 	
 	/**
 	 * Gets the token.
-	 *
+	 * 
 	 * @return the token
 	 */
 	public String getToken() {
@@ -61,8 +65,9 @@ public class TokenRet {
 	
 	/**
 	 * Sets the token.
-	 *
-	 * @param token the new token
+	 * 
+	 * @param token
+	 *            the new token
 	 */
 	public void setToken(final String token) {
 		this.token = token;
@@ -70,7 +75,7 @@ public class TokenRet {
 	
 	/**
 	 * Gets the time.
-	 *
+	 * 
 	 * @return the time
 	 */
 	public String getTime() {
@@ -79,8 +84,9 @@ public class TokenRet {
 	
 	/**
 	 * Sets the time.
-	 *
-	 * @param time the new time
+	 * 
+	 * @param time
+	 *            the new time
 	 */
 	public void setTime(final String time) {
 		this.time = time;

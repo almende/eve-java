@@ -21,7 +21,7 @@ public class ThreadPool {
 	 * 
 	 * @return the pool
 	 */
-	public static ExecutorService getPool(){
+	public static ExecutorService getPool() {
 		return pool;
 	}
 	
@@ -31,9 +31,9 @@ public class ThreadPool {
 	 * @param factory
 	 *            the new factory
 	 */
-	public static void setFactory(ThreadFactory factory){
-		ThreadPool.factory=factory;
+	public static void setFactory(final ThreadFactory factory) {
+		ThreadPool.factory = factory;
 		pool.shutdownNow();
-		pool	= Executors.newCachedThreadPool(factory);
+		pool = Executors.newCachedThreadPool(factory);
 	}
 }

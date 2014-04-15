@@ -17,8 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class TypeUtil.
- *
- * @param <T> the generic type
+ * 
+ * @param <T>
+ *            the generic type
  */
 public abstract class TypeUtil<T> {
 	static final Logger		LOG	= Logger.getLogger(TypeUtil.class.getName());
@@ -44,7 +45,7 @@ public abstract class TypeUtil<T> {
 	
 	/**
 	 * Gets the type.
-	 *
+	 * 
 	 * @return the {@link TypeUtil} value's type
 	 */
 	public Type getType() {
@@ -53,8 +54,9 @@ public abstract class TypeUtil<T> {
 	
 	/**
 	 * Inject.
-	 *
-	 * @param value the value
+	 * 
+	 * @param value
+	 *            the value
 	 * @return the t
 	 */
 	public T inject(final Object value) {
@@ -63,10 +65,13 @@ public abstract class TypeUtil<T> {
 	
 	/**
 	 * Inject.
-	 *
-	 * @param <T> the generic type
-	 * @param value the value
-	 * @param type the type
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param value
+	 *            the value
+	 * @param type
+	 *            the type
 	 * @return the t
 	 */
 	public static <T> T inject(final Object value, final Class<T> type) {
@@ -75,10 +80,13 @@ public abstract class TypeUtil<T> {
 	
 	/**
 	 * Inject.
-	 *
-	 * @param <T> the generic type
-	 * @param value the value
-	 * @param type the type
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param value
+	 *            the value
+	 * @param type
+	 *            the type
 	 * @return the t
 	 */
 	public static <T> T inject(final Object value, final Type type) {
@@ -87,10 +95,13 @@ public abstract class TypeUtil<T> {
 	
 	/**
 	 * Inject.
-	 *
-	 * @param <T> the generic type
-	 * @param value the value
-	 * @param fullType the full type
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param value
+	 *            the value
+	 * @param fullType
+	 *            the full type
 	 * @return the t
 	 */
 	@SuppressWarnings("unchecked")
@@ -109,8 +120,9 @@ public abstract class TypeUtil<T> {
 			try {
 				return mapper.convertValue(value, fullType);
 			} catch (final Exception e) {
-				ClassCastException cce = new ClassCastException("Failed to convert value:" + value
-						+ " -----> " + fullType);
+				final ClassCastException cce = new ClassCastException(
+						"Failed to convert value:" + value + " -----> "
+								+ fullType);
 				cce.initCause(e);
 				throw cce;
 			}

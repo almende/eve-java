@@ -80,7 +80,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @param service
 	 */
 	public ConcurrentJsonFileState(final String agentId, final String filename,
-			FileStateService service) {
+			final FileStateService service) {
 		super(agentId, service);
 		this.filename = filename;
 		om = JOM.getInstance();

@@ -13,14 +13,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *            the generic type
  */
 public class WakeHandler<T> implements Handler<T> {
-	private T		referent	= null;
-	private Object	wakeLock	= new Object();
-	private String	wakeKey		= null;
+	private T				referent	= null;
+	private final Object	wakeLock	= new Object();
+	private String			wakeKey		= null;
 	
 	/**
 	 * Instantiates a new wake handler.
 	 */
-	public WakeHandler(){}
+	public WakeHandler() {
+	}
 	
 	/**
 	 * Instantiates a new wake handler.
@@ -39,11 +40,13 @@ public class WakeHandler<T> implements Handler<T> {
 	@JsonIgnore
 	public synchronized T get() {
 		while (referent == null) {
-			//TODO: call Wake service with wakeKey. Currently it will deadlock:)
+			// TODO: call Wake service with wakeKey. Currently it will
+			// deadlock:)
 			
 			try {
 				wakeLock.wait();
-			} catch (InterruptedException e) {}
+			} catch (final InterruptedException e) {
+			}
 		}
 		return referent;
 	}
@@ -52,14 +55,14 @@ public class WakeHandler<T> implements Handler<T> {
 	public void update(final Handler<T> newHandler) {
 		this.referent = newHandler.get();
 		
-		//Can this be done in a cleaner way? 
-		if (newHandler instanceof WakeHandler){
-			WakeHandler<T> other = (WakeHandler<T>) newHandler;
+		// Can this be done in a cleaner way?
+		if (newHandler instanceof WakeHandler) {
+			final WakeHandler<T> other = (WakeHandler<T>) newHandler;
 			this.wakeKey = other.getWakeKey();
 			wakeLock.notifyAll();
 		}
 	}
-
+	
 	/**
 	 * Gets the wake key.
 	 * 
@@ -68,7 +71,7 @@ public class WakeHandler<T> implements Handler<T> {
 	public String getWakeKey() {
 		return wakeKey;
 	}
-
+	
 	/**
 	 * Sets the wake key.
 	 * 

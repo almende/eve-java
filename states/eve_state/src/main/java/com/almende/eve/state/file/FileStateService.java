@@ -36,7 +36,7 @@ public class FileStateService implements StateService {
 	 * @param params
 	 *            the params
 	 */
-	public FileStateService(JsonNode params) {
+	public FileStateService(final JsonNode params) {
 		if (params.has("json")) {
 			json = params.get("json").asBoolean();
 		}
@@ -251,23 +251,28 @@ public class FileStateService implements StateService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static FileStateService getInstanceByParams(JsonNode params) {
-		//TODO: add cache, keyed on path, JSON & multilevel. 
+	public static FileStateService getInstanceByParams(final JsonNode params) {
+		// TODO: add cache, keyed on path, JSON & multilevel.
 		return new FileStateService(params);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, java.lang.invoke.MethodHandle, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * .JsonNode, java.lang.invoke.MethodHandle, java.lang.Class)
 	 */
 	@Override
-	public <T,V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
-		String agentId = params.get("id").asText();
+	public <T, V> T get(final JsonNode params, final Handler<V> handle,
+			final Class<T> type) {
+		final String agentId = params.get("id").asText();
 		if (exists(agentId)) {
 			return TypeUtil.inject(get(agentId, json), type);
 		} else {
 			try {
-				return TypeUtil.inject(create(agentId, json),type);
-			} catch (IOException e) {
+				return TypeUtil.inject(create(agentId, json), type);
+			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Couldn't create state file", e);
 			}
 		}
@@ -275,8 +280,8 @@ public class FileStateService implements StateService {
 	}
 	
 	@Override
-	public void delete(State instance) {
-		String agentId = instance.getAgentId();
+	public void delete(final State instance) {
+		final String agentId = instance.getAgentId();
 		final File file = new File(getFilename(agentId));
 		if (file.exists()) {
 			file.delete();

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class ZmqService.
  */
 public class ZmqService implements TransportService {
-	private Map<URI, Transport>		instances	= new ConcurrentHashMap<URI, Transport>();
+	private final Map<URI, Transport>		instances	= new ConcurrentHashMap<URI, Transport>();
 	private static final ZmqService	singleton	= new ZmqService();
 	
 	/**
@@ -29,7 +29,7 @@ public class ZmqService implements TransportService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static ZmqService getInstanceByParams(JsonNode params) {
+	public static ZmqService getInstanceByParams(final JsonNode params) {
 		return singleton;
 	}
 	
@@ -41,9 +41,9 @@ public class ZmqService implements TransportService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
-		Handler<Receiver> newHandle = ZmqTransport.TYPEUTIL.inject(handle);
-		URI address = URI.create(params.get("address").asText());
+	public <T, V> T get(final JsonNode params, final Handler<V> handle, final Class<T> type) {
+		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
+		final URI address = URI.create(params.get("address").asText());
 		Transport result = instances.get(address);
 		
 		if (result == null) {
@@ -54,7 +54,7 @@ public class ZmqService implements TransportService {
 		}
 		return TypeUtil.inject(result, type);
 	}
-		
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -63,8 +63,8 @@ public class ZmqService implements TransportService {
 	 * .Transport)
 	 */
 	@Override
-	public void delete(Transport instance) {
-		instances.remove(instance.getAddress());	
+	public void delete(final Transport instance) {
+		instances.remove(instance.getAddress());
 	}
 	
 }

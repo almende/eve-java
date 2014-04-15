@@ -176,9 +176,10 @@ public final class Hex {
 	 * <p>
 	 * Returns 0 if the {@link CharSequence} does not contain any interesting
 	 * characters.
-	 *
-	 * @param s the {@link CharSequence} to extract a <code>long</code> from,
-	 * may not be <code>null</code>
+	 * 
+	 * @param s
+	 *            the {@link CharSequence} to extract a <code>long</code> from,
+	 *            may not be <code>null</code>
 	 * @return a <code>long</code>
 	 */
 	public static long parseLong(final CharSequence s) {
@@ -211,9 +212,10 @@ public final class Hex {
 	 * <p>
 	 * Returns 0 if the {@link CharSequence} does not contain any interesting
 	 * characters.
-	 *
-	 * @param s the {@link CharSequence} to extract a <code>short</code> from,
-	 * may not be <code>null</code>
+	 * 
+	 * @param s
+	 *            the {@link CharSequence} to extract a <code>short</code> from,
+	 *            may not be <code>null</code>
 	 * @return a <code>short</code>
 	 */
 	public static short parseShort(final String s) {

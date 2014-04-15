@@ -28,7 +28,7 @@ public class ObjectCache {
 	 * @param config
 	 *            the config
 	 */
-	protected ObjectCache(final String label, final Map<String,Object> config) {
+	protected ObjectCache(final String label, final Map<String, Object> config) {
 		if (config != null) {
 			configCache(config);
 		}
@@ -66,9 +66,9 @@ public class ObjectCache {
 	 * @param config
 	 *            the config
 	 */
-	public void configCache(final Map<String,Object> config) {
+	public void configCache(final Map<String, Object> config) {
 		synchronized (cache) {
-			final Integer max = (Integer)config.get("maxSize");
+			final Integer max = (Integer) config.get("maxSize");
 			if (max != null) {
 				maxSize = max;
 			}

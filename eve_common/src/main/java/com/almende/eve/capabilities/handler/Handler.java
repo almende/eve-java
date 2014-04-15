@@ -4,7 +4,6 @@
  */
 package com.almende.eve.capabilities.handler;
 
-
 /**
  * The Interface Handler.
  * 
@@ -12,9 +11,10 @@ package com.almende.eve.capabilities.handler;
  *            the generic type
  */
 public interface Handler<T> {
-
+	
 	/**
-	 * Gets the wrapped handler object, if not found: triggers wake process and waits for signal from update().
+	 * Gets the wrapped handler object, if not found: triggers wake process and
+	 * waits for signal from update().
 	 * 
 	 * @return the t
 	 */

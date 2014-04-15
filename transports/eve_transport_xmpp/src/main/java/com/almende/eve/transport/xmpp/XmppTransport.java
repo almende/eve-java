@@ -49,13 +49,13 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 */
 	public <V> XmppTransport(final JsonNode params,
 			final Handler<Receiver> handle, final TransportService service) {
-		//TODO: support more parameter structures.
+		// TODO: support more parameter structures.
 		super(URI.create(params.get("address").asText()), handle, service);
 		
-		URI address = super.getAddress();
+		final URI address = super.getAddress();
 		host = address.getHost();
 		port = address.getPort();
-		if (port < 0){
+		if (port < 0) {
 			port = 5222;
 		}
 		username = address.getUserInfo();
@@ -67,7 +67,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	}
 	
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
 		if (!isConnected()) {
 			connect();
@@ -86,7 +86,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	}
 	
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
 		send(receiverUri, Base64.encodeBase64String(message), tag);
 	}
@@ -101,7 +101,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			// this is a reconnect.
 			disconnect();
 		}
-		LOG.warning("Reconnect called:"+toString());
+		LOG.warning("Reconnect called:" + toString());
 		// configure and connect
 		final ConnectionConfiguration connConfig = new ConnectionConfiguration(
 				host, port, serviceName);
@@ -209,7 +209,8 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	}
 	
 	@Override
-	public String toString(){
-		return "XmppTransport:"+super.getAddress().toASCIIString()+ " ("+username+"@"+host+":"+port+"/"+resource+")";
+	public String toString() {
+		return "XmppTransport:" + super.getAddress().toASCIIString() + " ("
+				+ username + "@" + host + ":" + port + "/" + resource + ")";
 	}
 }

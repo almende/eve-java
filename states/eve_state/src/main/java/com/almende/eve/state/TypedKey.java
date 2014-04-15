@@ -13,17 +13,19 @@ import com.fasterxml.jackson.databind.JavaType;
 
 /**
  * The Class TypedKey.
- *
- * @param <T> the generic type
+ * 
+ * @param <T>
+ *            the generic type
  */
 public abstract class TypedKey<T> {
 	private final JavaType	valueType;
-	private final String		key;
+	private final String	key;
 	
 	/**
 	 * Instantiates a new typed key.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public TypedKey(final String key) {
 		this.key = key;
@@ -36,7 +38,7 @@ public abstract class TypedKey<T> {
 	
 	/**
 	 * Gets the type.
-	 *
+	 * 
 	 * @return the type
 	 */
 	public JavaType getType() {
@@ -45,14 +47,16 @@ public abstract class TypedKey<T> {
 	
 	/**
 	 * Gets the key.
-	 *
+	 * 
 	 * @return the key
 	 */
 	public String getKey() {
 		return key;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -67,7 +71,9 @@ public abstract class TypedKey<T> {
 		return key.equals(other.key) && valueType.equals(other.valueType);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override

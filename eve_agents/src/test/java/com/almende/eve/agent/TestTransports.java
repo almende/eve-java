@@ -33,12 +33,12 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testXmpp() throws IOException {
-		ObjectNode params = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
 		params.put("address", "xmpp://alex@openid.almende.org/test");
 		params.put("password", "alex");
 		
-		Transport transport = TransportFactory.getTransport(params,
+		final Transport transport = TransportFactory.getTransport(params,
 				new myReceiver());
 		transport.connect();
 		
@@ -47,7 +47,7 @@ public class TestTransports extends TestCase {
 		
 		try {
 			Thread.sleep(10000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 		}
 	}
 	
@@ -58,11 +58,11 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testZmq() throws IOException {
-		ObjectNode params = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transport.zmq.ZmqService");
 		params.put("address", "zmq://tcp://127.0.0.1:5678");
 		
-		Transport transport = TransportFactory.getTransport(params,
+		final Transport transport = TransportFactory.getTransport(params,
 				new myReceiver());
 		transport.connect();
 		
@@ -75,7 +75,7 @@ public class TestTransports extends TestCase {
 	 */
 	public class myReceiver implements Receiver, Handler<Receiver> {
 		@Override
-		public void receive(Object msg, URI senderUrl, String tag) {
+		public void receive(final Object msg, final URI senderUrl, final String tag) {
 			
 			LOG.warning("Received msg:'" + msg + "' from: "
 					+ senderUrl.toASCIIString());
@@ -87,7 +87,7 @@ public class TestTransports extends TestCase {
 		}
 		
 		@Override
-		public void update(Handler<Receiver> newHandler) {
+		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.
 		}
 		

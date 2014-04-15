@@ -56,9 +56,11 @@ public final class ClassUtil {
 	
 	/**
 	 * Check if checkClass has implemented interfaceClass.
-	 *
-	 * @param checkClass the check class
-	 * @param interfaceClass the interface class
+	 * 
+	 * @param checkClass
+	 *            the check class
+	 * @param interfaceClass
+	 *            the interface class
 	 * @return true, if successful
 	 */
 	public static boolean hasInterface(final Class<?> checkClass,
@@ -84,9 +86,11 @@ public final class ClassUtil {
 	
 	/**
 	 * Check if checkClass extends superClass.
-	 *
-	 * @param checkClass the check class
-	 * @param superClass the super class
+	 * 
+	 * @param checkClass
+	 *            the check class
+	 * @param superClass
+	 *            the super class
 	 * @return true, if successful
 	 */
 	public static boolean hasSuperClass(final Class<?> checkClass,
@@ -107,9 +111,11 @@ public final class ClassUtil {
 	/**
 	 * Wraps any primitive type in it's boxed version
 	 * returns other types unmodified.
-	 *
-	 * @param <T> the generic type
-	 * @param c the c
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param c
+	 *            the c
 	 * @return class type
 	 */
 	@SuppressWarnings("unchecked")
@@ -120,9 +126,11 @@ public final class ClassUtil {
 	/**
 	 * Unwraps any boxed type in it's primitive version
 	 * returns other types unmodified.
-	 *
-	 * @param <T> the generic type
-	 * @param c the c
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param c
+	 *            the c
 	 * @return class type
 	 */
 	@SuppressWarnings("unchecked")
@@ -131,19 +139,21 @@ public final class ClassUtil {
 				.get(c) : c;
 	}
 	
-	
 	/**
 	 * Search for method (reflection) which fits the given argument types. Works
 	 * for any combination of
 	 * primitive types, boxed types and normal objects.
-	 *
-	 * @param type Class in which the method is searched
-	 * @param name Method name to search for
-	 * @param parms Class types of the requested arguments
+	 * 
+	 * @param type
+	 *            Class in which the method is searched
+	 * @param name
+	 *            Method name to search for
+	 * @param parms
+	 *            Class types of the requested arguments
 	 * @return Method
 	 * @author PSpeed
-	 * http://stackoverflow.com/questions/1894740/any-solution-for
-	 * -class-getmethod-reflection-and-autoboxing
+	 *         http://stackoverflow.com/questions/1894740/any-solution-for
+	 *         -class-getmethod-reflection-and-autoboxing
 	 */
 	public static Method searchForMethod(final Class<?> type,
 			final String name, final Class<?>[] parms) {
@@ -171,9 +181,11 @@ public final class ClassUtil {
 	
 	/**
 	 * Are types compatible.
-	 *
-	 * @param targets the targets
-	 * @param sources the sources
+	 * 
+	 * @param targets
+	 *            the targets
+	 * @param sources
+	 *            the sources
 	 * @return true, if successful
 	 */
 	public static boolean areTypesCompatible(final Class<?>[] targets,
@@ -232,12 +244,16 @@ public final class ClassUtil {
 	
 	/**
 	 * Clone through serialize.
-	 *
-	 * @param <T> the generic type
-	 * @param t the t
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param t
+	 *            the t
 	 * @return the t
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws ClassNotFoundException the class not found exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> T cloneThroughSerialize(final T t)
@@ -252,10 +268,13 @@ public final class ClassUtil {
 	
 	/**
 	 * Serialize to output stream.
-	 *
-	 * @param ser the ser
-	 * @param os the os
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param ser
+	 *            the ser
+	 * @param os
+	 *            the os
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	private static void serializeToOutputStream(final Serializable ser,
 			final OutputStream os) throws IOException {

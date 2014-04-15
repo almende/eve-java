@@ -20,10 +20,11 @@ public class Config {
 	private static ObjectNode	configTree	= JOM.createObjectNode();
 	
 	static {
-		//Add default memory state:
-		ObjectNode defaultState = JOM.createObjectNode();
-		defaultState.put("class", "com.almende.eve.state.memory.MemoryStateService");
-		addConfig(defaultState,"state", "default"); 
+		// Add default memory state:
+		final ObjectNode defaultState = JOM.createObjectNode();
+		defaultState.put("class",
+				"com.almende.eve.state.memory.MemoryStateService");
+		addConfig(defaultState, "state", "default");
 	}
 	
 	/**
@@ -42,9 +43,9 @@ public class Config {
 	 *            the config path
 	 * @return the config
 	 */
-	public static ObjectNode getConfig(String... configPath) {
+	public static ObjectNode getConfig(final String... configPath) {
 		ObjectNode result = configTree;
-		for (String elem : configPath) {
+		for (final String elem : configPath) {
 			result = (ObjectNode) result.get(elem);
 			if (result == null) {
 				LOG.log(Level.WARNING, "Invalid configuration path given",
@@ -60,8 +61,8 @@ public class Config {
 	 * @param config
 	 *            the config
 	 */
-	public static void addConfig(ObjectNode config){
-		addConfig(config,(String) null);
+	public static void addConfig(final ObjectNode config) {
+		addConfig(config, (String) null);
 	}
 	
 	/**
@@ -72,7 +73,8 @@ public class Config {
 	 * @param configPath
 	 *            the config path
 	 */
-	public static void addConfig(ObjectNode config, String... configPath) {
+	public static void addConfig(final ObjectNode config,
+			final String... configPath) {
 		switch (configPath.length) {
 			case 0:
 				configTree = config.deepCopy();
@@ -85,8 +87,9 @@ public class Config {
 				for (int i = 0; i < configPath.length - 1; i++) {
 					position = position.with(configPath[i]);
 				}
-				position.put(configPath[configPath.length-1], config.deepCopy());
+				position.put(configPath[configPath.length - 1],
+						config.deepCopy());
 		}
 	}
-
+	
 }

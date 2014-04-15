@@ -21,8 +21,8 @@ public interface Capability {
 	 *            the params
 	 * @param handle
 	 *            the handle
-	 * @param type 
+	 * @param type
 	 * @return the t
 	 */
-	<T,V> T get(JsonNode params, Handler<V> handle, Class<T> type); 
+	<T, V> T get(JsonNode params, Handler<V> handle, Class<T> type);
 }

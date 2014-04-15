@@ -14,8 +14,12 @@ import com.fasterxml.jackson.databind.node.NullNode;
 public final class JsonNullAwareDeserializer extends JsonNodeDeserializer {
 	private static final long	serialVersionUID	= 8700330491206317830L;
 	
-	/* (non-Javadoc)
-	 * @see com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer#getNullValue()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer#getNullValue
+	 * ()
 	 */
 	@Override
 	public JsonNode getNullValue() {

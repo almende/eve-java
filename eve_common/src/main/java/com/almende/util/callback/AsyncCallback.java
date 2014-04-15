@@ -6,22 +6,25 @@ package com.almende.util.callback;
 
 /**
  * The Interface AsyncCallback.
- *
- * @param <T> the generic type
+ * 
+ * @param <T>
+ *            the generic type
  */
 public interface AsyncCallback<T> {
 	
 	/**
 	 * On success.
-	 *
-	 * @param result the result
+	 * 
+	 * @param result
+	 *            the result
 	 */
 	void onSuccess(T result);
 	
 	/**
 	 * On failure.
-	 *
-	 * @param exception the exception
+	 * 
+	 * @param exception
+	 *            the exception
 	 */
 	void onFailure(Exception exception);
 }

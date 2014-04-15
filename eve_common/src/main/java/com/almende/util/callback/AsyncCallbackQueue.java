@@ -25,18 +25,19 @@ public class AsyncCallbackQueue<T> {
 																	1,
 																	Executors
 																			.defaultThreadFactory());
-	//FIXME: provide some means for the Appengine implementation of ThreadManager.
+	// FIXME: provide some means for the Appengine implementation of
+	// ThreadManager.
 	
 	static {
 		try {
 			ScheduledThreadPoolExecutor.class.getMethod(
 					"setRemoveOnCancelPolicy", Boolean.class);
 			scheduler.setRemoveOnCancelPolicy(true);
-		} catch (NoSuchMethodException e) {
+		} catch (final NoSuchMethodException e) {
 		}
 	}
 	/** timeout in seconds */
-	private int									timeout		= 30;
+	private final int									timeout		= 30;
 	
 	// TODO: make the timeout customizable in eve.yaml
 	/**

@@ -20,12 +20,15 @@ public final class StringUtil {
 	
 	/**
 	 * Convert a stream to a string.
-	 *
-	 * @param in the in
+	 * 
+	 * @param in
+	 *            the in
 	 * @return the string
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public static String streamToString(final InputStream in) throws IOException {
+	public static String streamToString(final InputStream in)
+			throws IOException {
 		final StringBuffer out = new StringBuffer();
 		final byte[] b = new byte[4096];
 		int n = 0;

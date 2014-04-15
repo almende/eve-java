@@ -7,7 +7,8 @@ package com.almende.eve.transport;
 import java.net.URI;
 
 /**
- * The Interface Receiver, implementations will be able to receive messages from Eve's transport service.
+ * The Interface Receiver, implementations will be able to receive messages from
+ * Eve's transport service.
  */
 public interface Receiver {
 	/**
