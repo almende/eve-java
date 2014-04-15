@@ -35,9 +35,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ZmqTransport extends AbstractTransport {
 	private static final Logger						LOG					= Logger.getLogger(ZmqTransport.class
 																				.getCanonicalName());
-	private final String									zmqUrl;
+	private final String							zmqUrl;
 	private Thread									listeningThread;
-	private final boolean									doesAuthentication	= false;
+	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
 	private static final AsyncCallbackQueue<String>	callbacks			= new AsyncCallbackQueue<String>();
 	
@@ -55,7 +55,9 @@ public class ZmqTransport extends AbstractTransport {
 			final TransportService service) {
 		super(URI.create(params.get("address").asText()), handle, service);
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
-		
+		if (params.has("authenticate")) {
+			doesAuthentication = params.get("authentication").asBoolean();
+		}
 	}
 	
 	/**
@@ -106,8 +108,8 @@ public class ZmqTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final String message,
+			final String tag) throws IOException {
 		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
 				message.getBytes(), tag);
 	}
