@@ -4,384 +4,45 @@
  */
 package com.almende.eve.transport.http;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-
+import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Transport;
-import com.almende.util.ClassUtil;
-import com.almende.util.callback.AsyncCallback;
-import com.almende.util.callback.AsyncCallbackQueue;
-import com.almende.util.threads.ThreadPool;
+import com.almende.eve.transport.TransportService;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * The Class HttpService.
  */
-public class HttpService implements Transport {
-	private static final Logger	LOG			= Logger.getLogger(HttpService.class
-													.getCanonicalName());
-	private String				servletUrl	= null;
-	private final List<String>	protocols	= Arrays.asList("http", "https",
-													"web");
-	
+public class HttpService implements TransportService {
 	
 	/**
-	 * Construct an HttpService
+	 * Gets the instance by params.
 	 * 
 	 * @param params
-	 *            Available parameters: {String} servlet_url
+	 *            the params
+	 * @return the instance by params
 	 */
-	public HttpService(final Map<String, Object> params) {
-		if (params != null) {
-			setServletUrl((String) params.get("servlet_url"));
-			if (params.get("servlet_launcher") != null) {
-				String className = (String) params.get("servlet_launcher");
-				if (className.equals("JettyLauncher")) {
-					className = "com.almende.eve.transport.http.embed.JettyLauncher";
-				}
-				try {
-					final Class<?> launcherClass = Class.forName(className);
-					if (!ClassUtil.hasInterface(launcherClass,
-							ServletLauncher.class)) {
-						throw new IllegalArgumentException(
-								"ServletLauncher class "
-										+ launcherClass.getName()
-										+ " must implement "
-										+ ServletLauncher.class.getName());
-					}
-					
-					ServletLauncher launcher = (ServletLauncher) launcherClass
-							.newInstance();
-					launcher.add(new AgentServlet(this),
-							URI.create(getServletUrl()), params);
-					//FIXME: provide some hierarchical way of providing configuration
-					
-				} catch (Exception e) {
-					LOG.log(Level.WARNING, "Failed to load launcher!", e);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Construct an HttpService This constructor is called when the
-	 * Transport is constructed by the AgentHost.
-	 * 
-	 * @param servletUrl
-	 *            the servlet url
-	 */
-	public HttpService(final String servletUrl) {
-		setServletUrl(servletUrl);
-	}
-	
-	/**
-	 * Set the servlet url for the transport service. This determines the
-	 * mapping between an agentId and agentUrl.
-	 * 
-	 * @param servletUrl
-	 *            the new servlet url
-	 */
-	private void setServletUrl(final String servletUrl) {
-		if (servletUrl == null){
-			LOG.warning("ServletUrl may not be null!");
-		}
-		this.servletUrl = servletUrl;
-		if (!this.servletUrl.endsWith("/")) {
-			this.servletUrl += "/";
-		}
-		final int separator = this.servletUrl.indexOf(':');
-		if (separator != -1) {
-			final String protocol = this.servletUrl.substring(0, separator);
-			if (!protocols.contains(protocol)) {
-				protocols.add(protocol);
-			}
-		}
-	}
-	
-	/**
-	 * Return the configured servlet url corresponding to this transport
-	 * service. The servlet url is loaded from the parameter servlet_url in the
-	 * configuration.
-	 * 
-	 * @return servletUrl
-	 */
-	public String getServletUrl() {
-		return servletUrl;
-	}
-	
-	/**
-	 * Retrieve the protocols supported by the transport service. This can be
-	 * "http" or "https", depending on the configuration.
-	 * 
-	 * @return protocols
-	 */
-	@Override
-	public List<String> getProtocols() {
-		return protocols;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.transport.Transport#sendAsync(java.net.URI,
-	 * java.net.URI, byte[], java.lang.String)
-	 */
-	@Override
-	public void sendAsync(URI senderUri, URI receiverUri, byte[] message,
-			String tag) throws IOException {
-		sendAsync(senderUri, receiverUri, Base64.encodeBase64String(message),
-				tag);
-	}
-	
-	/**
-	 * Send a JSON-RPC request to an agent via HTTP.
-	 * 
-	 * @param senderUrl
-	 *            the sender url
-	 * @param receiverUrl
-	 *            the receiver url
-	 * @param message
-	 *            the message
-	 * @param tag
-	 *            the tag
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	@Override
-	public void sendAsync(final URI senderUrl, final URI receiverUrl,
-			final String message, final String tag) throws IOException {
-		
-		ThreadPool.getPool().execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				HttpPost httpPost = null;
-				try {
-					
-					if (tag != null) {
-						// This is a reply to a synchronous inbound call, get
-						// callback
-						// and use it to send the message
-						final AsyncCallbackQueue<String> callbacks = host
-								.getCallbackQueue("HttpTransport", String.class);
-						if (callbacks != null) {
-							final AsyncCallback<String> callback = callbacks
-									.pull(tag);
-							if (callback != null) {
-								callback.onSuccess(message);
-								return;
-							} else {
-								LOG.warning("Tag set, but no callback found! "
-										+ callback);
-							}
-						} else {
-							LOG.warning("Tag set, but no callbacks found!");
-						}
-						// Chicken out
-						return;
-					}
-					httpPost = new HttpPost(receiverUrl);
-					// invoke via Apache HttpClient request:
-					httpPost.setEntity(new StringEntity(message));
-					
-					// Add token for HTTP handshake
-					httpPost.addHeader("X-Eve-Token", TokenStore.create()
-							.toString());
-					httpPost.addHeader("X-Eve-SenderUrl", senderUrl.toString());
-					final HttpResponse webResp = ApacheHttpClient.get()
-							.execute(httpPost);
-					final String result = EntityUtils.toString(webResp
-							.getEntity());
-					if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-						LOG.warning("Received HTTP Error Status:"+webResp.getStatusLine().getStatusCode()+":"+webResp.getStatusLine().getReasonPhrase());
-						LOG.warning(result);
-					} else {
-						host.receive(getAgentId(senderUrl), result,
-								receiverUrl, null);
-					}
-				} catch (final Exception e) {
-					LOG.log(Level.WARNING,
-							"HTTP roundtrip resulted in exception!", e);
-				} finally {
-					if (httpPost != null) {
-						httpPost.reset();
-					}
-				}
-			}
-		});
-	}
-	
-	/**
-	 * Get the url of an agent from its id.
-	 * 
-	 * @param agentId
-	 *            the agent id
-	 * @return agentUrl
-	 */
-	@Override
-	public URI getAgentUrl(final String agentId) {
-		if (servletUrl != null) {
-			try {
-				try {
-					return new URI(servletUrl
-							+ URLEncoder.encode(agentId, "UTF-8") + "/");
-				} catch (final UnsupportedEncodingException e) {
-					return new URI(servletUrl + agentId + "/");
-				}
-			} catch (URISyntaxException e) {
-				LOG.log(Level.WARNING, "Strange, couldn't generate agentUrl:"
-						+ agentId, e);
-			}
-		}
+	public static HttpService getInstanceByParams(final JsonNode params) {
+		//TODO: return an instance mapped by servlet URL part. Create such Servlet and launch servlet container if needed.
+		//In the case the servlet pre-exists (through web.xml) we need to have a mechanism to let the servlet find us back.nu
 		return null;
 	}
 	
-	/**
-	 * Get the id of an agent from its url. If the id cannot be extracted, null
-	 * is returned. A typical url is "http://myserver.com/agents/agentid/"
-	 * 
-	 * @param agentUri
-	 *            the agent url
-	 * @return agentId
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public String getAgentId(URI agentUri) {
-		if (servletUrl != null) {
-			String agentUrl = agentUri.toString();
-			// add domain when missing
-			final String domain = getDomain(agentUrl);
-			if (domain.equals("")) {
-				// provided url is only containing the path (not the domain)
-				agentUrl = getDomain(servletUrl) + agentUrl;
-			}
-			
-			if (agentUrl.startsWith(servletUrl)) {
-				final int separator = agentUrl
-						.indexOf('/', servletUrl.length());
-				try {
-					if (separator != -1) {
-						return URLDecoder.decode(agentUrl.substring(
-								servletUrl.length(), separator), "UTF-8");
-					} else {
-						return URLDecoder.decode(
-								agentUrl.substring(servletUrl.length()),
-								"UTF-8");
-					}
-				} catch (final UnsupportedEncodingException e) {
-					LOG.log(Level.WARNING, "", e);
-				}
-			}
-		}
-		
+	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	/**
-	 * Get the resource from the end of an agentUrl, for example
-	 * "http://myserver.com/agents/agentid/index.html" will return "index.html"
-	 * The method will return null when the provided url does not match the
-	 * configured url
-	 * 
-	 * @param agentUrl
-	 *            the agent url
-	 * @return the agent resource
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
 	 */
-	public String getAgentResource(String agentUrl) {
-		if (servletUrl != null) {
-			// add domain when missing
-			final String domain = getDomain(agentUrl);
-			if (domain.equals("")) {
-				// provided url is only containing the path (not the domain)
-				agentUrl = getDomain(servletUrl) + agentUrl;
-			}
-			
-			if (agentUrl.startsWith(servletUrl)) {
-				final int separator = agentUrl
-						.indexOf('/', servletUrl.length());
-				if (separator != -1) {
-					return agentUrl.substring(separator + 1);
-				} else {
-					return "";
-				}
-			}
-		}
+	@Override
+	public void delete(Transport instance) {
+		// TODO Auto-generated method stub
 		
-		return null;
-	}
-	
-	/**
-	 * Get the domain part of given url. For example
-	 * "http://localhost:8080/EveCore/agents/testagent/1/" will return
-	 * "http://localhost:8080", and "/EveCore/agents/testagent/1/" will return
-	 * "".
-	 * 
-	 * @param url
-	 *            the url
-	 * @return domain
-	 */
-	public String getDomain(final String url) {
-		final int protocolSeparator = url.indexOf("://");
-		if (protocolSeparator != -1) {
-			final int fromIndex = (protocolSeparator != -1) ? protocolSeparator + 3
-					: 0;
-			final int pathSeparator = url.indexOf('/', fromIndex);
-			if (pathSeparator != -1) {
-				return url.substring(0, pathSeparator);
-			}
-		}
-		return "";
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		final Map<String, Object> data = new HashMap<String, Object>();
-		data.put("class", this.getClass().getName());
-		data.put("servlet_url", servletUrl);
-		data.put("protocols", protocols);
-		return data.toString();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.almende.eve.transport.Transport#reconnect(java.lang.String)
-	 */
-	@Override
-	public void reconnect(final String agentId) {
-		// Nothing todo at this point
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.transport.Transport#getKey()
-	 */
-	@Override
-	public String getKey() {
-		return "http://"
-				+ (getServletUrl() == null ? "outbound" : getServletUrl());
 	}
 	
 }

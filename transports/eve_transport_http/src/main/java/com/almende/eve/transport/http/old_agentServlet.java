@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
+import com.almende.util.ApacheHttpClient;
 import com.almende.util.StreamingUtil;
 import com.almende.util.StringUtil;
 import com.almende.util.callback.AsyncCallbackQueue;
