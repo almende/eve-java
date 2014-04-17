@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jivesoftware.smack.SmackConfiguration;
 
-import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.TypeUtil;

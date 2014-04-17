@@ -19,9 +19,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
-import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
+import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -1,8 +1,11 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.transform;
 
-import java.net.URI;
-
-import com.almende.eve.capabilities.data.Receiver;
-
-public interface Transform extends Receiver {
+/**
+ * The Interface Transform.
+ */
+public interface Transform {
 }

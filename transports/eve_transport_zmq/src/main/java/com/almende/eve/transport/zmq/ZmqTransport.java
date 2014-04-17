@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 
 import org.zeromq.ZMQ.Socket;
 
-import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
+import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.almende.eve.transport.tokens.TokenRet;
 import com.almende.eve.transport.tokens.TokenStore;
