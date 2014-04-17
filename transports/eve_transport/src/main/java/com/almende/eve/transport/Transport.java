@@ -7,6 +7,7 @@ package com.almende.eve.transport;
 import java.io.IOException;
 import java.net.URI;
 
+import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.TypeUtil;
 

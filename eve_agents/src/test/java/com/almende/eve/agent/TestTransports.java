@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.jackson.JOM;

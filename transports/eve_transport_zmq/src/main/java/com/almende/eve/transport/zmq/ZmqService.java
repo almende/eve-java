@@ -8,8 +8,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.almende.eve.capabilities.data.Receiver;
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.TypeUtil;
