@@ -21,12 +21,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * be woken when the system reboots, WakeHandlers are called, etc.
  */
 public class WakeService {
-	private static final Logger	LOG			= Logger.getLogger(WakeService.class
-													.getName());
-	private ObjectNode			myParams	= null;
-	private Map<String, Entry>	agents		= new HashMap<String, Entry>();
+	private static final Logger		LOG			= Logger.getLogger(WakeService.class
+														.getName());
+	private ObjectNode				myParams	= null;
+	private Map<String, WakeEntry>	agents		= new HashMap<String, WakeEntry>();
 	
-	private State				state		= null;
+	private State					state		= null;
 	
 	/**
 	 * Instantiates a new wake service.
@@ -67,14 +67,37 @@ public class WakeService {
 	}
 	
 	/**
+	 * Boot.
+	 */
+	@JsonIgnore
+	public void boot() {
+		load();
+		for (WakeEntry entry : agents.values()) {
+			wake(entry.getWakeKey(), true);
+		}
+	}
+	
+	/**
 	 * Wake.
 	 * 
 	 * @param wakeKey
 	 *            the wake key
 	 */
-	@JsonIgnore
 	public void wake(final String wakeKey) {
-		Entry entry = agents.get(wakeKey);
+		wake(wakeKey, false);
+	}
+	
+	/**
+	 * Wake.
+	 * 
+	 * @param wakeKey
+	 *            the wake key
+	 * @param onBoot
+	 *            the on boot
+	 */
+	@JsonIgnore
+	public void wake(final String wakeKey, boolean onBoot) {
+		WakeEntry entry = agents.get(wakeKey);
 		if (entry == null) {
 			// Retry from file
 			load();
@@ -91,7 +114,7 @@ public class WakeService {
 						+ wakeKey + "'", e);
 			}
 			if (instance != null) {
-				instance.wake(wakeKey);
+				instance.wake(wakeKey, onBoot);
 			}
 		} else {
 			LOG.warning("Sorry, I don't know any Wakeable called:'" + wakeKey
@@ -109,7 +132,7 @@ public class WakeService {
 	 */
 	@JsonIgnore
 	public void register(String wakeKey, String className) {
-		final Entry entry = new Entry(wakeKey, className);
+		final WakeEntry entry = new WakeEntry(wakeKey, className);
 		agents.put(wakeKey, entry);
 		store();
 	}
@@ -129,7 +152,7 @@ public class WakeService {
 	public void load() {
 		if (state != null) {
 			agents = state.get("agents",
-					new TypeUtil<HashMap<String, Entry>>() {
+					new TypeUtil<HashMap<String, WakeEntry>>() {
 					});
 		}
 	}
@@ -139,7 +162,7 @@ public class WakeService {
 	 * 
 	 * @return the agents
 	 */
-	public Map<String, Entry> getAgents() {
+	public Map<String, WakeEntry> getAgents() {
 		return agents;
 	}
 	
@@ -149,72 +172,8 @@ public class WakeService {
 	 * @param agents
 	 *            the agents
 	 */
-	public void setAgents(Map<String, Entry> agents) {
+	public void setAgents(Map<String, WakeEntry> agents) {
 		this.agents = agents;
 	}
 	
-	/**
-	 * The Class Entry.
-	 */
-	public class Entry {
-		private String	wakeKey		= null;
-		private String	className	= null;
-		
-		/**
-		 * Instantiates a new entry.
-		 */
-		public Entry() {
-		}
-		
-		/**
-		 * Instantiates a new entry.
-		 * 
-		 * @param wakeKey
-		 *            the wake key
-		 * @param className
-		 *            the class name
-		 */
-		public Entry(String wakeKey, String className) {
-			this.wakeKey = wakeKey;
-			this.className = className;
-		}
-		
-		/**
-		 * Gets the wake key.
-		 * 
-		 * @return the wake key
-		 */
-		public String getWakeKey() {
-			return wakeKey;
-		}
-		
-		/**
-		 * Sets the wake key.
-		 * 
-		 * @param wakeKey
-		 *            the new wake key
-		 */
-		public void setWakeKey(final String wakeKey) {
-			this.wakeKey = wakeKey;
-		}
-		
-		/**
-		 * Gets the className.
-		 * 
-		 * @return the className
-		 */
-		public String getClassName() {
-			return className;
-		}
-		
-		/**
-		 * Sets the className.
-		 * 
-		 * @param className
-		 *            the new className
-		 */
-		public void setClassName(final String className) {
-			this.className = className;
-		}
-	}
 }

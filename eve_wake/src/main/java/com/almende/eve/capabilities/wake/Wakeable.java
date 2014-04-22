@@ -5,7 +5,8 @@
 package com.almende.eve.capabilities.wake;
 
 /**
- * The Interface Wakeable. Objects implementing this interface can be woken by the WakeService.
+ * The Interface Wakeable. Objects implementing this interface can be woken by
+ * the WakeService.
  */
 public interface Wakeable {
 	
@@ -14,6 +15,9 @@ public interface Wakeable {
 	 * 
 	 * @param wakeKey
 	 *            the wake key
+	 * @param onBoot
+	 *            the onBoot flag, set to true if this wake came from
+	 *            WakeService.boot(). False in all other cases.
 	 */
-	void wake(String wakeKey);
+	void wake(String wakeKey, boolean onBoot);
 }

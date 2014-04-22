@@ -15,28 +15,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class TestWake.
  */
-public class TestWake extends TestCase {
+public class TestBoot extends TestCase {
 	
 	/**
 	 * Test wake.
 	 */
 	@Test
-	public void testWake() {
+	public void testBoot() {
 		ObjectNode params = JOM.createObjectNode();
 		ObjectNode state = JOM.createObjectNode();
 		state.put("class", "com.almende.eve.state.file.FileStateService");
 		state.put("json", true);
-		state.put("path",".wakeservices");
-		state.put("id","testWakeService");
+		state.put("path", ".wakeservices");
+		state.put("id", "testWakeService");
 		params.put("state", state);
 		
-		final WakeService	ws	= new WakeService(params);
-		
-			// Create agent without external references, hopefully!
-		new MyAgent("testWakeAgent", ws).init();
-		// Try to get rid of the agent instance from memory
-		System.gc();
-		System.gc();
+		final WakeService ws = new WakeService(params);
+		ws.boot();
 		
 		// Sleep for 10seconds, allowing external XMPP call.
 		try {

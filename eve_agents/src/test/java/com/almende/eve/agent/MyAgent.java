@@ -22,20 +22,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class MyAgent.
  */
 public class MyAgent implements Wakeable, Receiver {
-	private static final Logger			LOG			= Logger.getLogger(TestWake.class
-															.getName());
-	private static final WakeService	ws			= new WakeService();
-	private Transport					transport	= null;
-	final ObjectNode					params		= JOM.createObjectNode();
+	private static final Logger	LOG			= Logger.getLogger(TestWake.class
+													.getName());
+	private WakeService			ws			= new WakeService();
+	private Transport			transport	= null;
+	private String				wakeKey		= null;
 	
 	/**
 	 * Instantiates a new my agent.
 	 */
 	public MyAgent() {
-		
-		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
-		params.put("address", "xmpp://alex@openid.almende.org/test");
-		params.put("password", "alex");
+	}
+	
+	/**
+	 * Instantiates a new my agent.
+	 * 
+	 * @param wakeKey
+	 *            the wake key
+	 * @param ws
+	 *            the ws
+	 */
+	public MyAgent(String wakeKey, WakeService ws) {
+		this.wakeKey = wakeKey;
+		if (ws != null) {
+			this.ws = ws;
+		}
 		
 	}
 	
@@ -43,10 +54,14 @@ public class MyAgent implements Wakeable, Receiver {
 	 * Inits the agent.
 	 */
 	public void init() {
-		ws.register("TestAgent", MyAgent.class.getName());
+		ws.register(this.wakeKey, MyAgent.class.getName());
 		
+		final ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
+		params.put("address", "xmpp://alex@openid.almende.org/" + this.wakeKey);
+		params.put("password", "alex");
 		transport = TransportFactory.getTransport(params,
-				new WakeHandler<Receiver>(this, "TestAgent", ws));
+				new WakeHandler<Receiver>(this, this.wakeKey, ws));
 		try {
 			transport.connect();
 			transport.send(URI.create("xmpp:gloria@openid.almende.org"),
@@ -57,10 +72,22 @@ public class MyAgent implements Wakeable, Receiver {
 	}
 	
 	@Override
-	public void wake(String wakeKey) {
+	public void wake(String wakeKey, boolean onBoot) {
+		this.wakeKey = wakeKey;
+		final ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
+		params.put("address", "xmpp://alex@openid.almende.org/" + this.wakeKey);
+		params.put("password", "alex");
 		transport = TransportFactory.getTransport(params,
-				new WakeHandler<Receiver>(this, wakeKey, ws));
+				new WakeHandler<Receiver>(this, this.wakeKey, ws));
 		
+		if (onBoot) {
+			try {
+				transport.connect();
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "Failed to connect XMPP.", e);
+			}
+		}
 	}
 	
 	@Override
