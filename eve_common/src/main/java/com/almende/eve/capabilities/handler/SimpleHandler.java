@@ -38,5 +38,10 @@ public class SimpleHandler<T> implements Handler<T> {
 	public void update(final Handler<T> newHandler) {
 		this.referent = newHandler.get();
 	}
+
+	@Override
+	public String getKey() {
+		return null;
+	}
 	
 }

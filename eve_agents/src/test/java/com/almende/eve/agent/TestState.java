@@ -32,7 +32,6 @@ public class TestState extends TestCase {
 		params.put("json", false);
 		Config.addConfig(params, "state", "fileTest");
 		
-		System.out.println(Config.getConfig());
 	}
 	
 	/**

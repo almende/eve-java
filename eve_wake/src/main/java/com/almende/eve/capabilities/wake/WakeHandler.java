@@ -2,8 +2,11 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.capabilities.handler;
+package com.almende.eve.capabilities.wake;
 
+import java.lang.ref.WeakReference;
+
+import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -13,9 +16,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *            the generic type
  */
 public class WakeHandler<T> implements Handler<T> {
-	private T				referent	= null;
-	private final Object	wakeLock	= new Object();
-	private String			wakeKey		= null;
+	private WeakReference<T>	referent	= null;
+	private final Object		wakeLock	= new Object();
+	private String				wakeKey		= null;
+	private WakeService			service		= null;
 	
 	/**
 	 * Instantiates a new wake handler.
@@ -30,42 +34,55 @@ public class WakeHandler<T> implements Handler<T> {
 	 *            the referent
 	 * @param wakeKey
 	 *            the wake key
+	 * @param service
+	 *            the wake service where this referent is registered.
 	 */
-	public WakeHandler(final T referent, final String wakeKey) {
-		this.referent = referent;
+	public WakeHandler(final T referent, final String wakeKey,
+			final WakeService service) {
+		this.referent = new WeakReference<T>(referent);
 		this.setWakeKey(wakeKey);
+		this.service = service;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.capabilities.handler.Handler#get()
 	 */
 	@Override
 	@JsonIgnore
-	public synchronized T get() {
-		while (referent == null) {
-			// TODO: call Wake service with wakeKey. Currently it will
-			// deadlock:)
-			
-			try {
-				wakeLock.wait();
-			} catch (final InterruptedException e) {
+	public T get() {
+		if (referent.get() == null) {
+			service.wake(getWakeKey());
+		}
+		while (referent.get() == null) {
+			synchronized (wakeLock) {
+				try {
+					wakeLock.wait();
+				} catch (final InterruptedException e) {
+				}
 			}
 		}
-		return referent;
+		return referent.get();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.capabilities.handler.Handler)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.
+	 * capabilities.handler.Handler)
 	 */
 	@Override
 	public void update(final Handler<T> newHandler) {
-		this.referent = newHandler.get();
+		this.referent = new WeakReference<T>(newHandler.get());
 		
 		// Can this be done in a cleaner way?
 		if (newHandler instanceof WakeHandler) {
 			final WakeHandler<T> other = (WakeHandler<T>) newHandler;
 			this.wakeKey = other.getWakeKey();
-			wakeLock.notifyAll();
+			synchronized (wakeLock) {
+				wakeLock.notifyAll();
+			}
 		}
 	}
 	
@@ -86,6 +103,11 @@ public class WakeHandler<T> implements Handler<T> {
 	 */
 	public void setWakeKey(final String wakeKey) {
 		this.wakeKey = wakeKey;
+	}
+	
+	@Override
+	public String getKey() {
+		return wakeKey;
 	}
 	
 }

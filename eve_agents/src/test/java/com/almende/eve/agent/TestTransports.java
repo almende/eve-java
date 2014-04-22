@@ -102,6 +102,12 @@ public class TestTransports extends TestCase {
 		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.
 		}
+
+		@Override
+		public String getKey() {
+			// Not used, data should be the same.
+			return null;
+		}
 		
 	}
 }

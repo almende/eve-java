@@ -245,4 +245,13 @@ public class RpcTransform implements Transform {
 		}
 		return request;
 	}
+
+	/**
+	 * Gets the handle.
+	 * 
+	 * @return the handle
+	 */
+	public Handler<Object> getHandle() {
+		return destination;
+	}
 }

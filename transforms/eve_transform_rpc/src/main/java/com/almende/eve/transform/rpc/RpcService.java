@@ -4,6 +4,8 @@
  */
 package com.almende.eve.transform.rpc;
 
+import java.util.HashMap;
+
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transform.TransformService;
 import com.almende.util.TypeUtil;
@@ -13,8 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class RpcService.
  */
 public class RpcService implements TransformService {
-	private static final RpcService	singleton	= new RpcService();
-	private static final TypeUtil<Handler<Object>> TYPEUTIL = new TypeUtil<Handler<Object>>(){};
+	private static final RpcService						singleton	= new RpcService();
+	private static final TypeUtil<Handler<Object>>		TYPEUTIL	= new TypeUtil<Handler<Object>>() {
+																	};
+	private static final HashMap<String, RpcTransform>	instances	= new HashMap<String, RpcTransform>();
+	
 	/**
 	 * Gets the instance by params.
 	 * 
@@ -26,12 +31,27 @@ public class RpcService implements TransformService {
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
 	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
-		return TypeUtil.inject(new RpcTransform(params, TYPEUTIL.inject(handle), this), type);
+		RpcTransform result;
+		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
+			result = instances.get(handle.getKey());
+			Handler<Object> oldHandle = result.getHandle();
+			oldHandle.update(TYPEUTIL.inject(handle));
+		} else {
+			result = new RpcTransform(params, TYPEUTIL.inject(handle), this);
+		}
+		if (handle.getKey() != null) {
+			instances.put(handle.getKey(), result);
+		}
+		return TypeUtil.inject(result, type);
 	}
 	
 }
