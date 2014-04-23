@@ -115,7 +115,7 @@ public final class ApacheHttpClient {
 	 * 
 	 * @return the default http client
 	 */
-	static DefaultHttpClient get() {
+	public static DefaultHttpClient get() {
 		return httpClient;
 	}
 	

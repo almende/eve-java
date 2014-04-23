@@ -5,9 +5,10 @@
 package com.almende.eve.transport.http;
 
 import java.net.URI;
-import java.util.Map;
 
 import javax.servlet.Servlet;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
@@ -30,5 +31,5 @@ public interface ServletLauncher {
 	 * @param config
 	 *            the config
 	 */
-	void add(final Servlet servlet, final URI servletPath, final Map<String,Object> config);
+	void add(final Servlet servlet, final URI servletPath, final JsonNode config);
 }

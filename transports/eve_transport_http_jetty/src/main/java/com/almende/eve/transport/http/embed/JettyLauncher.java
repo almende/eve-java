@@ -5,8 +5,6 @@
 package com.almende.eve.transport.http.embed;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +15,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.almende.eve.transport.http.ServletLauncher;
+import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * The Class JettyLauncher.
@@ -33,10 +33,10 @@ public class JettyLauncher implements ServletLauncher {
 	 * @param params
 	 *            the params
 	 */
-	public void initServer(final Map<String, Object> params) {
+	public void initServer(final JsonNode params) {
 		int port = 8080;
-		if (params != null && params.containsKey("port")) {
-			port = (Integer)params.get("port");
+		if (params != null && params.has("port")) {
+			port = params.get("port").asInt();
 		}
 		server = new Server(port);
 		context = new ServletContextHandler(ServletContextHandler.SESSIONS|ServletContextHandler.NO_SECURITY);
@@ -54,15 +54,14 @@ public class JettyLauncher implements ServletLauncher {
 	/* (non-Javadoc)
 	 * @see com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet, java.net.URI, com.almende.eve.config.Config)
 	 */
-	@SuppressWarnings("unchecked")
 	public void add(final Servlet servlet, final URI servletPath,
-			final Map<String, Object> config) {
+			final JsonNode config) {
 		//TODO: config hierarchy...
 		if (server == null) {
 			if (config != null) {
-				initServer((Map<String, Object>) config.get("jetty"));
+				initServer(config.get("jetty"));
 			} else {
-				initServer(new HashMap<String, Object>());
+				initServer(JOM.createObjectNode());
 			}
 		}
 		LOG.info("Registering servlet:" + servletPath.getPath());

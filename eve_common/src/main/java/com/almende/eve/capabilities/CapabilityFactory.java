@@ -44,7 +44,12 @@ public abstract class CapabilityFactory {
 						JsonNode.class);
 				final Capability instance = (Capability) method.invoke(null,
 						params);
-				return instance.get(params, handle, type);
+				if (instance != null){
+					return instance.get(params, handle, type);
+				} else {
+					LOG.log(Level.WARNING, "Got null instance from service.");
+					return null;
+				}
 			} catch (final ClassNotFoundException e) {
 				LOG.log(Level.WARNING, "Couldn't find class:" + className, e);
 			} catch (final NoSuchMethodException e) {
