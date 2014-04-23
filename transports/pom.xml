@@ -12,7 +12,7 @@
 	<artifactId>eve-transport</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Agent Transport Bundle</name>
+	<name>EVE Transport Bundle</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

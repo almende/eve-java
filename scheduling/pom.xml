@@ -9,15 +9,15 @@
 		<relativePath>../eve_parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-transform</artifactId>
+	<artifactId>eve-scheduling</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Transform Bundle</name>
+	<name>EVE Scheduling Bundle</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>
-		<module>eve_transform</module>
-		<module>eve_transform_rpc</module>
+		<module>eve_scheduling</module>
+		<module>eve_persistent_scheduler</module>
 	</modules>
 
 	<properties>
@@ -26,8 +26,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-common</artifactId>
+			<artifactId>eve-state-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+                <dependency>
+                        <groupId>${project.parent.groupId}</groupId>
+                        <artifactId>eve-transport-common</artifactId>
+                        <version>${project.parent.version}</version>
+                </dependency>
 	</dependencies>
 </project>

@@ -11,7 +11,7 @@
 
 	<artifactId>eve-transform-common</artifactId>
 
-	<name>EVE Agent Transform Framework</name>
+	<name>EVE Transform Framework</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>

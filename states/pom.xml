@@ -12,7 +12,7 @@
 	<artifactId>eve-state</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Agent State Bundle</name>
+	<name>EVE State Bundle</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

@@ -11,7 +11,7 @@
 
 	<artifactId>eve-transform-rpc</artifactId>
 
-	<name>EVE Agent Transform JSON-RPC handling</name>
+	<name>EVE Transform JSON-RPC handling</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>

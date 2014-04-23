@@ -11,7 +11,7 @@
 
 	<artifactId>eve-transport-common</artifactId>
 
-	<name>EVE Agent Transport Capability</name>
+	<name>EVE Transport Framework</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>

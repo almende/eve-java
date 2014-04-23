@@ -1,0 +1,270 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
+package com.almende.eve.scheduling;
+
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.joda.time.DateTime;
+
+import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.scheduling.clock.RunnableClock;
+import com.almende.eve.state.State;
+import com.almende.eve.state.StateFactory;
+import com.almende.eve.transport.Receiver;
+import com.almende.util.jackson.JOM;
+import com.almende.util.uuid.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+/**
+ * The Class PersistentScheduler.
+ */
+public class PersistentScheduler extends SimpleScheduler {
+	private State	state	= null;
+	
+	/**
+	 * Instantiates a new persistent scheduler.
+	 * 
+	 * @param params
+	 *            the params
+	 * @param handle
+	 *            the handle
+	 */
+	public PersistentScheduler(JsonNode params, Handler<Receiver> handle) {
+		super(params, handle);
+		state = StateFactory.getState((ObjectNode) params.get("state"));
+		
+		if (clock == null) {
+			clock = new RunnableClock();
+		}
+		for (String key : state.keySet()){
+			final TaskEntry entry = state.get(key,TaskEntry.class);
+			run(entry);
+		}
+	}
+	
+	private void run(final TaskEntry entry){
+		if (entry != null){
+			if (clock == null) {
+				clock = new RunnableClock();
+			}
+			clock.requestTrigger(entry.getTaskId(), entry.getDue(), new Runnable() {
+				
+				@Override
+				public void run() {
+					state.remove(entry.getTaskId());
+					getHandle().get().receive(entry.getMessage(), getSchedulerUrl(), null);
+				}
+			});
+		}
+	}
+	
+	@Override
+	public String schedule(final Object msg, final DateTime due) {
+		
+		TaskEntry entry = new TaskEntry(due,msg);
+		state.put(entry.getTaskId(), entry);
+		run(entry);
+		return entry.getTaskId();
+	}
+	
+	@Override
+	public void cancel(String id) {
+		if (clock == null) {
+			clock = new RunnableClock();
+		}
+		state.remove(id);
+		clock.cancel(id);
+	}
+	
+	@Override
+	public void clear() {
+		if (clock == null) {
+			clock = new RunnableClock();
+		}
+		state.clear();
+		clock.clear();
+	}
+}
+
+/**
+ * @author Almende
+ * 
+ */
+class TaskEntry implements Comparable<TaskEntry>, Serializable {
+	private static final Logger	LOG					= Logger.getLogger(TaskEntry.class
+															.getCanonicalName());
+	private static final long	serialVersionUID	= -2402975617148459433L;
+	private String				taskId				= null;
+	private Object				message;
+	private DateTime			due;
+	private boolean				active				= false;
+	
+	/**
+	 * Instantiates a new task entry.
+	 */
+	public TaskEntry() {
+	};
+	
+	/**
+	 * Instantiates a new task entry.
+	 * 
+	 * @param due
+	 *            the due
+	 * @param message
+	 *            the message
+	 */
+	public TaskEntry(final DateTime due, final Object message){
+		taskId = new UUID().toString();
+		this.setMessage(message);
+		this.due = due;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof TaskEntry)) {
+			return false;
+		}
+		final TaskEntry other = (TaskEntry) o;
+		return taskId.equals(other.taskId);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return taskId.hashCode();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(final TaskEntry o) {
+		if (equals(o)) {
+			return 0;
+		}
+		if (due.equals(o.due)) {
+			return taskId.compareTo(o.taskId);
+		}
+		return due.compareTo(o.due);
+	}
+	
+	public Object getMessage() {
+		return message;
+	}
+	
+	public void setMessage(Object message) {
+		this.message = message;
+	}
+	
+	/**
+	 * Gets the task id.
+	 * 
+	 * @return the task id
+	 */
+	public String getTaskId() {
+		return taskId;
+	}
+	
+	/**
+	 * Gets the due as string.
+	 * 
+	 * @return the due as string
+	 */
+	public String getDueAsString() {
+		return due.toString();
+	}
+	
+	/**
+	 * Gets the due.
+	 * 
+	 * @return the due
+	 */
+	@JsonIgnore
+	public DateTime getDue() {
+		return due;
+	}
+	
+	/**
+	 * Sets the task id.
+	 * 
+	 * @param taskId
+	 *            the new task id
+	 */
+	public void setTaskId(final String taskId) {
+		this.taskId = taskId;
+	}
+	
+	/**
+	 * Sets the due as string.
+	 * 
+	 * @param due
+	 *            the new due as string
+	 */
+	public void setDueAsString(final String due) {
+		this.due = new DateTime(due);
+	}
+	
+	/**
+	 * Sets the due.
+	 * 
+	 * @param due
+	 *            the new due
+	 */
+	public void setDue(final DateTime due) {
+		this.due = due;
+	}
+	
+	/**
+	 * Sets the active.
+	 * 
+	 * @param active
+	 *            the new active
+	 */
+	public void setActive(final boolean active) {
+		this.active = active;
+	}
+	
+	/**
+	 * Checks if is active.
+	 * 
+	 * @return true, if is active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		try {
+			return JOM.getInstance().writeValueAsString(this);
+		} catch (final Exception e) {
+			LOG.log(Level.WARNING, "Couldn't use Jackson to print task.", e);
+			return "{\"taskId\":" + taskId + ",\"due\":" + due + "}";
+		}
+	}
+}

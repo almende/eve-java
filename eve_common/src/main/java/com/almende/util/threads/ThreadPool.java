@@ -26,6 +26,15 @@ public class ThreadPool {
 	}
 	
 	/**
+	 * Gets the factory.
+	 * 
+	 * @return the factory
+	 */
+	public static ThreadFactory getFactory() {
+		return factory;
+	}
+
+	/**
 	 * Sets the factory.
 	 * 
 	 * @param factory

@@ -8,7 +8,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>eve-transport-xmpp</artifactId>
-	<name>EVE XMPP Transport</name>
+	<name>EVE Transport XMPP</name>
 	<packaging>jar</packaging>
 
 	<properties>
