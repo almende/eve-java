@@ -28,15 +28,19 @@ public class HttpService implements TransportService {
 	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
 	private URI								myUrl		= null;
 	private Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
+	private JsonNode						myParams	= null;
 	
 	/**
 	 * Instantiates a new http service.
 	 * 
 	 * @param servletUrl
 	 *            the servlet url
+	 * @param params
+	 *            the params
 	 */
-	public HttpService(URI servletUrl) {
+	public HttpService(URI servletUrl, JsonNode params) {
 		this.myUrl = servletUrl;
+		this.myParams = params;
 	}
 	
 	/**
@@ -50,12 +54,13 @@ public class HttpService implements TransportService {
 		HttpService service = null;
 		if (params.has("url")) {
 			try {
-				final URI servletUrl = new URI(params.get("url").asText().replace("/$", ""));
+				final URI servletUrl = new URI(params.get("url").asText()
+						.replace("/$", ""));
 				if (services.containsKey(servletUrl)) {
 					// Shortcut, it already exists and is launched.
 					return services.get(servletUrl);
 				}
-				service = new HttpService(servletUrl);
+				service = new HttpService(servletUrl, params);
 				services.put(servletUrl, service);
 				if (params.has("servlet_launcher")) {
 					String className = params.get("servlet_launcher").asText();
@@ -148,8 +153,7 @@ public class HttpService implements TransportService {
 			final URI fullUrl = new URI(myUrl + id);
 			return transports.get(fullUrl);
 		} catch (URISyntaxException e) {
-			LOG.log(Level.WARNING, "Couldn't parse full Url:" + myUrl 
-					+ id, e);
+			LOG.log(Level.WARNING, "Couldn't parse full Url:" + myUrl + id, e);
 		}
 		return null;
 	}
@@ -171,5 +175,32 @@ public class HttpService implements TransportService {
 			return service.get(id);
 		}
 		return null;
+	}
+	
+	/**
+	 * Should the Servlet handle authentication?.
+	 * 
+	 * @param servletUrl
+	 *            the servlet url
+	 * @return true, if authentication is needed.
+	 */
+	public static boolean doAuthentication(URI servletUrl) {
+		HttpService service = services.get(servletUrl);
+		if (service != null){
+			return service.doAuthentication();
+		}
+		return false;
+	}
+
+	/**
+	 * Should the Servlet handle authentication?
+	 * 
+	 * @return true, if authentication is needed.
+	 */
+	private boolean doAuthentication() {
+		if (myParams.has("authentication")){
+			return myParams.get("authentication").asBoolean();
+		}
+		return false;
 	}
 }

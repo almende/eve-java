@@ -44,6 +44,7 @@ public class TestHttp extends TestCase {
 		params.put("jetty", jettyParms);
 		
 		params.put("id", "testAgent");
+		params.put("authentication", true);
 		
 		final Transport transport = TransportFactory.getTransport(params,
 				new myReceiver());
