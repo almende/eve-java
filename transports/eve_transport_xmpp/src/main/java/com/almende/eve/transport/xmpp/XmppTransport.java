@@ -86,10 +86,10 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		if (isConnected()) {
 			
 			// send the message
-			final Message reply = new Message();
-			reply.setTo(receiverUri.toASCIIString().replace("xmpp:", ""));
-			reply.setBody(message);
-			conn.sendPacket(reply);
+			final Message msg = new Message();
+			msg.setTo(receiverUri.toASCIIString().replace("xmpp:", ""));
+			msg.setBody(message);
+			conn.sendPacket(msg);
 		} else {
 			throw new IOException("Cannot send request, not connected");
 		}

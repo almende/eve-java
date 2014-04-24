@@ -25,6 +25,7 @@ import com.almende.util.ApacheHttpClient;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
+import com.almende.util.threads.ThreadPool;
 import com.almende.util.uuid.UUID;
 
 /**
@@ -74,39 +75,47 @@ public class HttpTransport extends AbstractTransport {
 			// Chicken out
 			return;
 		}
-		//Check and deliver local shortcut.
-		if (sendLocal(receiverUri,message)){
+		// Check and deliver local shortcut.
+		if (sendLocal(receiverUri, message)) {
 			return;
 		}
-		
-		HttpPost httpPost = null;
-		try {
-			httpPost = new HttpPost(receiverUri);
-			// invoke via Apache HttpClient request:
-			httpPost.setEntity(new StringEntity(message));
-			
-			// Add token for HTTP handshake
-			httpPost.addHeader("X-Eve-Token", TokenStore.create().toString());
-			httpPost.addHeader("X-Eve-SenderUrl", super.getAddress().toString());
-			final HttpResponse webResp = ApacheHttpClient.get().execute(
-					httpPost);
-			final String result = EntityUtils.toString(webResp.getEntity());
-			if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				LOG.warning("Received HTTP Error Status:"
-						+ webResp.getStatusLine().getStatusCode() + ":"
-						+ webResp.getStatusLine().getReasonPhrase());
-				LOG.warning(result);
-			} else {
-				super.getHandle().get().receive(result, receiverUri, null);
+		final String senderUrl = super.getAddress().toASCIIString();
+		final Handler<Receiver> handle = super.getHandle();
+		ThreadPool.getPool().execute(new Runnable() {
+			@Override
+			public void run() {
+				HttpPost httpPost = null;
+				try {
+					httpPost = new HttpPost(receiverUri);
+					// invoke via Apache HttpClient request:
+					httpPost.setEntity(new StringEntity(message));
+					
+					// Add token for HTTP handshake
+					httpPost.addHeader("X-Eve-Token", TokenStore.create()
+							.toString());
+					httpPost.addHeader("X-Eve-SenderUrl", senderUrl);
+					final HttpResponse webResp = ApacheHttpClient.get()
+							.execute(httpPost);
+					final String result = EntityUtils.toString(webResp
+							.getEntity());
+					if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+						LOG.warning("Received HTTP Error Status:"
+								+ webResp.getStatusLine().getStatusCode() + ":"
+								+ webResp.getStatusLine().getReasonPhrase());
+						LOG.warning(result);
+					} else {
+						handle.get().receive(result, receiverUri, null);
+					}
+				} catch (final Exception e) {
+					LOG.log(Level.WARNING,
+							"HTTP roundtrip resulted in exception!", e);
+				} finally {
+					if (httpPost != null) {
+						httpPost.reset();
+					}
+				}
 			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "HTTP roundtrip resulted in exception!", e);
-		} finally {
-			if (httpPost != null) {
-				httpPost.reset();
-			}
-		}
-		
+		});
 	}
 	
 	/*
