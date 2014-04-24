@@ -61,9 +61,9 @@ public class TestRpc extends TestCase {
 				.getTypeFactory().constructType(Boolean.class));
 		
 		//transport
-		Object response = transform.postMsg(request, URI.create("local://me"));
+		Object response = transform.invoke(request, URI.create("local://me"));
 		//transport
-		transform.postMsg(response, URI.create("local://me"));
+		transform.invoke(response, URI.create("local://me"));
 		
 	}
 	

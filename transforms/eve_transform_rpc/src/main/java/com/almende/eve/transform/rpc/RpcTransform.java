@@ -123,7 +123,7 @@ public class RpcTransform implements Transform {
 	}
 	
 	/**
-	 * Post msg.
+	 * Invoke this RPC msg.
 	 * 
 	 * @param msg
 	 *            the msg
@@ -131,7 +131,7 @@ public class RpcTransform implements Transform {
 	 *            the sender url
 	 * @return the JSON response
 	 */
-	public JSONResponse postMsg(final Object msg, final URI senderUrl) {
+	public JSONResponse invoke(final Object msg, final URI senderUrl) {
 		JsonNode id = null;
 		try {
 			final JSONMessage jsonMsg = jsonConvert(msg);
