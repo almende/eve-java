@@ -7,6 +7,7 @@ package com.almende.eve.transport;
 import java.net.URI;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.threads.ThreadPool;
 
 /**
  * The Class AbstractTransport.
@@ -71,5 +72,38 @@ public abstract class AbstractTransport implements Transport {
 	 */
 	public void setAddress(final URI address) {
 		this.address = address;
+	}
+
+	/**
+	 * Gets the service.
+	 * 
+	 * @return the service
+	 */
+	public TransportService getService() {
+		return service;
+	}
+	
+	/**
+	 * Send local.
+	 * 
+	 * @param receiverUri
+	 *            the receiver uri
+	 * @param message
+	 *            the message
+	 * @return true, if successful
+	 */
+	public boolean sendLocal(final URI receiverUri, final Object message){
+		final Transport local = getService().getLocal(receiverUri);
+		if (local != null){
+			//Do local shortcut.
+			ThreadPool.getPool().execute(new Runnable() {
+				@Override
+				public void run() {
+					local.getHandle().get().receive(message, getAddress(), null);
+				}
+			});
+			return true;
+		}
+		return false;
 	}
 }

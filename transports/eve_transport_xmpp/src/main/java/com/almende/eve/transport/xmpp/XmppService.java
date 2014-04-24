@@ -21,8 +21,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class XmppService.
  */
 public class XmppService implements TransportService {
-	private final Map<URI, Transport>			instances	= new ConcurrentHashMap<URI, Transport>();
-	private static final XmppService	singleton	= new XmppService();
+	private final Map<URI, Transport>	instances		= new ConcurrentHashMap<URI, Transport>();
+	private boolean						doesShortcut	= true;
+	private static final XmppService	singleton		= new XmppService();
 	
 	// Needed to force Android loading the ReconnectionManager....
 	static {
@@ -42,11 +43,19 @@ public class XmppService implements TransportService {
 	 * @return the instance by params
 	 */
 	public static XmppService getInstanceByParams(final JsonNode params) {
+		//TODO: return different instance if doesShortcut does not agree with current singleton.
+		if (params.has("doesShortcut")){
+			singleton.doesShortcut=params.get("doesShortcut").asBoolean();
+		}
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
 	public <T, V> T get(final JsonNode params, final Handler<V> handle,
@@ -64,12 +73,24 @@ public class XmppService implements TransportService {
 		return TypeUtil.inject(result, type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.transport
+	 * .Transport)
 	 */
 	@Override
 	public void delete(final Transport instance) {
 		instances.remove(instance.getAddress());
+	}
+	
+	@Override
+	public Transport getLocal(URI address) {
+		if (doesShortcut && instances.containsKey(address)) {
+			return instances.get(address);
+		}
+		return null;
 	}
 	
 }

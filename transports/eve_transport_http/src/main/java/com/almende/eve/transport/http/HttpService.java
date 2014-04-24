@@ -23,12 +23,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class HttpService.
  */
 public class HttpService implements TransportService {
-	private static final Logger				LOG			= Logger.getLogger(HttpService.class
-																.getName());
-	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
-	private URI								myUrl		= null;
-	private Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
-	private JsonNode						myParams	= null;
+	private static final Logger				LOG				= Logger.getLogger(HttpService.class
+																	.getName());
+	private static Map<URI, HttpService>	services		= new HashMap<URI, HttpService>();
+	private URI								myUrl			= null;
+	private Map<URI, HttpTransport>			transports		= new HashMap<URI, HttpTransport>();
+	private JsonNode						myParams		= null;
+	private boolean							localShortcuts	= true;
 	
 	/**
 	 * Instantiates a new http service.
@@ -41,6 +42,9 @@ public class HttpService implements TransportService {
 	public HttpService(URI servletUrl, JsonNode params) {
 		this.myUrl = servletUrl;
 		this.myParams = params;
+		if (params.has("doesShortcut")) {
+			this.localShortcuts = params.get("doesShortcut").asBoolean();
+		}
 	}
 	
 	/**
@@ -186,21 +190,35 @@ public class HttpService implements TransportService {
 	 */
 	public static boolean doAuthentication(URI servletUrl) {
 		HttpService service = services.get(servletUrl);
-		if (service != null){
+		if (service != null) {
 			return service.doAuthentication();
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Should the Servlet handle authentication?
 	 * 
 	 * @return true, if authentication is needed.
 	 */
 	private boolean doAuthentication() {
-		if (myParams.has("authentication")){
+		if (myParams.has("authentication")) {
 			return myParams.get("authentication").asBoolean();
 		}
 		return false;
 	}
+	
+	@Override
+	public Transport getLocal(URI address) {
+		if (!localShortcuts) {
+			return null;
+		}
+		if (transports.containsKey(address)) {
+			return transports.get(address);
+		} else {
+			//TODO: check for other HttpServices with this address?
+		}
+		return null;
+	}
+	
 }

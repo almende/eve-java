@@ -74,6 +74,11 @@ public class HttpTransport extends AbstractTransport {
 			// Chicken out
 			return;
 		}
+		//Check and deliver local shortcut.
+		if (sendLocal(receiverUri,message)){
+			return;
+		}
+		
 		HttpPost httpPost = null;
 		try {
 			httpPost = new HttpPost(receiverUri);

@@ -76,6 +76,10 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	@Override
 	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
+		//Check and deliver local shortcut.
+		if (sendLocal(receiverUri,message)){
+			return;
+		}
 		if (!isConnected()) {
 			connect();
 		}

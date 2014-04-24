@@ -76,6 +76,10 @@ public class ZmqTransport extends AbstractTransport {
 	 */
 	public void sendAsync(final byte[] zmqType, final String token,
 			final URI receiverUrl, final byte[] message, final String tag) {
+		//Check and deliver local shortcut.
+		if (sendLocal(receiverUrl,message)){
+			return;
+		}
 		final String senderUrl = super.getAddress().toString();
 		ThreadPool.getPool().execute(new Runnable() {
 			@Override

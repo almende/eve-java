@@ -19,8 +19,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class ZmqService.
  */
 public class ZmqService implements TransportService {
-	private final Map<URI, Transport>		instances	= new ConcurrentHashMap<URI, Transport>();
-	private static final ZmqService	singleton	= new ZmqService();
+	private final Map<URI, Transport>	instances		= new ConcurrentHashMap<URI, Transport>();
+	private boolean						doesShortcut	= true;
+	private static final ZmqService		singleton		= new ZmqService();
 	
 	/**
 	 * Gets the instance by params.
@@ -30,6 +31,11 @@ public class ZmqService implements TransportService {
 	 * @return the instance by params
 	 */
 	public static ZmqService getInstanceByParams(final JsonNode params) {
+		// TODO: return different instance if doesShortcut does not agree with
+		// current singleton.
+		if (params.has("doesShortcut")) {
+			singleton.doesShortcut = params.get("doesShortcut").asBoolean();
+		}
 		return singleton;
 	}
 	
@@ -41,7 +47,8 @@ public class ZmqService implements TransportService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final JsonNode params, final Handler<V> handle, final Class<T> type) {
+	public <T, V> T get(final JsonNode params, final Handler<V> handle,
+			final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final URI address = URI.create(params.get("address").asText());
 		Transport result = instances.get(address);
@@ -65,6 +72,14 @@ public class ZmqService implements TransportService {
 	@Override
 	public void delete(final Transport instance) {
 		instances.remove(instance.getAddress());
+	}
+	
+	@Override
+	public Transport getLocal(URI address) {
+		if (doesShortcut && instances.containsKey(address)) {
+			return instances.get(address);
+		}
+		return null;
 	}
 	
 }

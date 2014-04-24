@@ -4,6 +4,8 @@
  */
 package com.almende.eve.transport;
 
+import java.net.URI;
+
 import com.almende.eve.capabilities.Capability;
 
 /**
@@ -19,4 +21,13 @@ public interface TransportService extends Capability {
 	 */
 	void delete(Transport instance);
 	
+	/**
+	 * Looks for local transports, returns null if non is found. For local
+	 * shortcut support.
+	 * 
+	 * @param address
+	 *            the address
+	 * @return the local
+	 */
+	Transport getLocal(URI address);
 }
