@@ -50,7 +50,8 @@ public class Agent implements Receiver {
 	/**
 	 * Instantiates a new agent.
 	 */
-	public Agent(){}
+	public Agent() {
+	}
 	
 	/**
 	 * Instantiates a new agent.
@@ -69,7 +70,7 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the new config
 	 */
-	public void setConfig(JsonNode config){
+	public void setConfig(JsonNode config) {
 		this.config = config;
 		loadConfig();
 	}
@@ -79,26 +80,32 @@ public class Agent implements Receiver {
 	 * 
 	 * @return the config
 	 */
-	public JsonNode getConfig(){
+	public JsonNode getConfig() {
 		return this.config;
 	}
 	
 	private void loadConfig() {
 		final Handler<Receiver> handle = new SimpleHandler<Receiver>(this);
-		this.scheduler = SchedulerFactory.getScheduler(config.get("scheduler"),
-				handle);
-		this.state = StateFactory.getState(config.get("state"));
-		if (config.get("transport").isArray()) {
-			Router router = new Router();
-			Iterator<JsonNode> iter = config.get("transport").iterator();
-			while (iter.hasNext()) {
-				router.register(TransportFactory.getTransport(iter.next(),
-						handle));
+		if (config.has("scheduler")) {
+			this.scheduler = SchedulerFactory.getScheduler(
+					config.get("scheduler"), handle);
+		}
+		if (config.has("state")) {
+			this.state = StateFactory.getState(config.get("state"));
+		}
+		if (config.has("transport")) {
+			if (config.get("transport").isArray()) {
+				Router router = new Router();
+				Iterator<JsonNode> iter = config.get("transport").iterator();
+				while (iter.hasNext()) {
+					router.register(TransportFactory.getTransport(iter.next(),
+							handle));
+				}
+				this.transport = router;
+			} else {
+				this.transport = TransportFactory.getTransport(
+						config.get("transport"), handle);
 			}
-			this.transport = router;
-		} else {
-			this.transport = TransportFactory.getTransport(
-					config.get("transport"), handle);
 		}
 	}
 	
@@ -121,7 +128,7 @@ public class Agent implements Receiver {
 	 */
 	@Namespace("scheduler")
 	@JsonIgnore
-	public Scheduler getScheduler(){
+	public Scheduler getScheduler() {
 		return scheduler;
 	}
 	
@@ -132,10 +139,10 @@ public class Agent implements Receiver {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	@JsonIgnore
-	public State getState(){
+	public State getState() {
 		return state;
 	}
-
+	
 	/**
 	 * Send async.
 	 * 
@@ -155,9 +162,9 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> void sendAsync(final URI url, final String method, final ObjectNode params,
-			final AsyncCallback<T> callback, final JavaType type)
-			throws IOException {
+	public final <T> void sendAsync(final URI url, final String method,
+			final ObjectNode params, final AsyncCallback<T> callback,
+			final JavaType type) throws IOException {
 		JSONRequest request = rpc.buildMsg(method, params, callback, type);
 		transport.send(url, request.toString(), null);
 	}

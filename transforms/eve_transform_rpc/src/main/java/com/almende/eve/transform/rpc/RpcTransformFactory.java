@@ -8,6 +8,7 @@ import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating RpcTransform objects.
@@ -34,7 +35,9 @@ public class RpcTransformFactory {
 	 * @return the transform
 	 */
 	public static RpcTransform get(final Handler<Object> handle) {
-		return CapabilityFactory.get(JOM.createNullNode(), handle, RpcTransform.class);
+		ObjectNode params = JOM.createObjectNode();
+		params.put("class","com.almende.eve.transform.rpc.RpcService");
+		return CapabilityFactory.get(params, handle, RpcTransform.class);
 	}
 
 }
