@@ -26,7 +26,7 @@ public class FileStateService implements StateService {
 	private static final Logger			LOG			= Logger.getLogger(FileStateService.class
 															.getSimpleName());
 	private String						path		= null;
-	private Boolean						json		= false;
+	private Boolean						json		= true;
 	private Boolean						multilevel	= false;
 	private final Map<String, State>	states		= new HashMap<String, State>();
 	
