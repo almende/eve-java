@@ -6,6 +6,8 @@ package com.almende.eve.transport.http;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +37,9 @@ public class HttpTransport extends AbstractTransport {
 	private static final Logger			LOG			= Logger.getLogger(HttpTransport.class
 															.getName());
 	private AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
-	
+	private final List<String>	protocols	= Arrays.asList("http", "https",
+			"web");
+
 	/**
 	 * Instantiates a new http transport.
 	 * 
@@ -175,6 +179,14 @@ public class HttpTransport extends AbstractTransport {
 	public void disconnect() {
 		// Nothing todo at this point, maybe disable receival through the
 		// handler?
+	}
+
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
+	@Override
+	public List<String> getProtocols() {
+		return protocols;
 	}
 	
 }

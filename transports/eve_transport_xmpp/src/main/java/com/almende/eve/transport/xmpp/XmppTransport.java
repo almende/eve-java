@@ -6,6 +6,8 @@ package com.almende.eve.transport.xmpp;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class XmppTransport extends AbstractTransport implements PacketListener {
 	private static final Logger	LOG			= Logger.getLogger(XmppTransport.class
 													.getSimpleName());
+	private final List<String>	protocols	= Arrays.asList("xmpp");
+
 	private XMPPConnection		conn		= null;
 	private String				serviceName	= null;
 	private String				host		= null;
@@ -231,6 +235,14 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
+	@Override
+	public List<String> getProtocols() {
+		return protocols;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

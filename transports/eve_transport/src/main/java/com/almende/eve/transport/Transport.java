@@ -6,6 +6,7 @@ package com.almende.eve.transport;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.TypeUtil;
@@ -86,4 +87,11 @@ public interface Transport {
 	 * @return the address
 	 */
 	URI getAddress();
+	
+	/**
+	 * Get the outbound protocols supported by this transport.
+	 * 
+	 * @return protocols
+	 */
+	List<String> getProtocols();
 }

@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +41,7 @@ public class ZmqTransport extends AbstractTransport {
 	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
 	private static final AsyncCallbackQueue<String>	callbacks			= new AsyncCallbackQueue<String>();
+	private final List<String>						protocols			= Arrays.asList("zmq");
 	
 	/**
 	 * Instantiates a new zmq transport.
@@ -76,8 +78,8 @@ public class ZmqTransport extends AbstractTransport {
 	 */
 	public void sendAsync(final byte[] zmqType, final String token,
 			final URI receiverUrl, final byte[] message, final String tag) {
-		//Check and deliver local shortcut.
-		if (sendLocal(receiverUrl,message)){
+		// Check and deliver local shortcut.
+		if (sendLocal(receiverUrl, message)) {
 			return;
 		}
 		final String senderUrl = super.getAddress().toString();
@@ -155,6 +157,14 @@ public class ZmqTransport extends AbstractTransport {
 		listeningThread.interrupt();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
+	@Override
+	public List<String> getProtocols() {
+		return protocols;
+	}
+
 	/**
 	 * Gets the request.
 	 * 
