@@ -23,7 +23,12 @@ public class RpcTransformFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static RpcTransform get(final JsonNode params, final Handler<Object> handle) {
+	public static RpcTransform get(final JsonNode params,
+			final Handler<Object> handle) {
+		if (params != null && params.isObject() && !params.has("class")) {
+			((ObjectNode) params).put("class", RpcTransformFactory.class
+					.getPackage().getName() + ".RpcService");
+		}
 		return CapabilityFactory.get(params, handle, RpcTransform.class);
 	}
 	
@@ -36,8 +41,9 @@ public class RpcTransformFactory {
 	 */
 	public static RpcTransform get(final Handler<Object> handle) {
 		ObjectNode params = JOM.createObjectNode();
-		params.put("class","com.almende.eve.transform.rpc.RpcService");
+		params.put("class", RpcTransformFactory.class.getPackage().getName()
+				+ ".RpcService");
 		return CapabilityFactory.get(params, handle, RpcTransform.class);
 	}
-
+	
 }
