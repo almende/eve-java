@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class Agent implements Receiver {
 	private static final Logger	LOG			= Logger.getLogger(Agent.class
 													.getName());
+	private String				agentId		= null;
 	private JsonNode			config		= null;
 	private State				state		= null;
 	private Transport			transport	= null;
@@ -60,7 +61,7 @@ public class Agent implements Receiver {
 	 *            the config
 	 */
 	public Agent(JsonNode config) {
-		this.config = config;
+		this.config = config.deepCopy();
 		loadConfig();
 	}
 	
@@ -71,7 +72,7 @@ public class Agent implements Receiver {
 	 *            the new config
 	 */
 	public void setConfig(JsonNode config) {
-		this.config = config;
+		this.config = config.deepCopy();
 		loadConfig();
 	}
 	
@@ -86,12 +87,27 @@ public class Agent implements Receiver {
 	
 	private void loadConfig() {
 		final Handler<Receiver> handle = new SimpleHandler<Receiver>(this);
+		if (config.has("id")) {
+			this.agentId = config.get("id").asText();
+		}
 		if (config.has("scheduler")) {
+			JsonNode schedulerConfig = config.get("scheduler");
+			if (this.agentId != null && schedulerConfig.has("state")) {
+				ObjectNode stateConfig = (ObjectNode) schedulerConfig
+						.get("state");
+				if (!stateConfig.has("id")) {
+					stateConfig.put("id", "scheduler_" + this.agentId);
+				}
+			}
 			this.scheduler = SchedulerFactory.getScheduler(
-					config.get("scheduler"), handle);
+					schedulerConfig, handle);
 		}
 		if (config.has("state")) {
-			this.state = StateFactory.getState(config.get("state"));
+			ObjectNode stateConfig = (ObjectNode) config.get("state");
+			if (this.agentId != null && !stateConfig.has("id")) {
+				stateConfig.put("id", this.agentId);
+			}
+			this.state = StateFactory.getState(stateConfig);
 		}
 		if (config.has("transport")) {
 			if (config.get("transport").isArray()) {

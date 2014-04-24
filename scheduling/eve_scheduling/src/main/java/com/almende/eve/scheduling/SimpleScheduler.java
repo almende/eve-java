@@ -37,19 +37,17 @@ public class SimpleScheduler implements Scheduler {
 	 *            the handle
 	 */
 	public SimpleScheduler(final JsonNode params, final Handler<Receiver> handle) {
-		if (params.has("url")) {
+		if (params.has("senderUrl")) {
 			try {
-				this.schedulerUrl = new URI(params.get("url").asText());
+				this.schedulerUrl = new URI(params.get("senderUrl").asText());
 			} catch (URISyntaxException e) {
 				LOG.log(Level.WARNING,
-						"Couln't parse scheduler url from parameters.", e);
+						"Couldn't parse scheduler senderUrl from parameters.", e);
 			}
-		} else {
-			LOG.log(Level.WARNING, "Parameter 'url' is required, falling back to: 'local:unknown_scheduler'");
 		}
 		if (this.schedulerUrl == null) {
 			try {
-				this.schedulerUrl = new URI("local:unknown_scheduler");
+				this.schedulerUrl = new URI("local:unnamed_scheduler");
 			} catch (URISyntaxException e1) {
 				LOG.log(Level.SEVERE, "", e1);
 			}

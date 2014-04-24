@@ -38,7 +38,7 @@ public class TestScheduling extends TestCase {
 		state.put("path", ".eveagents_schedulingtest");
 		state.put("id", "testScheduling");
 		params.put("state", state);
-		params.put("url", "local:scheduler");
+		params.put("senderUrl", "local:scheduler");
 		params.put("class", "com.almende.eve.scheduling.PersistentSchedulerService");
 		
 		Scheduler test = SchedulerFactory.getScheduler(params,
