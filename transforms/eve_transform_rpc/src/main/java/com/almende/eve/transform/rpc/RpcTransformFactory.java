@@ -23,9 +23,12 @@ public class RpcTransformFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static RpcTransform get(final JsonNode params,
+	public static RpcTransform get(JsonNode params,
 			final Handler<Object> handle) {
-		if (params != null && params.isObject() && !params.has("class")) {
+		if (params == null || params.equals(JOM.createNullNode()) || params.isNull()){
+			params = JOM.createObjectNode();
+		}
+		if (params.isObject() && !params.has("class")) {
 			((ObjectNode) params).put("class", RpcTransformFactory.class
 					.getPackage().getName() + ".RpcService");
 		}
@@ -40,10 +43,7 @@ public class RpcTransformFactory {
 	 * @return the transform
 	 */
 	public static RpcTransform get(final Handler<Object> handle) {
-		ObjectNode params = JOM.createObjectNode();
-		params.put("class", RpcTransformFactory.class.getPackage().getName()
-				+ ".RpcService");
-		return CapabilityFactory.get(params, handle, RpcTransform.class);
+		return get(null,handle);
 	}
 	
 }
