@@ -16,22 +16,20 @@ public class HttpTransportConfig extends TransportConfig {
 	/**
 	 * Instantiates a new http transport config.
 	 */
-	public HttpTransportConfig(){
-		super(JOM.createObjectNode());
-		this.setClassPath(HttpTransportConfig.class.getPackage().getName()
-				+ ".HttpService");
+	public HttpTransportConfig() {
+		this(JOM.createObjectNode());
 	}
+	
 	/**
 	 * Instantiates a new http transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public HttpTransportConfig(ObjectNode node) {
+	public HttpTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.setClassPath(HttpTransportConfig.class.getPackage().getName()
-					+ ".HttpService");
+			setClassName(HttpService.class.getName());
 		}
 	}
 	
@@ -41,7 +39,7 @@ public class HttpTransportConfig extends TransportConfig {
 	 * @param url
 	 *            the new url
 	 */
-	public void setServletUrl(String url) {
+	public void setServletUrl(final String url) {
 		this.put("servletUrl", url.replace("/$", ""));
 	}
 	
@@ -63,7 +61,7 @@ public class HttpTransportConfig extends TransportConfig {
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.put("id", id);
 	}
 	
@@ -85,7 +83,7 @@ public class HttpTransportConfig extends TransportConfig {
 	 * @param servletLauncher
 	 *            the new servlet launcher class path;
 	 */
-	public void setServletLauncher(String servletLauncher) {
+	public void setServletLauncher(final String servletLauncher) {
 		this.put("servletLauncher", servletLauncher);
 	}
 	

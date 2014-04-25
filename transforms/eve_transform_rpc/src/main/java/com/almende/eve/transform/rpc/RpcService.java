@@ -39,11 +39,11 @@ public class RpcService implements TransformService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
 		RpcTransform result;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());
-			Handler<Object> oldHandle = result.getHandle();
+			final Handler<Object> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(handle));
 		} else {
 			result = new RpcTransform(params, TYPEUTIL.inject(handle), this);

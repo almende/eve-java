@@ -43,10 +43,10 @@ public class XmppService implements TransportService {
 	 * @return the instance by params
 	 */
 	public static XmppService getInstanceByParams(final ObjectNode params) {
-		//TODO: return different instance if doesShortcut does not agree with current singleton.
-		if (params.has("doesShortcut")){
-			singleton.doesShortcut=params.get("doesShortcut").asBoolean();
-		}
+		// TODO: return different instance if doesShortcut does not agree with
+		// current singleton.
+		singleton.doesShortcut = new XmppTransportConfig(params)
+				.getDoShortcut();
 		return singleton;
 	}
 	
@@ -61,11 +61,12 @@ public class XmppService implements TransportService {
 	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
-		final URI address = URI.create(params.get("address").asText());
+		final XmppTransportConfig config = new XmppTransportConfig(params);
+		final URI address = config.getAddress();
 		Transport result = instances.get(address);
 		
 		if (result == null) {
-			result = new XmppTransport(params, newHandle, this);
+			result = new XmppTransport(config, newHandle, this);
 			instances.put(address, result);
 		} else {
 			result.getHandle().update(newHandle);
@@ -86,7 +87,7 @@ public class XmppService implements TransportService {
 	}
 	
 	@Override
-	public Transport getLocal(URI address) {
+	public Transport getLocal(final URI address) {
 		if (doesShortcut && instances.containsKey(address)) {
 			return instances.get(address);
 		}

@@ -63,7 +63,7 @@ public final class ApacheHttpClient {
 			sslSf = new SSLSocketFactory(trustStrategy, hostnameVerifier);
 			final Scheme https = new Scheme("https", 443, sslSf);
 			schemeRegistry.register(https);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.warning("Couldn't init SSL socket, https not supported!");
 		}
 		
@@ -138,9 +138,10 @@ public final class ApacheHttpClient {
 		 *             Signals that an I/O exception has occurred.
 		 */
 		MyCookieStore() throws IOException {
-			//TODO: use Config service
-			ObjectNode params = JOM.createObjectNode();
-			params.put("class", "com.almende.eve.state.memory.MemoryStateService");
+			// TODO: use Config service
+			final ObjectNode params = JOM.createObjectNode();
+			params.put("class",
+					"com.almende.eve.state.memory.MemoryStateService");
 			params.put("id", COOKIESTORE);
 			
 			myState = StateFactory.getState(params);

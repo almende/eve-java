@@ -77,17 +77,23 @@ public class TestTransports extends TestCase {
 	 */
 	public class myReceiver implements Receiver, Handler<Receiver> {
 		
-		/* (non-Javadoc)
-		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
+		 * java.net.URI, java.lang.String)
 		 */
 		@Override
-		public void receive(final Object msg, final URI senderUrl, final String tag) {
+		public void receive(final Object msg, final URI senderUrl,
+				final String tag) {
 			
 			LOG.warning("Received msg:'" + msg + "' from: "
 					+ senderUrl.toASCIIString());
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#get()
 		 */
 		@Override
@@ -95,14 +101,18 @@ public class TestTransports extends TestCase {
 			return this;
 		}
 		
-		/* (non-Javadoc)
-		 * @see com.almende.eve.capabilities.handler.Handler#update(com.almende.eve.capabilities.handler.Handler)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.almende.eve.capabilities.handler.Handler#update(com.almende.eve
+		 * .capabilities.handler.Handler)
 		 */
 		@Override
 		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.
 		}
-
+		
 		@Override
 		public String getKey() {
 			// Not used, data should be the same.

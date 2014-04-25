@@ -37,7 +37,7 @@ public class AsyncCallbackQueue<T> {
 		}
 	}
 	/** timeout in seconds */
-	private final int									timeout		= 30;
+	private final int							timeout		= 30;
 	
 	// TODO: make the timeout customizable in eve.yaml
 	/**

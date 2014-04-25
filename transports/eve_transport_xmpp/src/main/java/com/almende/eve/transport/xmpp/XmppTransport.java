@@ -25,7 +25,6 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class XmppTransport.
@@ -34,7 +33,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	private static final Logger	LOG			= Logger.getLogger(XmppTransport.class
 													.getSimpleName());
 	private final List<String>	protocols	= Arrays.asList("xmpp");
-
+	
 	private XMPPConnection		conn		= null;
 	private String				serviceName	= null;
 	private String				host		= null;
@@ -48,17 +47,17 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 * 
 	 * @param <V>
 	 *            the value type
-	 * @param params
-	 *            the params
+	 * @param config
+	 *            the config
 	 * @param handle
 	 *            the handle
 	 * @param service
 	 *            the service
 	 */
-	public <V> XmppTransport(final ObjectNode params,
+	public <V> XmppTransport(final XmppTransportConfig config,
 			final Handler<Receiver> handle, final TransportService service) {
 		// TODO: support more parameter structures.
-		super(URI.create(params.get("address").asText()), handle, service);
+		super(config.getAddress(), handle, service);
 		
 		final URI address = super.getAddress();
 		host = address.getHost();
@@ -71,17 +70,20 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		if (serviceName == null) {
 			serviceName = host;
 		}
-		password = params.get("password").asText();
+		password = config.getPassword();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message, final String tag)
-			throws IOException {
-		//Check and deliver local shortcut.
-		if (sendLocal(receiverUri,message)){
+	public void send(final URI receiverUri, final String message,
+			final String tag) throws IOException {
+		// Check and deliver local shortcut.
+		if (sendLocal(receiverUri, message)) {
 			return;
 		}
 		if (!isConnected()) {
@@ -100,12 +102,15 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final byte[] message,
+			final String tag) throws IOException {
 		send(receiverUri, Base64.encodeBase64String(message), tag);
 	}
 	
@@ -113,7 +118,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		return (conn != null) ? conn.isConnected() : false;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -159,7 +166,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
@@ -170,8 +179,12 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.smack.packet.Packet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.
+	 * smack.packet.Packet)
 	 */
 	@Override
 	public void processPacket(final Packet packet) {
@@ -235,15 +248,19 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		return false;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
 		return protocols;
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -23,7 +23,8 @@ public class SchedulerFactory {
 	 *            the handle
 	 * @return the scheduler
 	 */
-	public static Scheduler getScheduler(final ObjectNode params, Handler<Receiver> handle) {
+	public static Scheduler getScheduler(final ObjectNode params,
+			final Handler<Receiver> handle) {
 		return CapabilityFactory.get(params, handle, Scheduler.class);
 	}
 }

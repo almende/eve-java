@@ -27,7 +27,7 @@ public class HttpService implements TransportService {
 																.getName());
 	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
 	private URI								myUrl		= null;
-	private Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
+	private final Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
 	private HttpTransportConfig				myParams	= null;
 	
 	/**
@@ -38,9 +38,9 @@ public class HttpService implements TransportService {
 	 * @param params
 	 *            the params
 	 */
-	public HttpService(URI servletUrl, ObjectNode params) {
-		this.myUrl = servletUrl;
-		this.myParams = new HttpTransportConfig(params);
+	public HttpService(final URI servletUrl, final ObjectNode params) {
+		myUrl = servletUrl;
+		myParams = new HttpTransportConfig(params);
 	}
 	
 	/**
@@ -80,17 +80,17 @@ public class HttpService implements TransportService {
 											+ ServletLauncher.class.getName());
 						}
 						
-						ServletLauncher launcher = (ServletLauncher) launcherClass
+						final ServletLauncher launcher = (ServletLauncher) launcherClass
 								.newInstance();
 						// TODO: make the Servlet type configurable
 						launcher.add(new EveServlet(servletUri), servletUri,
 								params);
 						
-					} catch (Exception e1) {
+					} catch (final Exception e1) {
 						LOG.log(Level.WARNING, "Failed to load launcher!", e1);
 					}
 				}
-			} catch (URISyntaxException e) {
+			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING, "Couldn't parse 'servletUrl'", e);
 			}
 		} else {
@@ -107,7 +107,7 @@ public class HttpService implements TransportService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final HttpTransportConfig config = new HttpTransportConfig(params);
 		HttpTransport result = null;
@@ -122,7 +122,7 @@ public class HttpService implements TransportService {
 					result = new HttpTransport(fullUrl, newHandle, this);
 					transports.put(fullUrl, result);
 				}
-			} catch (URISyntaxException e) {
+			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING, "Couldn't parse full Url:" + myUrl
 						+ params.get("id").asText(), e);
 			}
@@ -140,7 +140,7 @@ public class HttpService implements TransportService {
 	 * .Transport)
 	 */
 	@Override
-	public void delete(Transport instance) {
+	public void delete(final Transport instance) {
 		transports.remove(instance.getAddress());
 	}
 	
@@ -151,11 +151,11 @@ public class HttpService implements TransportService {
 	 *            the id
 	 * @return the http transport
 	 */
-	private HttpTransport get(String id) {
+	private HttpTransport get(final String id) {
 		try {
 			final URI fullUrl = new URI(myUrl + id);
 			return transports.get(fullUrl);
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Couldn't parse full Url:" + myUrl + id, e);
 		}
 		return null;
@@ -172,8 +172,8 @@ public class HttpService implements TransportService {
 	 *            the id
 	 * @return the http transport
 	 */
-	public static HttpTransport get(URI servletUrl, String id) {
-		HttpService service = services.get(servletUrl);
+	public static HttpTransport get(final URI servletUrl, final String id) {
+		final HttpService service = services.get(servletUrl);
 		if (service != null) {
 			return service.get(id);
 		}
@@ -187,8 +187,8 @@ public class HttpService implements TransportService {
 	 *            the servlet url
 	 * @return true, if authentication is needed.
 	 */
-	public static boolean doAuthentication(URI servletUrl) {
-		HttpService service = services.get(servletUrl);
+	public static boolean doAuthentication(final URI servletUrl) {
+		final HttpService service = services.get(servletUrl);
 		if (service != null) {
 			return service.doAuthentication();
 		}
@@ -205,7 +205,7 @@ public class HttpService implements TransportService {
 	}
 	
 	@Override
-	public Transport getLocal(URI address) {
+	public Transport getLocal(final URI address) {
 		if (!myParams.getDoShortcut()) {
 			return null;
 		}

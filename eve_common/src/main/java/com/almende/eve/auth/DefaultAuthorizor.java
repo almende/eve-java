@@ -8,28 +8,35 @@ package com.almende.eve.auth;
  * The Class DefaultAuthorizor.
  */
 public class DefaultAuthorizor implements Authorizor {
-
-	/* (non-Javadoc)
-	 * @see com.almende.eve.auth.Authorizor#onAccess(java.lang.String, java.lang.String)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.auth.Authorizor#onAccess(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
-	public boolean onAccess(String senderUrl, String functionTag) {
+	public boolean onAccess(final String senderUrl, final String functionTag) {
 		return true;
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.auth.Authorizor#onAccess(java.lang.String)
 	 */
 	@Override
-	public boolean onAccess(String senderUrl) {
+	public boolean onAccess(final String senderUrl) {
 		return true;
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.auth.Authorizor#isSelf(java.lang.String)
 	 */
 	@Override
-	public boolean isSelf(String senderUrl) {
+	public boolean isSelf(final String senderUrl) {
 		return true;
 	}
 }

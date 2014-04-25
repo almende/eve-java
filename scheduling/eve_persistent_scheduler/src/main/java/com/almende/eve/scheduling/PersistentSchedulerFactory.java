@@ -22,10 +22,11 @@ public class PersistentSchedulerFactory {
 	 *            the handle
 	 * @return the scheduler
 	 */
-	public static PersistentScheduler getScheduler(final ObjectNode params, Handler<Receiver> handle) {
+	public static PersistentScheduler getScheduler(final ObjectNode params,
+			final Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", PersistentSchedulerFactory.class
-					.getPackage().getName() + ".PersistentSchedulerService");
+			params.put("class", PersistentSchedulerFactory.class.getPackage()
+					.getName() + ".PersistentSchedulerService");
 		}
 		return CapabilityFactory.get(params, handle, PersistentScheduler.class);
 	}

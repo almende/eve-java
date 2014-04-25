@@ -32,28 +32,37 @@ public class MemoryStateService implements StateService {
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
 	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
-		final String agentId = params.get("id").asText();
-		if (states.containsKey(agentId)) {
-			return TypeUtil.inject(states.get(agentId), type);
+		final MemoryStateConfig config = new MemoryStateConfig(params);
+		final String id = config.getId();
+		
+		if (states.containsKey(id)) {
+			return TypeUtil.inject(states.get(id), type);
 		} else {
-			final MemoryState result = new MemoryState(agentId, this);
-			states.put(agentId, result);
+			final MemoryState result = new MemoryState(id, this);
+			states.put(id, result);
 			return TypeUtil.inject(result, type);
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
 	 */
 	@Override
 	public void delete(final State instance) {
-		states.remove(instance.getAgentId());
+		states.remove(instance.getId());
 	}
 	
 }

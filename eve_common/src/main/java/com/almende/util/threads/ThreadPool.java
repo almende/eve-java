@@ -33,7 +33,7 @@ public class ThreadPool {
 	public static ThreadFactory getFactory() {
 		return factory;
 	}
-
+	
 	/**
 	 * Sets the factory.
 	 * 

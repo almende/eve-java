@@ -33,11 +33,11 @@ public class PersistentSchedulerService implements SchedulerService {
 	}
 	
 	@Override
-	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
 		PersistentScheduler result = null;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());
-			Handler<Receiver> oldHandle = result.getHandle();
+			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(handle));
 		} else {
 			result = new PersistentScheduler(params, TYPEUTIL.inject(handle));

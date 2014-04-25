@@ -41,8 +41,8 @@ public class WakeService {
 	 *            the params, containing at least a "state" field, with a
 	 *            specific State configuration.
 	 */
-	public WakeService(ObjectNode params) {
-		this.myParams = params;
+	public WakeService(final ObjectNode params) {
+		myParams = params;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
 	}
 	
@@ -61,7 +61,7 @@ public class WakeService {
 	 * @param myParams
 	 *            the new my params
 	 */
-	public void setMyParams(ObjectNode myParams) {
+	public void setMyParams(final ObjectNode myParams) {
 		this.myParams = myParams;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
 	}
@@ -72,7 +72,7 @@ public class WakeService {
 	@JsonIgnore
 	public void boot() {
 		load();
-		for (WakeEntry entry : agents.values()) {
+		for (final WakeEntry entry : agents.values()) {
 			wake(entry.getWakeKey(), true);
 		}
 	}
@@ -96,7 +96,7 @@ public class WakeService {
 	 *            the on boot
 	 */
 	@JsonIgnore
-	public void wake(final String wakeKey, boolean onBoot) {
+	public void wake(final String wakeKey, final boolean onBoot) {
 		WakeEntry entry = agents.get(wakeKey);
 		if (entry == null) {
 			// Retry from file
@@ -109,7 +109,7 @@ public class WakeService {
 			try {
 				final Class<?> clazz = Class.forName(className);
 				instance = (Wakeable) clazz.newInstance();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOG.log(Level.WARNING, "Failed to instantiate Wakeable:'"
 						+ wakeKey + "'", e);
 			}
@@ -131,7 +131,7 @@ public class WakeService {
 	 *            the class name
 	 */
 	@JsonIgnore
-	public void register(String wakeKey, String className) {
+	public void register(final String wakeKey, final String className) {
 		final WakeEntry entry = new WakeEntry(wakeKey, className);
 		agents.put(wakeKey, entry);
 		store();
@@ -172,7 +172,7 @@ public class WakeService {
 	 * @param agents
 	 *            the agents
 	 */
-	public void setAgents(Map<String, WakeEntry> agents) {
+	public void setAgents(final Map<String, WakeEntry> agents) {
 		this.agents = agents;
 	}
 	

@@ -38,7 +38,7 @@ public class TestAgents extends TestCase {
 	public void testAgent() throws IOException, URISyntaxException,
 			InterruptedException {
 		
-		HttpTransportConfig transportConfig = new HttpTransportConfig();
+		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 		transportConfig.setId("example");
 		
@@ -47,25 +47,25 @@ public class TestAgents extends TestCase {
 		jettyParms.put("port", 8080);
 		transportConfig.put("jetty", jettyParms);
 		
-		Config config = new Config();
+		final Config config = new Config();
 		config.put("transport", transportConfig);
 		
-		Agent agent = new ExampleAgent();
+		final Agent agent = new ExampleAgent();
 		agent.setConfig(config);
 		
-		ObjectNode callParams = JOM.createObjectNode();
+		final ObjectNode callParams = JOM.createObjectNode();
 		callParams.put("message", "Hello world!");
 		
 		agent.sendAsync(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams, new AsyncCallback<String>() {
 					
 					@Override
-					public void onSuccess(String result) {
+					public void onSuccess(final String result) {
 						LOG.warning("Received:'" + result + "'");
 					}
 					
 					@Override
-					public void onFailure(Exception exception) {
+					public void onFailure(final Exception exception) {
 						LOG.log(Level.SEVERE, "", exception);
 						fail();
 					}

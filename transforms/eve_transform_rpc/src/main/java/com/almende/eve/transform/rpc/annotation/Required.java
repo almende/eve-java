@@ -21,7 +21,7 @@ public @interface Required {
 	
 	/**
 	 * Value.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	boolean value();

@@ -35,10 +35,13 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param json the json
-	 * @throws JSONRPCException the jSONRPC exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param json
+	 *            the json
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONRequest(final String json) throws JSONRPCException, IOException {
 		final ObjectMapper mapper = JOM.getInstance();
@@ -47,9 +50,11 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param request the request
-	 * @throws JSONRPCException the jSONRPC exception
+	 * 
+	 * @param request
+	 *            the request
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
 	 */
 	public JSONRequest(final JsonNode request) throws JSONRPCException {
 		init(request);
@@ -57,9 +62,11 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Inits the.
-	 *
-	 * @param request the request
-	 * @throws JSONRPCException the jSONRPC exception
+	 * 
+	 * @param request
+	 *            the request
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
 	 */
 	public void init(final JsonNode request) throws JSONRPCException {
 		if (request == null || request.isNull()) {
@@ -90,9 +97,11 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param method the method
-	 * @param params the params
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
 	 */
 	public JSONRequest(final String method, final ObjectNode params) {
 		init(null, method, params);
@@ -100,10 +109,13 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param id the id
-	 * @param method the method
-	 * @param params the params
+	 * 
+	 * @param id
+	 *            the id
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
 	 */
 	public JSONRequest(final JsonNode id, final String method,
 			final ObjectNode params) {
@@ -112,11 +124,15 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param method the method
-	 * @param params the params
-	 * @param callbackUrl the callback url
-	 * @param callbackMethod the callback method
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callbackUrl
+	 *            the callback url
+	 * @param callbackMethod
+	 *            the callback method
 	 */
 	public JSONRequest(final String method, final ObjectNode params,
 			final String callbackUrl, final String callbackMethod) {
@@ -126,12 +142,17 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON request.
-	 *
-	 * @param id the id
-	 * @param method the method
-	 * @param params the params
-	 * @param callbackUrl the callback url
-	 * @param callbackMethod the callback method
+	 * 
+	 * @param id
+	 *            the id
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callbackUrl
+	 *            the callback url
+	 * @param callbackMethod
+	 *            the callback method
 	 */
 	public JSONRequest(final JsonNode id, final String method,
 			final ObjectNode params, final String callbackUrl,
@@ -142,10 +163,13 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Inits the.
-	 *
-	 * @param id the id
-	 * @param method the method
-	 * @param params the params
+	 * 
+	 * @param id
+	 *            the id
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
 	 */
 	private void init(final JsonNode id, final String method,
 			final ObjectNode params) {
@@ -157,8 +181,9 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Sets the id.
-	 *
-	 * @param id the new id
+	 * 
+	 * @param id
+	 *            the new id
 	 */
 	public void setId(final JsonNode id) {
 		if (id == null || id.isNull()) {
@@ -168,7 +193,9 @@ public final class JSONRequest extends JSONMessage {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transform.rpc.jsonrpc.JSONMessage#getId()
 	 */
 	@Override
@@ -178,8 +205,9 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Sets the method.
-	 *
-	 * @param method the new method
+	 * 
+	 * @param method
+	 *            the new method
 	 */
 	public void setMethod(final String method) {
 		req.put(METHOD, method);
@@ -187,7 +215,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the method.
-	 *
+	 * 
 	 * @return the method
 	 */
 	public String getMethod() {
@@ -199,8 +227,9 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Sets the params.
-	 *
-	 * @param params the new params
+	 * 
+	 * @param params
+	 *            the new params
 	 */
 	public void setParams(final ObjectNode params) {
 		final ObjectNode newParams = JOM.createObjectNode();
@@ -212,7 +241,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the params.
-	 *
+	 * 
 	 * @return the params
 	 */
 	public ObjectNode getParams() {
@@ -221,9 +250,11 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Put param.
-	 *
-	 * @param name the name
-	 * @param value the value
+	 * 
+	 * @param name
+	 *            the name
+	 * @param value
+	 *            the value
 	 */
 	public void putParam(final String name, final Object value) {
 		final ObjectMapper mapper = JOM.getInstance();
@@ -232,8 +263,9 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the param.
-	 *
-	 * @param name the name
+	 * 
+	 * @param name
+	 *            the name
 	 * @return the param
 	 */
 	public Object getParam(final String name) {
@@ -247,8 +279,9 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Checks for param.
-	 *
-	 * @param name the name
+	 * 
+	 * @param name
+	 *            the name
 	 * @return the object
 	 */
 	public Object hasParam(final String name) {
@@ -264,9 +297,11 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Sets the callback.
-	 *
-	 * @param url the url
-	 * @param method the method
+	 * 
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
 	 */
 	public void setCallback(final String url, final String method) {
 		final ObjectNode callback = JOM.createObjectNode();
@@ -277,7 +312,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the callback url.
-	 *
+	 * 
 	 * @return the callback url
 	 */
 	public String getCallbackUrl() {
@@ -291,7 +326,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the callback method.
-	 *
+	 * 
 	 * @return the callback method
 	 */
 	public String getCallbackMethod() {
@@ -305,7 +340,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Checks for callback.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean hasCallback() {
@@ -314,7 +349,7 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Gets the object node.
-	 *
+	 * 
 	 * @return the object node
 	 */
 	@JsonIgnore
@@ -322,7 +357,9 @@ public final class JSONRequest extends JSONMessage {
 		return req;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -338,11 +375,14 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Write object.
-	 *
-	 * @param out the out
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param out
+	 *            the out
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	private void writeObject(final java.io.ObjectOutputStream out) throws IOException {
+	private void writeObject(final java.io.ObjectOutputStream out)
+			throws IOException {
 		final ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.writeValue(out, req);
@@ -350,13 +390,16 @@ public final class JSONRequest extends JSONMessage {
 	
 	/**
 	 * Read object.
-	 *
-	 * @param in the in
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws ClassNotFoundException the class not found exception
+	 * 
+	 * @param in
+	 *            the in
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 */
-	private void readObject(final java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
+	private void readObject(final java.io.ObjectInputStream in)
+			throws IOException, ClassNotFoundException {
 		final ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
 		req = mapper.readValue(in, ObjectNode.class);

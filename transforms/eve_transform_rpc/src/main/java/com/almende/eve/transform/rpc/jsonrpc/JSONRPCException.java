@@ -129,7 +129,7 @@ public class JSONRPCException extends Exception {
 	 */
 	public JSONRPCException(final String message) {
 		super(message);
-		init(CODE.UNKNOWN_ERROR,message,null);
+		init(CODE.UNKNOWN_ERROR, message, null);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class JSONRPCException extends Exception {
 	 */
 	public JSONRPCException(final String message, final Throwable t) {
 		super(message, t);
-		init(CODE.UNKNOWN_ERROR,message,t);
+		init(CODE.UNKNOWN_ERROR, message, t);
 	}
 	
 	/**
@@ -187,13 +187,17 @@ public class JSONRPCException extends Exception {
 		super();
 		JSONRPCException cause = null;
 		if (exception != null && !exception.isNull()) {
-			cause = JOM.getInstance().convertValue(exception,JSONRPCException.class);
+			cause = JOM.getInstance().convertValue(exception,
+					JSONRPCException.class);
 			cause.setRemote(true);
-			TypeUtil<List<StackTraceElement>> injector = new TypeUtil<List<StackTraceElement>>(){};
-			List<StackTraceElement> trace = injector.inject(exception.get("stackTrace"));
+			final TypeUtil<List<StackTraceElement>> injector = new TypeUtil<List<StackTraceElement>>() {
+			};
+			final List<StackTraceElement> trace = injector.inject(exception
+					.get("stackTrace"));
 			cause.setStackTrace(trace.toArray(new StackTraceElement[0]));
 		}
-		init(CODE.REMOTE_EXCEPTION,JSONRPCException.class.getSimpleName()+" received!",cause);
+		init(CODE.REMOTE_EXCEPTION, JSONRPCException.class.getSimpleName()
+				+ " received!", cause);
 	}
 	
 	/**
@@ -246,7 +250,7 @@ public class JSONRPCException extends Exception {
 				break;
 		}
 		setMessage(message);
-		if (t != null && getCause() == null){
+		if (t != null && getCause() == null) {
 			initCause(t);
 		}
 		try {
@@ -328,10 +332,10 @@ public class JSONRPCException extends Exception {
 	/**
 	 * @param remote
 	 */
-	public void setRemote(boolean remote) {
+	public void setRemote(final boolean remote) {
 		this.remote = remote;
 	}
-
+	
 	/**
 	 * Gets the object node.
 	 * 
@@ -349,7 +353,8 @@ public class JSONRPCException extends Exception {
 	 */
 	@Override
 	public String toString() {
-		return this.getClass().getName() + ": " + (remote ? "(Remote stackTrace) " : "")
+		return this.getClass().getName() + ": "
+				+ (remote ? "(Remote stackTrace) " : "")
 				+ getLocalizedMessage();
 	}
 	

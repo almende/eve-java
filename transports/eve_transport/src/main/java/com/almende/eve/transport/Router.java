@@ -19,7 +19,7 @@ import com.almende.eve.capabilities.handler.Handler;
  */
 public class Router implements Transport {
 	
-	private Map<String, Transport>	transports	= new HashMap<String, Transport>();
+	private final Map<String, Transport>	transports	= new HashMap<String, Transport>();
 	
 	/**
 	 * Register new transport. If a given protocol is already known, this will
@@ -28,16 +28,16 @@ public class Router implements Transport {
 	 * @param transport
 	 *            the transport
 	 */
-	public void register(Transport transport) {
-		for (String protocol : transport.getProtocols()) {
+	public void register(final Transport transport) {
+		for (final String protocol : transport.getProtocols()) {
 			transports.put(protocol, transport);
 		}
 	}
 	
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
-		Transport transport = transports.get(receiverUri.getScheme()
+		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
 			transport.send(receiverUri, message, tag);
@@ -48,9 +48,9 @@ public class Router implements Transport {
 	}
 	
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
-		Transport transport = transports.get(receiverUri.getScheme()
+		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
 			transport.send(receiverUri, message, tag);

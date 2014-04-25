@@ -34,12 +34,14 @@ import com.almende.util.uuid.UUID;
  * The Class HttpTransport.
  */
 public class HttpTransport extends AbstractTransport {
-	private static final Logger			LOG			= Logger.getLogger(HttpTransport.class
-															.getName());
-	private AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
-	private final List<String>	protocols	= Arrays.asList("http", "https",
-			"web");
-
+	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
+																	.getName());
+	private final AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
+	private final List<String>					protocols	= Arrays.asList(
+																	"http",
+																	"https",
+																	"web");
+	
 	/**
 	 * Instantiates a new http transport.
 	 * 
@@ -153,7 +155,7 @@ public class HttpTransport extends AbstractTransport {
 		super.getHandle().get().receive(body, senderUrl, tag);
 		try {
 			return callback.get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new IOException(
 					"Receiver raised exception:" + e.getMessage(), e);
 		}
@@ -180,8 +182,10 @@ public class HttpTransport extends AbstractTransport {
 		// Nothing todo at this point, maybe disable receival through the
 		// handler?
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override

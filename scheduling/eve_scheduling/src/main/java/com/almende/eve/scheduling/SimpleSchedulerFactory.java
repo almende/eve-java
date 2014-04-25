@@ -22,11 +22,9 @@ public class SimpleSchedulerFactory {
 	 *            the handle
 	 * @return the scheduler
 	 */
-	public static SimpleScheduler getScheduler(final ObjectNode params, Handler<Receiver> handle) {
-		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", SimpleSchedulerFactory.class
-					.getPackage().getName() + ".SimpleSchedulerService");
-		}
-		return CapabilityFactory.get(params, handle, SimpleScheduler.class);
+	public static SimpleScheduler getScheduler(final ObjectNode params,
+			final Handler<Receiver> handle) {
+		return CapabilityFactory.get(new SimpleSchedulerConfig(params), handle,
+				SimpleScheduler.class);
 	}
 }

@@ -22,17 +22,17 @@ public class TestWake extends TestCase {
 	 */
 	@Test
 	public void testWake() {
-		ObjectNode params = JOM.createObjectNode();
-		ObjectNode state = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
+		final ObjectNode state = JOM.createObjectNode();
 		state.put("class", "com.almende.eve.state.file.FileStateService");
 		state.put("json", true);
-		state.put("path",".wakeservices");
-		state.put("id","testWakeService");
+		state.put("path", ".wakeservices");
+		state.put("id", "testWakeService");
 		params.put("state", state);
 		
-		final WakeService	ws	= new WakeService(params);
+		final WakeService ws = new WakeService(params);
 		
-			// Create agent without external references, hopefully!
+		// Create agent without external references, hopefully!
 		new MyAgent("testWakeAgent", ws).init();
 		// Try to get rid of the agent instance from memory
 		System.gc();
@@ -41,7 +41,7 @@ public class TestWake extends TestCase {
 		// Sleep for 10seconds, allowing external XMPP call.
 		try {
 			Thread.sleep(20000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

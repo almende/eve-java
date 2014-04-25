@@ -128,7 +128,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	 * @param agentId
 	 */
 	public void setAgentId(final String agentId) {
-		this.triggerId = agentId;
+		triggerId = agentId;
 	}
 	
 	/**
@@ -194,7 +194,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	@Override
 	public int compareTo(final ClockEntry o) {
 		if (due == null || o.due == null) {
-			if (this.equals(o)) {
+			if (equals(o)) {
 				return 0;
 			} else {
 				return -1;

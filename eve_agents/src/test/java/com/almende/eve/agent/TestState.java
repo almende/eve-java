@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestState.
  */
 public class TestState extends TestCase {
-		
+	
 	/**
 	 * Run test.
 	 * 

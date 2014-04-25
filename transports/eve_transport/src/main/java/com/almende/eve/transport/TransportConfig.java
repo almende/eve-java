@@ -18,31 +18,8 @@ public class TransportConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public TransportConfig(ObjectNode node){
+	public TransportConfig(final ObjectNode node) {
 		super(node);
-	}
-	
-	
-	/**
-	 * Sets the class path. (Required)
-	 * 
-	 * @param className
-	 *            the new class
-	 */
-	public void setClassPath(final String className) {
-		this.put("class", className);
-	}
-	
-	/**
-	 * Gets the class path.
-	 * 
-	 * @return the class path
-	 */
-	public String getClassPath() {
-		if (this.has("class")) {
-			return this.get("class").asText();
-		}
-		return null;
 	}
 	
 	/**
@@ -51,7 +28,7 @@ public class TransportConfig extends Config {
 	 * @param doShortcut
 	 *            the new do shortcut
 	 */
-	public void setDoShortcut(final boolean doShortcut){
+	public void setDoShortcut(final boolean doShortcut) {
 		this.put("doShortcut", doShortcut);
 	}
 	
@@ -60,31 +37,30 @@ public class TransportConfig extends Config {
 	 * 
 	 * @return the do shortcut
 	 */
-	public boolean getDoShortcut(){
-		if (this.has("doShortcut")){
+	public boolean getDoShortcut() {
+		if (this.has("doShortcut")) {
 			return this.get("doShortcut").asBoolean();
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Sets the do authentication. (Optional, default is true)
 	 * 
 	 * @param doAuthentication
 	 *            the new do authentication
 	 */
-	public void setDoAuthentication(final boolean doAuthentication){
+	public void setDoAuthentication(final boolean doAuthentication) {
 		this.put("doAuthentication", doAuthentication);
 	}
 	
-
 	/**
 	 * Gets the do authentication.
 	 * 
 	 * @return the do authentication
 	 */
-	public boolean getDoAuthentication(){
-		if (this.has("doAuthentication")){
+	public boolean getDoAuthentication() {
+		if (this.has("doAuthentication")) {
 			return this.get("doAuthentication").asBoolean();
 		}
 		return true;

@@ -39,24 +39,30 @@ public class JettyLauncher implements ServletLauncher {
 			port = params.get("port").asInt();
 		}
 		server = new Server(port);
-		context = new ServletContextHandler(ServletContextHandler.SESSIONS|ServletContextHandler.NO_SECURITY);
+		context = new ServletContextHandler(ServletContextHandler.SESSIONS
+				| ServletContextHandler.NO_SECURITY);
 		
 		context.setContextPath("/");
 		server.setHandler(context);
 		
 		try {
 			server.start();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.log(Level.SEVERE, "Couldn't start embedded Jetty server!", e);
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet, java.net.URI, com.almende.eve.config.Config)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet,
+	 * java.net.URI, com.almende.eve.config.Config)
 	 */
+	@Override
 	public void add(final Servlet servlet, final URI servletPath,
 			final ObjectNode config) {
-		//TODO: config hierarchy...
+		// TODO: config hierarchy...
 		if (server == null) {
 			if (config != null) {
 				initServer((ObjectNode) config.get("jetty"));

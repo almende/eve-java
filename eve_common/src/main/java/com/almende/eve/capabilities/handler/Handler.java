@@ -27,9 +27,10 @@ public interface Handler<T> {
 	 *            the new handler
 	 */
 	void update(Handler<T> newHandler);
-
+	
 	/**
-	 * Gets the key of this handle, when relevant. Returns null if no such key is available.
+	 * Gets the key of this handle, when relevant. Returns null if no such key
+	 * is available.
 	 * 
 	 * @return the key
 	 */

@@ -25,11 +25,32 @@ public class Config extends ObjectNode {
 	 * @param node
 	 *            the node
 	 */
-	public Config(ObjectNode node) {
+	public Config(final ObjectNode node) {
 		super(JOM.getInstance().getNodeFactory());
 		if (node != null) {
 			this.setAll(node);
 		}
 	}
 	
+	/**
+	 * Sets the class path. (Required)
+	 * 
+	 * @param className
+	 *            the new class
+	 */
+	public void setClassName(final String className) {
+		this.put("class", className);
+	}
+	
+	/**
+	 * Gets the class path.
+	 * 
+	 * @return the class path
+	 */
+	public String getClassName() {
+		if (this.has("class")) {
+			return this.get("class").asText();
+		}
+		return null;
+	}
 }

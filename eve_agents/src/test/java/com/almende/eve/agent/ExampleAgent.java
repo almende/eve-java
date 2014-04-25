@@ -21,7 +21,7 @@ public class ExampleAgent extends Agent {
 	 *            the message
 	 * @return the string
 	 */
-	public String helloWorld(@Name("message") String message){
-		return "You said:"+message;
+	public String helloWorld(@Name("message") final String message) {
+		return "You said:" + message;
 	}
 }

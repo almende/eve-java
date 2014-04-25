@@ -25,7 +25,7 @@ public class ZmqTransportFactory {
 	public static ZmqService get(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", ZmqTransportFactory.class
+			params.put("class", ZmqTransportFactory.class
 					.getPackage().getName() + ".ZmqService");
 		}
 		return CapabilityFactory.get(params, handle, ZmqService.class);

@@ -10,7 +10,6 @@ import javax.servlet.Servlet;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 /**
  * The Interface ServletLauncher.
  * 
@@ -31,5 +30,6 @@ public interface ServletLauncher {
 	 * @param config
 	 *            the config
 	 */
-	void add(final Servlet servlet, final URI servletPath, final ObjectNode config);
+	void add(final Servlet servlet, final URI servletPath,
+			final ObjectNode config);
 }

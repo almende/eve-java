@@ -40,9 +40,9 @@ public class EveServlet extends HttpServlet {
 	 * @param servletUrl
 	 *            the servlet url
 	 */
-	public EveServlet(URI servletUrl) {
+	public EveServlet(final URI servletUrl) {
 		if (servletUrl != null) {
-			this.myUrl = servletUrl;
+			myUrl = servletUrl;
 		}
 	}
 	
@@ -150,13 +150,15 @@ public class EveServlet extends HttpServlet {
 			if (req.getSession(false) != null) {
 				return true;
 			}
-			//TODO: make sure connection is secure if configured to enforce that.
+			// TODO: make sure connection is secure if configured to enforce
+			// that.
 			final Handshake hs = doHandShake(req);
 			if (hs.equals(Handshake.INVALID)) {
 				return false;
 			}
-
-			final boolean doAuthentication = HttpService.doAuthentication(myUrl);
+			
+			final boolean doAuthentication = HttpService
+					.doAuthentication(myUrl);
 			if (hs.equals(Handshake.NAK) && doAuthentication) {
 				if (!req.isSecure()) {
 					res.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -178,8 +180,7 @@ public class EveServlet extends HttpServlet {
 		return true;
 	}
 	
-	
-	private String getId(String url){
+	private String getId(final String url) {
 		String id = "";
 		if (myUrl != null) {
 			id = url.replace(myUrl.getRawPath(), "");
@@ -194,7 +195,7 @@ public class EveServlet extends HttpServlet {
 			final HttpServletResponse resp) throws IOException,
 			ServletException {
 		
-		if (!handleSession(req, resp)){
+		if (!handleSession(req, resp)) {
 			if (!resp.isCommitted()) {
 				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			}
@@ -220,19 +221,19 @@ public class EveServlet extends HttpServlet {
 		URI senderUrl = null;
 		try {
 			senderUrl = new URI(sender);
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Couldn't parse senderUrl:" + sender, e);
 		}
-		HttpTransport transport = HttpService.get(myUrl, id);
+		final HttpTransport transport = HttpService.get(myUrl, id);
 		if (transport != null) {
 			try {
-				String response = transport.receive(body, senderUrl);
+				final String response = transport.receive(body, senderUrl);
 				// TODO: It doesn't need to be json, should we handle mime-types
 				// better?
 				resp.addHeader("Content-Type", "application/json");
 				resp.getWriter().println(response);
 				resp.getWriter().close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Receiver raised exception:" + e.getMessage());
 			}
@@ -261,7 +262,7 @@ public class EveServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		HttpTransport transport = HttpService.get(myUrl, id);
+		final HttpTransport transport = HttpService.get(myUrl, id);
 		
 		resp.setContentType("text/plain");
 		resp.getWriter().println(

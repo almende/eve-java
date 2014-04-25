@@ -18,14 +18,15 @@ import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class PersistentScheduler.
  */
 public class PersistentScheduler extends SimpleScheduler {
-	private State	state	= null;
+	private static final Logger	LOG		= Logger.getLogger(PersistentScheduler.class
+												.getName());
+	private State				state	= null;
 	
 	/**
 	 * Instantiates a new persistent scheduler.
@@ -35,50 +36,65 @@ public class PersistentScheduler extends SimpleScheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public PersistentScheduler(JsonNode params, Handler<Receiver> handle) {
+	public PersistentScheduler(final ObjectNode params, final Handler<Receiver> handle) {
 		super(params, handle);
-		state = StateFactory.getState((ObjectNode) params.get("state"));
-		
+		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(params);
 		if (clock == null) {
 			clock = new RunnableClock();
 		}
-		for (String key : state.keySet()){
-			final TaskEntry entry = state.get(key,TaskEntry.class);
-			run(entry);
+		
+		final ObjectNode stateConfig = config.getState();
+		if (stateConfig == null) {
+			LOG.warning("Parameter 'state' is required, falling back to SimpleScheduler.");
+		} else {
+			state = StateFactory.getState(stateConfig);
+			for (final String key : state.keySet()) {
+				final TaskEntry entry = state.get(key, TaskEntry.class);
+				run(entry);
+			}
 		}
+		
 	}
 	
-	private void run(final TaskEntry entry){
-		if (entry != null){
+	private void run(final TaskEntry entry) {
+		if (entry != null) {
 			if (clock == null) {
 				clock = new RunnableClock();
 			}
-			clock.requestTrigger(entry.getTaskId(), entry.getDue(), new Runnable() {
-				
-				@Override
-				public void run() {
-					state.remove(entry.getTaskId());
-					getHandle().get().receive(entry.getMessage(), getSchedulerUrl(), null);
-				}
-			});
+			clock.requestTrigger(entry.getTaskId(), entry.getDue(),
+					new Runnable() {
+						
+						@Override
+						public void run() {
+							if (state != null) {
+								state.remove(entry.getTaskId());
+							}
+							getHandle().get().receive(entry.getMessage(),
+									getSchedulerUrl(), null);
+						}
+					});
 		}
 	}
 	
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
 		
-		TaskEntry entry = new TaskEntry(due,msg);
-		state.put(entry.getTaskId(), entry);
+		final TaskEntry entry = new TaskEntry(due, msg);
+		if (state != null) {
+			state.put(entry.getTaskId(), entry);
+		}
 		run(entry);
 		return entry.getTaskId();
 	}
 	
 	@Override
-	public void cancel(String id) {
+	public void cancel(final String id) {
 		if (clock == null) {
 			clock = new RunnableClock();
 		}
-		state.remove(id);
+		if (state != null) {
+			state.remove(id);
+		}
 		clock.cancel(id);
 	}
 	
@@ -87,7 +103,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		if (clock == null) {
 			clock = new RunnableClock();
 		}
-		state.clear();
+		if (state != null) {
+			state.clear();
+		}
 		clock.clear();
 	}
 }
@@ -119,9 +137,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	 * @param message
 	 *            the message
 	 */
-	public TaskEntry(final DateTime due, final Object message){
+	public TaskEntry(final DateTime due, final Object message) {
 		taskId = new UUID().toString();
-		this.setMessage(message);
+		setMessage(message);
 		this.due = due;
 	}
 	
@@ -172,7 +190,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		return message;
 	}
 	
-	public void setMessage(Object message) {
+	public void setMessage(final Object message) {
 		this.message = message;
 	}
 	

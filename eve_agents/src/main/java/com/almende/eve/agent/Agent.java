@@ -44,7 +44,7 @@ public class Agent implements Receiver {
 	private State				state		= null;
 	private Transport			transport	= null;
 	private Scheduler			scheduler	= null;
-	private RpcTransform		rpc			= RpcTransformFactory
+	private final RpcTransform		rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
 															this));
 	
@@ -60,7 +60,7 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the config
 	 */
-	public Agent(ObjectNode config) {
+	public Agent(final ObjectNode config) {
 		this.config = config.deepCopy();
 		loadConfig();
 	}
@@ -71,7 +71,7 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the new config
 	 */
-	public void setConfig(JsonNode config) {
+	public void setConfig(final JsonNode config) {
 		this.config = config.deepCopy();
 		loadConfig();
 	}
@@ -82,56 +82,56 @@ public class Agent implements Receiver {
 	 * @return the config
 	 */
 	public JsonNode getConfig() {
-		return this.config;
+		return config;
 	}
 	
 	private void loadConfig() {
 		final Handler<Receiver> handle = new SimpleHandler<Receiver>(this);
 		if (config.has("id")) {
-			this.agentId = config.get("id").asText();
+			agentId = config.get("id").asText();
 		}
 		if (config.has("scheduler")) {
-			ObjectNode schedulerConfig = (ObjectNode) config.get("scheduler");
-			if (this.agentId != null && schedulerConfig.has("state")) {
-				ObjectNode stateConfig = (ObjectNode) schedulerConfig
+			final ObjectNode schedulerConfig = (ObjectNode) config.get("scheduler");
+			if (agentId != null && schedulerConfig.has("state")) {
+				final ObjectNode stateConfig = (ObjectNode) schedulerConfig
 						.get("state");
 				if (!stateConfig.has("id")) {
-					stateConfig.put("id", "scheduler_" + this.agentId);
+					stateConfig.put("id", "scheduler_" + agentId);
 				}
 			}
-			this.scheduler = SchedulerFactory.getScheduler(
-					schedulerConfig, handle);
+			scheduler = SchedulerFactory.getScheduler(schedulerConfig,
+					handle);
 		}
 		if (config.has("state")) {
-			ObjectNode stateConfig = (ObjectNode) config.get("state");
-			if (this.agentId != null && !stateConfig.has("id")) {
-				stateConfig.put("id", this.agentId);
+			final ObjectNode stateConfig = (ObjectNode) config.get("state");
+			if (agentId != null && !stateConfig.has("id")) {
+				stateConfig.put("id", agentId);
 			}
-			this.state = StateFactory.getState(stateConfig);
+			state = StateFactory.getState(stateConfig);
 		}
 		if (config.has("transport")) {
 			if (config.get("transport").isArray()) {
-				Router router = new Router();
-				Iterator<JsonNode> iter = config.get("transport").iterator();
+				final Router router = new Router();
+				final Iterator<JsonNode> iter = config.get("transport").iterator();
 				while (iter.hasNext()) {
-					router.register(TransportFactory.getTransport((ObjectNode) iter.next(),
-							handle));
+					router.register(TransportFactory.getTransport(
+							(ObjectNode) iter.next(), handle));
 				}
-				this.transport = router;
+				transport = router;
 			} else {
-				this.transport = TransportFactory.getTransport(
+				transport = TransportFactory.getTransport(
 						(ObjectNode) config.get("transport"), handle);
 			}
 		}
 	}
 	
 	@Override
-	public void receive(Object msg, URI senderUrl, String tag) {
-		JSONResponse response = rpc.invoke(msg, senderUrl);
+	public void receive(final Object msg, final URI senderUrl, final String tag) {
+		final JSONResponse response = rpc.invoke(msg, senderUrl);
 		if (response != null) {
 			try {
 				transport.send(senderUrl, response.toString(), tag);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Couldn't send message", e);
 			}
 		}
@@ -181,7 +181,7 @@ public class Agent implements Receiver {
 	public final <T> void sendAsync(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback,
 			final JavaType type) throws IOException {
-		JSONRequest request = rpc.buildMsg(method, params, callback, type);
+		final JSONRequest request = rpc.buildMsg(method, params, callback, type);
 		transport.send(url, request.toString(), null);
 	}
 	

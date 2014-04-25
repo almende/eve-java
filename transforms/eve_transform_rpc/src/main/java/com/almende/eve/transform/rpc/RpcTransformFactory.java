@@ -6,7 +6,6 @@ package com.almende.eve.transform.rpc;
 
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -22,16 +21,11 @@ public class RpcTransformFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static RpcTransform get(ObjectNode params,
+	public static RpcTransform get(final ObjectNode params,
 			final Handler<Object> handle) {
-		if (params == null || params.equals(JOM.createNullNode()) || params.isNull()){
-			params = JOM.createObjectNode();
-		}
-		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", RpcTransformFactory.class
-					.getPackage().getName() + ".RpcService");
-		}
-		return CapabilityFactory.get(params, handle, RpcTransform.class);
+		
+		return CapabilityFactory.get(new RpcTransformConfig(params), handle,
+				RpcTransform.class);
 	}
 	
 	/**
@@ -42,7 +36,7 @@ public class RpcTransformFactory {
 	 * @return the transform
 	 */
 	public static RpcTransform get(final Handler<Object> handle) {
-		return get(null,handle);
+		return get(null, handle);
 	}
 	
 }

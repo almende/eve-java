@@ -6,10 +6,10 @@ package com.almende.eve.transform.rpc.annotation;
 
 /**
  * The Enum AccessType.
- *
+ * 
  * @author Almende
  * 
- * Basic authorization constrains for methods for JSON-RPC access.
+ *         Basic authorization constrains for methods for JSON-RPC access.
  */
 public enum AccessType {
 	/**
@@ -18,10 +18,16 @@ public enum AccessType {
 	 */
 	PUBLIC,
 	
-	/** This method(s) can only be accessed through JSON-RPC by sender's for which onAccess(SenderUrl,tag) returns true;. */
+	/**
+	 * This method(s) can only be accessed through JSON-RPC by sender's for
+	 * which onAccess(SenderUrl,tag) returns true;.
+	 */
 	PRIVATE,
 	
-	/** This method(s) can only be accessed through JSON-RPC by the agent itself (or a scheduler task on its behalve). */
+	/**
+	 * This method(s) can only be accessed through JSON-RPC by the agent itself
+	 * (or a scheduler task on its behalve).
+	 */
 	SELF,
 	/**
 	 * This method(s) can not be accessed through JSON-RPC.

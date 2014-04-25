@@ -34,17 +34,18 @@ public abstract class CapabilityFactory {
 	 *            the capability type (e.g. State, Transport, etc.)
 	 * @return the t
 	 */
-	public static <T, V> T get(final ObjectNode params, final Handler<V> handle,
-			final Class<T> type) {
-		if (params.has("class")) {
-			final String className = params.get("class").asText();
+	public static <T, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
+		final Config config = new Config(params);
+		final String className = config.getClassName();
+		if (className != null) {
 			try {
 				final Class<?> clazz = Class.forName(className);
 				final Method method = clazz.getMethod("getInstanceByParams",
 						ObjectNode.class);
 				final Capability instance = (Capability) method.invoke(null,
 						params);
-				if (instance != null){
+				if (instance != null) {
 					return instance.get(params, handle, type);
 				} else {
 					LOG.log(Level.WARNING, "Got null instance from service.");

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class JSONResponse extends JSONMessage {
 	private static final long	serialVersionUID	= 12392962249054051L;
-	private final ObjectNode			resp				= JOM.createObjectNode();
+	private final ObjectNode	resp				= JOM.createObjectNode();
 	private static final Logger	LOG					= Logger.getLogger(JSONResponse.class
 															.getName());
 	
@@ -32,10 +32,13 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param json the json
-	 * @throws JSONRPCException the jSONRPC exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param json
+	 *            the json
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONResponse(final String json) throws JSONRPCException, IOException {
 		final ObjectMapper mapper = JOM.getInstance();
@@ -49,9 +52,11 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param response the response
-	 * @throws JSONRPCException the jSONRPC exception
+	 * 
+	 * @param response
+	 *            the response
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
 	 */
 	public JSONResponse(final ObjectNode response) throws JSONRPCException {
 		init(response);
@@ -59,8 +64,9 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param result the result
+	 * 
+	 * @param result
+	 *            the result
 	 */
 	public JSONResponse(final Object result) {
 		init(null, result, null);
@@ -68,9 +74,11 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param id the id
-	 * @param result the result
+	 * 
+	 * @param id
+	 *            the id
+	 * @param result
+	 *            the result
 	 */
 	public JSONResponse(final JsonNode id, final Object result) {
 		init(id, result, null);
@@ -78,8 +86,9 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param error the error
+	 * 
+	 * @param error
+	 *            the error
 	 */
 	public JSONResponse(final JSONRPCException error) {
 		init(null, null, error);
@@ -87,9 +96,11 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Instantiates a new jSON response.
-	 *
-	 * @param id the id
-	 * @param error the error
+	 * 
+	 * @param id
+	 *            the id
+	 * @param error
+	 *            the error
 	 */
 	public JSONResponse(final JsonNode id, final JSONRPCException error) {
 		init(id, null, error);
@@ -97,9 +108,11 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Inits the.
-	 *
-	 * @param response the response
-	 * @throws JSONRPCException the jSONRPC exception
+	 * 
+	 * @param response
+	 *            the response
+	 * @throws JSONRPCException
+	 *             the jSONRPC exception
 	 */
 	private void init(final ObjectNode response) throws JSONRPCException {
 		if (response == null || response.isNull()) {
@@ -111,7 +124,8 @@ public final class JSONResponse extends JSONMessage {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Value of member 'jsonrpc' must be '2.0'");
 		}
-		final boolean hasError = response.has(ERROR) && !response.get(ERROR).isNull();
+		final boolean hasError = response.has(ERROR)
+				&& !response.get(ERROR).isNull();
 		if (hasError && !(response.get(ERROR).isObject())) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'error' is no ObjectNode");
@@ -129,12 +143,16 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Inits the.
-	 *
-	 * @param id the id
-	 * @param result the result
-	 * @param error the error
+	 * 
+	 * @param id
+	 *            the id
+	 * @param result
+	 *            the result
+	 * @param error
+	 *            the error
 	 */
-	private void init(final JsonNode id, final Object result, final JSONRPCException error) {
+	private void init(final JsonNode id, final Object result,
+			final JSONRPCException error) {
 		setVersion();
 		setId(id);
 		setResult(result);
@@ -143,14 +161,17 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Sets the id.
-	 *
-	 * @param id the new id
+	 * 
+	 * @param id
+	 *            the new id
 	 */
 	public void setId(final JsonNode id) {
 		resp.put(ID, id);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transform.rpc.jsonrpc.JSONMessage#getId()
 	 */
 	@Override
@@ -160,8 +181,9 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Sets the result.
-	 *
-	 * @param result the new result
+	 * 
+	 * @param result
+	 *            the new result
 	 */
 	public void setResult(final Object result) {
 		if (result != null) {
@@ -177,7 +199,7 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Gets the result.
-	 *
+	 * 
 	 * @return the result
 	 */
 	public JsonNode getResult() {
@@ -186,8 +208,9 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Sets the error.
-	 *
-	 * @param error the new error
+	 * 
+	 * @param error
+	 *            the new error
 	 */
 	public void setError(final JSONRPCException error) {
 		if (error != null) {
@@ -202,7 +225,7 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Gets the error.
-	 *
+	 * 
 	 * @return the error
 	 */
 	public JSONRPCException getError() {
@@ -223,14 +246,16 @@ public final class JSONResponse extends JSONMessage {
 	
 	/**
 	 * Gets the object node.
-	 *
+	 * 
 	 * @return the object node
 	 */
 	public ObjectNode getObjectNode() {
 		return resp;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

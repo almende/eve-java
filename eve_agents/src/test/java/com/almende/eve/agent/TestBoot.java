@@ -22,8 +22,8 @@ public class TestBoot extends TestCase {
 	 */
 	@Test
 	public void testBoot() {
-		ObjectNode params = JOM.createObjectNode();
-		ObjectNode state = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
+		final ObjectNode state = JOM.createObjectNode();
 		state.put("class", "com.almende.eve.state.file.FileStateService");
 		state.put("json", true);
 		state.put("path", ".wakeservices");
@@ -36,7 +36,7 @@ public class TestBoot extends TestCase {
 		// Sleep for 10seconds, allowing external XMPP call.
 		try {
 			Thread.sleep(20000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

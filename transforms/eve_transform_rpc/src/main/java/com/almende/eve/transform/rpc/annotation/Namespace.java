@@ -20,7 +20,7 @@ public @interface Namespace {
 	
 	/**
 	 * Value.
-	 *
+	 * 
 	 * @return the string
 	 */
 	String value();

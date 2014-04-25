@@ -28,7 +28,6 @@ import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.threads.ThreadPool;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class ZmqTransport.
@@ -46,20 +45,18 @@ public class ZmqTransport extends AbstractTransport {
 	/**
 	 * Instantiates a new zmq transport.
 	 * 
-	 * @param params
-	 *            the params
+	 * @param config
+	 *            the config
 	 * @param handle
 	 *            the handle
 	 * @param service
 	 *            the service
 	 */
-	public ZmqTransport(final ObjectNode params, final Handler<Receiver> handle,
-			final TransportService service) {
-		super(URI.create(params.get("address").asText()), handle, service);
+	public ZmqTransport(final ZmqTransportConfig config,
+			final Handler<Receiver> handle, final TransportService service) {
+		super(config.getAddress(), handle, service);
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
-		if (params.has("authenticate")) {
-			doesAuthentication = params.get("authentication").asBoolean();
-		}
+		doesAuthentication = config.getDoAuthentication();
 	}
 	
 	/**
@@ -157,14 +154,16 @@ public class ZmqTransport extends AbstractTransport {
 		listeningThread.interrupt();
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
 		return protocols;
 	}
-
+	
 	/**
 	 * Gets the request.
 	 * 

@@ -35,7 +35,7 @@ public class RpcTransform implements Transform {
 	private static final Logger					LOG			= Logger.getLogger(RpcTransform.class
 																	.getName());
 	private Authorizor							auth		= new DefaultAuthorizor();
-	private AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
+	private final AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>				destination;
 	
 	/**
@@ -50,7 +50,7 @@ public class RpcTransform implements Transform {
 	 */
 	public RpcTransform(final ObjectNode params, final Handler<Object> handle,
 			final TransformService service) {
-		this.destination = handle;
+		destination = handle;
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class RpcTransform implements Transform {
 	 * @param auth
 	 *            the new auth
 	 */
-	public void setAuth(Authorizor auth) {
+	public void setAuth(final Authorizor auth) {
 		this.auth = auth;
 	}
 	
@@ -114,7 +114,7 @@ public class RpcTransform implements Transform {
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.log(Level.WARNING,
 					"Message triggered exception in trying to convert it to a JSONMessage.",
 					e);
@@ -141,7 +141,8 @@ public class RpcTransform implements Transform {
 					final JSONRequest request = (JSONRequest) jsonMsg;
 					final RequestParams params = new RequestParams();
 					params.put(Sender.class, senderUrl.toASCIIString());
-					return JSONRPC.invoke(destination.get(), request, params, auth);
+					return JSONRPC.invoke(destination.get(), request, params,
+							auth);
 				} else if (jsonMsg instanceof JSONResponse && callbacks != null
 						&& id != null && !id.isNull()) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
@@ -245,7 +246,7 @@ public class RpcTransform implements Transform {
 		}
 		return request;
 	}
-
+	
 	/**
 	 * Gets the handle.
 	 * 

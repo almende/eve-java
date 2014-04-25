@@ -54,7 +54,7 @@ public abstract class AbstractState<V> implements State {
 	 * @return agentId
 	 */
 	@Override
-	public synchronized String getAgentId() {
+	public synchronized String getId() {
 		return agentId;
 	}
 	
@@ -256,7 +256,9 @@ public abstract class AbstractState<V> implements State {
 				om.valueToTree(oldVal));
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#delete()
 	 */
 	@Override

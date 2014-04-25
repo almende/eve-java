@@ -20,7 +20,7 @@ public @interface Name {
 	
 	/**
 	 * Value.
-	 *
+	 * 
 	 * @return the string
 	 */
 	String value();

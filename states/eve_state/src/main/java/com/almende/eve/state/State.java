@@ -20,11 +20,11 @@ public interface State {
 	void delete();
 	
 	/**
-	 * Gets the agent id.
+	 * Gets the state's id.
 	 * 
-	 * @return the agent id
+	 * @return the state's id
 	 */
-	String getAgentId();
+	String getId();
 	
 	/**
 	 * Put.

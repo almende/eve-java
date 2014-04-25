@@ -9,7 +9,6 @@ import java.util.HashMap;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -29,16 +28,16 @@ public class SimpleSchedulerService implements SchedulerService {
 	 * @return the instance by params
 	 */
 	public static SimpleSchedulerService getInstanceByParams(
-			final JsonNode params) {
+			final ObjectNode params) {
 		return singleton;
 	}
 	
 	@Override
-	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
 		SimpleScheduler result = null;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());
-			Handler<Receiver> oldHandle = result.getHandle();
+			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(handle));
 		} else {
 			result = new SimpleScheduler(params, TYPEUTIL.inject(handle));

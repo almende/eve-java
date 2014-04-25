@@ -21,7 +21,7 @@ public class WakeEntry {
 	 * @param className
 	 *            the class name
 	 */
-	public WakeEntry(String wakeKey, String className) {
+	public WakeEntry(final String wakeKey, final String className) {
 		this.wakeKey = wakeKey;
 		this.className = className;
 	}

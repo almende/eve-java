@@ -39,16 +39,17 @@ public class SimpleScheduler implements Scheduler {
 	public SimpleScheduler(final JsonNode params, final Handler<Receiver> handle) {
 		if (params.has("senderUrl")) {
 			try {
-				this.schedulerUrl = new URI(params.get("senderUrl").asText());
-			} catch (URISyntaxException e) {
+				schedulerUrl = new URI(params.get("senderUrl").asText());
+			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING,
-						"Couldn't parse scheduler senderUrl from parameters.", e);
+						"Couldn't parse scheduler senderUrl from parameters.",
+						e);
 			}
 		}
-		if (this.schedulerUrl == null) {
+		if (schedulerUrl == null) {
 			try {
-				this.schedulerUrl = new URI("local:unnamed_scheduler");
-			} catch (URISyntaxException e1) {
+				schedulerUrl = new URI("local:unnamed_scheduler");
+			} catch (final URISyntaxException e1) {
 				LOG.log(Level.SEVERE, "", e1);
 			}
 		}
@@ -73,7 +74,7 @@ public class SimpleScheduler implements Scheduler {
 	}
 	
 	@Override
-	public void cancel(String id) {
+	public void cancel(final String id) {
 		if (clock == null) {
 			clock = new RunnableClock();
 			return;

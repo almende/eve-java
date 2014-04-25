@@ -5,6 +5,7 @@
 package com.almende.eve.scheduling.clock;
 
 import org.joda.time.DateTime;
+
 /**
  * The Interface Clock.
  */
@@ -12,20 +13,23 @@ public interface Clock {
 	
 	/**
 	 * Request trigger.
-	 *
-	 * @param triggerId the agent id
-	 * @param due the due
-	 * @param callback the callback
+	 * 
+	 * @param triggerId
+	 *            the agent id
+	 * @param due
+	 *            the due
+	 * @param callback
+	 *            the callback
 	 */
 	void requestTrigger(String triggerId, DateTime due, Runnable callback);
-
+	
 	/**
 	 * Cancel a triggerRequest
 	 * 
 	 * @param triggerId
 	 */
 	void cancel(String triggerId);
-
+	
 	/**
 	 * Clear all triggerRequests!
 	 */

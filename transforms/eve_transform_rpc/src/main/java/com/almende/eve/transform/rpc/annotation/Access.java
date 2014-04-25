@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 // annotation)
 /**
  * The Interface Access.
- *
+ * 
  * @author Almende
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,14 +24,14 @@ public @interface Access {
 	
 	/**
 	 * Value.
-	 *
+	 * 
 	 * @return AccessType
 	 */
 	AccessType value();
 	
 	/**
 	 * Tag.
-	 *
+	 * 
 	 * @return String
 	 */
 	String tag() default "";

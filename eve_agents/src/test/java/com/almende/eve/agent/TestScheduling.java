@@ -31,17 +31,18 @@ public class TestScheduling extends TestCase {
 	 */
 	@Test
 	public void testScheduling() {
-		ObjectNode params = JOM.createObjectNode();
-		ObjectNode state = JOM.createObjectNode();
+		final ObjectNode params = JOM.createObjectNode();
+		final ObjectNode state = JOM.createObjectNode();
 		state.put("class", "com.almende.eve.state.file.FileStateService");
 		state.put("json", true);
 		state.put("path", ".eveagents_schedulingtest");
 		state.put("id", "testScheduling");
 		params.put("state", state);
 		params.put("senderUrl", "local:scheduler");
-		params.put("class", "com.almende.eve.scheduling.PersistentSchedulerService");
+		params.put("class",
+				"com.almende.eve.scheduling.PersistentSchedulerService");
 		
-		Scheduler test = SchedulerFactory.getScheduler(params,
+		final Scheduler test = SchedulerFactory.getScheduler(params,
 				new SimpleHandler<Receiver>(new MyReceiver()));
 		
 		test.schedule("Hi there!", DateTime.now());
@@ -50,13 +51,15 @@ public class TestScheduling extends TestCase {
 		
 		try {
 			Thread.sleep(11000);
-		} catch (InterruptedException e) {}
+		} catch (final InterruptedException e) {
+		}
 		
 	}
 	
 	class MyReceiver implements Receiver {
 		@Override
-		public void receive(Object msg, URI senderUrl, String tag) {
+		public void receive(final Object msg, final URI senderUrl,
+				final String tag) {
 			LOG.warning("Received msg:'" + msg + "' from: "
 					+ senderUrl.toASCIIString());
 		}

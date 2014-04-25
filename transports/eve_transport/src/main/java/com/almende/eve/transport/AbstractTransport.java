@@ -35,7 +35,9 @@ public abstract class AbstractTransport implements Transport {
 		this.handle = handle;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#delete()
 	 */
 	@Override
@@ -56,7 +58,9 @@ public abstract class AbstractTransport implements Transport {
 		return handle;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getAddress()
 	 */
 	@Override
@@ -73,7 +77,7 @@ public abstract class AbstractTransport implements Transport {
 	public void setAddress(final URI address) {
 		this.address = address;
 	}
-
+	
 	/**
 	 * Gets the service.
 	 * 
@@ -92,14 +96,15 @@ public abstract class AbstractTransport implements Transport {
 	 *            the message
 	 * @return true, if successful
 	 */
-	public boolean sendLocal(final URI receiverUri, final Object message){
+	public boolean sendLocal(final URI receiverUri, final Object message) {
 		final Transport local = getService().getLocal(receiverUri);
-		if (local != null){
-			//Do local shortcut.
+		if (local != null) {
+			// Do local shortcut.
 			ThreadPool.getPool().execute(new Runnable() {
 				@Override
 				public void run() {
-					local.getHandle().get().receive(message, getAddress(), null);
+					local.getHandle().get()
+							.receive(message, getAddress(), null);
 				}
 			});
 			return true;

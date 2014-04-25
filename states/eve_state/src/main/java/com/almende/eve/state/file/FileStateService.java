@@ -37,12 +37,10 @@ public class FileStateService implements StateService {
 	 *            the params
 	 */
 	public FileStateService(final ObjectNode params) {
-		if (params.has("json")) {
-			json = params.get("json").asBoolean();
-		}
-		if (params.has("path")) {
-			setPath(params.get("path").asText());
-		}
+		final FileStateConfig config = new FileStateConfig(params);
+		json = config.getJson();
+		setPath(config.getPath());
+		
 		if (params.has("multilevel")) {
 			multilevel = params.get("multilevel").asBoolean();
 		}
@@ -97,7 +95,7 @@ public class FileStateService implements StateService {
 	private synchronized void setPath(String path) {
 		if (path == null) {
 			path = ".eveagents";
-			LOG.warning("Config parameter 'state.path' missing in Eve "
+			LOG.warning("Config parameter 'path' missing in State "
 					+ "configuration. Using the default path '" + path + "'");
 		}
 		if (!path.endsWith("/")) {
@@ -266,12 +264,14 @@ public class FileStateService implements StateService {
 	@Override
 	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
-		final String agentId = params.get("id").asText();
-		if (exists(agentId)) {
-			return TypeUtil.inject(get(agentId, json), type);
+		final FileStateConfig config = new FileStateConfig(params);
+		
+		final String id = config.getId();
+		if (exists(id)) {
+			return TypeUtil.inject(get(id, json), type);
 		} else {
 			try {
-				return TypeUtil.inject(create(agentId, json), type);
+				return TypeUtil.inject(create(id, json), type);
 			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Couldn't create state file", e);
 			}
@@ -279,16 +279,19 @@ public class FileStateService implements StateService {
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
 	 */
 	@Override
 	public void delete(final State instance) {
-		final String agentId = instance.getAgentId();
-		final File file = new File(getFilename(agentId));
+		final String id = instance.getId();
+		final File file = new File(getFilename(id));
 		if (file.exists()) {
 			file.delete();
 		}
-		states.remove(agentId);
+		states.remove(id);
 	}
 }

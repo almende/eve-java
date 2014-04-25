@@ -33,9 +33,7 @@ public class ZmqService implements TransportService {
 	public static ZmqService getInstanceByParams(final ObjectNode params) {
 		// TODO: return different instance if doesShortcut does not agree with
 		// current singleton.
-		if (params.has("doesShortcut")) {
-			singleton.doesShortcut = params.get("doesShortcut").asBoolean();
-		}
+		singleton.doesShortcut = new ZmqTransportConfig(params).getDoShortcut();
 		return singleton;
 	}
 	
@@ -50,11 +48,12 @@ public class ZmqService implements TransportService {
 	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
-		final URI address = URI.create(params.get("address").asText());
+		final ZmqTransportConfig config = new ZmqTransportConfig(params);
+		final URI address = config.getAddress();
 		Transport result = instances.get(address);
 		
 		if (result == null) {
-			result = new ZmqTransport(params, newHandle, this);
+			result = new ZmqTransport(config, newHandle, this);
 			instances.put(address, result);
 		} else {
 			result.getHandle().update(newHandle);
@@ -75,7 +74,7 @@ public class ZmqService implements TransportService {
 	}
 	
 	@Override
-	public Transport getLocal(URI address) {
+	public Transport getLocal(final URI address) {
 		if (doesShortcut && instances.containsKey(address)) {
 			return instances.get(address);
 		}

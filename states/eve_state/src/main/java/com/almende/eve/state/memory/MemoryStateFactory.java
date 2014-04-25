@@ -22,11 +22,12 @@ public class MemoryStateFactory {
 	 * @return the state
 	 */
 	public static State get(ObjectNode params) {
-		if (params == null || params.equals(JOM.createNullNode()) || params.isNull()){
+		if (params == null || params.equals(JOM.createNullNode())
+				|| params.isNull()) {
 			params = JOM.createObjectNode();
 		}
 		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", MemoryStateFactory.class
+			params.put("class", MemoryStateFactory.class
 					.getPackage().getName() + ".MemoryStateService");
 		}
 		return CapabilityFactory.get(params, null, State.class);
@@ -37,7 +38,7 @@ public class MemoryStateFactory {
 	 * 
 	 * @return the state
 	 */
-	public static State get(){
+	public static State get() {
 		return get(null);
 	}
 }

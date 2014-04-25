@@ -42,7 +42,7 @@ public class MyAgent implements Wakeable, Receiver {
 	 * @param ws
 	 *            the ws
 	 */
-	public MyAgent(String wakeKey, WakeService ws) {
+	public MyAgent(final String wakeKey, final WakeService ws) {
 		this.wakeKey = wakeKey;
 		if (ws != null) {
 			this.ws = ws;
@@ -54,25 +54,25 @@ public class MyAgent implements Wakeable, Receiver {
 	 * Inits the agent.
 	 */
 	public void init() {
-		ws.register(this.wakeKey, MyAgent.class.getName());
+		ws.register(wakeKey, MyAgent.class.getName());
 		
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
-		params.put("address", "xmpp://alex@openid.almende.org/" + this.wakeKey);
+		params.put("address", "xmpp://alex@openid.almende.org/" + wakeKey);
 		params.put("password", "alex");
 		transport = TransportFactory.getTransport(params,
-				new WakeHandler<Receiver>(this, this.wakeKey, ws));
+				new WakeHandler<Receiver>(this, wakeKey, ws));
 		try {
 			transport.connect();
 			transport.send(URI.create("xmpp:gloria@openid.almende.org"),
 					"I'm awake!", null);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOG.log(Level.WARNING, "Failed to connect XMPP.", e);
 		}
 	}
 	
 	@Override
-	public void wake(String wakeKey, boolean onBoot) {
+	public void wake(final String wakeKey, final boolean onBoot) {
 		this.wakeKey = wakeKey;
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
@@ -84,14 +84,14 @@ public class MyAgent implements Wakeable, Receiver {
 		if (onBoot) {
 			try {
 				transport.connect();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Failed to connect XMPP.", e);
 			}
 		}
 	}
 	
 	@Override
-	public void receive(Object msg, URI senderUrl, String tag) {
+	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		LOG.warning("Received msg:'" + msg + "' from: "
 				+ senderUrl.toASCIIString());
 	}
