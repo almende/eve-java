@@ -7,7 +7,7 @@ package com.almende.eve.scheduling;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating Scheduler objects.
@@ -23,7 +23,7 @@ public class SchedulerFactory {
 	 *            the handle
 	 * @return the scheduler
 	 */
-	public static Scheduler getScheduler(final JsonNode params, Handler<Receiver> handle) {
+	public static Scheduler getScheduler(final ObjectNode params, Handler<Receiver> handle) {
 		return CapabilityFactory.get(params, handle, Scheduler.class);
 	}
 }

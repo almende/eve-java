@@ -5,7 +5,7 @@
 package com.almende.eve.transport;
 
 import com.almende.eve.capabilities.Config;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class TransportConfig.
@@ -18,7 +18,7 @@ public class TransportConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public TransportConfig(JsonNode node){
+	public TransportConfig(ObjectNode node){
 		super(node);
 	}
 	

@@ -5,7 +5,7 @@
 package com.almende.eve.state;
 
 import com.almende.eve.capabilities.CapabilityFactory;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating State objects.
@@ -21,7 +21,7 @@ public class StateFactory {
 	 *            the params
 	 * @return the state
 	 */
-	public static State getState(final JsonNode params) {
+	public static State getState(final ObjectNode params) {
 		return CapabilityFactory.get(params, null, State.class);
 	}
 }

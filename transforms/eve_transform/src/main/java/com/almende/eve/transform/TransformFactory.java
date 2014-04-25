@@ -6,7 +6,7 @@ package com.almende.eve.transform;
 
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating Transform objects.
@@ -22,7 +22,7 @@ public class TransformFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static Transform getTransform(final JsonNode params,
+	public static Transform getTransform(final ObjectNode params,
 			final Handler<Object> handle) {
 		return CapabilityFactory.get(params, handle, Transform.class);
 	}

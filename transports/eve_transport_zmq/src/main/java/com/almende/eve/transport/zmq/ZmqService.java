@@ -13,7 +13,7 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class ZmqService.
@@ -30,7 +30,7 @@ public class ZmqService implements TransportService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static ZmqService getInstanceByParams(final JsonNode params) {
+	public static ZmqService getInstanceByParams(final ObjectNode params) {
 		// TODO: return different instance if doesShortcut does not agree with
 		// current singleton.
 		if (params.has("doesShortcut")) {
@@ -47,7 +47,7 @@ public class ZmqService implements TransportService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final JsonNode params, final Handler<V> handle,
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final URI address = URI.create(params.get("address").asText());

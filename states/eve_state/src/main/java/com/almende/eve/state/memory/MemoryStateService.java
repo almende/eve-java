@@ -11,7 +11,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A service for managing MemoryState objects.
@@ -28,7 +28,7 @@ public class MemoryStateService implements StateService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static MemoryStateService getInstanceByParams(final JsonNode params) {
+	public static MemoryStateService getInstanceByParams(final ObjectNode params) {
 		return singleton;
 	}
 	
@@ -36,7 +36,7 @@ public class MemoryStateService implements StateService {
 	 * @see com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind.JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final JsonNode params, final Handler<V> handle,
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final String agentId = params.get("id").asText();
 		if (states.containsKey(agentId)) {

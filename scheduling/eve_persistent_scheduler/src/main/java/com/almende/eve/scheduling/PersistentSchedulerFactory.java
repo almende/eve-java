@@ -7,7 +7,6 @@ package com.almende.eve.scheduling;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -23,7 +22,7 @@ public class PersistentSchedulerFactory {
 	 *            the handle
 	 * @return the scheduler
 	 */
-	public static PersistentScheduler getScheduler(final JsonNode params, Handler<Receiver> handle) {
+	public static PersistentScheduler getScheduler(final ObjectNode params, Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
 			((ObjectNode) params).put("class", PersistentSchedulerFactory.class
 					.getPackage().getName() + ".PersistentSchedulerService");

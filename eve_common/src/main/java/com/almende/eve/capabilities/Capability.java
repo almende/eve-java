@@ -5,7 +5,7 @@
 package com.almende.eve.capabilities;
 
 import com.almende.eve.capabilities.handler.Handler;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Interface Capability.
@@ -27,5 +27,5 @@ public interface Capability {
 	 *            the type
 	 * @return the t
 	 */
-	<T, V> T get(JsonNode params, Handler<V> handle, Class<T> type);
+	<T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type);
 }

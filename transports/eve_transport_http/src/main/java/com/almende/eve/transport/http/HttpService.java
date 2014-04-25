@@ -17,7 +17,7 @@ import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.ClassUtil;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class HttpService.
@@ -38,7 +38,7 @@ public class HttpService implements TransportService {
 	 * @param params
 	 *            the params
 	 */
-	public HttpService(URI servletUrl, JsonNode params) {
+	public HttpService(URI servletUrl, ObjectNode params) {
 		this.myUrl = servletUrl;
 		this.myParams = new HttpTransportConfig(params);
 	}
@@ -50,7 +50,7 @@ public class HttpService implements TransportService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static HttpService getInstanceByParams(final JsonNode params) {
+	public static HttpService getInstanceByParams(final ObjectNode params) {
 		HttpService service = null;
 		final HttpTransportConfig config = new HttpTransportConfig(params);
 		final String servletUrl = config.getServletUrl();
@@ -107,7 +107,7 @@ public class HttpService implements TransportService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final HttpTransportConfig config = new HttpTransportConfig(params);
 		HttpTransport result = null;

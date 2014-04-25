@@ -40,7 +40,7 @@ public class Agent implements Receiver {
 	private static final Logger	LOG			= Logger.getLogger(Agent.class
 													.getName());
 	private String				agentId		= null;
-	private JsonNode			config		= null;
+	private ObjectNode			config		= null;
 	private State				state		= null;
 	private Transport			transport	= null;
 	private Scheduler			scheduler	= null;
@@ -60,7 +60,7 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the config
 	 */
-	public Agent(JsonNode config) {
+	public Agent(ObjectNode config) {
 		this.config = config.deepCopy();
 		loadConfig();
 	}
@@ -91,7 +91,7 @@ public class Agent implements Receiver {
 			this.agentId = config.get("id").asText();
 		}
 		if (config.has("scheduler")) {
-			JsonNode schedulerConfig = config.get("scheduler");
+			ObjectNode schedulerConfig = (ObjectNode) config.get("scheduler");
 			if (this.agentId != null && schedulerConfig.has("state")) {
 				ObjectNode stateConfig = (ObjectNode) schedulerConfig
 						.get("state");
@@ -114,13 +114,13 @@ public class Agent implements Receiver {
 				Router router = new Router();
 				Iterator<JsonNode> iter = config.get("transport").iterator();
 				while (iter.hasNext()) {
-					router.register(TransportFactory.getTransport(iter.next(),
+					router.register(TransportFactory.getTransport((ObjectNode) iter.next(),
 							handle));
 				}
 				this.transport = router;
 			} else {
 				this.transport = TransportFactory.getTransport(
-						config.get("transport"), handle);
+						(ObjectNode) config.get("transport"), handle);
 			}
 		}
 	}

@@ -25,7 +25,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class XmppTransport.
@@ -55,7 +55,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 * @param service
 	 *            the service
 	 */
-	public <V> XmppTransport(final JsonNode params,
+	public <V> XmppTransport(final ObjectNode params,
 			final Handler<Receiver> handle, final TransportService service) {
 		// TODO: support more parameter structures.
 		super(URI.create(params.get("address").asText()), handle, service);

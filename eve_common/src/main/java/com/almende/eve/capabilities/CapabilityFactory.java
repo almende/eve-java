@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class CapabilityFactory.
@@ -34,14 +34,14 @@ public abstract class CapabilityFactory {
 	 *            the capability type (e.g. State, Transport, etc.)
 	 * @return the t
 	 */
-	public static <T, V> T get(final JsonNode params, final Handler<V> handle,
+	public static <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		if (params.has("class")) {
 			final String className = params.get("class").asText();
 			try {
 				final Class<?> clazz = Class.forName(className);
 				final Method method = clazz.getMethod("getInstanceByParams",
-						JsonNode.class);
+						ObjectNode.class);
 				final Capability instance = (Capability) method.invoke(null,
 						params);
 				if (instance != null){

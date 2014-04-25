@@ -9,7 +9,7 @@ import java.util.HashMap;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class PersistentSchedulerService.
@@ -28,12 +28,12 @@ public class PersistentSchedulerService implements SchedulerService {
 	 * @return the instance by params
 	 */
 	public static PersistentSchedulerService getInstanceByParams(
-			final JsonNode params) {
+			final ObjectNode params) {
 		return singleton;
 	}
 	
 	@Override
-	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
 		PersistentScheduler result = null;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());

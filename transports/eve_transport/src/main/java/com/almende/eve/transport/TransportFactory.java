@@ -6,7 +6,7 @@ package com.almende.eve.transport;
 
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating Transport objects.
@@ -24,7 +24,7 @@ public class TransportFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static Transport getTransport(final JsonNode params,
+	public static Transport getTransport(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		return CapabilityFactory.get(params, handle, Transport.class);
 	}

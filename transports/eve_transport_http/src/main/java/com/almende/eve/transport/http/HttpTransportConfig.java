@@ -6,7 +6,7 @@ package com.almende.eve.transport.http;
 
 import com.almende.eve.transport.TransportConfig;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class HttpTransportConfig.
@@ -27,7 +27,7 @@ public class HttpTransportConfig extends TransportConfig {
 	 * @param node
 	 *            the node
 	 */
-	public HttpTransportConfig(JsonNode node) {
+	public HttpTransportConfig(ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
 			this.setClassPath(HttpTransportConfig.class.getPackage().getName()

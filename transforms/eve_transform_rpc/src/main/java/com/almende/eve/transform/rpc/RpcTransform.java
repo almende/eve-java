@@ -48,7 +48,7 @@ public class RpcTransform implements Transform {
 	 * @param service
 	 *            the service
 	 */
-	public RpcTransform(final JsonNode params, final Handler<Object> handle,
+	public RpcTransform(final ObjectNode params, final Handler<Object> handle,
 			final TransformService service) {
 		this.destination = handle;
 	}

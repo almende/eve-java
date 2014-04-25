@@ -7,7 +7,6 @@ package com.almende.eve.transform.rpc;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -23,7 +22,7 @@ public class RpcTransformFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static RpcTransform get(JsonNode params,
+	public static RpcTransform get(ObjectNode params,
 			final Handler<Object> handle) {
 		if (params == null || params.equals(JOM.createNullNode()) || params.isNull()){
 			params = JOM.createObjectNode();

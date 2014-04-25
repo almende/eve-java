@@ -28,7 +28,7 @@ import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.threads.ThreadPool;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class ZmqTransport.
@@ -53,7 +53,7 @@ public class ZmqTransport extends AbstractTransport {
 	 * @param service
 	 *            the service
 	 */
-	public ZmqTransport(final JsonNode params, final Handler<Receiver> handle,
+	public ZmqTransport(final ObjectNode params, final Handler<Receiver> handle,
 			final TransportService service) {
 		super(URI.create(params.get("address").asText()), handle, service);
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");

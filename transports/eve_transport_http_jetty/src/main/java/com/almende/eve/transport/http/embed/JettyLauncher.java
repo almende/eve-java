@@ -16,7 +16,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.almende.eve.transport.http.ServletLauncher;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class JettyLauncher.
@@ -33,7 +33,7 @@ public class JettyLauncher implements ServletLauncher {
 	 * @param params
 	 *            the params
 	 */
-	public void initServer(final JsonNode params) {
+	public void initServer(final ObjectNode params) {
 		int port = 8080;
 		if (params != null && params.has("port")) {
 			port = params.get("port").asInt();
@@ -55,11 +55,11 @@ public class JettyLauncher implements ServletLauncher {
 	 * @see com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet, java.net.URI, com.almende.eve.config.Config)
 	 */
 	public void add(final Servlet servlet, final URI servletPath,
-			final JsonNode config) {
+			final ObjectNode config) {
 		//TODO: config hierarchy...
 		if (server == null) {
 			if (config != null) {
-				initServer(config.get("jetty"));
+				initServer((ObjectNode) config.get("jetty"));
 			} else {
 				initServer(JOM.createObjectNode());
 			}

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transform.TransformService;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class RpcService.
@@ -27,7 +27,7 @@ public class RpcService implements TransformService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static RpcService getInstanceByParams(final JsonNode params) {
+	public static RpcService getInstanceByParams(final ObjectNode params) {
 		return singleton;
 	}
 	
@@ -39,7 +39,7 @@ public class RpcService implements TransformService {
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
+	public <T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type) {
 		RpcTransform result;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());

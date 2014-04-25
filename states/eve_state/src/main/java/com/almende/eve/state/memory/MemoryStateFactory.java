@@ -7,7 +7,6 @@ package com.almende.eve.state.memory;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.state.State;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -22,7 +21,7 @@ public class MemoryStateFactory {
 	 *            the params
 	 * @return the state
 	 */
-	public static State get(JsonNode params) {
+	public static State get(ObjectNode params) {
 		if (params == null || params.equals(JOM.createNullNode()) || params.isNull()){
 			params = JOM.createObjectNode();
 		}

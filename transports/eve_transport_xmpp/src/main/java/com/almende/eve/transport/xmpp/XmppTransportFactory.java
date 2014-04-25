@@ -7,7 +7,6 @@ package com.almende.eve.transport.xmpp;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -23,7 +22,7 @@ public class XmppTransportFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static XmppService get(final JsonNode params,
+	public static XmppService get(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
 			((ObjectNode) params).put("class", XmppTransportFactory.class

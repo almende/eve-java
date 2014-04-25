@@ -17,7 +17,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating FileState objects.
@@ -36,7 +36,7 @@ public class FileStateService implements StateService {
 	 * @param params
 	 *            the params
 	 */
-	public FileStateService(final JsonNode params) {
+	public FileStateService(final ObjectNode params) {
 		if (params.has("json")) {
 			json = params.get("json").asBoolean();
 		}
@@ -251,7 +251,7 @@ public class FileStateService implements StateService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public static FileStateService getInstanceByParams(final JsonNode params) {
+	public static FileStateService getInstanceByParams(final ObjectNode params) {
 		// TODO: add cache, keyed on path, JSON & multilevel.
 		return new FileStateService(params);
 	}
@@ -264,7 +264,7 @@ public class FileStateService implements StateService {
 	 * .JsonNode, java.lang.invoke.MethodHandle, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final JsonNode params, final Handler<V> handle,
+	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final String agentId = params.get("id").asText();
 		if (exists(agentId)) {
