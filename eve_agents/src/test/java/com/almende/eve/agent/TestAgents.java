@@ -14,6 +14,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.capabilities.Config;
+import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,23 +29,25 @@ public class TestAgents extends TestCase {
 	
 	/**
 	 * Test agents.
-	 * @throws URISyntaxException 
-	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws URISyntaxException
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void testAgent() throws IOException, URISyntaxException, InterruptedException {
-		ObjectNode config = JOM.createObjectNode();
-		final ObjectNode transportConfig = JOM.createObjectNode();
-		transportConfig.put("class", "com.almende.eve.transport.http.HttpService");
-		transportConfig.put("url", "http://localhost:8080/agents/");
-		transportConfig.put("servlet_launcher", "JettyLauncher");
+	public void testAgent() throws IOException, URISyntaxException,
+			InterruptedException {
+		
+		HttpTransportConfig transportConfig = new HttpTransportConfig();
+		transportConfig.setServletUrl("http://localhost:8080/agents/");
+		transportConfig.setId("example");
+		
+		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transportConfig.put("jetty", jettyParms);
 		
-		transportConfig.put("id", "example");
-		transportConfig.put("authentication", true);
+		Config config = new Config();
 		config.put("transport", transportConfig);
 		
 		Agent agent = new ExampleAgent();
@@ -52,8 +56,8 @@ public class TestAgents extends TestCase {
 		ObjectNode callParams = JOM.createObjectNode();
 		callParams.put("message", "Hello world!");
 		
-		agent.sendAsync(new URI("http://localhost:8080/agents/example"), "helloWorld",
-				callParams, new AsyncCallback<String>() {
+		agent.sendAsync(new URI("http://localhost:8080/agents/example"),
+				"helloWorld", callParams, new AsyncCallback<String>() {
 					
 					@Override
 					public void onSuccess(String result) {
@@ -66,10 +70,9 @@ public class TestAgents extends TestCase {
 						fail();
 					}
 					
-				}, JOM
-				.getTypeFactory().constructType(String.class));
+				}, JOM.getTypeFactory().constructType(String.class));
 		
-		//Give connection time to complete:
+		// Give connection time to complete:
 		Thread.sleep(1000);
 	}
 	
