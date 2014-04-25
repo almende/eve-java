@@ -29,7 +29,7 @@ public class RpcTransformConfig extends Config {
 	public RpcTransformConfig(final ObjectNode node) {
 		super(node);
 		if (!this.has("class")) {
-			setClassName(RpcTransform.class.getName());
+			setClassName(RpcService.class.getName());
 		}
 	}
 }
