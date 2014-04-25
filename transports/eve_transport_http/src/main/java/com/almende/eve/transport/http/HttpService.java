@@ -23,13 +23,12 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class HttpService.
  */
 public class HttpService implements TransportService {
-	private static final Logger				LOG				= Logger.getLogger(HttpService.class
-																	.getName());
-	private static Map<URI, HttpService>	services		= new HashMap<URI, HttpService>();
-	private URI								myUrl			= null;
-	private Map<URI, HttpTransport>			transports		= new HashMap<URI, HttpTransport>();
-	private JsonNode						myParams		= null;
-	private boolean							localShortcuts	= true;
+	private static final Logger				LOG			= Logger.getLogger(HttpService.class
+																.getName());
+	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
+	private URI								myUrl		= null;
+	private Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
+	private HttpTransportConfig				myParams	= null;
 	
 	/**
 	 * Instantiates a new http service.
@@ -41,10 +40,7 @@ public class HttpService implements TransportService {
 	 */
 	public HttpService(URI servletUrl, JsonNode params) {
 		this.myUrl = servletUrl;
-		this.myParams = params;
-		if (params.has("doesShortcut")) {
-			this.localShortcuts = params.get("doesShortcut").asBoolean();
-		}
+		this.myParams = new HttpTransportConfig(params);
 	}
 	
 	/**
@@ -56,23 +52,25 @@ public class HttpService implements TransportService {
 	 */
 	public static HttpService getInstanceByParams(final JsonNode params) {
 		HttpService service = null;
-		if (params.has("url")) {
+		final HttpTransportConfig config = new HttpTransportConfig(params);
+		final String servletUrl = config.getServletUrl();
+		if (servletUrl != null) {
 			try {
-				final URI servletUrl = new URI(params.get("url").asText()
-						.replace("/$", ""));
-				if (services.containsKey(servletUrl)) {
+				final URI servletUri = new URI(servletUrl);
+				if (services.containsKey(servletUri)) {
 					// Shortcut, it already exists and is launched.
-					return services.get(servletUrl);
+					return services.get(servletUri);
 				}
-				service = new HttpService(servletUrl, params);
-				services.put(servletUrl, service);
-				if (params.has("servlet_launcher")) {
-					String className = params.get("servlet_launcher").asText();
-					if (className.equals("JettyLauncher")) {
-						className = "com.almende.eve.transport.http.embed.JettyLauncher";
+				service = new HttpService(servletUri, params);
+				services.put(servletUri, service);
+				String servletLauncher = config.getServletLauncher();
+				if (servletLauncher != null) {
+					if (servletLauncher.equals("JettyLauncher")) {
+						servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
 					}
 					try {
-						final Class<?> launcherClass = Class.forName(className);
+						final Class<?> launcherClass = Class
+								.forName(servletLauncher);
 						if (!ClassUtil.hasInterface(launcherClass,
 								ServletLauncher.class)) {
 							throw new IllegalArgumentException(
@@ -85,7 +83,7 @@ public class HttpService implements TransportService {
 						ServletLauncher launcher = (ServletLauncher) launcherClass
 								.newInstance();
 						// TODO: make the Servlet type configurable
-						launcher.add(new EveServlet(servletUrl), servletUrl,
+						launcher.add(new EveServlet(servletUri), servletUri,
 								params);
 						
 					} catch (Exception e1) {
@@ -93,10 +91,10 @@ public class HttpService implements TransportService {
 					}
 				}
 			} catch (URISyntaxException e) {
-				LOG.log(Level.WARNING, "Couldn't parse 'url'", e);
+				LOG.log(Level.WARNING, "Couldn't parse 'servletUrl'", e);
 			}
 		} else {
-			LOG.warning("Parameter 'url' is required.");
+			LOG.warning("Parameter 'servletUrl' is required.");
 		}
 		return service;
 	}
@@ -111,10 +109,11 @@ public class HttpService implements TransportService {
 	@Override
 	public <T, V> T get(JsonNode params, Handler<V> handle, Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
+		final HttpTransportConfig config = new HttpTransportConfig(params);
 		HttpTransport result = null;
-		if (params.has("id")) {
+		final String id = config.getId();
+		if (id != null) {
 			try {
-				final String id = params.get("id").asText();
 				final URI fullUrl = new URI(myUrl.toASCIIString() + id);
 				if (transports.containsKey(fullUrl)) {
 					result = transports.get(fullUrl);
@@ -202,21 +201,18 @@ public class HttpService implements TransportService {
 	 * @return true, if authentication is needed.
 	 */
 	private boolean doAuthentication() {
-		if (myParams.has("authentication")) {
-			return myParams.get("authentication").asBoolean();
-		}
-		return false;
+		return myParams.getDoAuthentication();
 	}
 	
 	@Override
 	public Transport getLocal(URI address) {
-		if (!localShortcuts) {
+		if (!myParams.getDoShortcut()) {
 			return null;
 		}
 		if (transports.containsKey(address)) {
 			return transports.get(address);
 		} else {
-			//TODO: check for other HttpServices with this address?
+			// TODO: check for other HttpServices with this address?
 		}
 		return null;
 	}

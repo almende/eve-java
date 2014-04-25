@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.CapabilityFactory;
-import com.almende.eve.defaults.Config;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
 import com.almende.util.jackson.JOM;
@@ -19,21 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestState.
  */
 public class TestState extends TestCase {
-	
-	/**
-	 * Create new agent.
-	 */
-	public TestState() {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
-		Config.addConfig(params, "state", "memTest");
 		
-		params.put("class", "com.almende.eve.state.file.FileStateService");
-		params.put("json", false);
-		Config.addConfig(params, "state", "fileTest");
-		
-	}
-	
 	/**
 	 * Run test.
 	 * 
@@ -55,7 +40,8 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testState() {
-		final ObjectNode params = Config.getConfig("state", "memTest");
+		final ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
 		params.put("id", "TestAgent");
 		
 		State myState = CapabilityFactory.get(params, null, State.class);
@@ -72,7 +58,9 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testFileState() {
-		final ObjectNode params = Config.getConfig("state", "fileTest");
+		ObjectNode params = JOM.createObjectNode();
+		params.put("class", "com.almende.eve.state.file.FileStateService");
+		params.put("json", false);
 		params.put("id", "TestAgent");
 		
 		State myState = CapabilityFactory.get(params, null, State.class);
@@ -82,6 +70,7 @@ public class TestState extends TestCase {
 		myState2 = StateFactory.getState(params);
 		runTest(myState, myState2);
 		
+		params = params.deepCopy();
 		params.put("json", true);
 		myState = CapabilityFactory.get(params, null, State.class);
 		myState2 = StateFactory.getState(params);

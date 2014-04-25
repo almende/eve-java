@@ -8,7 +8,6 @@ import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * A factory for creating HttpTransport objects.
@@ -26,10 +25,7 @@ public class HttpTransportFactory {
 	 */
 	public static HttpService get(final JsonNode params,
 			final Handler<Receiver> handle) {
-		if (params.isObject() && !params.has("class")) {
-			((ObjectNode) params).put("class", HttpTransportFactory.class
-					.getPackage().getName() + ".HttpService");
-		}
-		return CapabilityFactory.get(params, handle, HttpService.class);
+		return CapabilityFactory.get(new HttpTransportConfig(params), handle,
+				HttpService.class);
 	}
 }

@@ -16,6 +16,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -35,18 +36,16 @@ public class TestHttp extends TestCase {
 	 */
 	@Test
 	public void testHttp() throws IOException {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transport.http.HttpService");
-		params.put("url", "http://localhost:8080/agents/");
-		params.put("servlet_launcher", "JettyLauncher");
+		HttpTransportConfig config = new HttpTransportConfig();
+		config.setServletUrl("http://localhost:8080/agents/");
+		config.setId("testAgent");
+		
+		config.setServletLauncher("JettyLauncher");		
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
-		params.put("jetty", jettyParms);
+		config.put("jetty", jettyParms);
 		
-		params.put("id", "testAgent");
-		params.put("authentication", true);
-		
-		final Transport transport = TransportFactory.getTransport(params,
+		final Transport transport = TransportFactory.getTransport(config,
 				new myReceiver());
 		
 		transport.send(URI.create("http://localhost:8080/agents/testAgent"), "Hello World",
