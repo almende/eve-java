@@ -30,6 +30,66 @@ public abstract class TypeUtil<T> {
 	private final JavaType	valueType;
 	
 	/**
+	 * Gets an instances of this TypeUtil
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> get() {
+		return new TypeUtil<T>() {
+		};
+	}
+	
+	/**
+	 * Gets an instances of this TypeUtil.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param type
+	 *            the type
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> get(Class<T> type) {
+		return new TypeUtil<T>(type) {
+		};
+	}
+	
+	/**
+	 * Gets an instances of this TypeUtil.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param type
+	 *            the type
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> get(JavaType type) {
+		return new TypeUtil<T>(type) {
+		};
+	}
+	
+	/**
+	 * Instantiates a new type util.
+	 * 
+	 * @param type
+	 *            the type
+	 */
+	public TypeUtil(JavaType type) {
+		this.valueType = type;
+	}
+	
+	/**
+	 * Instantiates a new type util.
+	 * 
+	 * @param type
+	 *            the type
+	 */
+	public TypeUtil(Class<T> type) {
+		this.valueType = JOM.getTypeFactory().constructType(type);
+	}
+	
+	/**
 	 * Usage example: <br>
 	 * 
 	 * TypeUtil&lt;TreeSet&lt;TaskEntry>> injector = new
@@ -53,6 +113,15 @@ public abstract class TypeUtil<T> {
 	 * @return the {@link TypeUtil} value's type
 	 */
 	public Type getType() {
+		return this.valueType;
+	}
+
+	/**
+	 * Gets the type.
+	 * 
+	 * @return the {@link TypeUtil} value's type
+	 */
+	public JavaType getJavaType() {
 		return this.valueType;
 	}
 	

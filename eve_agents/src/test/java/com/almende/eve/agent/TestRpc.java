@@ -59,7 +59,7 @@ public class TestRpc extends TestCase {
 		final ObjectNode parms = JOM.createObjectNode();
 		parms.put("parm", true);
 		final Object request = transform.buildMsg("testMe", parms, callback,
-				new TypeUtil<Boolean>(){});
+				TypeUtil.get(Boolean.class));
 		
 		// transport
 		final Object response = transform.invoke(request,
