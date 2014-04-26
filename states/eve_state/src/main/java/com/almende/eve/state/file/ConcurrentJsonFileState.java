@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class ConcurrentJsonFileState.
@@ -79,10 +80,12 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 *            the filename
 	 * @param service
 	 *            the service
+	 * @param params
+	 *            the params
 	 */
 	public ConcurrentJsonFileState(final String agentId, final String filename,
-			final FileStateService service) {
-		super(agentId, service);
+			final FileStateService service, final ObjectNode params) {
+		super(agentId, service, params);
 		this.filename = filename;
 		om = JOM.getInstance();
 	}

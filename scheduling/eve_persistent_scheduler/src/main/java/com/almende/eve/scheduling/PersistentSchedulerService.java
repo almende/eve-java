@@ -6,6 +6,7 @@ package com.almende.eve.scheduling;
 
 import java.util.HashMap;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.TypeUtil;
@@ -33,7 +34,7 @@ public class PersistentSchedulerService implements SchedulerService {
 	}
 	
 	@Override
-	public <T, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
 		PersistentScheduler result = null;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());

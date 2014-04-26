@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.TypeUtil;
 
 /**
  * The Interface Transport.
  */
-public interface Transport {
+public interface Transport extends Capability {
 	
 	/**
 	 * The Constant TYPEUTIL.

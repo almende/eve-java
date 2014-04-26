@@ -6,12 +6,12 @@ package com.almende.eve.transport;
 
 import java.net.URI;
 
-import com.almende.eve.capabilities.Capability;
+import com.almende.eve.capabilities.CapabilityService;
 
 /**
  * The Interface TransportService.
  */
-public interface TransportService extends Capability {
+public interface TransportService extends CapabilityService {
 	
 	/**
 	 * Delete.

@@ -16,7 +16,7 @@ import com.almende.eve.scheduling.clock.Clock;
 import com.almende.eve.scheduling.clock.RunnableClock;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.uuid.UUID;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class SimpleScheduler.
@@ -27,6 +27,7 @@ public class SimpleScheduler implements Scheduler {
 	private URI					schedulerUrl	= null;
 	private Handler<Receiver>	handle			= null;
 	protected Clock				clock			= null;
+	private ObjectNode			myParams		= null;
 	
 	/**
 	 * Instantiates a new abstract scheduler.
@@ -36,7 +37,7 @@ public class SimpleScheduler implements Scheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public SimpleScheduler(final JsonNode params, final Handler<Receiver> handle) {
+	public SimpleScheduler(final ObjectNode params, final Handler<Receiver> handle) {
 		if (params.has("senderUrl")) {
 			try {
 				schedulerUrl = new URI(params.get("senderUrl").asText());
@@ -54,6 +55,7 @@ public class SimpleScheduler implements Scheduler {
 			}
 		}
 		this.handle = handle;
+		this.myParams=params;
 	}
 	
 	@Override
@@ -116,6 +118,11 @@ public class SimpleScheduler implements Scheduler {
 	 */
 	public Clock getClock() {
 		return clock;
+	}
+
+	@Override
+	public ObjectNode getParams() {
+		return myParams;
 	}
 	
 }

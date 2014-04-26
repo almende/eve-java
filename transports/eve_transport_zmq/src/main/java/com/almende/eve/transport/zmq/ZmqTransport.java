@@ -54,7 +54,7 @@ public class ZmqTransport extends AbstractTransport {
 	 */
 	public ZmqTransport(final ZmqTransportConfig config,
 			final Handler<Receiver> handle, final TransportService service) {
-		super(config.getAddress(), handle, service);
+		super(config.getAddress(), handle, service, config);
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
 		doesAuthentication = config.getDoAuthentication();
 	}

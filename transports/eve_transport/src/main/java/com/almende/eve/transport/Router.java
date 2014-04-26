@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Router, outbound transport selection based on protocol scheme.
@@ -88,6 +91,17 @@ public class Router implements Transport {
 	@Override
 	public List<String> getProtocols() {
 		return new ArrayList<String>(transports.keySet());
+	}
+
+	@Override
+	public ObjectNode getParams() {
+		final ArrayNode transportConfs = JOM.createArrayNode();
+		for (Transport transport: transports.values()){
+			transportConfs.add(transport.getParams());
+		}
+		final ObjectNode result = JOM.createObjectNode();
+		result.put("transports", transportConfs);
+		return result;
 	}
 	
 }

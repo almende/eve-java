@@ -57,7 +57,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	public <V> XmppTransport(final XmppTransportConfig config,
 			final Handler<Receiver> handle, final TransportService service) {
 		// TODO: support more parameter structures.
-		super(config.getAddress(), handle, service);
+		super(config.getAddress(), handle, service, config);
 		
 		final URI address = super.getAddress();
 		host = address.getHost();

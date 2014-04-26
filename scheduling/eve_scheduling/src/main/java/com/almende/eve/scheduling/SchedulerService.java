@@ -4,11 +4,11 @@
  */
 package com.almende.eve.scheduling;
 
-import com.almende.eve.capabilities.Capability;
+import com.almende.eve.capabilities.CapabilityService;
 
 /**
  * The Interface SchedulerService.
  */
-public interface SchedulerService extends Capability {
+public interface SchedulerService extends CapabilityService {
 	
 }

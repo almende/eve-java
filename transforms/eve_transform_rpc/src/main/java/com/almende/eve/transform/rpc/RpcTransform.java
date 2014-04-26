@@ -36,6 +36,7 @@ public class RpcTransform implements Transform {
 	private Authorizor								auth		= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
+	private final ObjectNode						myParams;
 	
 	/**
 	 * Instantiates a new rpc transform.
@@ -50,6 +51,7 @@ public class RpcTransform implements Transform {
 	public RpcTransform(final ObjectNode params, final Handler<Object> handle,
 			final TransformService service) {
 		destination = handle;
+		this.myParams = params;
 	}
 	
 	/**
@@ -208,7 +210,9 @@ public class RpcTransform implements Transform {
 					}
 					final TypeUtil<T> type = TypeUtil.resolve(callback);
 					
-					if (type != null && !type.getJavaType().getRawClass().equals(Void.class)) {
+					if (type != null
+							&& !type.getJavaType().getRawClass()
+									.equals(Void.class)) {
 						try {
 							final T res = type.inject(response.getResult());
 							callback.onSuccess(res);
@@ -249,6 +253,11 @@ public class RpcTransform implements Transform {
 	 */
 	public Handler<Object> getHandle() {
 		return destination;
+	}
+	
+	@Override
+	public ObjectNode getParams() {
+		return this.myParams;
 	}
 	
 }

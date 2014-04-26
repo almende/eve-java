@@ -29,6 +29,7 @@ import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.threads.ThreadPool;
 import com.almende.util.uuid.UUID;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class HttpTransport.
@@ -51,10 +52,12 @@ public class HttpTransport extends AbstractTransport {
 	 *            the handle
 	 * @param service
 	 *            the service
+	 * @param params
+	 *            the params
 	 */
 	public HttpTransport(final URI address, final Handler<Receiver> handle,
-			final TransportService service) {
-		super(address, handle, service);
+			final TransportService service, final ObjectNode params) {
+		super(address, handle, service, params);
 	}
 	
 	/*

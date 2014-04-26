@@ -34,7 +34,7 @@ public abstract class CapabilityFactory {
 	 *            the capability type (e.g. State, Transport, etc.)
 	 * @return the t
 	 */
-	public static <T, V> T get(final ObjectNode params,
+	public static <T extends Capability, V> T get(final ObjectNode params,
 			final Handler<V> handle, final Class<T> type) {
 		final Config config = new Config(params);
 		final String className = config.getClassName();
@@ -43,7 +43,7 @@ public abstract class CapabilityFactory {
 				final Class<?> clazz = Class.forName(className);
 				final Method method = clazz.getMethod("getInstanceByParams",
 						ObjectNode.class);
-				final Capability instance = (Capability) method.invoke(null,
+				final CapabilityService instance = (CapabilityService) method.invoke(null,
 						params);
 				if (instance != null) {
 					return instance.get(params, handle, type);

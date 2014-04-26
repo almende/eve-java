@@ -4,11 +4,11 @@
  */
 package com.almende.eve.transform;
 
-import com.almende.eve.capabilities.Capability;
+import com.almende.eve.capabilities.CapabilityService;
 
 /**
  * The Interface TransformService.
  */
-public interface TransformService extends Capability {
+public interface TransformService extends CapabilityService {
 	
 }

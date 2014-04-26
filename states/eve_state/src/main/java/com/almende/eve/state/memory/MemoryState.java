@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class MemoryState.
@@ -57,9 +58,12 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	 *            the agent id
 	 * @param service
 	 *            the service
+	 * @param params
+	 *            the params
 	 */
-	public MemoryState(final String agentId, final StateService service) {
-		super(agentId, service);
+	public MemoryState(final String agentId, final StateService service,
+			final ObjectNode params) {
+		super(agentId, service, params);
 	}
 	
 	/*

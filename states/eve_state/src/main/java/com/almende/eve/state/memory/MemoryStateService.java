@@ -7,6 +7,7 @@ package com.almende.eve.state.memory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
@@ -36,11 +37,11 @@ public class MemoryStateService implements StateService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
+	public <T extends Capability, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final MemoryStateConfig config = new MemoryStateConfig(params);
 		final String id = config.getId();
@@ -48,7 +49,7 @@ public class MemoryStateService implements StateService {
 		if (states.containsKey(id)) {
 			return TypeUtil.inject(states.get(id), type);
 		} else {
-			final MemoryState result = new MemoryState(id, this);
+			final MemoryState result = new MemoryState(id, this, params);
 			states.put(id, result);
 			return TypeUtil.inject(result, type);
 		}

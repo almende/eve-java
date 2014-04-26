@@ -8,6 +8,7 @@ import java.net.URI;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.threads.ThreadPool;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class AbstractTransport.
@@ -16,6 +17,7 @@ public abstract class AbstractTransport implements Transport {
 	private TransportService	service	= null;
 	private Handler<Receiver>	handle	= null;
 	private URI					address	= null;
+	private ObjectNode			myParams = null;
 	
 	/**
 	 * Instantiates a new abstract transport.
@@ -26,13 +28,16 @@ public abstract class AbstractTransport implements Transport {
 	 *            the handler method of this transport owner
 	 * @param service
 	 *            the service that created this transport instance
+	 * @param params
+	 *            the params
 	 */
 	
 	public AbstractTransport(final URI address, final Handler<Receiver> handle,
-			final TransportService service) {
+			final TransportService service, final ObjectNode params) {
 		this.address = address;
 		this.service = service;
 		this.handle = handle;
+		this.myParams = params;
 	}
 	
 	/*
@@ -87,6 +92,9 @@ public abstract class AbstractTransport implements Transport {
 		return service;
 	}
 	
+	public ObjectNode getParams(){
+		return this.myParams;
+	}
 	/**
 	 * Send local.
 	 * 

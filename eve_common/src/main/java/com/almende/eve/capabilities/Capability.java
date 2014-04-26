@@ -4,7 +4,6 @@
  */
 package com.almende.eve.capabilities;
 
-import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -13,19 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public interface Capability {
 	
 	/**
-	 * Gets the resulting capability instance.
+	 * Gets the params.
 	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param <V>
-	 *            the value type
-	 * @param params
-	 *            the params
-	 * @param handle
-	 *            the handle
-	 * @param type
-	 *            the type
-	 * @return the t
+	 * @return the params
 	 */
-	<T, V> T get(ObjectNode params, Handler<V> handle, Class<T> type);
+	ObjectNode getParams();
+	
 }

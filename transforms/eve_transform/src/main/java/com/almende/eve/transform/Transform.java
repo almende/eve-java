@@ -4,8 +4,10 @@
  */
 package com.almende.eve.transform;
 
+import com.almende.eve.capabilities.Capability;
+
 /**
  * The Interface Transform.
  */
-public interface Transform {
+public interface Transform extends Capability {
 }

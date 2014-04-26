@@ -23,9 +23,9 @@ public class HttpTransportFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static HttpService get(final ObjectNode params,
+	public static HttpTransport get(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		return CapabilityFactory.get(new HttpTransportConfig(params), handle,
-				HttpService.class);
+				HttpTransport.class);
 	}
 }

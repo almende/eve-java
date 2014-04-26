@@ -6,10 +6,12 @@ package com.almende.eve.scheduling;
 
 import org.joda.time.DateTime;
 
+import com.almende.eve.capabilities.Capability;
+
 /**
  * The Interface Scheduler.
  */
-public interface Scheduler {
+public interface Scheduler extends Capability {
 	
 	/**
 	 * Schedule.

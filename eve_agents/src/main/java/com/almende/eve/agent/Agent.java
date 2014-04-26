@@ -29,6 +29,7 @@ import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
+import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -77,6 +78,15 @@ public class Agent implements Receiver {
 	}
 	
 	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 */
+	public String getId() {
+		return agentId;
+	}
+	
+	/**
 	 * Gets the config.
 	 * 
 	 * @return the config
@@ -89,6 +99,8 @@ public class Agent implements Receiver {
 		final Handler<Receiver> handle = new SimpleHandler<Receiver>(this);
 		if (config.has("id")) {
 			agentId = config.get("id").asText();
+		} else {
+			agentId = new UUID().toString();
 		}
 		if (config.has("scheduler")) {
 			final ObjectNode schedulerConfig = (ObjectNode) config
@@ -139,6 +151,17 @@ public class Agent implements Receiver {
 	}
 	
 	/**
+	 * Sets the scheduler.
+	 * 
+	 * @param scheduler
+	 *            the new scheduler
+	 */
+	@JsonIgnore
+	public void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+	
+	/**
 	 * Gets the scheduler.
 	 * 
 	 * @return the scheduler
@@ -148,7 +171,18 @@ public class Agent implements Receiver {
 	public Scheduler getScheduler() {
 		return scheduler;
 	}
+
 	
+	/**
+	 * Sets the state.
+	 * 
+	 * @param state
+	 *            the new state
+	 */
+	@JsonIgnore
+	public void setState(State state) {
+		this.state = state;
+	}
 	/**
 	 * Gets the state.
 	 * 
@@ -159,6 +193,8 @@ public class Agent implements Receiver {
 	public State getState() {
 		return state;
 	}
+	
+	
 	
 	/**
 	 * Send async.
@@ -177,7 +213,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> void send(final URI url, final String method,
+	protected final <T> void send(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
 		final JSONRequest request = rpc.buildMsg(method, params, callback);
@@ -199,12 +235,12 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> void send(final URI url, final String method,
+	protected final <T> void send(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		final JSONRequest request = rpc.buildMsg(method, params, null);
 		transport.send(url, request.toString(), null);
 	}
-
+	
 	/**
 	 * Send sync, expecting a response.
 	 * 
@@ -221,7 +257,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> T sendSync(final URI url, final String method,
+	protected final <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		SyncCallback<T> callback = new SyncCallback<T>();
 		final JSONRequest request = rpc.buildMsg(method, params, callback);

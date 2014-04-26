@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jivesoftware.smack.SmackConfiguration;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
@@ -54,11 +55,11 @@ public class XmppService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
+	public <T extends Capability, V> T get(final ObjectNode params, final Handler<V> handle,
 			final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final XmppTransportConfig config = new XmppTransportConfig(params);

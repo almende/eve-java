@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
@@ -130,9 +131,12 @@ public class FileStateService implements StateService {
 	 *            the agent id
 	 * @param json
 	 *            the json
+	 * @param params
+	 *            the params
 	 * @return state
 	 */
-	public State get(final String agentId, final boolean json) {
+	public State get(final String agentId, final boolean json,
+			final ObjectNode params) {
 		State state = null;
 		if (exists(agentId)) {
 			if (states.containsKey(agentId)) {
@@ -140,10 +144,10 @@ public class FileStateService implements StateService {
 			} else {
 				if (json) {
 					state = new ConcurrentJsonFileState(agentId,
-							getFilename(agentId), this);
+							getFilename(agentId), this, params);
 				} else {
 					state = new ConcurrentSerializableFileState(agentId,
-							getFilename(agentId), this);
+							getFilename(agentId), this, params);
 				}
 				states.put(agentId, state);
 			}
@@ -159,12 +163,14 @@ public class FileStateService implements StateService {
 	 *            the agent id
 	 * @param json
 	 *            the json
+	 * @param params
+	 *            the params
 	 * @return state
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public synchronized State create(final String agentId, final boolean json)
-			throws IOException {
+	public synchronized State create(final String agentId, final boolean json,
+			final ObjectNode params) throws IOException {
 		if (exists(agentId)) {
 			throw new IllegalStateException("Cannot create state, "
 					+ "state with id '" + agentId + "' already exists.");
@@ -180,9 +186,10 @@ public class FileStateService implements StateService {
 		State state = null;
 		// instantiate the state
 		if (json) {
-			state = new ConcurrentJsonFileState(agentId, filename, this);
+			state = new ConcurrentJsonFileState(agentId, filename, this, params);
 		} else {
-			state = new ConcurrentSerializableFileState(agentId, filename, this);
+			state = new ConcurrentSerializableFileState(agentId, filename,
+					this, params);
 		}
 		states.put(agentId, state);
 		return state;
@@ -258,20 +265,21 @@ public class FileStateService implements StateService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.capabilities.Capability#get(com.fasterxml.jackson.databind
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.
+	 * databind
 	 * .JsonNode, java.lang.invoke.MethodHandle, java.lang.Class)
 	 */
 	@Override
-	public <T, V> T get(final ObjectNode params, final Handler<V> handle,
-			final Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		final FileStateConfig config = new FileStateConfig(params);
 		
 		final String id = config.getId();
 		if (exists(id)) {
-			return TypeUtil.inject(get(id, json), type);
+			return TypeUtil.inject(get(id, json, params), type);
 		} else {
 			try {
-				return TypeUtil.inject(create(id, json), type);
+				return TypeUtil.inject(create(id, json, params), type);
 			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Couldn't create state file", e);
 			}

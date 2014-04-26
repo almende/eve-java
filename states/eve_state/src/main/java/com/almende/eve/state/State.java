@@ -7,13 +7,14 @@ package com.almende.eve.state;
 import java.lang.reflect.Type;
 import java.util.Set;
 
+import com.almende.eve.capabilities.Capability;
 import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.JavaType;
 
 /**
  * The Interface State.
  */
-public interface State {
+public interface State extends Capability {
 	/**
 	 * Delete.
 	 */

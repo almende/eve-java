@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class AbstractState.
@@ -23,10 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *            the value type
  */
 public abstract class AbstractState<V> implements State {
-	private static final Logger	LOG		= Logger.getLogger(AbstractState.class
-												.getCanonicalName());
-	private String				agentId	= null;
-	private StateService		service	= null;
+	private static final Logger	LOG			= Logger.getLogger(AbstractState.class
+													.getCanonicalName());
+	private String				id		= null;
+	private StateService		service		= null;
+	private ObjectNode			myParams	= null;
 	
 	/**
 	 * The implemented classes must have a public constructor.
@@ -38,14 +40,18 @@ public abstract class AbstractState<V> implements State {
 	 * The implemented classes must have this public constructor with
 	 * parameters AgentHost, and agentId.
 	 * 
-	 * @param agentId
+	 * @param id
 	 *            the agent id
 	 * @param service
 	 *            the service in which this instance is created
+	 * @param params
+	 *            the params
 	 */
-	public AbstractState(final String agentId, final StateService service) {
-		this.agentId = agentId;
+	public AbstractState(final String id, final StateService service,
+			final ObjectNode params) {
+		this.id = id;
 		this.service = service;
+		this.myParams = params;
 	}
 	
 	/**
@@ -55,7 +61,7 @@ public abstract class AbstractState<V> implements State {
 	 */
 	@Override
 	public synchronized String getId() {
-		return agentId;
+		return id;
 	}
 	
 	/**
@@ -65,7 +71,7 @@ public abstract class AbstractState<V> implements State {
 	 *            the new agent id
 	 */
 	public void setAgentId(final String agentId) {
-		this.agentId = agentId;
+		this.id = agentId;
 	}
 	
 	/**
@@ -267,6 +273,14 @@ public abstract class AbstractState<V> implements State {
 			clear();
 			service.delete(this);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
+	@Override
+	public ObjectNode getParams(){
+		return myParams;
 	}
 	
 	/*

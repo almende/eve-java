@@ -22,12 +22,12 @@ public class ZmqTransportFactory {
 	 *            the handle
 	 * @return the state
 	 */
-	public static ZmqService get(final ObjectNode params,
+	public static ZmqTransport get(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
 			params.put("class", ZmqTransportFactory.class
 					.getPackage().getName() + ".ZmqService");
 		}
-		return CapabilityFactory.get(params, handle, ZmqService.class);
+		return CapabilityFactory.get(params, handle, ZmqTransport.class);
 	}
 }
