@@ -56,7 +56,7 @@ public class TestAgents extends TestCase {
 		final ObjectNode callParams = JOM.createObjectNode();
 		callParams.put("message", "Hello world!");
 		
-		agent.sendAsync(new URI("http://localhost:8080/agents/example"),
+		agent.send(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams, new AsyncCallback<String>() {
 					
 					@Override
@@ -71,9 +71,9 @@ public class TestAgents extends TestCase {
 					}
 					
 				});
-		
-		// Give connection time to complete:
-		Thread.sleep(1000);
+
+		LOG.warning("Sync received:'"+agent.sendSync(new URI("http://localhost:8080/agents/example"),
+				"helloWorld", callParams)+"'");
 	}
 	
 }

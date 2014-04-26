@@ -28,6 +28,7 @@ import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
+import com.almende.util.callback.SyncCallback;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -176,11 +177,60 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> void sendAsync(final URI url, final String method,
+	public final <T> void send(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
 		final JSONRequest request = rpc.buildMsg(method, params, callback);
 		transport.send(url, request.toString(), null);
+	}
+	
+	/**
+	 * Send async.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public final <T> void send(final URI url, final String method,
+			final ObjectNode params) throws IOException {
+		final JSONRequest request = rpc.buildMsg(method, params, null);
+		transport.send(url, request.toString(), null);
+	}
+
+	/**
+	 * Send sync, expecting a response.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @return response
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public final <T> T sendSync(final URI url, final String method,
+			final ObjectNode params) throws IOException {
+		SyncCallback<T> callback = new SyncCallback<T>();
+		final JSONRequest request = rpc.buildMsg(method, params, callback);
+		transport.send(url, request.toString(), null);
+		try {
+			return callback.get();
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
 	}
 	
 }
