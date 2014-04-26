@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.transport.http.HttpTransportConfig;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -70,7 +71,7 @@ public class TestAgents extends TestCase {
 						fail();
 					}
 					
-				}, JOM.getTypeFactory().constructType(String.class));
+				}, new TypeUtil<String>(){});
 		
 		// Give connection time to complete:
 		Thread.sleep(1000);

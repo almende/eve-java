@@ -24,7 +24,6 @@ import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -32,11 +31,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class RpcTransform.
  */
 public class RpcTransform implements Transform {
-	private static final Logger					LOG			= Logger.getLogger(RpcTransform.class
-																	.getName());
-	private Authorizor							auth		= new DefaultAuthorizor();
+	private static final Logger						LOG			= Logger.getLogger(RpcTransform.class
+																		.getName());
+	private Authorizor								auth		= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
-	private final Handler<Object>				destination;
+	private final Handler<Object>					destination;
 	
 	/**
 	 * Instantiates a new rpc transform.
@@ -191,14 +190,13 @@ public class RpcTransform implements Transform {
 	 */
 	public <T> JSONRequest buildMsg(final String method,
 			final ObjectNode params, final AsyncCallback<T> callback,
-			final JavaType type) {
+			final TypeUtil<T> type) {
 		
 		final JSONRequest request = new JSONRequest(method, params);
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
 		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public void onSuccess(final JSONResponse response) {
 				if (callback == null) {
@@ -212,10 +210,9 @@ public class RpcTransform implements Transform {
 					if (err != null) {
 						callback.onFailure(err);
 					}
-					if (type != null && !type.hasRawClass(Void.class)) {
+					if (type != null && !type.getType().equals(Void.class)) {
 						try {
-							final T res = (T) TypeUtil.inject(
-									response.getResult(), type);
+							final T res = type.inject(response.getResult());
 							callback.onSuccess(res);
 						} catch (final ClassCastException cce) {
 							callback.onFailure(new JSONRPCException(
@@ -255,4 +252,5 @@ public class RpcTransform implements Transform {
 	public Handler<Object> getHandle() {
 		return destination;
 	}
+	
 }

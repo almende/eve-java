@@ -27,9 +27,9 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -180,7 +180,7 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	public final <T> void sendAsync(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback,
-			final JavaType type) throws IOException {
+			final TypeUtil<T> type) throws IOException {
 		final JSONRequest request = rpc.buildMsg(method, params, callback, type);
 		transport.send(url, request.toString(), null);
 	}
