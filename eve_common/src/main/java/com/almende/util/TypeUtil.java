@@ -65,7 +65,9 @@ public abstract class TypeUtil<T> {
 	 * @return the type util
 	 */
 	public static <T> TypeUtil<T> resolve(Object target) {
-
+		if (target == null){
+			return new TypeUtil<T>(Void.class){};
+		}
 		final Type gsc = target.getClass().getGenericSuperclass();
 		ParameterizedType ptype = (ParameterizedType) TypeResolver
 				.resolveGenericType((Class<?>) gsc, target.getClass());
@@ -117,7 +119,7 @@ public abstract class TypeUtil<T> {
 	 * @param type
 	 *            the type
 	 */
-	public TypeUtil(Class<T> type) {
+	public TypeUtil(Class<?> type) {
 		this.valueType = JOM.getTypeFactory().constructType(type);
 	}
 	
