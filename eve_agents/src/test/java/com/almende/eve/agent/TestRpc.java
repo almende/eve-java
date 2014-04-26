@@ -18,7 +18,6 @@ import com.almende.eve.transform.rpc.RpcTransform;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
-import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,8 +57,7 @@ public class TestRpc extends TestCase {
 		
 		final ObjectNode parms = JOM.createObjectNode();
 		parms.put("parm", true);
-		final Object request = transform.buildMsg("testMe", parms, callback,
-				TypeUtil.get(Boolean.class));
+		final Object request = transform.buildMsg("testMe", parms, callback);
 		
 		// transport
 		final Object response = transform.invoke(request,

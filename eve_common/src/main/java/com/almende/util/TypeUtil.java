@@ -56,6 +56,38 @@ public abstract class TypeUtil<T> {
 	}
 	
 	/**
+	 * Resolve.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param target
+	 *            the target
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> resolve(Object target) {
+
+		final Type gsc = target.getClass().getGenericSuperclass();
+		ParameterizedType ptype = (ParameterizedType) TypeResolver
+				.resolveGenericType((Class<?>) gsc, target.getClass());
+		
+		if (ptype == null){
+			ptype = (ParameterizedType) target.getClass().getGenericInterfaces()[0];
+		}
+		if (ptype == null){
+			LOG.warning("Couldn't find generic type.");
+			return null;
+		}
+		JavaType type = JOM.getTypeFactory().constructType(
+					ptype.getActualTypeArguments()[0]);
+		if (type == null){
+			LOG.warning("Couldn't find generic type.");
+			return null;
+		}
+		return new TypeUtil<T>(type) {
+		};
+	}
+	
+	/**
 	 * Gets an instances of this TypeUtil.
 	 * 
 	 * @param <T>
@@ -115,7 +147,7 @@ public abstract class TypeUtil<T> {
 	public Type getType() {
 		return this.valueType;
 	}
-
+	
 	/**
 	 * Gets the type.
 	 * 

@@ -27,7 +27,6 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
-import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class Agent implements Receiver {
 	private State				state		= null;
 	private Transport			transport	= null;
 	private Scheduler			scheduler	= null;
-	private final RpcTransform		rpc			= RpcTransformFactory
+	private final RpcTransform	rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
 															this));
 	
@@ -91,7 +90,8 @@ public class Agent implements Receiver {
 			agentId = config.get("id").asText();
 		}
 		if (config.has("scheduler")) {
-			final ObjectNode schedulerConfig = (ObjectNode) config.get("scheduler");
+			final ObjectNode schedulerConfig = (ObjectNode) config
+					.get("scheduler");
 			if (agentId != null && schedulerConfig.has("state")) {
 				final ObjectNode stateConfig = (ObjectNode) schedulerConfig
 						.get("state");
@@ -99,8 +99,7 @@ public class Agent implements Receiver {
 					stateConfig.put("id", "scheduler_" + agentId);
 				}
 			}
-			scheduler = SchedulerFactory.getScheduler(schedulerConfig,
-					handle);
+			scheduler = SchedulerFactory.getScheduler(schedulerConfig, handle);
 		}
 		if (config.has("state")) {
 			final ObjectNode stateConfig = (ObjectNode) config.get("state");
@@ -112,7 +111,8 @@ public class Agent implements Receiver {
 		if (config.has("transport")) {
 			if (config.get("transport").isArray()) {
 				final Router router = new Router();
-				final Iterator<JsonNode> iter = config.get("transport").iterator();
+				final Iterator<JsonNode> iter = config.get("transport")
+						.iterator();
 				while (iter.hasNext()) {
 					router.register(TransportFactory.getTransport(
 							(ObjectNode) iter.next(), handle));
@@ -172,16 +172,14 @@ public class Agent implements Receiver {
 	 *            the params
 	 * @param callback
 	 *            the callback
-	 * @param type
-	 *            the type
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	public final <T> void sendAsync(final URI url, final String method,
-			final ObjectNode params, final AsyncCallback<T> callback,
-			final TypeUtil<T> type) throws IOException {
-		final JSONRequest request = rpc.buildMsg(method, params, callback, type);
+			final ObjectNode params, final AsyncCallback<T> callback)
+			throws IOException {
+		final JSONRequest request = rpc.buildMsg(method, params, callback);
 		transport.send(url, request.toString(), null);
 	}
 	

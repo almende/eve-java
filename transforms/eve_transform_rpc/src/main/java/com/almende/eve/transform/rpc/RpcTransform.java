@@ -184,14 +184,10 @@ public class RpcTransform implements Transform {
 	 *            the params
 	 * @param callback
 	 *            the callback
-	 * @param type
-	 *            the type
 	 * @return the JSON request
 	 */
 	public <T> JSONRequest buildMsg(final String method,
-			final ObjectNode params, final AsyncCallback<T> callback,
-			final TypeUtil<T> type) {
-		
+			final ObjectNode params, final AsyncCallback<T> callback) {
 		final JSONRequest request = new JSONRequest(method, params);
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
@@ -210,7 +206,9 @@ public class RpcTransform implements Transform {
 					if (err != null) {
 						callback.onFailure(err);
 					}
-					if (type != null && !type.getType().equals(Void.class)) {
+					final TypeUtil<T> type = TypeUtil.resolve(callback);
+					
+					if (type != null && !type.getJavaType().getRawClass().equals(Void.class)) {
 						try {
 							final T res = type.inject(response.getResult());
 							callback.onSuccess(res);
