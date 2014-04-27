@@ -4,7 +4,9 @@
  */
 package com.almende.eve.capabilities;
 
+import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -52,5 +54,32 @@ public class Config extends ObjectNode {
 			return this.get("class").asText();
 		}
 		return null;
+	}
+	
+	/**
+	 * Gets the.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param keys
+	 *            the keys
+	 * @return the json node
+	 */
+	public <T> T get(String... keys){
+		if (keys == null || keys.length == 0){
+			return null;
+		}
+		JsonNode node = this;
+		for (String key : keys){
+			node = node.get(key);
+			if (node == null){
+				break;
+			}
+		}
+		if (node == null){
+			return null;
+		}
+		TypeUtil<T> tu = new TypeUtil<T>(){};
+		return tu.inject(node);
 	}
 }

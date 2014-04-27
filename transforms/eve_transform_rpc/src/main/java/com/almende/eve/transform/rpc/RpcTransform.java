@@ -200,8 +200,7 @@ public class RpcTransform implements Transform {
 				if (callback == null) {
 					final Exception err = response.getError();
 					if (err != null) {
-						LOG.warning("async RPC call failed, and no callback handler available:"
-								+ err.getLocalizedMessage());
+						LOG.log(Level.WARNING,"async RPC call failed, and no callback handler available.",err);
 					}
 				} else {
 					final Exception err = response.getError();
@@ -231,8 +230,7 @@ public class RpcTransform implements Transform {
 			@Override
 			public void onFailure(final Exception exception) {
 				if (callback == null) {
-					LOG.warning("async RPC call failed and no callback handler available:"
-							+ exception.getLocalizedMessage());
+					LOG.log(Level.WARNING,"async RPC call failed, and no callback handler available.",exception);
 				} else {
 					callback.onFailure(exception);
 				}

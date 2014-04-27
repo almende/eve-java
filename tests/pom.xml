@@ -9,9 +9,9 @@
 		<relativePath>../eve_parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-agents</artifactId>
+	<artifactId>eve-tests</artifactId>
 
-	<name>EVE Base Agents</name>
+	<name>EVE Test Suite</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
@@ -20,27 +20,27 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-wake</artifactId>
+			<artifactId>eve-agents</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-state-common</artifactId>
+			<artifactId>eve-scheduling-persistent</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-scheduling-common</artifactId>
+			<artifactId>eve-transport-xmpp</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-transport-common</artifactId>
+			<artifactId>eve-transport-zmq</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-transform-rpc</artifactId>
+			<artifactId>eve-transport-http-jetty</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>

@@ -26,6 +26,7 @@ import com.almende.eve.transform.rpc.jsonrpc.JSONResponse;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
+import com.almende.eve.transport.TransportConfig;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
@@ -37,6 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Agent.
  */
+@Access(AccessType.PUBLIC)
 public class Agent implements Receiver {
 	private static final Logger	LOG			= Logger.getLogger(Agent.class
 													.getName());
@@ -72,7 +74,7 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the new config
 	 */
-	public void setConfig(final JsonNode config) {
+	public void setConfig(final ObjectNode config) {
 		this.config = config.deepCopy();
 		loadConfig();
 	}
@@ -127,13 +129,22 @@ public class Agent implements Receiver {
 				final Iterator<JsonNode> iter = config.get("transport")
 						.iterator();
 				while (iter.hasNext()) {
-					router.register(TransportFactory.getTransport(
-							(ObjectNode) iter.next(), handle));
+					TransportConfig transconfig = new TransportConfig(
+							(ObjectNode) iter.next());
+					if (transconfig.get("id") == null) {
+						transconfig.put("id", agentId);
+					}
+					router.register(TransportFactory.getTransport(transconfig,
+							handle));
 				}
 				transport = router;
 			} else {
-				transport = TransportFactory.getTransport(
-						(ObjectNode) config.get("transport"), handle);
+				TransportConfig transconfig = new TransportConfig(
+						(ObjectNode) config.get("transport"));
+				if (transconfig.get("id") == null) {
+					transconfig.put("id", agentId);
+				}
+				transport = TransportFactory.getTransport(transconfig, handle);
 			}
 		}
 	}
@@ -171,7 +182,6 @@ public class Agent implements Receiver {
 	public Scheduler getScheduler() {
 		return scheduler;
 	}
-
 	
 	/**
 	 * Sets the state.
@@ -183,6 +193,7 @@ public class Agent implements Receiver {
 	public void setState(State state) {
 		this.state = state;
 	}
+	
 	/**
 	 * Gets the state.
 	 * 
@@ -193,8 +204,6 @@ public class Agent implements Receiver {
 	public State getState() {
 		return state;
 	}
-	
-	
 	
 	/**
 	 * Send async.

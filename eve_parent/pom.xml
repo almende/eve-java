@@ -63,6 +63,7 @@
 		<module>../transforms</module>
 		<module>../scheduling</module>
 		<module>../eve_agents</module>
+		<module>../tests</module>
 	</modules>
 
 	<properties>
