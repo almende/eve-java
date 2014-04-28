@@ -63,6 +63,7 @@
 		<module>../transforms</module>
 		<module>../scheduling</module>
 		<module>../eve_agents</module>
+		<module>../config/eve_yaml</module>
 		<module>../tests</module>
 	</modules>
 
@@ -79,6 +80,7 @@
 		<maven-javadoc-plugin.version>2.9</maven-javadoc-plugin.version>
 		<gpg.version>1.4</gpg.version>
 		<junit.version>4.11</junit.version>
+		<jackson.version>2.3.2</jackson.version>
 	</properties>
 
 	<dependencies>
@@ -87,6 +89,11 @@
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 	</dependencies>
 

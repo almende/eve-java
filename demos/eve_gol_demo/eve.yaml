@@ -1,32 +1,14 @@
 # Eve configuration
 
-# transport services
-transport_services:
-- class: HttpService
-  servlet_url: http://127.0.0.1:8081/agents/
-  servlet_launcher: JettyLauncher
+transport:
+   class: com.almende.eve.transport.http.HttpService
+   servletUrl: http://127.0.0.1:8081/agents/
 
-# state settings
-# the state is used to persist the agents state.
 state:
-#  class: MemoryStateFactory
-  class: FileStateFactory
-  path: .eveagents_goldemo
-  json: true
-
-# scheduler settings
-scheduler:
-  class: ClockSchedulerFactory
-
-jetty:
-  port: 8081
+  class: com.almende.eve.state.memory.MemoryStateService
 
 gol:
-  runTime: 50
-  columns: 30
-  rows: 30
-  doesShortcut: true
-#  OddUrl: "http://127.0.0.1:8081/agents/"
-#  EvenUrl: "http://127.0.0.1:8081/agents/"
-  OddUrl: "local:"
-  EvenUrl: "local:"  
+  runTime: 10
+  columns: 5
+  rows: 5
+

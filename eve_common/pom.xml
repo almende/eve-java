@@ -15,20 +15,19 @@
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
-		<jackson.version>2.3.2</jackson.version>
 		<jodah.version>0.3.0</jodah.version>
 		<codec.version>1.9</codec.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-joda</artifactId>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>

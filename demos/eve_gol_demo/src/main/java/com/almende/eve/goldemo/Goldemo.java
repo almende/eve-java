@@ -5,6 +5,8 @@
 package com.almende.eve.goldemo;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -12,11 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.almende.eve.capabilities.Config;
-import com.almende.eve.state.memory.MemoryStateConfig;
+import com.almende.eve.config.YamlReader;
 import com.almende.eve.transform.rpc.jsonrpc.JSONRPCException;
-import com.almende.eve.transport.http.HttpTransportConfig;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Goldemo.
@@ -72,13 +71,11 @@ public class Goldemo {
 					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath>");
 			return;
 		}
-		//String path = args[0];
-
-		//TODO: get Agent config
-		Config config = new Config();
+		Config config = YamlReader.load(new FileInputStream(new File(args[0])));
+/*
 		//Temporary:
 		ObjectNode golConfig = JOM.createObjectNode();
-		golConfig.put("runTime", 10);
+		golConfig.put("runTime", 50);
 		golConfig.put("columns", 5);
 		golConfig.put("rows", 5);
 		config.put("gol", golConfig);
@@ -89,7 +86,7 @@ public class Goldemo {
 		
 		MemoryStateConfig state = new MemoryStateConfig();
 		config.put("state", state);
-		
+*/		
 		Integer runTime = config.get("gol", "runTime");
 		Integer N = config.get("gol", "columns");
 		Integer M = config.get("gol", "rows");

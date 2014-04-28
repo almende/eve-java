@@ -12,9 +12,9 @@ import java.util.concurrent.ThreadFactory;
  * The Class ThreadPool.
  */
 public class ThreadPool {
-	private static ThreadFactory	factory	= Executors.defaultThreadFactory();
-	private static ExecutorService	pool	= Executors
-													.newCachedThreadPool(factory);
+	private static ThreadFactory				factory	= Executors
+																.defaultThreadFactory();
+	private static ExecutorService	pool	= Executors.newCachedThreadPool(factory);
 	
 	/**
 	 * Gets the pool.
