@@ -47,10 +47,9 @@ public class TestAgents extends TestCase {
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transportConfig.put("jetty", jettyParms);
-		
-		final Config config = new Config();
-		config.put("transport", transportConfig);
-		config.put("id", "example");
+
+		final AgentConfig config = new AgentConfig("example");
+		config.setTransport(transportConfig);
 		
 		ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
@@ -90,10 +89,12 @@ public class TestAgents extends TestCase {
 		System.gc();
 		System.gc();
 		
+		final AgentConfig ac = new AgentConfig("tester");
+		ac.setTransport(transportConfig);
 		Agent tester = new Agent(){};
-		tester.sendSync(new URI("http://localhost:8080/agents/example"),
-				"helloWorld after sleep.", callParams);
-		
+		tester.setConfig(ac);
+		LOG.warning("Sync received:'"+tester.sendSync(new URI("http://localhost:8080/agents/example"),
+				"helloWorld", callParams.deepCopy().put("message", "Hello world after sleep!"))+"'");
 	}
 	
 }

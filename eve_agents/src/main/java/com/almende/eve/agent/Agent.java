@@ -15,6 +15,7 @@ import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerFactory;
 import com.almende.eve.state.State;
+import com.almende.eve.state.StateConfig;
 import com.almende.eve.state.StateFactory;
 import com.almende.eve.transform.rpc.RpcTransform;
 import com.almende.eve.transform.rpc.RpcTransformFactory;
@@ -30,7 +31,6 @@ import com.almende.eve.transport.TransportConfig;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
-import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,7 +43,7 @@ public class Agent implements Receiver {
 	private static final Logger	LOG			= Logger.getLogger(Agent.class
 													.getName());
 	private String				agentId		= null;
-	private ObjectNode			config		= null;
+	private AgentConfig			config		= null;
 	private State				state		= null;
 	private Transport			transport	= null;
 	private Scheduler			scheduler	= null;
@@ -69,13 +69,26 @@ public class Agent implements Receiver {
 	}
 	
 	/**
+	 * Instantiates a new agent.
+	 * 
+	 * @param agentId
+	 *            the agent id
+	 * @param config
+	 *            the config
+	 */
+	public Agent(final String agentId, final ObjectNode config) {
+		this.config = new AgentConfig(agentId, config);
+		loadConfig(false);
+	}
+	
+	/**
 	 * Sets the config.
 	 * 
 	 * @param config
 	 *            the new config
 	 */
 	public void setConfig(final ObjectNode config) {
-		this.config = config.deepCopy();
+		this.config = new AgentConfig(config);
 		loadConfig(false);
 	}
 	
@@ -88,7 +101,7 @@ public class Agent implements Receiver {
 	 *            the on boot flag
 	 */
 	public void setConfig(final ObjectNode config, final boolean onBoot) {
-		this.config = config.deepCopy();
+		this.config = new AgentConfig(config);
 		loadConfig(onBoot);
 	}
 	
@@ -106,41 +119,39 @@ public class Agent implements Receiver {
 	 * 
 	 * @return the config
 	 */
-	public ObjectNode getConfig() {
+	public AgentConfig getConfig() {
 		return config;
 	}
 	
 	protected void loadConfig(final boolean onBoot) {
-		if (config.has("id")) {
-			agentId = config.get("id").asText();
-		} else {
-			agentId = new UUID().toString();
-		}
-		if (config.has("scheduler")) {
-			final ObjectNode schedulerConfig = (ObjectNode) config
-					.get("scheduler");
+		agentId = config.getId();
+		
+		final ObjectNode schedulerConfig = config.getScheduler();
+		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
-				final ObjectNode stateConfig = (ObjectNode) schedulerConfig
-						.get("state");
-				if (!stateConfig.has("id")) {
-					stateConfig.put("id", "scheduler_" + agentId);
+				final StateConfig stateConfig = new StateConfig(
+						(ObjectNode) schedulerConfig.get("state"));
+				
+				if (stateConfig.getId() == null) {
+					stateConfig.setId("scheduler_" + agentId);
 				}
 			}
 			scheduler = SchedulerFactory
 					.getScheduler(schedulerConfig, receiver);
 		}
-		if (config.has("state")) {
-			final ObjectNode stateConfig = (ObjectNode) config.get("state");
-			if (agentId != null && !stateConfig.has("id")) {
-				stateConfig.put("id", agentId);
+		final ObjectNode sc = config.getState();
+		if (sc != null) {
+			final StateConfig stateConfig = new StateConfig(sc);
+			if (agentId != null && stateConfig.getId() != null) {
+				stateConfig.setId(agentId);
 			}
 			state = StateFactory.getState(stateConfig);
 		}
-		if (config.has("transport")) {
-			if (config.get("transport").isArray()) {
+		JsonNode transportConfig = config.getTransport();
+		if (transportConfig != null) {
+			if (transportConfig.isArray()) {
 				final Router router = new Router();
-				final Iterator<JsonNode> iter = config.get("transport")
-						.iterator();
+				final Iterator<JsonNode> iter = transportConfig.iterator();
 				while (iter.hasNext()) {
 					TransportConfig transconfig = new TransportConfig(
 							(ObjectNode) iter.next());
@@ -153,18 +164,19 @@ public class Agent implements Receiver {
 				transport = router;
 			} else {
 				TransportConfig transconfig = new TransportConfig(
-						(ObjectNode) config.get("transport"));
+						(ObjectNode) transportConfig);
 				if (transconfig.get("id") == null) {
 					transconfig.put("id", agentId);
 				}
 				transport = TransportFactory
 						.getTransport(transconfig, receiver);
 			}
-			if (onBoot){
+			if (onBoot) {
 				try {
 					transport.connect();
 				} catch (IOException e) {
-					LOG.log(Level.WARNING,"Couldn't connect transports on boot",e);
+					LOG.log(Level.WARNING,
+							"Couldn't connect transports on boot", e);
 				}
 			}
 		}
@@ -233,7 +245,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public void connect() throws IOException{
+	public void connect() throws IOException {
 		this.transport.connect();
 	}
 	
