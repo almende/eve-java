@@ -14,8 +14,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.almende.eve.capabilities.Config;
 import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.capabilities.wake.WakeServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.callback.AsyncCallback;
@@ -76,11 +76,11 @@ public class TestAgents extends TestCase {
 		LOG.warning("Sync received:'"+agent.sendSync(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams)+"'");
 		
-		Config wsconfig = new Config();
+		WakeServiceConfig wsconfig = new WakeServiceConfig();
 		FileStateConfig state = new FileStateConfig();
 		state.setPath(".wakeservices");
 		state.setId("testAgents");
-		wsconfig.put("state", state);
+		wsconfig.setState(state);
 		
 		agent.registerAt(new WakeService(wsconfig));
 		

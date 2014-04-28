@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.Capability;
+import com.almende.eve.capabilities.CapabilityService;
+import com.almende.eve.capabilities.Config;
+import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
 import com.almende.util.TypeUtil;
@@ -20,13 +24,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * This is a "resurrection" service, to which agents can register themselves to
  * be woken when the system reboots, WakeHandlers are called, etc.
  */
-public class WakeService {
-	private static final Logger		LOG			= Logger.getLogger(WakeService.class
-														.getName());
-	private ObjectNode				myParams	= null;
-	private Map<String, WakeEntry>	agents		= new HashMap<String, WakeEntry>();
+public class WakeService implements Capability, CapabilityService {
+	private static final Logger						LOG			= Logger.getLogger(WakeService.class
+																		.getName());
+	private static final Map<String, WakeService>	services	= new HashMap<String, WakeService>();
+	private ObjectNode								myParams	= null;
+	private Map<String, WakeEntry>					agents		= new HashMap<String, WakeEntry>();
 	
-	private State					state		= null;
+	private State									state		= null;
 	
 	/**
 	 * Instantiates a new wake service.
@@ -44,6 +49,7 @@ public class WakeService {
 	public WakeService(final ObjectNode params) {
 		myParams = params;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
+		services.put(state.getId(), this);
 	}
 	
 	/**
@@ -64,6 +70,7 @@ public class WakeService {
 	public void setMyParams(final ObjectNode myParams) {
 		this.myParams = myParams;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
+		services.put(state.getId(), this);
 	}
 	
 	/**
@@ -192,6 +199,25 @@ public class WakeService {
 	 */
 	public void setAgents(final Map<String, WakeEntry> agents) {
 		this.agents = agents;
+	}
+	
+	@Override
+	public <T extends Capability, V> T get(ObjectNode params,
+			Handler<V> handle, Class<T> type) {
+		Config config = new Config(params);
+		String id = config.get("state", "id");
+		WakeService service = null;
+		if (services.containsKey(id)) {
+			service = services.get(id);
+		}
+		service = new WakeService(params);
+		
+		return TypeUtil.inject(service, type);
+	}
+	
+	@Override
+	public ObjectNode getParams() {
+		return myParams;
 	}
 	
 }
