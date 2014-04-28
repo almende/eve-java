@@ -114,7 +114,7 @@ public class WakeService {
 						+ wakeKey + "'", e);
 			}
 			if (instance != null) {
-				instance.wake(wakeKey, onBoot);
+				instance.wake(wakeKey, entry.getParams(), onBoot);
 			}
 		} else {
 			LOG.warning("Sorry, I don't know any Wakeable called:'" + wakeKey
@@ -132,7 +132,25 @@ public class WakeService {
 	 */
 	@JsonIgnore
 	public void register(final String wakeKey, final String className) {
-		final WakeEntry entry = new WakeEntry(wakeKey, className);
+		final WakeEntry entry = new WakeEntry(wakeKey, null, className);
+		agents.put(wakeKey, entry);
+		store();
+	}
+	
+	/**
+	 * Register.
+	 * 
+	 * @param wakeKey
+	 *            the wake key
+	 * @param className
+	 *            the class name
+	 * @param params
+	 *            the params
+	 */
+	@JsonIgnore
+	public void register(final String wakeKey, final ObjectNode params,
+			final String className) {
+		final WakeEntry entry = new WakeEntry(wakeKey, params, className);
 		agents.put(wakeKey, entry);
 		store();
 	}

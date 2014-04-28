@@ -54,12 +54,13 @@ public class MyAgent implements Wakeable, Receiver {
 	 * Inits the agent.
 	 */
 	public void init() {
-		ws.register(wakeKey, MyAgent.class.getName());
 		
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
 		params.put("address", "xmpp://alex@openid.almende.org/" + wakeKey);
 		params.put("password", "alex");
+		ws.register(wakeKey, params, MyAgent.class.getName());
+		
 		transport = TransportFactory.getTransport(params,
 				new WakeHandler<Receiver>(this, wakeKey, ws));
 		try {
@@ -72,12 +73,8 @@ public class MyAgent implements Wakeable, Receiver {
 	}
 	
 	@Override
-	public void wake(final String wakeKey, final boolean onBoot) {
+	public void wake(final String wakeKey, final ObjectNode params, final boolean onBoot) {
 		this.wakeKey = wakeKey;
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
-		params.put("address", "xmpp://alex@openid.almende.org/" + this.wakeKey);
-		params.put("password", "alex");
 		transport = TransportFactory.getTransport(params,
 				new WakeHandler<Receiver>(this, this.wakeKey, ws));
 		

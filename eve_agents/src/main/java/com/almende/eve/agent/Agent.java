@@ -47,9 +47,10 @@ public class Agent implements Receiver {
 	private State				state		= null;
 	private Transport			transport	= null;
 	private Scheduler			scheduler	= null;
-	private final RpcTransform	rpc			= RpcTransformFactory
+	protected RpcTransform		rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
 															this));
+	protected Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
 	
 	/**
 	 * Instantiates a new agent.
@@ -64,8 +65,7 @@ public class Agent implements Receiver {
 	 *            the config
 	 */
 	public Agent(final ObjectNode config) {
-		this.config = config.deepCopy();
-		loadConfig();
+		setConfig(config);
 	}
 	
 	/**
@@ -76,7 +76,20 @@ public class Agent implements Receiver {
 	 */
 	public void setConfig(final ObjectNode config) {
 		this.config = config.deepCopy();
-		loadConfig();
+		loadConfig(false);
+	}
+	
+	/**
+	 * Sets the config.
+	 * 
+	 * @param config
+	 *            the new config
+	 * @param onBoot
+	 *            the on boot flag
+	 */
+	public void setConfig(final ObjectNode config, final boolean onBoot) {
+		this.config = config.deepCopy();
+		loadConfig(onBoot);
 	}
 	
 	/**
@@ -97,8 +110,7 @@ public class Agent implements Receiver {
 		return config;
 	}
 	
-	private void loadConfig() {
-		final Handler<Receiver> handle = new SimpleHandler<Receiver>(this);
+	private void loadConfig(final boolean onBoot) {
 		if (config.has("id")) {
 			agentId = config.get("id").asText();
 		} else {
@@ -114,7 +126,8 @@ public class Agent implements Receiver {
 					stateConfig.put("id", "scheduler_" + agentId);
 				}
 			}
-			scheduler = SchedulerFactory.getScheduler(schedulerConfig, handle);
+			scheduler = SchedulerFactory
+					.getScheduler(schedulerConfig, receiver);
 		}
 		if (config.has("state")) {
 			final ObjectNode stateConfig = (ObjectNode) config.get("state");
@@ -135,7 +148,7 @@ public class Agent implements Receiver {
 						transconfig.put("id", agentId);
 					}
 					router.register(TransportFactory.getTransport(transconfig,
-							handle));
+							receiver));
 				}
 				transport = router;
 			} else {
@@ -144,7 +157,15 @@ public class Agent implements Receiver {
 				if (transconfig.get("id") == null) {
 					transconfig.put("id", agentId);
 				}
-				transport = TransportFactory.getTransport(transconfig, handle);
+				transport = TransportFactory
+						.getTransport(transconfig, receiver);
+			}
+			if (onBoot){
+				try {
+					transport.connect();
+				} catch (IOException e) {
+					LOG.log(Level.WARNING,"Couldn't connect transports on boot",e);
+				}
 			}
 		}
 	}
@@ -203,6 +224,17 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public State getState() {
 		return state;
+	}
+	
+	/**
+	 * Connect all transports.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public void connect() throws IOException{
+		this.transport.connect();
 	}
 	
 	/**

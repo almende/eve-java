@@ -63,7 +63,6 @@
 		<module>../transforms</module>
 		<module>../scheduling</module>
 		<module>../eve_agents</module>
-		<module>../config/eve_yaml</module>
 		<module>../tests</module>
 	</modules>
 
