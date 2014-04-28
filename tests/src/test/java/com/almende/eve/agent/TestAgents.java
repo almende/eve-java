@@ -15,6 +15,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.Config;
+import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.state.file.FileStateConfig;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
@@ -40,8 +42,7 @@ public class TestAgents extends TestCase {
 		
 		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
-		transportConfig.setId("example");
-		
+
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
@@ -49,8 +50,9 @@ public class TestAgents extends TestCase {
 		
 		final Config config = new Config();
 		config.put("transport", transportConfig);
+		config.put("id", "example");
 		
-		final Agent agent = new ExampleAgent();
+		ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
 		
 		final ObjectNode callParams = JOM.createObjectNode();
@@ -74,6 +76,24 @@ public class TestAgents extends TestCase {
 
 		LOG.warning("Sync received:'"+agent.sendSync(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams)+"'");
+		
+		Config wsconfig = new Config();
+		FileStateConfig state = new FileStateConfig();
+		state.setPath(".wakeservices");
+		state.setId("testAgents");
+		wsconfig.put("state", state);
+		
+		agent.registerAt(new WakeService(wsconfig));
+		
+		// Try to get rid of the agent instance from memory
+		agent = null;
+		System.gc();
+		System.gc();
+		
+		Agent tester = new Agent(){};
+		tester.sendSync(new URI("http://localhost:8080/agents/example"),
+				"helloWorld after sleep.", callParams);
+		
 	}
 	
 }

@@ -9,14 +9,13 @@ import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.Wakeable;
 import com.almende.eve.transform.rpc.RpcTransformFactory;
 import com.almende.eve.transport.Receiver;
-import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class WakeableAgent.
  */
 public class WakeableAgent extends Agent implements Wakeable {
-	
+	private WakeService ws =null;
 	/**
 	 * Instantiates a new wake agent.
 	 */
@@ -32,22 +31,30 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 *            the ws
 	 */
 	public WakeableAgent(ObjectNode config, WakeService ws) {
-		String agentId = "";
-		if (config.has("id")) {
-			agentId = config.get("id").asText();
-		} else {
-			agentId = new UUID().toString();
-			config.put("id", agentId);
-		}
-		this.rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
-				agentId, ws));
-		this.receiver = new WakeHandler<Receiver>(this, agentId, ws);
+		this.ws=ws;
 		setConfig(config, true);
-		ws.register(agentId, config, this.getClass().getName());
+		registerAt(ws);
+	}
+	
+	/**
+	 * Register at.
+	 * 
+	 * @param ws
+	 *            the ws
+	 */
+	public void registerAt(WakeService ws){
+		this.rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
+				getId(), ws));
+		this.receiver = new WakeHandler<Receiver>(this, getId(), ws);
+		loadConfig(false);
+		ws.register(getId(), getConfig(), this.getClass().getName());
 	}
 	
 	@Override
 	public void wake(String wakeKey, ObjectNode params, boolean onBoot) {
+		this.rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
+				wakeKey, ws));
+		this.receiver = new WakeHandler<Receiver>(this, wakeKey, ws);
 		setConfig(params, onBoot);
 	}
 	

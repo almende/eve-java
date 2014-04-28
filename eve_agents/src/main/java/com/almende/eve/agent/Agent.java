@@ -106,11 +106,11 @@ public class Agent implements Receiver {
 	 * 
 	 * @return the config
 	 */
-	public JsonNode getConfig() {
+	public ObjectNode getConfig() {
 		return config;
 	}
 	
-	private void loadConfig(final boolean onBoot) {
+	protected void loadConfig(final boolean onBoot) {
 		if (config.has("id")) {
 			agentId = config.get("id").asText();
 		} else {
