@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -79,6 +80,7 @@ public abstract class AbstractState<V> implements State {
 	 * 
 	 * @return the service
 	 */
+	@JsonIgnore
 	public StateService getService() {
 		return service;
 	}
@@ -139,6 +141,7 @@ public abstract class AbstractState<V> implements State {
 	 *            the key
 	 * @return the v
 	 */
+	@JsonIgnore
 	public abstract V get(String key);
 	
 	/*
@@ -147,6 +150,7 @@ public abstract class AbstractState<V> implements State {
 	 * @see com.almende.eve.state.State#get(java.lang.String, java.lang.Class)
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T get(final String key, final Class<T> type) {
 		return TypeUtil.inject(get(key), type);
 	}
@@ -158,6 +162,7 @@ public abstract class AbstractState<V> implements State {
 	 * java.lang.reflect.Type)
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T get(final String key, final Type type) {
 		return TypeUtil.inject(get(key), type);
 	}
@@ -169,6 +174,7 @@ public abstract class AbstractState<V> implements State {
 	 * com.fasterxml.jackson.databind.JavaType)
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T get(final String key, final JavaType type) {
 		return TypeUtil.inject(get(key), type);
 	}
@@ -180,6 +186,7 @@ public abstract class AbstractState<V> implements State {
 	 * com.almende.util.TypeUtil)
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T get(final String key, final TypeUtil<T> type) {
 		return type.inject(get(key));
 	}
@@ -190,6 +197,7 @@ public abstract class AbstractState<V> implements State {
 	 * @see com.almende.eve.state.State#get(com.almende.eve.state.TypedKey)
 	 */
 	@Override
+	@JsonIgnore
 	public <T> T get(final TypedKey<T> typedKey) {
 		return get(typedKey.getKey(), typedKey.getType());
 	}
@@ -279,6 +287,7 @@ public abstract class AbstractState<V> implements State {
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
+	@JsonIgnore
 	public ObjectNode getParams(){
 		return myParams;
 	}

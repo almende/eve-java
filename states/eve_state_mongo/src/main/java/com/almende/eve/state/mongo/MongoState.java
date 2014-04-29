@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jongo.MongoCollection;
+import org.jongo.marshall.jackson.oid.Id;
 
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
@@ -67,49 +68,38 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	/* mapping object that contains variables used by the agent */
 	private Map<String, JsonNode>	properties	= Collections
 														.synchronizedMap(new HashMap<String, JsonNode>());
-	
-	/*
-	 * metadata for agenthost : agent type and last update for a simple update
-	 * conflict avoidance
-	 */
 	private Long					timestamp;
 	
 	@JsonIgnore
 	private MongoCollection			collection;
 	
+	@Id
+	@Override
+	public String getId() {
+		return super.getId();
+	}
+	
 	/**
 	 * Instantiates a new memory state.
 	 */
 	public MongoState() {
-		
 		timestamp = System.nanoTime();
-		// assuming this is called only once after creation, simply save the
-		// entire state
-		collection.save(this);
-		collection.ensureIndex("{ _id: 1}");
-		collection.ensureIndex("{ _id: 1, timestamp:1 }");
 	}
 	
 	/**
 	 * Instantiates a new mongo state.
 	 * 
-	 * @param agentId
-	 *            the agent id
+	 * @param id
+	 *            the state's id
 	 * @param service
 	 *            the service
 	 * @param params
 	 *            the params
 	 */
-	public MongoState(final String agentId, final StateService service,
+	public MongoState(final String id, final StateService service,
 			final ObjectNode params) {
-		super(agentId, service, params);
-		
+		super(id, service, params);
 		timestamp = System.nanoTime();
-		// assuming this is called only once after creation, simply save the
-		// entire state
-		collection.save(this);
-		collection.ensureIndex("{ _id: 1}");
-		collection.ensureIndex("{ _id: 1, timestamp:1 }");
 	}
 	
 	/**
@@ -121,6 +111,11 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	@JsonIgnore
 	public void setCollection(MongoCollection collection) {
 		this.collection = collection;
+		// assuming this is called only once after creation, simply save the
+		// entire state
+		collection.save(this);
+		collection.ensureIndex("{ _id: 1}");
+		collection.ensureIndex("{ _id: 1, timestamp:1 }");
 	}
 	
 	/**
@@ -200,7 +195,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	public void clear() {
 		try {
 			properties.clear();
-			updateProperties(false);
+			updateProperties(true);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "clear error", e);
 		}
@@ -228,10 +223,15 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * @see com.almende.eve.state.AbstractState#get(java.lang.String)
 	 */
 	@Override
+	@JsonIgnore
 	public JsonNode get(String key) {
 		JsonNode result = null;
 		try {
 			result = properties.get(key);
+			if (result == null) {
+				reloadProperties();
+				result = properties.get(key);
+			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "get error", e);
 		}
@@ -340,10 +340,16 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * 
 	 */
 	private synchronized void reloadProperties() {
-		final MongoState updatedState = collection.findOne("{_id: #}",
-				getId()).as(MongoState.class);
-		this.timestamp = updatedState.timestamp;
-		this.properties = updatedState.properties;
+		final MongoState updatedState = collection.findOne("{_id: #}", getId())
+				.as(MongoState.class);
+		if (updatedState != null) {
+			this.timestamp = updatedState.timestamp;
+			this.properties = updatedState.properties;
+		} else {
+			this.properties	= Collections
+					.synchronizedMap(new HashMap<String, JsonNode>());
+			this.timestamp = System.nanoTime();
+		}
 	}
 	
 	/**
@@ -359,11 +365,12 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			throws UpdateConflictException {
 		Long now = System.nanoTime();
 		/* write to database */
-		WriteResult result = (force) ? collection.update("{_id: #}",
-				getId()).with("{$set: {properties: #, timestamp: #}}",
-				properties, now) : collection.update("{_id: #, timestamp: #}",
-				getId(), timestamp).with(
-				"{$set: {properties: #, timestamp: #}}", properties, now);
+		WriteResult result = (force) ? collection.update("{_id: #}", getId())
+				.with("{$set: {properties: #, timestamp: #}}", properties, now)
+				: collection.update("{_id: #, timestamp: #}", getId(),
+						timestamp).with(
+						"{$set: {properties: #, timestamp: #}}", properties,
+						now);
 		/* check results */
 		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
 		if (result.getN() == 0 && result.getError() == null) {

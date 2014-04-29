@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.mongo.MongoStateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,7 +30,7 @@ public class TestState extends TestCase {
 	 */
 	public void runTest(final State myState, final State myState2) {
 		myState.put("msg", "Hi There!");
-		assertEquals(myState2.get("msg", String.class), "Hi There!");
+		assertEquals("Hi There!", myState2.get("msg", String.class));
 		
 		myState.delete();
 		assertNull(myState.get("msg", String.class));
@@ -76,5 +77,23 @@ public class TestState extends TestCase {
 		myState2 = StateFactory.getState(params);
 		runTest(myState, myState2);
 		
+	}
+	
+	/**
+	 * Test me.
+	 */
+	@Test
+	public void testMongoState() {
+		MongoStateConfig config = new MongoStateConfig();
+		config.setId("TestAgent");
+		
+		State myState = CapabilityFactory.get(config, null, State.class);
+		State myState2 = StateFactory.getState(config);
+		runTest(myState, myState2);
+		
+		System.err.println("Round 2");
+		myState = CapabilityFactory.get(config, null, State.class);
+		myState2 = StateFactory.getState(config);
+		runTest(myState, myState2);
 	}
 }

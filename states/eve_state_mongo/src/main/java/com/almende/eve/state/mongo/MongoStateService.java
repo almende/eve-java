@@ -26,23 +26,26 @@ import com.mongodb.ServerAddress;
  * A service for managing MemoryState objects.
  */
 public class MongoStateService implements StateService {
-	private static final Logger			LOG			= Logger.getLogger(MongoStateService.class
-															.getName());
+	private static final Logger	LOG	= Logger.getLogger(MongoStateService.class
+											.getName());
 	
 	/* internal attributes */
-	private final Jongo					jongo;
-	private final String				collectionName;
+	private final Jongo			jongo;
+	private final String		collectionName;
 	
 	/**
 	 * Instantiates a new mongo state service.
 	 * 
 	 * @param params
 	 *            the params
-	 * @throws UnknownHostException 
+	 * @throws UnknownHostException
 	 */
-	public MongoStateService(final ObjectNode params) throws UnknownHostException {
+	public MongoStateService(final ObjectNode params)
+			throws UnknownHostException {
 		
 		MongoStateConfig config = new MongoStateConfig(params);
+		
+		LOG.warning("Creating mongoState:" + config);
 		
 		// initialization of client & jongo
 		MongoClient client = createClient(config.getHost(), config.getPort());
@@ -51,6 +54,7 @@ public class MongoStateService implements StateService {
 		
 		this.jongo.runCommand("{collMod: '" + this.collectionName
 				+ "', usePowerOf2Sizes : true }");
+		
 	}
 	
 	private static MongoClient createClient(String databaseUri, int port)
@@ -62,6 +66,7 @@ public class MongoStateService implements StateService {
 				port), options);
 		return client;
 	}
+	
 	/**
 	 * Gets the instance by params.
 	 * 
@@ -70,11 +75,12 @@ public class MongoStateService implements StateService {
 	 * @return the instance by params
 	 */
 	public static MongoStateService getInstanceByParams(final ObjectNode params) {
-		//TODO: fix lookup to multiple params
+		// TODO: fix lookup to multiple params
 		try {
+			
 			return new MongoStateService(params);
 		} catch (UnknownHostException e) {
-			LOG.log(Level.WARNING,"Couldn't init MongoStateService",e);
+			LOG.log(Level.WARNING, "Couldn't init MongoStateService", e);
 		}
 		return null;
 	}
@@ -99,16 +105,23 @@ public class MongoStateService implements StateService {
 	@Override
 	public <T extends Capability, V> T get(final ObjectNode params,
 			final Handler<V> handle, final Class<T> type) {
+		
 		final StateConfig config = new StateConfig(params);
 		final String id = config.getId();
+		
+		LOG.warning("Looking for:" + config);
 		
 		MongoState result = null;
 		try {
 			result = getCollection().findOne("{_id: #}", id).as(
 					MongoState.class);
-			if (result != null) {
-				result.setCollection(getCollection());
+			if (result == null) {
+				result = new MongoState(id, this, params);
+				getCollection().insert(result);
+			} else {
+				result.setService(this);
 			}
+			result.setCollection(getCollection());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "get error", e);
 		}
@@ -124,7 +137,8 @@ public class MongoStateService implements StateService {
 	@Override
 	public void delete(final State instance) {
 		try {
-			getCollection().remove("{_id: #}", instance.getId());
+			getCollection().remove("{_id: #}",
+					instance.getId());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "delete error", e);
 		}
