@@ -58,10 +58,10 @@
 	<modules>
 		<module>../eve_common</module>
 		<module>../states</module>
-		<module>../eve_wake</module>
 		<module>../transports</module>
 		<module>../transforms</module>
 		<module>../scheduling</module>
+		<module>../eve_wake</module>
 		<module>../eve_agents</module>
 		<module>../tests</module>
 		<module>../bundles</module>
