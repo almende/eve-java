@@ -268,5 +268,17 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>graph</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.fusesource.mvnplugins</groupId>
+						<artifactId>maven-graph-plugin</artifactId>
+						<version>1.30</version>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>
