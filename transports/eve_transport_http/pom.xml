@@ -8,7 +8,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>eve-transport-http</artifactId>
-	<name>EVE HTTP Transport</name>
+	<name>EVE Transport HTTP</name>
 
 	<properties>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>

@@ -12,7 +12,7 @@
 	<artifactId>eve-scheduling</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Scheduling Bundle</name>
+	<name>EVE Scheduling Parent</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

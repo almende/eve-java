@@ -11,7 +11,7 @@
 
 	<artifactId>eve-state-common</artifactId>
 
-	<name>EVE State (MemoryState and FileState)</name>
+	<name>EVE State Framework (incl. Memory and FileState)</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>

@@ -12,7 +12,7 @@
 	<artifactId>eve-transform</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Transform Bundle</name>
+	<name>EVE Transform Parent</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

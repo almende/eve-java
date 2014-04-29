@@ -12,7 +12,7 @@
 	<artifactId>eve-transport</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Transport Bundle</name>
+	<name>EVE Transport Parent</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

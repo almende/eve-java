@@ -8,7 +8,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>eve-transport-http-jetty</artifactId>
-	<name>EVE HTTP Transport - Embedded Jetty Setup</name>
+	<name>EVE Transport HTTP - Embedded Jetty Setup</name>
 
 	<properties>
 		<jetty.version>9.2.0.M0</jetty.version>
