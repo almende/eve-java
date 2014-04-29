@@ -24,41 +24,41 @@
 			<version>${project.parent.version}</version>
 			<artifactId>eve-agents</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>${project.parent.groupId}</groupId>
-                        <version>${project.parent.version}</version>
-                        <artifactId>eve-transport-http</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>${project.parent.groupId}</groupId>
-                        <version>${project.parent.version}</version>
-                        <artifactId>eve-transport-xmpp</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>${project.parent.groupId}</groupId>
-                        <version>${project.parent.version}</version>
-                        <artifactId>eve-scheduling-persistent</artifactId>
-                </dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+			<artifactId>eve-transport-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+			<artifactId>eve-transport-xmpp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+			<artifactId>eve-scheduling-persistent</artifactId>
+		</dependency>
 	</dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven.shade.version}</version>
-        <configuration>
-          <!-- put your configurations here -->
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>${maven.shade.version}</version>
+				<configuration>
+					<!-- put your configurations here -->
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
