@@ -18,10 +18,10 @@
 	</properties>
 
 	<dependencies>
-                <dependency>
-                        <groupId>com.almende.eve</groupId>
-                        <artifactId>eve-transform-common</artifactId>
-                        <version>${project.parent.version}</version>
-                </dependency>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-transform-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 </project>

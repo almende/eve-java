@@ -13,22 +13,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.impl.conn.SchemeRegistryFactory;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
@@ -39,9 +34,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class ApacheHttpClient.
  */
 public final class ApacheHttpClient {
-	private static final Logger			LOG			= Logger.getLogger(ApacheHttpClient.class
-															.getCanonicalName());
-	private static DefaultHttpClient	httpClient	= null;
+	private static final Logger	LOG			= Logger.getLogger(ApacheHttpClient.class
+													.getCanonicalName());
+	private static HttpClient	httpClient	= null;
 	static {
 		new ApacheHttpClient();
 	}
@@ -52,24 +47,23 @@ public final class ApacheHttpClient {
 	 */
 	private ApacheHttpClient() {
 		
+		final HttpClientBuilder builder = HttpClientBuilder.create();
+		
 		// Allow self-signed SSL certificates:
-		final TrustStrategy trustStrategy = new TrustSelfSignedStrategy();
-		final X509HostnameVerifier hostnameVerifier = new AllowAllHostnameVerifier();
-		final SchemeRegistry schemeRegistry = SchemeRegistryFactory
-				.createDefault();
-		
-		SSLSocketFactory sslSf;
 		try {
-			sslSf = new SSLSocketFactory(trustStrategy, hostnameVerifier);
-			final Scheme https = new Scheme("https", 443, sslSf);
-			schemeRegistry.register(https);
-		} catch (final Exception e) {
-			LOG.warning("Couldn't init SSL socket, https not supported!");
-		}
+		SSLContextBuilder SSLbuilder = new SSLContextBuilder();
+		SSLbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+				SSLbuilder.build(),
+				SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 		
+		builder.setSSLSocketFactory(sslsf);
+		} catch (Exception e){
+			LOG.log(Level.WARNING,"Couldn't init SSL strategy",e);
+		}
 		// Work with PoolingClientConnectionManager
-		final ClientConnectionManager connection = new PoolingClientConnectionManager(
-				schemeRegistry);
+		final HttpClientConnectionManager connection = new PoolingHttpClientConnectionManager();
+		builder.setConnectionManager(connection);
 		
 		// Provide eviction thread to clear out stale threads.
 		new Thread(new Runnable() {
@@ -89,25 +83,27 @@ public final class ApacheHttpClient {
 			}
 		}).start();
 		
-		// generate httpclient
-		httpClient = new DefaultHttpClient(connection);
-		
-		// Set cookie policy and persistent cookieStore
 		try {
-			httpClient.setCookieStore(new MyCookieStore());
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING,
-					"Failed to initialize persistent cookieStore!", e);
+			builder.setDefaultCookieStore(new MyCookieStore());
+		} catch (IOException e) {
+			LOG.log(Level.WARNING,"Couldn't init cookie store",e);
 		}
-		final HttpParams params = httpClient.getParams();
 		
-		params.setParameter(ClientPNames.COOKIE_POLICY,
-				CookiePolicy.BROWSER_COMPATIBILITY);
-		params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-		params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
-		params.setParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-		params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
-		httpClient.setParams(params);
+		RequestConfig globalConfig = RequestConfig.custom()
+				.setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+				.setConnectTimeout(20000).setStaleConnectionCheckEnabled(false)
+				.build();
+		
+		builder.setDefaultRequestConfig(globalConfig);
+		
+		SocketConfig socketConfig = SocketConfig.custom()
+				.setSoTimeout(60000)
+				.setTcpNoDelay(true)
+				.build();
+		builder.setDefaultSocketConfig(socketConfig);
+		
+		// generate httpclient
+		httpClient = builder.build();
 	}
 	
 	/**
@@ -115,7 +111,7 @@ public final class ApacheHttpClient {
 	 * 
 	 * @return the default http client
 	 */
-	public static DefaultHttpClient get() {
+	public static HttpClient get() {
 		return httpClient;
 	}
 	

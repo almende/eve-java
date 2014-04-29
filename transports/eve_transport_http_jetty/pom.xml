@@ -11,8 +11,8 @@
 	<name>EVE HTTP Transport - Embedded Jetty Setup</name>
 
 	<properties>
-		<jetty.version>9.1.0.v20131115</jetty.version>
-		<slf4j.version>1.7.5</slf4j.version>
+		<jetty.version>9.2.0.M0</jetty.version>
+		<slf4j.version>1.7.7</slf4j.version>
 	</properties>
 
 	<dependencies>
