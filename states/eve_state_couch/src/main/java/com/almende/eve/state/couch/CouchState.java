@@ -37,6 +37,12 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	
 	/**
 	 * Instantiates a new couch state.
+	 */
+	public CouchState() {
+	}
+	
+	/**
+	 * Instantiates a new couch state.
 	 * 
 	 * @param id
 	 *            the id
@@ -57,9 +63,14 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * Read.
 	 */
 	private void read() {
-		final CouchState state = db.get(CouchState.class, getId());
-		revision = state.revision;
-		properties = state.properties;
+		try {
+			final CouchState state = db.get(CouchState.class, getId());
+			if (state != null) {
+				revision = state.revision;
+				properties = state.properties;
+			}
+		} catch (org.ektorp.DocumentNotFoundException e) {
+		}
 	}
 	
 	/**
@@ -69,8 +80,11 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		db.update(this);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.AbstractState#locPut(java.lang.String, com.fasterxml.jackson.databind.JsonNode)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
+	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
 	public synchronized JsonNode locPut(final String key, final JsonNode value) {
@@ -89,8 +103,13 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.state.AbstractState#locPutIfUnchanged(java.lang.String, com.fasterxml.jackson.databind.JsonNode, com.fasterxml.jackson.databind.JsonNode)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.state.AbstractState#locPutIfUnchanged(java.lang.String,
+	 * com.fasterxml.jackson.databind.JsonNode,
+	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
 	public synchronized boolean locPutIfUnchanged(final String key,
@@ -122,7 +141,10 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		
 		return result;
 	}
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#remove(java.lang.String)
 	 */
 	@Override
@@ -137,7 +159,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#containsKey(java.lang.String)
 	 */
 	@Override
@@ -146,13 +170,19 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		boolean result = false;
 		try {
 			result = properties.containsKey(ckey);
+			if (result == false) {
+				read();
+				result = properties.containsKey(ckey);
+			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
 		return result;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#keySet()
 	 */
 	@Override
@@ -170,7 +200,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#clear()
 	 */
 	@Override
@@ -183,7 +215,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.State#size()
 	 */
 	@Override
@@ -197,7 +231,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.AbstractState#get(java.lang.String)
 	 */
 	@Override
@@ -206,6 +242,11 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		JsonNode result = null;
 		try {
 			result = properties.get(key);
+			if (result == null) {
+				read();
+				result = properties.get(key);
+			}
+			
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -214,7 +255,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	
 	/**
 	 * Gets the id.
-	 *
+	 * 
 	 * @return the id
 	 */
 	@JsonProperty("_id")
@@ -224,8 +265,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	
 	/**
 	 * Sets the id.
-	 *
-	 * @param id the new id
+	 * 
+	 * @param id
+	 *            the new id
 	 */
 	@JsonProperty("_id")
 	public void setId(final String id) {
@@ -234,7 +276,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	
 	/**
 	 * Gets the revision.
-	 *
+	 * 
 	 * @return the revision
 	 */
 	@JsonProperty("_rev")
@@ -245,12 +287,32 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	
 	/**
 	 * Sets the revision.
-	 *
-	 * @param revision the new revision
+	 * 
+	 * @param revision
+	 *            the new revision
 	 */
 	@JsonProperty("_rev")
 	public void setRevision(final String revision) {
 		this.revision = revision;
+	}
+	
+	/**
+	 * Gets the properties.
+	 * 
+	 * @return the properties
+	 */
+	public Map<String, JsonNode> getProperties() {
+		return properties;
+	}
+	
+	/**
+	 * Sets the properties.
+	 * 
+	 * @param properties
+	 *            the properties
+	 */
+	public void setProperties(final Map<String, JsonNode> properties) {
+		this.properties = properties;
 	}
 	
 	/**
@@ -260,7 +322,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 *            the new db
 	 */
 	public void setDb(CouchDbConnector db) {
-		this.db=db;
+		this.db = db;
 	}
 	
 	/**

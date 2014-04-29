@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.couch.CouchStateConfig;
 import com.almende.eve.state.mongo.MongoStateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,6 +31,7 @@ public class TestState extends TestCase {
 	 */
 	public void runTest(final State myState, final State myState2) {
 		myState.put("msg", "Hi There!");
+		assertEquals("Hi There!", myState.get("msg", String.class));
 		assertEquals("Hi There!", myState2.get("msg", String.class));
 		
 		myState.delete();
@@ -91,7 +93,23 @@ public class TestState extends TestCase {
 		State myState2 = StateFactory.getState(config);
 		runTest(myState, myState2);
 		
-		System.err.println("Round 2");
+		myState = CapabilityFactory.get(config, null, State.class);
+		myState2 = StateFactory.getState(config);
+		runTest(myState, myState2);
+	}
+	/**
+	 * Test me.
+	 */
+	@Test
+	public void testCouchState() {
+		CouchStateConfig config = new CouchStateConfig();
+		config.setId("TestAgent");
+		config.setUrl("http://localhost:5984");
+		
+		State myState = CapabilityFactory.get(config, null, State.class);
+		State myState2 = StateFactory.getState(config);
+		runTest(myState, myState2);
+		
 		myState = CapabilityFactory.get(config, null, State.class);
 		myState2 = StateFactory.getState(config);
 		runTest(myState, myState2);

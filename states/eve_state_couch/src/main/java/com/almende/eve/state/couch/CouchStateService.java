@@ -75,7 +75,7 @@ public class CouchStateService implements StateService {
 	 *            the params
 	 * @return the instance by params
 	 */
-	public CouchStateService getInstanceByParams(final ObjectNode params) {
+	public static CouchStateService getInstanceByParams(final ObjectNode params) {
 		CouchStateConfig config = new CouchStateConfig(params);
 		String key = config.getKey();
 		if (instances.containsKey(key)) {
@@ -98,14 +98,15 @@ public class CouchStateService implements StateService {
 	@Override
 	public <T extends Capability, V> T get(ObjectNode params,
 			Handler<V> handle, Class<T> type) {
-		final CouchStateConfig config = new CouchStateConfig(params); 
+		final CouchStateConfig config = new CouchStateConfig(params);
 		final String id = couchify(config.getId());
 		
 		CouchState state = null;
 		try {
-			state = db.get(CouchState.class, id);
-			if (state != null){
+			if (db.contains(id)) {
+				state = db.get(CouchState.class, id);
 				state.setDb(db);
+				state.setService(this);
 			} else {
 				state = new CouchState(id, db, this, config);
 				db.create(state);
