@@ -8,13 +8,12 @@ exchange (HTTP) and for messaging (JSON-RPC).
 
 This project contains the Java implementation of Eve. Please refer to the documentation for other implementations.
 
-{% highlight xml %}
+```xml
 <dependency>
     <groupId>com.almende.eve</groupId>
     <artifactId>eve-full</artifactId>
     <version>3.0.0</version>
 </dependency>
-{% endhighlight %}
-
+```
 
 Documentation is available on http://almende.github.com/eve
