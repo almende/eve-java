@@ -1,5 +1,7 @@
 ## EVE - JAVA implementation
 
+{% assign version = '3.0.0' %}
+
 Eve is a multipurpose, web based agent platform. The project aims to develop 
 an open protocol for communication between software agents. Eve is designed as 
 a decentral, scalable system for autonomously acting agents. Eve uses the 
@@ -16,7 +18,17 @@ Documentation is available on http://almende.github.com/eve
 <dependency>
     <groupId>com.almende.eve</groupId>
     <artifactId>eve-full</artifactId>
-    <version>3.0.0</version>
+    <version>{{version}}</version>
+</dependency>
+```
+
+or with embedded Jetty 9 servlet container:
+
+```xml
+<dependency>
+    <groupId>com.almende.eve</groupId>
+    <artifactId>eve-full-embed</artifactId>
+    <version>{{version}}</version>
 </dependency>
 ```
 
