@@ -17,6 +17,8 @@
 
 	<modules>
 		<module>eve_state</module>
+		<module>eve_state_mongo</module>
+		<module>eve_state_couch</module>
 	</modules>
 
 	<properties>
