@@ -8,6 +8,7 @@ exchange (HTTP) and for messaging (JSON-RPC).
 
 This project contains the Java implementation of Eve. Please refer to the documentation for other implementations.
 
+# Quick start using Maven:
 ```xml
 <dependency>
     <groupId>com.almende.eve</groupId>
