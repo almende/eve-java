@@ -6,6 +6,7 @@ package com.almende.eve.state.mongo;
 
 import com.almende.eve.state.StateConfig;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -34,7 +35,17 @@ public class MongoStateConfig extends StateConfig {
 	}
 	
 	/**
-	 * Sets the url.
+	 * Gets the key.
+	 * 
+	 * @return the key
+	 */
+	@JsonIgnore
+	public String getKey(){
+		return getHost()+":"+getPort()+"/"+getDatabase()+"#"+getCollection();
+	}
+	
+	/**
+	 * Sets the host.
 	 * 
 	 * @param host
 	 *            the new host

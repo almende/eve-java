@@ -5,6 +5,8 @@
 package com.almende.eve.state.mongo;
 
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import com.mongodb.ServerAddress;
 public class MongoStateService implements StateService {
 	private static final Logger	LOG	= Logger.getLogger(MongoStateService.class
 											.getName());
+	private static Map<String,MongoStateService> instances = new HashMap<String,MongoStateService>();
 	
 	/* internal attributes */
 	private final Jongo			jongo;
@@ -75,10 +78,16 @@ public class MongoStateService implements StateService {
 	 * @return the instance by params
 	 */
 	public static MongoStateService getInstanceByParams(final ObjectNode params) {
-		// TODO: fix lookup to multiple params
 		try {
-			
-			return new MongoStateService(params);
+			MongoStateConfig config = new MongoStateConfig(params);
+			String key = config.getKey();
+			if (instances.containsKey(key)){
+				return instances.get(key);
+			} else {
+				MongoStateService result = new MongoStateService(params);
+				instances.put(key, result);
+				return result;
+			}
 		} catch (UnknownHostException e) {
 			LOG.log(Level.WARNING, "Couldn't init MongoStateService", e);
 		}
