@@ -5,8 +5,8 @@
 package com.almende.eve.state.mongo;
 
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +30,7 @@ import com.mongodb.ServerAddress;
 public class MongoStateService implements StateService {
 	private static final Logger	LOG	= Logger.getLogger(MongoStateService.class
 											.getName());
-	private static Map<String,MongoStateService> instances = new HashMap<String,MongoStateService>();
+	private static Map<String,MongoStateService> instances = new ConcurrentHashMap<String,MongoStateService>();
 	
 	/* internal attributes */
 	private final Jongo			jongo;

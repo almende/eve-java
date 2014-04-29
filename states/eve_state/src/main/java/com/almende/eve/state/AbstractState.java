@@ -56,9 +56,9 @@ public abstract class AbstractState<V> implements State {
 	}
 	
 	/**
-	 * Get the agents id.
+	 * Get the id.
 	 * 
-	 * @return agentId
+	 * @return id
 	 */
 	@Override
 	public synchronized String getId() {
@@ -66,13 +66,13 @@ public abstract class AbstractState<V> implements State {
 	}
 	
 	/**
-	 * Sets the agent id.
+	 * Sets the id.
 	 * 
-	 * @param agentId
+	 * @param id
 	 *            the new agent id
 	 */
-	public void setAgentId(final String agentId) {
-		this.id = agentId;
+	public void setId(final String id) {
+		this.id = id;
 	}
 	
 	/**
