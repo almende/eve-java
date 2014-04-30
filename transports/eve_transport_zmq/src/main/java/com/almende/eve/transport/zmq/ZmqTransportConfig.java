@@ -55,14 +55,14 @@ public class ZmqTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Sets the address.
 	 * 
 	 * @param address
 	 *            the new address
 	 */
-	public void setAddress(String address) {
+	public void setAddress(final String address) {
 		this.put("address", address);
 	}
 	

@@ -30,7 +30,7 @@ public class Cell extends Agent {
 	 * @param config
 	 *            the config
 	 */
-	public Cell(ObjectNode config){
+	public Cell(final ObjectNode config) {
 		this.setConfig(config);
 	}
 	
@@ -40,14 +40,15 @@ public class Cell extends Agent {
 	 * @param initState
 	 * @param totalSize
 	 */
-	public void create(@Name("pathOdd") String odd,
-			@Name("pathEven") String even, @Name("state") Boolean initState,
-			@Name("totalSize") int totalSize) {
+	public void create(@Name("pathOdd") final String odd,
+			@Name("pathEven") final String even,
+			@Name("state") final Boolean initState,
+			@Name("totalSize") final int totalSize) {
 		getState().put("Stopped", false);
 		getState().put("val_0", new CycleState(0, initState));
 		getState().put("current_cycle", 1);
-		String id = getId();
-		int agentNo = Integer.parseInt(id.substring(id.indexOf('_') + 1));
+		final String id = getId();
+		final int agentNo = Integer.parseInt(id.substring(id.indexOf('_') + 1));
 		calcNeighbours(odd, even, agentNo, totalSize);
 	}
 	
@@ -55,10 +56,10 @@ public class Cell extends Agent {
 	 * @param agentNo
 	 * @param totalSize
 	 */
-	private void calcNeighbours(String odd, String even, int agentNo,
-			int totalSize) {
-		int N = (int) Math.floor(Math.sqrt(totalSize));
-		int M = N;
+	private void calcNeighbours(final String odd, final String even,
+			final int agentNo, final int totalSize) {
+		final int N = (int) Math.floor(Math.sqrt(totalSize));
+		final int M = N;
 		int cN = 0;
 		int cM = 0;
 		if (agentNo != 0) {
@@ -68,22 +69,24 @@ public class Cell extends Agent {
 		neighbors = new ArrayList<String>(8);
 		
 		for (int id = 0; id < 8; id++) {
-			int neighborNo = getNeighborNo(id, cN, cM, N, M);
+			final int neighborNo = getNeighborNo(id, cN, cM, N, M);
 			neighbors.add(addPath(odd, even, Goldemo.AGENTPREFIX + neighborNo,
 					neighborNo));
 		}
 		getState().put("neighbors", neighbors);
 	}
 	
-	private String addPath(String odd, String even, String path, int agentNo) {
+	private String addPath(final String odd, final String even,
+			final String path, final int agentNo) {
 		return (agentNo % 2 == 0 ? even : odd) + path;
 	}
 	
-	private int calcBack(int cN, int cM, int M) {
+	private int calcBack(final int cN, final int cM, final int M) {
 		return cM + cN * M;
 	}
 	
-	private int getNeighborNo(int id, int cN, int cM, int N, int M) {
+	private int getNeighborNo(final int id, final int cN, final int cM,
+			final int N, final int M) {
 		switch (id) {
 			case 0:
 				return calcBack(((N + cN - 1) % N), ((M + cM - 1) % M), M);
@@ -109,7 +112,7 @@ public class Cell extends Agent {
 	/**
 	 * Stop.
 	 */
-	public void stop(){
+	public void stop() {
 		getState().put("Stopped", true);
 	}
 	
@@ -122,16 +125,16 @@ public class Cell extends Agent {
 					new TypeUtil<ArrayList<String>>() {
 					});
 		}
-		CycleState myState = getState().get("val_0", CycleState.class);
+		final CycleState myState = getState().get("val_0", CycleState.class);
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("alive", myState.isAlive());
 		params.put("cycle", 0);
 		params.put("from", getId().substring(6));
-		for (String neighbor : neighbors) {
+		for (final String neighbor : neighbors) {
 			final URI uri = URI.create(neighbor);
 			try {
 				send(uri, "collect", params, null);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -143,20 +146,20 @@ public class Cell extends Agent {
 	 * @param cycle
 	 * @param neighborNo
 	 */
-	public void collect(@Name("alive") boolean alive, @Name("cycle") int cycle,
-			@Name("from") int neighborNo) {
+	public void collect(@Name("alive") final boolean alive,
+			@Name("cycle") final int cycle, @Name("from") final int neighborNo) {
 		if (neighbors == null) {
 			neighbors = getState().get("neighbors",
 					new TypeUtil<ArrayList<String>>() {
 					});
 		}
-		CycleState state = new CycleState(cycle, alive);
+		final CycleState state = new CycleState(cycle, alive);
 		// System.out.println(getId()+": Received state:" + state + " from:" +
 		// neighborNo);
 		getState().put(neighborNo + "_" + state.getCycle(), state);
 		try {
 			calcCycle();
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}
@@ -166,7 +169,7 @@ public class Cell extends Agent {
 		if (neighbor.startsWith("local:")) {
 			neighborId = neighbor.replace("local:", "");
 		} else {
-			URI neighborUrl = URI.create(neighbor);
+			final URI neighborUrl = URI.create(neighbor);
 			neighborId = neighborUrl.getPath().replaceFirst("agents/", "");
 		}
 		neighborId = neighborId.replaceFirst(".*_", "");
@@ -179,9 +182,9 @@ public class Cell extends Agent {
 		if (currentCycle != null && currentCycle != 0) {
 			int aliveNeighbors = 0;
 			int knownNeighbors = 0;
-			for (String neighbor : neighbors) {
-				String neighborId = getNeighborId(neighbor);
-				CycleState nState = getState()
+			for (final String neighbor : neighbors) {
+				final String neighborId = getNeighborId(neighbor);
+				final CycleState nState = getState()
 						.get(neighborId + "_" + (currentCycle - 1),
 								CycleState.class);
 				if (nState == null) {
@@ -196,8 +199,8 @@ public class Cell extends Agent {
 				// System.out.println(getId()+"/"+currentCycle+" has seen: "+knownNeighbors+" neighbors.");
 				return;
 			}
-			CycleState myState = getState().get("val_" + (currentCycle - 1),
-					CycleState.class);
+			final CycleState myState = getState().get(
+					"val_" + (currentCycle - 1), CycleState.class);
 			CycleState newState = null;
 			if (aliveNeighbors < 2 || aliveNeighbors > 3) {
 				newState = new CycleState(currentCycle, false);
@@ -217,16 +220,16 @@ public class Cell extends Agent {
 				params.put("alive", newState.isAlive());
 				params.put("cycle", currentCycle);
 				params.put("from", getId().substring(6));
-				for (String neighbor : neighbors) {
+				for (final String neighbor : neighbors) {
 					final URI uri = URI.create(neighbor);
 					try {
 						send(uri, "collect", params, null);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						e.printStackTrace();
 					}
 				}
-				for (String neighbor : neighbors) {
-					String neighborId = getNeighborId(neighbor);
+				for (final String neighbor : neighbors) {
+					final String neighborId = getNeighborId(neighbor);
 					getState().remove(neighborId + "_" + (currentCycle - 1));
 				}
 				calcCycle();
@@ -241,7 +244,7 @@ public class Cell extends Agent {
 	 *            the cycle
 	 * @return the cycle state
 	 */
-	public CycleState getCycleState(@Name("cycle") int cycle) {
+	public CycleState getCycleState(@Name("cycle") final int cycle) {
 		if (getState().containsKey("val_" + cycle)) {
 			return getState().get("val_" + cycle, CycleState.class);
 		}
@@ -254,7 +257,7 @@ public class Cell extends Agent {
 	 * @return the all cycle states
 	 */
 	public ArrayList<CycleState> getAllCycleStates() {
-		ArrayList<CycleState> result = new ArrayList<CycleState>();
+		final ArrayList<CycleState> result = new ArrayList<CycleState>();
 		int count = 0;
 		while (getState().containsKey("val_" + count)) {
 			result.add(getState().get("val_" + count, CycleState.class));

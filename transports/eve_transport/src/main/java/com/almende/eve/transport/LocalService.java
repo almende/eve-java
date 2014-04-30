@@ -36,7 +36,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 * @param params
 	 *            the params
 	 */
-	public LocalService(URI address, Handler<Receiver> handle, ObjectNode params) {
+	public LocalService(final URI address, final Handler<Receiver> handle, final ObjectNode params) {
 		super(address, handle, singleton, params);
 	}
 	
@@ -56,13 +56,13 @@ public class LocalService extends AbstractTransport implements TransportService 
 	}
 	
 	@Override
-	public LocalService getLocal(URI address) {
+	public LocalService getLocal(final URI address) {
 		return instances.get(address);
 	}
 	
 	@Override
-	public <T extends Capability, V> T get(ObjectNode params,
-			Handler<V> handle, Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final LocalTransportConfig config = new LocalTransportConfig(params);
 		final String id = config.getId();
@@ -107,7 +107,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	}
 	
 	@Override
-	public void delete(Transport instance) {
+	public void delete(final Transport instance) {
 		instances.remove(instance.getAddress());
 	}
 	

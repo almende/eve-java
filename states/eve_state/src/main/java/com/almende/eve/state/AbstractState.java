@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public abstract class AbstractState<V> implements State {
 	private static final Logger	LOG			= Logger.getLogger(AbstractState.class
 													.getCanonicalName());
-	private String				id		= null;
+	private String				id			= null;
 	private StateService		service		= null;
 	private ObjectNode			myParams	= null;
 	
@@ -283,12 +283,14 @@ public abstract class AbstractState<V> implements State {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
 	@JsonIgnore
-	public ObjectNode getParams(){
+	public ObjectNode getParams() {
 		return myParams;
 	}
 	

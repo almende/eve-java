@@ -34,7 +34,7 @@ public class WakeEntry {
 			final String className) {
 		this.wakeKey = wakeKey;
 		this.className = className;
-		this.setParams(params);
+		setParams(params);
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class WakeEntry {
 	 * @param params
 	 *            the new params
 	 */
-	public void setParams(ObjectNode params) {
+	public void setParams(final ObjectNode params) {
 		this.params = params;
 	}
 }

@@ -58,7 +58,7 @@ public final class AgentProxyFactory {
 						try {
 							return TypeUtil.inject(callback.get(),
 									method.getGenericReturnType());
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							throw new JSONRPCException(CODE.REMOTE_EXCEPTION, e
 									.getLocalizedMessage(), e);
 						}

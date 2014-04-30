@@ -202,10 +202,10 @@ public class WakeService implements Capability, CapabilityService {
 	}
 	
 	@Override
-	public <T extends Capability, V> T get(ObjectNode params,
-			Handler<V> handle, Class<T> type) {
-		Config config = new Config(params);
-		String id = config.get("state", "id");
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
+		final Config config = new Config(params);
+		final String id = config.get("state", "id");
 		WakeService service = null;
 		if (services.containsKey(id)) {
 			service = services.get(id);

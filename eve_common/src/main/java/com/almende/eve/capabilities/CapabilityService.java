@@ -27,5 +27,6 @@ public interface CapabilityService {
 	 *            the type
 	 * @return the t
 	 */
-	<T extends Capability, V> T get(ObjectNode params, Handler<V> handle, Class<T> type);
+	<T extends Capability, V> T get(ObjectNode params, Handler<V> handle,
+			Class<T> type);
 }

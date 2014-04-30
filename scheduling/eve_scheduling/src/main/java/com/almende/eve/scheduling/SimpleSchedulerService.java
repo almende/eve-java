@@ -34,7 +34,8 @@ public class SimpleSchedulerService implements SchedulerService {
 	}
 	
 	@Override
-	public <T extends Capability, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		SimpleScheduler result = null;
 		if (handle.getKey() != null && instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());

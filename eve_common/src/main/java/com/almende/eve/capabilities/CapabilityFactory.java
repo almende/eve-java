@@ -43,8 +43,8 @@ public abstract class CapabilityFactory {
 				final Class<?> clazz = Class.forName(className);
 				final Method method = clazz.getMethod("getInstanceByParams",
 						ObjectNode.class);
-				final CapabilityService instance = (CapabilityService) method.invoke(null,
-						params);
+				final CapabilityService instance = (CapabilityService) method
+						.invoke(null, params);
 				if (instance != null) {
 					return instance.get(params, handle, type);
 				} else {

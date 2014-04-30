@@ -25,8 +25,8 @@ public class XmppTransportFactory {
 	public static XmppTransport get(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		if (params.isObject() && !params.has("class")) {
-			params.put("class", XmppTransportFactory.class
-					.getPackage().getName() + ".XmppService");
+			params.put("class", XmppTransportFactory.class.getPackage()
+					.getName() + ".XmppService");
 		}
 		return CapabilityFactory.get(params, handle, XmppTransport.class);
 	}

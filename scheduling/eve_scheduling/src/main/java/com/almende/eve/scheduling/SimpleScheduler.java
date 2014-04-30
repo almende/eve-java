@@ -37,7 +37,8 @@ public class SimpleScheduler implements Scheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public SimpleScheduler(final ObjectNode params, final Handler<Receiver> handle) {
+	public SimpleScheduler(final ObjectNode params,
+			final Handler<Receiver> handle) {
 		if (params.has("senderUrl")) {
 			try {
 				schedulerUrl = new URI(params.get("senderUrl").asText());
@@ -55,7 +56,7 @@ public class SimpleScheduler implements Scheduler {
 			}
 		}
 		this.handle = handle;
-		this.myParams=params;
+		myParams = params;
 	}
 	
 	@Override
@@ -119,7 +120,7 @@ public class SimpleScheduler implements Scheduler {
 	public Clock getClock() {
 		return clock;
 	}
-
+	
 	@Override
 	public ObjectNode getParams() {
 		return myParams;

@@ -73,7 +73,8 @@ public class MyAgent implements Wakeable, Receiver {
 	}
 	
 	@Override
-	public void wake(final String wakeKey, final ObjectNode params, final boolean onBoot) {
+	public void wake(final String wakeKey, final ObjectNode params,
+			final boolean onBoot) {
 		this.wakeKey = wakeKey;
 		transport = TransportFactory.getTransport(params,
 				new WakeHandler<Receiver>(this, this.wakeKey, ws));

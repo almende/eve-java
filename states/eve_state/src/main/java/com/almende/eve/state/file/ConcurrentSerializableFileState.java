@@ -82,7 +82,8 @@ public class ConcurrentSerializableFileState extends
 	 *            the params
 	 */
 	public ConcurrentSerializableFileState(final String agentId,
-			final String filename, final FileStateService service, final ObjectNode params) {
+			final String filename, final FileStateService service,
+			final ObjectNode params) {
 		super(agentId, service, params);
 		this.filename = filename;
 	}

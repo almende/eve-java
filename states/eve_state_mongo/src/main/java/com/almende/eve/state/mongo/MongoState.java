@@ -44,14 +44,14 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		/**
 		 * timestamp of last update
 		 */
-		private Long				timestamp;
+		private final Long			timestamp;
 		
 		/**
 		 * default constructor for class specific exception
 		 * 
 		 * @param timestamp
 		 */
-		public UpdateConflictException(Long timestamp) {
+		public UpdateConflictException(final Long timestamp) {
 			this.timestamp = timestamp;
 		}
 		
@@ -109,7 +109,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 *            the new collection
 	 */
 	@JsonIgnore
-	public void setCollection(MongoCollection collection) {
+	public void setCollection(final MongoCollection collection) {
 		this.collection = collection;
 		// assuming this is called only once after creation, simply save the
 		// entire state
@@ -224,7 +224,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 */
 	@Override
 	@JsonIgnore
-	public JsonNode get(String key) {
+	public JsonNode get(final String key) {
 		JsonNode result = null;
 		try {
 			result = properties.get(key);
@@ -323,7 +323,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		this.properties.putAll(properties);
 		try {
 			updateProperties(true);
-		} catch (UpdateConflictException e) {
+		} catch (final UpdateConflictException e) {
 			// should never happen
 			LOG.log(Level.WARNING, "setProperties error", e);
 		}
@@ -343,12 +343,12 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		final MongoState updatedState = collection.findOne("{_id: #}", getId())
 				.as(MongoState.class);
 		if (updatedState != null) {
-			this.timestamp = updatedState.timestamp;
-			this.properties = updatedState.properties;
+			timestamp = updatedState.timestamp;
+			properties = updatedState.properties;
 		} else {
-			this.properties	= Collections
+			properties = Collections
 					.synchronizedMap(new HashMap<String, JsonNode>());
-			this.timestamp = System.nanoTime();
+			timestamp = System.nanoTime();
 		}
 	}
 	
@@ -361,18 +361,18 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * @throws UpdateConflictException
 	 *             | will not throw anything when $force flag is true
 	 */
-	private synchronized boolean updateProperties(boolean force)
+	private synchronized boolean updateProperties(final boolean force)
 			throws UpdateConflictException {
-		Long now = System.nanoTime();
+		final Long now = System.nanoTime();
 		/* write to database */
-		WriteResult result = (force) ? collection.update("{_id: #}", getId())
-				.with("{$set: {properties: #, timestamp: #}}", properties, now)
-				: collection.update("{_id: #, timestamp: #}", getId(),
-						timestamp).with(
-						"{$set: {properties: #, timestamp: #}}", properties,
-						now);
+		final WriteResult result = (force) ? collection.update("{_id: #}",
+				getId()).with("{$set: {properties: #, timestamp: #}}",
+				properties, now) : collection.update("{_id: #, timestamp: #}",
+				getId(), timestamp).with(
+				"{$set: {properties: #, timestamp: #}}", properties, now);
 		/* check results */
-		Boolean updatedExisting = (Boolean) result.getField("updatedExisting");
+		final Boolean updatedExisting = (Boolean) result
+				.getField("updatedExisting");
 		if (result.getN() == 0 && result.getError() == null) {
 			throw new UpdateConflictException(timestamp);
 		} else if (result.getN() != 1) {

@@ -20,8 +20,9 @@ public class MemoryStateFactory {
 	 *            the params
 	 * @return the state
 	 */
-	public static State get(ObjectNode params) {
-		return CapabilityFactory.get(new MemoryStateConfig(params), null, State.class);
+	public static State get(final ObjectNode params) {
+		return CapabilityFactory.get(new MemoryStateConfig(params), null,
+				State.class);
 	}
 	
 	/**

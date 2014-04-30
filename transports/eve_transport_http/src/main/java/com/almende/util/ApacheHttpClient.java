@@ -51,15 +51,15 @@ public final class ApacheHttpClient {
 		
 		// Allow self-signed SSL certificates:
 		try {
-		SSLContextBuilder SSLbuilder = new SSLContextBuilder();
-		SSLbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-				SSLbuilder.build(),
-				SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-		
-		builder.setSSLSocketFactory(sslsf);
-		} catch (Exception e){
-			LOG.log(Level.WARNING,"Couldn't init SSL strategy",e);
+			final SSLContextBuilder SSLbuilder = new SSLContextBuilder();
+			SSLbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+			final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+					SSLbuilder.build(),
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+			
+			builder.setSSLSocketFactory(sslsf);
+		} catch (final Exception e) {
+			LOG.log(Level.WARNING, "Couldn't init SSL strategy", e);
 		}
 		// Work with PoolingClientConnectionManager
 		final HttpClientConnectionManager connection = new PoolingHttpClientConnectionManager();
@@ -85,21 +85,19 @@ public final class ApacheHttpClient {
 		
 		try {
 			builder.setDefaultCookieStore(new MyCookieStore());
-		} catch (IOException e) {
-			LOG.log(Level.WARNING,"Couldn't init cookie store",e);
+		} catch (final IOException e) {
+			LOG.log(Level.WARNING, "Couldn't init cookie store", e);
 		}
 		
-		RequestConfig globalConfig = RequestConfig.custom()
+		final RequestConfig globalConfig = RequestConfig.custom()
 				.setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
 				.setConnectTimeout(20000).setStaleConnectionCheckEnabled(false)
 				.build();
 		
 		builder.setDefaultRequestConfig(globalConfig);
 		
-		SocketConfig socketConfig = SocketConfig.custom()
-				.setSoTimeout(60000)
-				.setTcpNoDelay(true)
-				.build();
+		final SocketConfig socketConfig = SocketConfig.custom()
+				.setSoTimeout(60000).setTcpNoDelay(true).build();
 		builder.setDefaultSocketConfig(socketConfig);
 		
 		// generate httpclient

@@ -40,8 +40,9 @@ public class MongoStateConfig extends StateConfig {
 	 * @return the key
 	 */
 	@JsonIgnore
-	public String getKey(){
-		return getHost()+":"+getPort()+"/"+getDatabase()+"#"+getCollection();
+	public String getKey() {
+		return getHost() + ":" + getPort() + "/" + getDatabase() + "#"
+				+ getCollection();
 	}
 	
 	/**
@@ -50,7 +51,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @param host
 	 *            the new host
 	 */
-	public void setHost(String host) {
+	public void setHost(final String host) {
 		this.put("host", host);
 	}
 	
@@ -72,7 +73,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @param port
 	 *            the new port
 	 */
-	public void setPort(int port) {
+	public void setPort(final int port) {
 		this.put("port", port);
 	}
 	
@@ -94,7 +95,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @param database
 	 *            the new database
 	 */
-	public void setDatabase(String database) {
+	public void setDatabase(final String database) {
 		this.put("database", database);
 	}
 	
@@ -116,7 +117,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @param collection
 	 *            the new collection
 	 */
-	public void setCollection(String collection) {
+	public void setCollection(final String collection) {
 		this.put("collection", collection);
 	}
 	

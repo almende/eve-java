@@ -63,7 +63,7 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testZmq() throws IOException {
-		ZmqTransportConfig config = new ZmqTransportConfig();
+		final ZmqTransportConfig config = new ZmqTransportConfig();
 		config.setAddress("zmq://tcp://127.0.0.1:5678");
 		
 		final Transport transport = TransportFactory.getTransport(config,
@@ -73,7 +73,6 @@ public class TestTransports extends TestCase {
 		transport.send(URI.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
 				null);
 	}
-	
 	
 	/**
 	 * Test local transport.
@@ -87,10 +86,10 @@ public class TestTransports extends TestCase {
 		
 		final Transport transport = LocalTransportFactory.get(config,
 				new myReceiver());
-
-		transport.send(URI.create("local:testMe"), "Hello World",
-				null);
+		
+		transport.send(URI.create("local:testMe"), "Hello World", null);
 	}
+	
 	/**
 	 * The Class myReceiver.
 	 */

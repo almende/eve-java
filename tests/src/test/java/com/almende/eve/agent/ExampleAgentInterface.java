@@ -18,5 +18,5 @@ public interface ExampleAgentInterface {
 	 *            the message
 	 * @return the string
 	 */
-	public String helloWorld(@Name("message") final String message) ;
+	public String helloWorld(@Name("message") final String message);
 }

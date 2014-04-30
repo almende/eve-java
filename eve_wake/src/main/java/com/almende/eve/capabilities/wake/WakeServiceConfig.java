@@ -39,7 +39,7 @@ public class WakeServiceConfig extends Config {
 	 * @param state
 	 *            the new state
 	 */
-	public void setState(ObjectNode state){
+	public void setState(final ObjectNode state) {
 		this.put("state", state);
 	}
 	
@@ -48,8 +48,8 @@ public class WakeServiceConfig extends Config {
 	 * 
 	 * @return the state
 	 */
-	public ObjectNode getState(){
-		if (this.has("state")){
+	public ObjectNode getState() {
+		if (this.has("state")) {
 			return (ObjectNode) this.get("state");
 		}
 		return null;

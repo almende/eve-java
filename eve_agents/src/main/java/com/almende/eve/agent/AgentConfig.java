@@ -21,7 +21,7 @@ public class AgentConfig extends Config {
 	public AgentConfig() {
 		this(JOM.createObjectNode());
 	}
-
+	
 	/**
 	 * Instantiates a new memory state config.
 	 * 
@@ -31,7 +31,7 @@ public class AgentConfig extends Config {
 	public AgentConfig(final String id) {
 		super(JOM.createObjectNode());
 		setId(id);
-	}	
+	}
 	
 	/**
 	 * Instantiates a new memory state config.
@@ -57,14 +57,15 @@ public class AgentConfig extends Config {
 	public AgentConfig(final String id, final ObjectNode node) {
 		super(node);
 		setId(id);
-	}	
+	}
+	
 	/**
 	 * Sets the id.
 	 * 
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.put("id", id);
 	}
 	
@@ -87,7 +88,7 @@ public class AgentConfig extends Config {
 	 *            the new transport config (can be ObjectNode or
 	 *            ArrayNode, the latter indicating multiple transports)
 	 */
-	public void setTransport(JsonNode transport) {
+	public void setTransport(final JsonNode transport) {
 		this.put("transport", transport);
 	}
 	
@@ -106,10 +107,11 @@ public class AgentConfig extends Config {
 	/**
 	 * Sets the state config.
 	 * 
-	 * @param state config
+	 * @param state
+	 *            config
 	 *            the new state config
 	 */
-	public void setState(ObjectNode state) {
+	public void setState(final ObjectNode state) {
 		this.put("state", state);
 	}
 	
@@ -128,10 +130,11 @@ public class AgentConfig extends Config {
 	/**
 	 * Sets the scheduler config.
 	 * 
-	 * @param scheduler config
+	 * @param scheduler
+	 *            config
 	 *            the new scheduler config
 	 */
-	public void setScheduler(ObjectNode scheduler){
+	public void setScheduler(final ObjectNode scheduler) {
 		this.put("scheduler", scheduler);
 	}
 	
@@ -140,9 +143,9 @@ public class AgentConfig extends Config {
 	 * 
 	 * @return the schedule configr
 	 */
-	public ObjectNode getScheduler(){
-		if (this.has("scheduler")){
-			return (ObjectNode)this.get("scheduler");
+	public ObjectNode getScheduler() {
+		if (this.has("scheduler")) {
+			return (ObjectNode) this.get("scheduler");
 		}
 		return null;
 	}

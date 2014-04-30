@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeableAgent.
  */
 public class WakeableAgent extends Agent implements Wakeable {
-	private WakeService ws =null;
+	private WakeService	ws	= null;
+	
 	/**
 	 * Instantiates a new wake agent.
 	 */
@@ -30,8 +31,8 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 * @param ws
 	 *            the ws
 	 */
-	public WakeableAgent(ObjectNode config, WakeService ws) {
-		this.ws=ws;
+	public WakeableAgent(final ObjectNode config, final WakeService ws) {
+		this.ws = ws;
 		setConfig(config, true);
 		registerAt(ws);
 	}
@@ -42,19 +43,19 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 * @param ws
 	 *            the ws
 	 */
-	public void registerAt(WakeService ws){
-		this.rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
+	public void registerAt(final WakeService ws) {
+		rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
 				getId(), ws));
-		this.receiver = new WakeHandler<Receiver>(this, getId(), ws);
+		receiver = new WakeHandler<Receiver>(this, getId(), ws);
 		loadConfig(false);
 		ws.register(getId(), getConfig(), this.getClass().getName());
 	}
 	
 	@Override
-	public void wake(String wakeKey, ObjectNode params, boolean onBoot) {
-		this.rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
+	public void wake(final String wakeKey, final ObjectNode params, final boolean onBoot) {
+		rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
 				wakeKey, ws));
-		this.receiver = new WakeHandler<Receiver>(this, wakeKey, ws);
+		receiver = new WakeHandler<Receiver>(this, wakeKey, ws);
 		setConfig(params, onBoot);
 	}
 	

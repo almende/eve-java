@@ -12,7 +12,8 @@ import com.almende.eve.transform.rpc.annotation.Name;
  * The Class ExampleAgent.
  */
 @Access(AccessType.PUBLIC)
-public class ExampleAgent extends WakeableAgent implements ExampleAgentInterface {
+public class ExampleAgent extends WakeableAgent implements
+		ExampleAgentInterface {
 	
 	/**
 	 * Hello world.
@@ -21,6 +22,7 @@ public class ExampleAgent extends WakeableAgent implements ExampleAgentInterface
 	 *            the message
 	 * @return the string
 	 */
+	@Override
 	public String helloWorld(@Name("message") final String message) {
 		return "You said:" + message;
 	}

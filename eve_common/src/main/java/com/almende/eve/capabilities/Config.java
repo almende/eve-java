@@ -65,21 +65,22 @@ public class Config extends ObjectNode {
 	 *            the keys
 	 * @return the json node
 	 */
-	public <T> T get(String... keys){
-		if (keys == null || keys.length == 0){
+	public <T> T get(final String... keys) {
+		if (keys == null || keys.length == 0) {
 			return null;
 		}
 		JsonNode node = this;
-		for (String key : keys){
+		for (final String key : keys) {
 			node = node.get(key);
-			if (node == null){
+			if (node == null) {
 				break;
 			}
 		}
-		if (node == null){
+		if (node == null) {
 			return null;
 		}
-		TypeUtil<T> tu = new TypeUtil<T>(){};
+		final TypeUtil<T> tu = new TypeUtil<T>() {
+		};
 		return tu.inject(node);
 	}
 }

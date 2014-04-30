@@ -86,7 +86,7 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testMongoState() {
-		MongoStateConfig config = new MongoStateConfig();
+		final MongoStateConfig config = new MongoStateConfig();
 		config.setId("TestAgent");
 		
 		State myState = CapabilityFactory.get(config, null, State.class);
@@ -97,12 +97,13 @@ public class TestState extends TestCase {
 		myState2 = StateFactory.getState(config);
 		runTest(myState, myState2);
 	}
+	
 	/**
 	 * Test me.
 	 */
 	@Test
 	public void testCouchState() {
-		CouchStateConfig config = new CouchStateConfig();
+		final CouchStateConfig config = new CouchStateConfig();
 		config.setId("TestAgent");
 		config.setUrl("http://localhost:5984");
 		

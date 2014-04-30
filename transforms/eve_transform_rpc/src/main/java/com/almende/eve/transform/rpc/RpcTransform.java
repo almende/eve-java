@@ -32,14 +32,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class RpcTransform.
  */
 public class RpcTransform implements Transform {
-	private static final Logger						LOG			= Logger.getLogger(RpcTransform.class
-																		.getName());
-	private static final RequestParams	EVEREQUESTPARAMS	= new RequestParams();
+	private static final Logger						LOG					= Logger.getLogger(RpcTransform.class
+																				.getName());
+	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
 	static {
 		EVEREQUESTPARAMS.put(Sender.class, null);
 	}
-	private Authorizor								auth		= new DefaultAuthorizor();
-	private final AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
+	private Authorizor								auth				= new DefaultAuthorizor();
+	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
 	private final ObjectNode						myParams;
 	
@@ -56,7 +56,7 @@ public class RpcTransform implements Transform {
 	public RpcTransform(final ObjectNode params, final Handler<Object> handle,
 			final TransformService service) {
 		destination = handle;
-		this.myParams = params;
+		myParams = params;
 	}
 	
 	/**
@@ -188,6 +188,7 @@ public class RpcTransform implements Transform {
 	public List<Object> getMethods() {
 		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS);
 	}
+	
 	/**
 	 * Builds the msg.
 	 * 
@@ -207,7 +208,7 @@ public class RpcTransform implements Transform {
 		addCallback(request, callback);
 		return request;
 	}
-
+	
 	/**
 	 * Builds the msg.
 	 * 
@@ -221,8 +222,8 @@ public class RpcTransform implements Transform {
 	 *            the callback
 	 * @return the JSON request
 	 */
-	public <T> JSONRequest buildMsg(final Method method,
-			final Object[] params, final AsyncCallback<T> callback) {
+	public <T> JSONRequest buildMsg(final Method method, final Object[] params,
+			final AsyncCallback<T> callback) {
 		final JSONRequest request = JSONRPC.createRequest(method, params);
 		addCallback(request, callback);
 		return request;
@@ -232,8 +233,9 @@ public class RpcTransform implements Transform {
 			final AsyncCallback<T> callback) {
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
-		// conversions required on the result. 
-		//TODO: if JSON-RPC notifications are going to be supported in the future, this may be skipped if callback == null;
+		// conversions required on the result.
+		// TODO: if JSON-RPC notifications are going to be supported in the
+		// future, this may be skipped if callback == null;
 		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>() {
 			@Override
 			public void onSuccess(final JSONResponse response) {
@@ -298,7 +300,7 @@ public class RpcTransform implements Transform {
 	
 	@Override
 	public ObjectNode getParams() {
-		return this.myParams;
+		return myParams;
 	}
 	
 }

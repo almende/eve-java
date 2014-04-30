@@ -122,7 +122,7 @@ public class Agent implements Receiver {
 	 * @return the type
 	 */
 	@Access(AccessType.PUBLIC)
-	public String getType(){
+	public String getType() {
 		return this.getClass().getName();
 	}
 	
@@ -133,9 +133,10 @@ public class Agent implements Receiver {
 	 */
 	@Access(AccessType.PUBLIC)
 	@JsonIgnore
-	public List<URI> getUrls(){
+	public List<URI> getUrls() {
 		return transport.getAddresses();
 	}
+	
 	/**
 	 * Gets the methods.
 	 * 
@@ -182,12 +183,12 @@ public class Agent implements Receiver {
 		}
 		transport = new Router();
 		
-		JsonNode transportConfig = config.getTransport();
+		final JsonNode transportConfig = config.getTransport();
 		if (transportConfig != null) {
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
 				while (iter.hasNext()) {
-					TransportConfig transconfig = new TransportConfig(
+					final TransportConfig transconfig = new TransportConfig(
 							(ObjectNode) iter.next());
 					if (transconfig.get("id") == null) {
 						transconfig.put("id", agentId);
@@ -196,7 +197,7 @@ public class Agent implements Receiver {
 							transconfig, receiver));
 				}
 			} else {
-				TransportConfig transconfig = new TransportConfig(
+				final TransportConfig transconfig = new TransportConfig(
 						(ObjectNode) transportConfig);
 				if (transconfig.get("id") == null) {
 					transconfig.put("id", agentId);
@@ -205,13 +206,13 @@ public class Agent implements Receiver {
 						receiver));
 			}
 			// All agents have a local transport
-			transport.register(LocalTransportFactory.get(new LocalTransportConfig(
-					agentId), receiver));
+			transport.register(LocalTransportFactory.get(
+					new LocalTransportConfig(agentId), receiver));
 			
 			if (onBoot) {
 				try {
 					transport.connect();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOG.log(Level.WARNING,
 							"Couldn't connect transports on boot", e);
 				}
@@ -238,7 +239,7 @@ public class Agent implements Receiver {
 	 *            the new scheduler
 	 */
 	@JsonIgnore
-	public void setScheduler(Scheduler scheduler) {
+	public void setScheduler(final Scheduler scheduler) {
 		this.scheduler = scheduler;
 	}
 	
@@ -260,7 +261,7 @@ public class Agent implements Receiver {
 	 *            the new state
 	 */
 	@JsonIgnore
-	public void setState(State state) {
+	public void setState(final State state) {
 		this.state = state;
 	}
 	
@@ -283,7 +284,7 @@ public class Agent implements Receiver {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	public void connect() throws IOException {
-		this.transport.connect();
+		transport.connect();
 	}
 	
 	/**
@@ -373,12 +374,12 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected final <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		SyncCallback<T> callback = new SyncCallback<T>();
+		final SyncCallback<T> callback = new SyncCallback<T>();
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
 				null);
 		try {
 			return callback.get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new IOException(e);
 		}
 	}

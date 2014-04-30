@@ -61,7 +61,7 @@ public class Goldemo {
 	 * @throws NoSuchMethodException
 	 *             the no such method exception
 	 */
-	public static void main(String[] args) throws IOException,
+	public static void main(final String[] args) throws IOException,
 			JSONRPCException, ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
@@ -71,31 +71,32 @@ public class Goldemo {
 					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath>");
 			return;
 		}
-		Config config = YamlReader.load(new FileInputStream(new File(args[0])));
-/*
-		//Temporary:
-		ObjectNode golConfig = JOM.createObjectNode();
-		golConfig.put("runTime", 50);
-		golConfig.put("columns", 5);
-		golConfig.put("rows", 5);
-		config.put("gol", golConfig);
+		final Config config = YamlReader.load(new FileInputStream(new File(
+				args[0])));
+		/*
+		 * //Temporary:
+		 * ObjectNode golConfig = JOM.createObjectNode();
+		 * golConfig.put("runTime", 50);
+		 * golConfig.put("columns", 5);
+		 * golConfig.put("rows", 5);
+		 * config.put("gol", golConfig);
+		 * 
+		 * HttpTransportConfig transport = new HttpTransportConfig();
+		 * transport.setServletUrl("http://127.0.0.1:8081/agents/");
+		 * config.put("transport", transport);
+		 * 
+		 * MemoryStateConfig state = new MemoryStateConfig();
+		 * config.put("state", state);
+		 */
+		final Integer runTime = config.get("gol", "runTime");
+		final Integer N = config.get("gol", "columns");
+		final Integer M = config.get("gol", "rows");
 		
-		HttpTransportConfig transport = new HttpTransportConfig();
-		transport.setServletUrl("http://127.0.0.1:8081/agents/");
-		config.put("transport", transport);
-		
-		MemoryStateConfig state = new MemoryStateConfig();
-		config.put("state", state);
-*/		
-		Integer runTime = config.get("gol", "runTime");
-		Integer N = config.get("gol", "columns");
-		Integer M = config.get("gol", "rows");
-		
-		String oddUrl = config.get("gol", "OddUrl");
+		final String oddUrl = config.get("gol", "OddUrl");
 		if (oddUrl != null) {
 			PATHodd = oddUrl;
 		}
-		String evenUrl = config.get("gol", "EvenUrl");
+		final String evenUrl = config.get("gol", "EvenUrl");
 		if (evenUrl != null) {
 			PATHeven = evenUrl;
 		}
@@ -111,56 +112,61 @@ public class Goldemo {
 			annimate = true;
 		}
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		final BufferedReader br = new BufferedReader(new InputStreamReader(
+				System.in));
 		
 		String input;
 		
 		int cN = 0;
-		ArrayList<Cell> cells = new ArrayList<Cell>(N*M);
+		final ArrayList<Cell> cells = new ArrayList<Cell>(N * M);
 		
 		int no = 0;
 		while ((input = br.readLine()) != null && cN < N) {
-			String trimmedInput = input.trim();
-			if (trimmedInput.isEmpty()) break;
-			if (trimmedInput.length() != M) throw new IllegalArgumentException(
-					"Incorrect input line detected:" + input);
+			final String trimmedInput = input.trim();
+			if (trimmedInput.isEmpty()) {
+				break;
+			}
+			if (trimmedInput.length() != M) {
+				throw new IllegalArgumentException(
+						"Incorrect input line detected:" + input);
+			}
 			for (int cM = 0; cM < M; cM++) {
-				Config agent_config = new Config(config);
-				agent_config.put("id",AGENTPREFIX + no++);
-				Cell cell = new Cell(agent_config);
+				final Config agent_config = new Config(config);
+				agent_config.put("id", AGENTPREFIX + no++);
+				final Cell cell = new Cell(agent_config);
 				cell.create(PATHodd, PATHeven,
 						(trimmedInput.charAt(cM) == '+'), M * N);
 				cells.add(cell);
 			}
 			cN++;
 		}
-		for (Cell cell: cells){
+		for (final Cell cell : cells) {
 			cell.start();
 		}
 		System.err.println("Started!");
 		try {
 			Thread.sleep(runTime * 1000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			System.err.println("Early interrupt");
 		}
-		for (Cell cell: cells){
+		for (final Cell cell : cells) {
 			cell.stop();
 		}
-		HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
+		final HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
 		int max_full = 0;
-		for (Cell cell: cells){
-			ArrayList<CycleState> res = cell.getAllCycleStates();
+		for (final Cell cell : cells) {
+			final ArrayList<CycleState> res = cell.getAllCycleStates();
 			max_full = (max_full == 0 || max_full > res.size() ? res.size()
 					: max_full);
 			results.put(cell.getId(), res);
 		}
-
+		
 		int cycle = 0;
 		for (int j = 0; j < max_full; j++) {
 			if (annimate) {
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 				}
 				final String ESC = "\033[";
 				System.out.print(ESC + "2J");
@@ -175,8 +181,8 @@ public class Goldemo {
 			for (cN = 0; cN < N; cN++) {
 				System.out.print("| ");
 				for (int cM = 0; cM < M; cM++) {
-					String id = AGENTPREFIX + no++;
-					ArrayList<CycleState> states = results.get(id);
+					final String id = AGENTPREFIX + no++;
+					final ArrayList<CycleState> states = results.get(id);
 					if (states.size() <= cycle) {
 						break;
 					}

@@ -32,18 +32,19 @@ public class TestDebug extends TestCase {
 		
 		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
-		transportConfig.setServletClass("com.almende.eve.transport.http.debug.DebugServlet");
+		transportConfig
+				.setServletClass("com.almende.eve.transport.http.debug.DebugServlet");
 		transportConfig.setDoAuthentication(false);
-
+		
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transportConfig.put("jetty", jettyParms);
-
+		
 		final AgentConfig config = new AgentConfig("example");
 		config.setTransport(transportConfig);
 		
-		ExampleAgent agent = new ExampleAgent();
+		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
 		
 		synchronized (this) {

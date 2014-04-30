@@ -40,8 +40,8 @@ public class Router implements Transport {
 	}
 	
 	@Override
-	public void send(final URI receiverUri, final String message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final String message,
+			final String tag) throws IOException {
 		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
@@ -53,8 +53,8 @@ public class Router implements Transport {
 	}
 	
 	@Override
-	public void send(final URI receiverUri, final byte[] message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final byte[] message,
+			final String tag) throws IOException {
 		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
@@ -95,9 +95,9 @@ public class Router implements Transport {
 	 * 
 	 * @return the addresses
 	 */
-	public List<URI> getAddresses(){
+	public List<URI> getAddresses() {
 		final Set<URI> result = new HashSet<URI>(transports.size());
-		for (Transport transport: transports.values()){
+		for (final Transport transport : transports.values()) {
 			result.add(transport.getAddress());
 		}
 		return new ArrayList<URI>(result);
@@ -107,11 +107,11 @@ public class Router implements Transport {
 	public List<String> getProtocols() {
 		return new ArrayList<String>(transports.keySet());
 	}
-
+	
 	@Override
 	public ObjectNode getParams() {
 		final ArrayNode transportConfs = JOM.createArrayNode();
-		for (Transport transport: transports.values()){
+		for (final Transport transport : transports.values()) {
 			transportConfs.add(transport.getParams());
 		}
 		final ObjectNode result = JOM.createObjectNode();

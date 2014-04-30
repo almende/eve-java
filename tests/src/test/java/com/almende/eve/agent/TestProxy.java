@@ -19,7 +19,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestRpc.
  */
 public class TestProxy extends TestCase {
-	private static final Logger	LOG	= Logger.getLogger(TestProxy.class.getName());
+	private static final Logger	LOG	= Logger.getLogger(TestProxy.class
+											.getName());
 	
 	/**
 	 * Test me.
@@ -28,19 +29,21 @@ public class TestProxy extends TestCase {
 	public void testProxy() {
 		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8081/agents/");
-
+		
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8081);
 		transportConfig.put("jetty", jettyParms);
-
+		
 		final AgentConfig config = new AgentConfig("example");
 		config.setTransport(transportConfig);
 		
-		ExampleAgent agent = new ExampleAgent();
+		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
 		
-		ExampleAgentInterface proxy = AgentProxyFactory.genProxy(agent, URI.create("http://localhost:8081/agents/example"), ExampleAgentInterface.class);
-		LOG.warning("Proxy got reply:"+proxy.helloWorld("Hi there"));
+		final ExampleAgentInterface proxy = AgentProxyFactory.genProxy(agent,
+				URI.create("http://localhost:8081/agents/example"),
+				ExampleAgentInterface.class);
+		LOG.warning("Proxy got reply:" + proxy.helloWorld("Hi there"));
 	}
 }

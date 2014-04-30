@@ -28,13 +28,13 @@ import com.mongodb.ServerAddress;
  * A service for managing MemoryState objects.
  */
 public class MongoStateService implements StateService {
-	private static final Logger	LOG	= Logger.getLogger(MongoStateService.class
-											.getName());
-	private static Map<String,MongoStateService> instances = new ConcurrentHashMap<String,MongoStateService>();
+	private static final Logger						LOG			= Logger.getLogger(MongoStateService.class
+																		.getName());
+	private static Map<String, MongoStateService>	instances	= new ConcurrentHashMap<String, MongoStateService>();
 	
 	/* internal attributes */
-	private final Jongo			jongo;
-	private final String		collectionName;
+	private final Jongo								jongo;
+	private final String							collectionName;
 	
 	/**
 	 * Instantiates a new mongo state service.
@@ -46,26 +46,26 @@ public class MongoStateService implements StateService {
 	public MongoStateService(final ObjectNode params)
 			throws UnknownHostException {
 		
-		MongoStateConfig config = new MongoStateConfig(params);
+		final MongoStateConfig config = new MongoStateConfig(params);
 		
 		LOG.warning("Creating mongoState:" + config);
 		
 		// initialization of client & jongo
-		MongoClient client = createClient(config.getHost(), config.getPort());
-		this.jongo = new Jongo(client.getDB(config.getDatabase()));
-		this.collectionName = config.getCollection();
+		final MongoClient client = createClient(config.getHost(), config.getPort());
+		jongo = new Jongo(client.getDB(config.getDatabase()));
+		collectionName = config.getCollection();
 		
-		this.jongo.runCommand("{collMod: '" + this.collectionName
+		jongo.runCommand("{collMod: '" + collectionName
 				+ "', usePowerOf2Sizes : true }");
 		
 	}
 	
-	private static MongoClient createClient(String databaseUri, int port)
+	private static MongoClient createClient(final String databaseUri, final int port)
 			throws UnknownHostException {
-		MongoClientOptions options = MongoClientOptions.builder()
+		final MongoClientOptions options = MongoClientOptions.builder()
 				.connectionsPerHost(100)
 				.threadsAllowedToBlockForConnectionMultiplier(1500).build();
-		MongoClient client = new MongoClient(new ServerAddress(databaseUri,
+		final MongoClient client = new MongoClient(new ServerAddress(databaseUri,
 				port), options);
 		return client;
 	}
@@ -79,16 +79,16 @@ public class MongoStateService implements StateService {
 	 */
 	public static MongoStateService getInstanceByParams(final ObjectNode params) {
 		try {
-			MongoStateConfig config = new MongoStateConfig(params);
-			String key = config.getKey();
-			if (instances.containsKey(key)){
+			final MongoStateConfig config = new MongoStateConfig(params);
+			final String key = config.getKey();
+			if (instances.containsKey(key)) {
 				return instances.get(key);
 			} else {
-				MongoStateService result = new MongoStateService(params);
+				final MongoStateService result = new MongoStateService(params);
 				instances.put(key, result);
 				return result;
 			}
-		} catch (UnknownHostException e) {
+		} catch (final UnknownHostException e) {
 			LOG.log(Level.WARNING, "Couldn't init MongoStateService", e);
 		}
 		return null;
@@ -146,8 +146,7 @@ public class MongoStateService implements StateService {
 	@Override
 	public void delete(final State instance) {
 		try {
-			getCollection().remove("{_id: #}",
-					instance.getId());
+			getCollection().remove("{_id: #}", instance.getId());
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "delete error", e);
 		}

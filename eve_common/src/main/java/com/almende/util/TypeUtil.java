@@ -50,7 +50,7 @@ public abstract class TypeUtil<T> {
 	 *            the type
 	 * @return the type util
 	 */
-	public static <T> TypeUtil<T> get(Class<T> type) {
+	public static <T> TypeUtil<T> get(final Class<T> type) {
 		return new TypeUtil<T>(type) {
 		};
 	}
@@ -64,24 +64,26 @@ public abstract class TypeUtil<T> {
 	 *            the target
 	 * @return the type util
 	 */
-	public static <T> TypeUtil<T> resolve(Object target) {
-		if (target == null){
-			return new TypeUtil<T>(Void.class){};
+	public static <T> TypeUtil<T> resolve(final Object target) {
+		if (target == null) {
+			return new TypeUtil<T>(Void.class) {
+			};
 		}
 		final Type gsc = target.getClass().getGenericSuperclass();
 		ParameterizedType ptype = (ParameterizedType) TypeResolver
 				.resolveGenericType((Class<?>) gsc, target.getClass());
 		
-		if (ptype == null){
-			ptype = (ParameterizedType) target.getClass().getGenericInterfaces()[0];
+		if (ptype == null) {
+			ptype = (ParameterizedType) target.getClass()
+					.getGenericInterfaces()[0];
 		}
-		if (ptype == null){
+		if (ptype == null) {
 			LOG.warning("Couldn't find generic type.");
 			return null;
 		}
-		JavaType type = JOM.getTypeFactory().constructType(
-					ptype.getActualTypeArguments()[0]);
-		if (type == null){
+		final JavaType type = JOM.getTypeFactory().constructType(
+				ptype.getActualTypeArguments()[0]);
+		if (type == null) {
 			LOG.warning("Couldn't find generic type.");
 			return null;
 		}
@@ -98,7 +100,7 @@ public abstract class TypeUtil<T> {
 	 *            the type
 	 * @return the type util
 	 */
-	public static <T> TypeUtil<T> get(JavaType type) {
+	public static <T> TypeUtil<T> get(final JavaType type) {
 		return new TypeUtil<T>(type) {
 		};
 	}
@@ -109,7 +111,7 @@ public abstract class TypeUtil<T> {
 	 * @param type
 	 *            the type
 	 */
-	public TypeUtil(JavaType type) {
+	public TypeUtil(final JavaType type) {
 		this.valueType = type;
 	}
 	
@@ -119,7 +121,7 @@ public abstract class TypeUtil<T> {
 	 * @param type
 	 *            the type
 	 */
-	public TypeUtil(Class<?> type) {
+	public TypeUtil(final Class<?> type) {
 		this.valueType = JOM.getTypeFactory().constructType(type);
 	}
 	

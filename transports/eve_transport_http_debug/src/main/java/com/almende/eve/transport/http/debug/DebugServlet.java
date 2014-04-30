@@ -194,6 +194,7 @@ public class DebugServlet extends HttpServlet {
 		}
 		return id.indexOf('/') > 0 ? id.substring(0, id.indexOf('/')) : id;
 	}
+	
 	private String getResource(final String url) {
 		String id = "";
 		if (myUrl != null) {
@@ -202,7 +203,7 @@ public class DebugServlet extends HttpServlet {
 			// TODO: this doesn't work with resources behind agentId
 			id = url.replaceAll(".*/[^/]+", "");
 		}
-		return id.indexOf('/') < 0 ? null : id.substring(id.indexOf('/')+1);
+		return id.indexOf('/') < 0 ? null : id.substring(id.indexOf('/') + 1);
 	}
 	
 	@Override
@@ -303,7 +304,7 @@ public class DebugServlet extends HttpServlet {
 					StreamingUtil.streamBinaryData(is, mimetype, resp);
 				} else {
 					throw new ServletException("Resource '" + resource
-							+ "' not found. (filename:'"+filename+"')");
+							+ "' not found. (filename:'" + filename + "')");
 				}
 				resp.flushBuffer();
 			}

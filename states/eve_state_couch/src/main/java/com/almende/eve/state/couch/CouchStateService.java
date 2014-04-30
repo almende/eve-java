@@ -39,7 +39,7 @@ public class CouchStateService implements StateService {
 	 * @param params
 	 *            the params
 	 */
-	public CouchStateService(ObjectNode params) {
+	public CouchStateService(final ObjectNode params) {
 		try {
 			final CouchStateConfig config = new CouchStateConfig(params);
 			final String url = config.getUrl();
@@ -76,12 +76,12 @@ public class CouchStateService implements StateService {
 	 * @return the instance by params
 	 */
 	public static CouchStateService getInstanceByParams(final ObjectNode params) {
-		CouchStateConfig config = new CouchStateConfig(params);
-		String key = config.getKey();
+		final CouchStateConfig config = new CouchStateConfig(params);
+		final String key = config.getKey();
 		if (instances.containsKey(key)) {
 			return instances.get(key);
 		} else {
-			CouchStateService result = new CouchStateService(params);
+			final CouchStateService result = new CouchStateService(params);
 			instances.put(key, result);
 			return result;
 		}
@@ -96,8 +96,8 @@ public class CouchStateService implements StateService {
 	 * java.lang.Class)
 	 */
 	@Override
-	public <T extends Capability, V> T get(ObjectNode params,
-			Handler<V> handle, Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		final CouchStateConfig config = new CouchStateConfig(params);
 		final String id = couchify(config.getId());
 		
@@ -125,7 +125,7 @@ public class CouchStateService implements StateService {
 	 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
 	 */
 	@Override
-	public void delete(State instance) {
+	public void delete(final State instance) {
 		db.delete(instance);
 	}
 	

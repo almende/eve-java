@@ -42,12 +42,12 @@ public class TestAgents extends TestCase {
 		
 		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
-
+		
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transportConfig.put("jetty", jettyParms);
-
+		
 		final AgentConfig config = new AgentConfig("example");
 		config.setTransport(transportConfig);
 		
@@ -72,12 +72,14 @@ public class TestAgents extends TestCase {
 					}
 					
 				});
-
-		LOG.warning("Sync received:'"+agent.sendSync(new URI("http://localhost:8080/agents/example"),
-				"helloWorld", callParams)+"'");
 		
-		WakeServiceConfig wsconfig = new WakeServiceConfig();
-		FileStateConfig state = new FileStateConfig();
+		LOG.warning("Sync received:'"
+				+ agent.sendSync(
+						new URI("http://localhost:8080/agents/example"),
+						"helloWorld", callParams) + "'");
+		
+		final WakeServiceConfig wsconfig = new WakeServiceConfig();
+		final FileStateConfig state = new FileStateConfig();
 		state.setPath(".wakeservices");
 		state.setId("testAgents");
 		wsconfig.setState(state);
@@ -91,10 +93,15 @@ public class TestAgents extends TestCase {
 		
 		final AgentConfig ac = new AgentConfig("tester");
 		ac.setTransport(transportConfig);
-		Agent tester = new Agent(){};
+		final Agent tester = new Agent() {
+		};
 		tester.setConfig(ac);
-		LOG.warning("Sync received:'"+tester.sendSync(new URI("http://localhost:8080/agents/example"),
-				"helloWorld", callParams.deepCopy().put("message", "Hello world after sleep!"))+"'");
+		LOG.warning("Sync received:'"
+				+ tester.sendSync(
+						new URI("http://localhost:8080/agents/example"),
+						"helloWorld",
+						callParams.deepCopy().put("message",
+								"Hello world after sleep!")) + "'");
 	}
 	
 }

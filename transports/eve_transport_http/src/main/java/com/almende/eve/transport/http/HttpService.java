@@ -101,11 +101,14 @@ public class HttpService implements TransportService {
 						if (servlet != null) {
 							launcher.add(servlet, servletUri, params);
 						} else {
-							LOG.log(Level.WARNING, "Couldn't instantiate servlet!");
+							LOG.log(Level.WARNING,
+									"Couldn't instantiate servlet!");
 						}
 						
 					} catch (final Exception e1) {
-						LOG.log(Level.WARNING, "Failed to load servlet in servletlauncher!", e1);
+						LOG.log(Level.WARNING,
+								"Failed to load servlet in servletlauncher!",
+								e1);
 					}
 				}
 			} catch (final URISyntaxException e) {

@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class WakeServiceFactory {
 	
-	
 	/**
 	 * Gets the.
 	 * 
@@ -20,8 +19,9 @@ public class WakeServiceFactory {
 	 *            the params
 	 * @return the wake service
 	 */
-	public WakeService get(ObjectNode params){
-		return CapabilityFactory.get(new WakeServiceConfig(params),null,WakeService.class);
+	public WakeService get(final ObjectNode params) {
+		return CapabilityFactory.get(new WakeServiceConfig(params), null,
+				WakeService.class);
 	}
 	
 }

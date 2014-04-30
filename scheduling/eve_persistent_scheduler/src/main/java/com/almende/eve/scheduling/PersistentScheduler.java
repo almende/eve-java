@@ -36,9 +36,11 @@ public class PersistentScheduler extends SimpleScheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public PersistentScheduler(final ObjectNode params, final Handler<Receiver> handle) {
+	public PersistentScheduler(final ObjectNode params,
+			final Handler<Receiver> handle) {
 		super(params, handle);
-		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(params);
+		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(
+				params);
 		if (clock == null) {
 			clock = new RunnableClock();
 		}

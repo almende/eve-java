@@ -19,8 +19,9 @@ public class CouchStateFactory {
 	 *            the params
 	 * @return the state
 	 */
-	public static State get(ObjectNode params) {
-		return CapabilityFactory.get(new CouchStateConfig(params), null, State.class);
+	public static State get(final ObjectNode params) {
+		return CapabilityFactory.get(new CouchStateConfig(params), null,
+				State.class);
 	}
 	
 	/**

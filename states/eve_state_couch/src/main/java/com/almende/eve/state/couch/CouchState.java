@@ -69,7 +69,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 				revision = state.revision;
 				properties = state.properties;
 			}
-		} catch (org.ektorp.DocumentNotFoundException e) {
+		} catch (final org.ektorp.DocumentNotFoundException e) {
 		}
 	}
 	
@@ -258,6 +258,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * 
 	 * @return the id
 	 */
+	@Override
 	@JsonProperty("_id")
 	public String getId() {
 		return super.getId();
@@ -269,6 +270,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * @param id
 	 *            the new id
 	 */
+	@Override
 	@JsonProperty("_id")
 	public void setId(final String id) {
 		super.setId(id);
@@ -321,7 +323,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * @param db
 	 *            the new db
 	 */
-	public void setDb(CouchDbConnector db) {
+	public void setDb(final CouchDbConnector db) {
 		this.db = db;
 	}
 	

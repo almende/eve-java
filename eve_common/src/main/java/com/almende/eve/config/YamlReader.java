@@ -19,7 +19,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  * The Class YamlReader.
  */
 public class YamlReader {
-	private static final Logger LOG = Logger.getLogger(YamlReader.class.getName());
+	private static final Logger	LOG	= Logger.getLogger(YamlReader.class
+											.getName());
 	
 	/**
 	 * Load.
@@ -28,14 +29,14 @@ public class YamlReader {
 	 *            the is
 	 * @return the config
 	 */
-	public static Config load(InputStream is){
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+	public static Config load(final InputStream is) {
+		final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		try {
-			return new Config((ObjectNode)mapper.readTree(is));
-		} catch (JsonProcessingException e) {
-			LOG.log(Level.WARNING,"Couldn't parse Yaml file",e);
-		} catch (IOException e) {
-			LOG.log(Level.WARNING,"Couldn't read Yaml file",e);
+			return new Config((ObjectNode) mapper.readTree(is));
+		} catch (final JsonProcessingException e) {
+			LOG.log(Level.WARNING, "Couldn't parse Yaml file", e);
+		} catch (final IOException e) {
+			LOG.log(Level.WARNING, "Couldn't read Yaml file", e);
 		}
 		return null;
 	}

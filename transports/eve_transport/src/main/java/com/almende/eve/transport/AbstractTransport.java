@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class AbstractTransport.
  */
 public abstract class AbstractTransport implements Transport {
-	private TransportService	service	= null;
-	private Handler<Receiver>	handle	= null;
-	private URI					address	= null;
-	private ObjectNode			myParams = null;
+	private TransportService	service		= null;
+	private Handler<Receiver>	handle		= null;
+	private URI					address		= null;
+	private ObjectNode			myParams	= null;
 	
 	/**
 	 * Instantiates a new abstract transport.
@@ -37,7 +37,7 @@ public abstract class AbstractTransport implements Transport {
 		this.address = address;
 		this.service = service;
 		this.handle = handle;
-		this.myParams = params;
+		myParams = params;
 	}
 	
 	/*
@@ -92,9 +92,11 @@ public abstract class AbstractTransport implements Transport {
 		return service;
 	}
 	
-	public ObjectNode getParams(){
-		return this.myParams;
+	@Override
+	public ObjectNode getParams() {
+		return myParams;
 	}
+	
 	/**
 	 * Send local.
 	 * 

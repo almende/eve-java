@@ -27,7 +27,7 @@ public class CouchStateConfig extends StateConfig {
 	 * @param node
 	 *            the node
 	 */
-	public CouchStateConfig(ObjectNode node) {
+	public CouchStateConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
 			this.put("class", CouchStateService.class.getName());
@@ -51,7 +51,7 @@ public class CouchStateConfig extends StateConfig {
 	 * @param username
 	 *            the new username
 	 */
-	public void setUsername(String username) {
+	public void setUsername(final String username) {
 		this.put("username", username);
 	}
 	
@@ -73,7 +73,7 @@ public class CouchStateConfig extends StateConfig {
 	 * @param password
 	 *            the new password
 	 */
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.put("password", password);
 	}
 	
@@ -95,7 +95,7 @@ public class CouchStateConfig extends StateConfig {
 	 * @param url
 	 *            the new url
 	 */
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.put("url", url);
 	}
 	
@@ -117,7 +117,7 @@ public class CouchStateConfig extends StateConfig {
 	 * @param database
 	 *            the new database
 	 */
-	public void setDatabase(String database) {
+	public void setDatabase(final String database) {
 		this.put("database", database);
 	}
 	

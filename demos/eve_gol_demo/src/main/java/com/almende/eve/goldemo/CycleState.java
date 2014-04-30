@@ -32,7 +32,7 @@ public class CycleState implements Serializable {
 	 * @param alive
 	 *            the alive
 	 */
-	public CycleState(int cycle, boolean alive) {
+	public CycleState(final int cycle, final boolean alive) {
 		this.cycle = cycle;
 		this.alive = alive;
 	}
@@ -52,7 +52,7 @@ public class CycleState implements Serializable {
 	 * @param cycle
 	 *            the new cycle
 	 */
-	public void setCycle(int cycle) {
+	public void setCycle(final int cycle) {
 		this.cycle = cycle;
 	}
 	
@@ -71,17 +71,20 @@ public class CycleState implements Serializable {
 	 * @param alive
 	 *            the new alive
 	 */
-	public void setAlive(boolean alive) {
+	public void setAlive(final boolean alive) {
 		this.alive = alive;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString(){
+	@Override
+	public String toString() {
 		try {
 			return JOM.getInstance().writeValueAsString(this);
-		} catch (JsonProcessingException e) {
+		} catch (final JsonProcessingException e) {
 			return super.toString();
 		}
 	}
