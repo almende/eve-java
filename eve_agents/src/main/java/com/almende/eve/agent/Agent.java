@@ -181,9 +181,6 @@ public class Agent implements Receiver {
 			state = StateFactory.getState(stateConfig);
 		}
 		transport = new Router();
-		// All agents have a local transport
-		transport.register(LocalTransportFactory.get(new LocalTransportConfig(
-				agentId), receiver));
 		
 		JsonNode transportConfig = config.getTransport();
 		if (transportConfig != null) {
@@ -207,6 +204,10 @@ public class Agent implements Receiver {
 				transport.register(TransportFactory.getTransport(transconfig,
 						receiver));
 			}
+			// All agents have a local transport
+			transport.register(LocalTransportFactory.get(new LocalTransportConfig(
+					agentId), receiver));
+			
 			if (onBoot) {
 				try {
 					transport.connect();
