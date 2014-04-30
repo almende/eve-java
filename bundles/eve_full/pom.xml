@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
-			<artifactId>eve-transport-http</artifactId>
+			<artifactId>eve-transport-http-debug</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -48,7 +48,6 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>${maven.shade.version}</version>
 				<configuration>
-					<!-- put your configurations here -->
 				</configuration>
 				<executions>
 					<execution>
