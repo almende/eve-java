@@ -13,9 +13,12 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.transport.LocalTransportConfig;
+import com.almende.eve.transport.LocalTransportFactory;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -53,18 +56,17 @@ public class TestTransports extends TestCase {
 	}
 	
 	/**
-	 * Test Xmpp.
+	 * Test Zmq.
 	 * 
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
 	public void testZmq() throws IOException {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transport.zmq.ZmqService");
-		params.put("address", "zmq://tcp://127.0.0.1:5678");
+		ZmqTransportConfig config = new ZmqTransportConfig();
+		config.setAddress("zmq://tcp://127.0.0.1:5678");
 		
-		final Transport transport = TransportFactory.getTransport(params,
+		final Transport transport = TransportFactory.getTransport(config,
 				new myReceiver());
 		transport.connect();
 		
@@ -72,6 +74,23 @@ public class TestTransports extends TestCase {
 				null);
 	}
 	
+	
+	/**
+	 * Test local transport.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testLocal() throws IOException {
+		final LocalTransportConfig config = new LocalTransportConfig("testMe");
+		
+		final Transport transport = LocalTransportFactory.get(config,
+				new myReceiver());
+
+		transport.send(URI.create("local:testMe"), "Hello World",
+				null);
+	}
 	/**
 	 * The Class myReceiver.
 	 */

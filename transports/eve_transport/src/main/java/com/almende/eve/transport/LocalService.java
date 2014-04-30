@@ -1,0 +1,114 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
+package com.almende.eve.transport;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
+import com.almende.eve.capabilities.Capability;
+import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.TypeUtil;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+/**
+ * The Class LocalService, transport and transportService in one.
+ */
+public class LocalService extends AbstractTransport implements TransportService {
+	private static final Logger					LOG			= Logger.getLogger(LocalService.class
+																	.getName());
+	private static final Map<URI, LocalService>	instances	= new ConcurrentHashMap<URI, LocalService>();
+	private static final LocalService			singleton	= new LocalService();
+	
+	/**
+	 * Instantiates a new local transport.
+	 * 
+	 * @param address
+	 *            the address
+	 * @param handle
+	 *            the handle
+	 * @param params
+	 *            the params
+	 */
+	public LocalService(URI address, Handler<Receiver> handle, ObjectNode params) {
+		super(address, handle, singleton, params);
+	}
+	
+	private LocalService() {
+		super(null, null, null, null);
+	}
+	
+	/**
+	 * Gets the instance by params.
+	 * 
+	 * @param params
+	 *            the params
+	 * @return the instance by params
+	 */
+	public static LocalService getInstanceByParams(final ObjectNode params) {
+		return singleton;
+	}
+	
+	@Override
+	public LocalService getLocal(URI address) {
+		return instances.get(address);
+	}
+	
+	@Override
+	public <T extends Capability, V> T get(ObjectNode params,
+			Handler<V> handle, Class<T> type) {
+		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
+		final LocalTransportConfig config = new LocalTransportConfig(params);
+		final String id = config.getId();
+		if (id == null) {
+			LOG.warning("Parameter 'id' is required!");
+			return null;
+		}
+		final URI address = URI.create("local:" + config.getId());
+		LocalService result = getLocal(address);
+		if (result == null) {
+			result = new LocalService(address, newHandle, params);
+			instances.put(address, result);
+		} else {
+			result.getHandle().update(newHandle);
+		}
+		return TypeUtil.inject(result, type);
+	}
+	
+	@Override
+	public void send(final URI receiverUri, final String message,
+			final String tag) throws IOException {
+		sendLocal(receiverUri, message);
+	}
+	
+	@Override
+	public void send(final URI receiverUri, final byte[] message,
+			final String tag) throws IOException {
+		sendLocal(receiverUri, message);
+	}
+	
+	@Override
+	public void connect() throws IOException {
+	}
+	
+	@Override
+	public void disconnect() {
+	}
+	
+	@Override
+	public List<String> getProtocols() {
+		return Arrays.asList("local");
+	}
+	
+	@Override
+	public void delete(Transport instance) {
+		instances.remove(instance.getAddress());
+	}
+	
+}
