@@ -31,6 +31,11 @@
 
     <table>
         <tr><th>Id</th><td>{{id || '...'}}</td></tr>
+        <tr><th>Type</th><td>{{type || '...'}}</td></tr>
+        <tr><th>Urls</th><td>
+            <div ng-repeat="url in urls">{{url}}</div>
+            <div ng-show="!urls">...</div>
+        </td></tr>
     </table>
 
     <h2>Methods</h2>

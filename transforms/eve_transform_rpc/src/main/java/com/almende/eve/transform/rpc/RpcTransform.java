@@ -186,7 +186,7 @@ public class RpcTransform implements Transform {
 	 * @return the methods
 	 */
 	public List<Object> getMethods() {
-		return JSONRPC.describe(this, EVEREQUESTPARAMS);
+		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS);
 	}
 	/**
 	 * Builds the msg.

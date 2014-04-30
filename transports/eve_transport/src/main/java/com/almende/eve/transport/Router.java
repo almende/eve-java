@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.jackson.JOM;
@@ -86,6 +88,19 @@ public class Router implements Transport {
 	@Override
 	public URI getAddress() {
 		return null;
+	}
+	
+	/**
+	 * Gets the addresses.
+	 * 
+	 * @return the addresses
+	 */
+	public List<URI> getAddresses(){
+		final Set<URI> result = new HashSet<URI>(transports.size());
+		for (Transport transport: transports.values()){
+			result.add(transport.getAddress());
+		}
+		return new ArrayList<URI>(result);
 	}
 	
 	@Override

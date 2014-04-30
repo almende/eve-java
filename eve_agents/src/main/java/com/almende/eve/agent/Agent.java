@@ -117,6 +117,26 @@ public class Agent implements Receiver {
 	}
 	
 	/**
+	 * Gets the type.
+	 * 
+	 * @return the type
+	 */
+	@Access(AccessType.PUBLIC)
+	public String getType(){
+		return this.getClass().getName();
+	}
+	
+	/**
+	 * Gets the urls.
+	 * 
+	 * @return the urls
+	 */
+	@Access(AccessType.PUBLIC)
+	@JsonIgnore
+	public List<URI> getUrls(){
+		return transport.getAddresses();
+	}
+	/**
 	 * Gets the methods.
 	 * 
 	 * @return the methods

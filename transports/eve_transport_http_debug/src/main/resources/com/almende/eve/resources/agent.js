@@ -302,14 +302,14 @@ function Controller($scope, $resource) {
                 document.title = result;
             }
         });
-/*
+
         // get urls
         send ('getUrls', {}, function (err, result) {
             if (!err) {
                 $scope.urls = result;
             }
         });
-
+        
         // get type
         send ('getType', {}, function (err, result) {
             if (!err) {
@@ -317,20 +317,6 @@ function Controller($scope, $resource) {
             }
         });
 
-        // get description
-        send ('getDescription', {}, function (err, result) {
-            if (!err) {
-                $scope.description = result;
-            }
-        });
-
-        // get version
-        send ('getVersion', {}, function (err, result) {
-            if (!err) {
-                $scope.version = result;
-            }
-        });
-*/
         // get methods
         send ('getMethods', {}, function (err, result) {
             if (!err) {
