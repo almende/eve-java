@@ -98,4 +98,26 @@ public class HttpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
+	
+	/**
+	 * Sets the servlet class.
+	 * 
+	 * @param servletClass
+	 *            the new servlet class
+	 */
+	public void setServletClass(final String servletClass){
+		this.put("servletClass", servletClass);
+	}
+	
+	/**
+	 * Gets the servlet class.
+	 * 
+	 * @return the servlet class
+	 */
+	public String getServletClass(){
+		if (this.has("servletClass")){
+			return this.get("servletClass").asText();
+		}
+		return EveServlet.class.getName();
+	}
 }

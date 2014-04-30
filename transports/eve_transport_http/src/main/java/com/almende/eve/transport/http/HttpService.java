@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.Servlet;
+
 import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
@@ -28,7 +30,7 @@ public class HttpService implements TransportService {
 																.getName());
 	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
 	private URI								myUrl		= null;
-	private final Map<URI, HttpTransport>			transports	= new HashMap<URI, HttpTransport>();
+	private final Map<URI, HttpTransport>	transports	= new HashMap<URI, HttpTransport>();
 	private HttpTransportConfig				myParams	= null;
 	
 	/**
@@ -80,15 +82,30 @@ public class HttpService implements TransportService {
 											+ " must implement "
 											+ ServletLauncher.class.getName());
 						}
-						
 						final ServletLauncher launcher = (ServletLauncher) launcherClass
 								.newInstance();
 						// TODO: make the Servlet type configurable
-						launcher.add(new EveServlet(servletUri), servletUri,
-								params);
+						
+						final Class<?> servletClass = Class.forName(config
+								.getServletClass());
+						if (!ClassUtil
+								.hasInterface(servletClass, Servlet.class)) {
+							throw new IllegalArgumentException("Servlet class "
+									+ servletClass.getName()
+									+ " must implement "
+									+ Servlet.class.getName());
+						}
+						final Servlet servlet = (Servlet) servletClass
+								.getConstructor(URI.class).newInstance(
+										servletUri);
+						if (servlet != null) {
+							launcher.add(servlet, servletUri, params);
+						} else {
+							LOG.log(Level.WARNING, "Couldn't instantiate servlet!");
+						}
 						
 					} catch (final Exception e1) {
-						LOG.log(Level.WARNING, "Failed to load launcher!", e1);
+						LOG.log(Level.WARNING, "Failed to load servlet in servletlauncher!", e1);
 					}
 				}
 			} catch (final URISyntaxException e) {
@@ -104,11 +121,13 @@ public class HttpService implements TransportService {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.
+	 * databind
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public <T extends Capability, V> T get(final ObjectNode params, final Handler<V> handle, final Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final HttpTransportConfig config = new HttpTransportConfig(params);
 		HttpTransport result = null;

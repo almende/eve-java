@@ -7,6 +7,7 @@ package com.almende.eve.agent;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +23,11 @@ import com.almende.eve.transform.rpc.RpcTransformFactory;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
+import com.almende.eve.transform.rpc.annotation.Sender;
+import com.almende.eve.transform.rpc.jsonrpc.JSONRPC;
 import com.almende.eve.transform.rpc.jsonrpc.JSONRequest;
 import com.almende.eve.transform.rpc.jsonrpc.JSONResponse;
+import com.almende.eve.transform.rpc.jsonrpc.RequestParams;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
@@ -40,17 +44,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 public class Agent implements Receiver {
-	private static final Logger	LOG			= Logger.getLogger(Agent.class
-													.getName());
-	private String				agentId		= null;
-	private AgentConfig			config		= null;
-	private State				state		= null;
-	private Transport			transport	= null;
-	private Scheduler			scheduler	= null;
-	protected RpcTransform		rpc			= RpcTransformFactory
-													.get(new SimpleHandler<Object>(
-															this));
-	protected Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
+	private static final Logger			LOG					= Logger.getLogger(Agent.class
+																	.getName());
+	private String						agentId				= null;
+	private AgentConfig					config				= null;
+	private State						state				= null;
+	private Transport					transport			= null;
+	private Scheduler					scheduler			= null;
+	protected RpcTransform				rpc					= RpcTransformFactory
+																	.get(new SimpleHandler<Object>(
+																			this));
+	protected Handler<Receiver>			receiver			= new SimpleHandler<Receiver>(
+																	this);
+	private static final RequestParams	EVEREQUESTPARAMS	= new RequestParams();
+	static {
+		EVEREQUESTPARAMS.put(Sender.class, null);
+	}
 	
 	/**
 	 * Instantiates a new agent.
@@ -112,6 +121,17 @@ public class Agent implements Receiver {
 	 */
 	public String getId() {
 		return agentId;
+	}
+	
+	/**
+	 * Gets the methods.
+	 * 
+	 * @return the methods
+	 */
+	@Access(AccessType.PUBLIC)
+	@JsonIgnore
+	public List<Object> getMethods() {
+		return JSONRPC.describe(this, EVEREQUESTPARAMS);
 	}
 	
 	/**
