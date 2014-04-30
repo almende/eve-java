@@ -5,6 +5,7 @@
 package com.almende.eve.agent;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -23,11 +24,7 @@ import com.almende.eve.transform.rpc.RpcTransformFactory;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
-import com.almende.eve.transform.rpc.annotation.Sender;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRPC;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRequest;
-import com.almende.eve.transform.rpc.jsonrpc.JSONResponse;
-import com.almende.eve.transform.rpc.jsonrpc.RequestParams;
+import com.almende.eve.transform.rpc.formats.JSONResponse;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
@@ -56,10 +53,6 @@ public class Agent implements Receiver {
 																			this));
 	protected Handler<Receiver>			receiver			= new SimpleHandler<Receiver>(
 																	this);
-	private static final RequestParams	EVEREQUESTPARAMS	= new RequestParams();
-	static {
-		EVEREQUESTPARAMS.put(Sender.class, null);
-	}
 	
 	/**
 	 * Instantiates a new agent.
@@ -131,7 +124,7 @@ public class Agent implements Receiver {
 	@Access(AccessType.PUBLIC)
 	@JsonIgnore
 	public List<Object> getMethods() {
-		return JSONRPC.describe(this, EVEREQUESTPARAMS);
+		return rpc.getMethods();
 	}
 	
 	/**
@@ -289,8 +282,30 @@ public class Agent implements Receiver {
 	protected final <T> void send(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
-		final JSONRequest request = rpc.buildMsg(method, params, callback);
-		transport.send(url, request.toString(), null);
+		transport.send(url, rpc.buildMsg(method, params, callback).toString(), null);
+	}
+	
+	/**
+	 * Send async for usage in proxies.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callback
+	 *            the callback
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected final <T> void send(final URI url, final Method method,
+			final Object[] params, final AsyncCallback<T> callback)
+			throws IOException {
+		transport.send(url, rpc.buildMsg(method, params, callback).toString(), null);
 	}
 	
 	/**
@@ -310,8 +325,7 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected final <T> void send(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final JSONRequest request = rpc.buildMsg(method, params, null);
-		transport.send(url, request.toString(), null);
+		transport.send(url, rpc.buildMsg(method, params, null).toString(), null);
 	}
 	
 	/**
@@ -333,8 +347,7 @@ public class Agent implements Receiver {
 	protected final <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		SyncCallback<T> callback = new SyncCallback<T>();
-		final JSONRequest request = rpc.buildMsg(method, params, callback);
-		transport.send(url, request.toString(), null);
+		transport.send(url, rpc.buildMsg(method, params, callback).toString(), null);
 		try {
 			return callback.get();
 		} catch (Exception e) {

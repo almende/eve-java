@@ -4,7 +4,9 @@
  */
 package com.almende.eve.transform.rpc;
 
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +16,11 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transform.Transform;
 import com.almende.eve.transform.TransformService;
 import com.almende.eve.transform.rpc.annotation.Sender;
-import com.almende.eve.transform.rpc.jsonrpc.JSONMessage;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRPC;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRPCException;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRequest;
-import com.almende.eve.transform.rpc.jsonrpc.JSONResponse;
-import com.almende.eve.transform.rpc.jsonrpc.RequestParams;
+import com.almende.eve.transform.rpc.formats.JSONMessage;
+import com.almende.eve.transform.rpc.formats.JSONRPCException;
+import com.almende.eve.transform.rpc.formats.JSONRequest;
+import com.almende.eve.transform.rpc.formats.JSONResponse;
+import com.almende.eve.transform.rpc.formats.RequestParams;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
@@ -33,6 +34,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class RpcTransform implements Transform {
 	private static final Logger						LOG			= Logger.getLogger(RpcTransform.class
 																		.getName());
+	private static final RequestParams	EVEREQUESTPARAMS	= new RequestParams();
+	static {
+		EVEREQUESTPARAMS.put(Sender.class, null);
+	}
 	private Authorizor								auth		= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks	= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
@@ -176,6 +181,14 @@ public class RpcTransform implements Transform {
 	}
 	
 	/**
+	 * Gets the methods.
+	 * 
+	 * @return the methods
+	 */
+	public List<Object> getMethods() {
+		return JSONRPC.describe(this, EVEREQUESTPARAMS);
+	}
+	/**
 	 * Builds the msg.
 	 * 
 	 * @param <T>
@@ -191,16 +204,45 @@ public class RpcTransform implements Transform {
 	public <T> JSONRequest buildMsg(final String method,
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		final JSONRequest request = new JSONRequest(method, params);
+		addCallback(request, callback);
+		return request;
+	}
+
+	/**
+	 * Builds the msg.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callback
+	 *            the callback
+	 * @return the JSON request
+	 */
+	public <T> JSONRequest buildMsg(final Method method,
+			final Object[] params, final AsyncCallback<T> callback) {
+		final JSONRequest request = JSONRPC.createRequest(method, params);
+		addCallback(request, callback);
+		return request;
+	}
+	
+	private <T> void addCallback(final JSONRequest request,
+			final AsyncCallback<T> callback) {
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
-		// conversions required on the result.
+		// conversions required on the result. 
+		//TODO: if JSON-RPC notifications are going to be supported in the future, this may be skipped if callback == null;
 		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>() {
 			@Override
 			public void onSuccess(final JSONResponse response) {
 				if (callback == null) {
 					final Exception err = response.getError();
 					if (err != null) {
-						LOG.log(Level.WARNING,"async RPC call failed, and no callback handler available.",err);
+						LOG.log(Level.WARNING,
+								"async RPC call failed, and no callback handler available.",
+								err);
 					}
 				} else {
 					final Exception err = response.getError();
@@ -230,7 +272,9 @@ public class RpcTransform implements Transform {
 			@Override
 			public void onFailure(final Exception exception) {
 				if (callback == null) {
-					LOG.log(Level.WARNING,"async RPC call failed, and no callback handler available.",exception);
+					LOG.log(Level.WARNING,
+							"async RPC call failed, and no callback handler available.",
+							exception);
 				} else {
 					callback.onFailure(exception);
 				}
@@ -241,7 +285,6 @@ public class RpcTransform implements Transform {
 			callbacks.push(((JSONMessage) request).getId(), request.toString(),
 					responseCallback);
 		}
-		return request;
 	}
 	
 	/**

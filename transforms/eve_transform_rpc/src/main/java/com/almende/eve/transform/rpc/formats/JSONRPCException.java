@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.transform.rpc.jsonrpc;
+package com.almende.eve.transform.rpc.formats;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPCException.
  */
-public class JSONRPCException extends Exception {
+public class JSONRPCException extends RuntimeException {
 	private static final long	serialVersionUID	= -4258336566828038603L;
 	private static final Logger	LOG					= Logger.getLogger(JSONRPCException.class
 															.getCanonicalName());

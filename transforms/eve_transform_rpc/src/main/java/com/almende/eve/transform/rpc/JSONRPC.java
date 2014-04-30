@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.transform.rpc.jsonrpc;
+package com.almende.eve.transform.rpc;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -23,13 +23,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.auth.Authorizor;
+import com.almende.eve.transform.rpc.NamespaceUtil.CallTuple;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
 import com.almende.eve.transform.rpc.annotation.Namespace;
 import com.almende.eve.transform.rpc.annotation.Optional;
 import com.almende.eve.transform.rpc.annotation.Sender;
-import com.almende.eve.transform.rpc.jsonrpc.NamespaceUtil.CallTuple;
+import com.almende.eve.transform.rpc.formats.JSONRPCException;
+import com.almende.eve.transform.rpc.formats.JSONRequest;
+import com.almende.eve.transform.rpc.formats.JSONResponse;
+import com.almende.eve.transform.rpc.formats.RequestParams;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
@@ -43,7 +47,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
-public final class JSONRPC {
+final class JSONRPC {
 	private static final Logger		LOG				= Logger.getLogger(JSONRPC.class
 															.getName());
 	private static final boolean	USEMETHODHANDLE	= false;

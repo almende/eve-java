@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.transform.rpc.jsonrpc;
+package com.almende.eve.transform.rpc;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 /**
  * The Class NamespaceUtil.
  */
-public final class NamespaceUtil {
+final class NamespaceUtil {
 	
 	private static final Map<String, AnnotatedMethod[]>	cache		= new HashMap<String, AnnotatedMethod[]>();
 	private static final NamespaceUtil					instance	= new NamespaceUtil();

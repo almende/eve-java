@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
-import com.almende.eve.transform.rpc.jsonrpc.JSONRPCException;
+import com.almende.eve.transform.rpc.formats.JSONRPCException;
 
 /**
  * The Class Goldemo.

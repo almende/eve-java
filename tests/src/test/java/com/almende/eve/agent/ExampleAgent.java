@@ -12,7 +12,7 @@ import com.almende.eve.transform.rpc.annotation.Name;
  * The Class ExampleAgent.
  */
 @Access(AccessType.PUBLIC)
-public class ExampleAgent extends WakeableAgent {
+public class ExampleAgent extends WakeableAgent implements ExampleAgentInterface {
 	
 	/**
 	 * Hello world.
