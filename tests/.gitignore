@@ -11,3 +11,5 @@ target
 /.eveagents_resultmonitor
 /.eveagents_schedulerTest
 /.eveagents_schedulingtest
+TestXMPPAsk.java
+
