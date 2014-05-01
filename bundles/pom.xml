@@ -9,10 +9,10 @@
 		<relativePath>../eve_parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-bundles</artifactId>
+	<artifactId>eve-bundle</artifactId>
 	<packaging>pom</packaging>
 
-	<name>EVE Bundles</name>
+	<name>EVE Bundle Parent</name>
 	<url>http://almende.github.com/eve</url>
 
 	<modules>

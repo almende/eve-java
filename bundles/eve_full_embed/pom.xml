@@ -4,14 +4,14 @@
 
 	<parent>
 		<groupId>com.almende.eve</groupId>
-		<artifactId>eve-bundles</artifactId>
+		<artifactId>eve-bundle</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-full-embed</artifactId>
+	<artifactId>eve-bundle-full-embed</artifactId>
 
-	<name>EVE Full Bundle with Embedded Jetty Server</name>
+	<name>EVE Bundle Full with Embedded Jetty Server</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
