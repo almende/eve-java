@@ -152,6 +152,8 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			} else {
 				conn.login(username, password, resource);
 			}
+			// instantiate a packet listener
+			conn.addPacketListener(this, null);
 			
 			// set presence to available
 			final Presence presence = new Presence(Presence.Type.available);
@@ -160,9 +162,6 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			// set acceptance to all
 			conn.getRoster().setSubscriptionMode(
 					Roster.SubscriptionMode.accept_all);
-			
-			// instantiate a packet listener
-			conn.addPacketListener(this, null);
 			
 		} catch (final XMPPException e) {
 			LOG.log(Level.WARNING, "", e);
