@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.almende.eve.capabilities.wake.WakeHandler;
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.Wakeable;
+import com.almende.eve.test.TestWake;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;

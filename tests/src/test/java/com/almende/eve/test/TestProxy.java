@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.agent;
+package com.almende.eve.test;
 
 import java.net.URI;
 import java.util.logging.Logger;
@@ -11,6 +11,10 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.agent.AgentConfig;
+import com.almende.eve.agent.AgentProxyFactory;
+import com.almende.eve.agent.ExampleAgent;
+import com.almende.eve.agent.ExampleAgentInterface;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;

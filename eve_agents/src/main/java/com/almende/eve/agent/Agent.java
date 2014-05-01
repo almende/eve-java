@@ -304,7 +304,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected final <T> void send(final URI url, final String method,
+	protected <T> void send(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
@@ -328,7 +328,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected final <T> void send(final URI url, final Method method,
+	protected <T> void send(final URI url, final Method method,
 			final Object[] params, final AsyncCallback<T> callback)
 			throws IOException {
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
@@ -350,7 +350,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected final <T> void send(final URI url, final String method,
+	protected <T> void send(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		transport
 				.send(url, rpc.buildMsg(method, params, null).toString(), null);
@@ -372,7 +372,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected final <T> T sendSync(final URI url, final String method,
+	protected <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		final SyncCallback<T> callback = new SyncCallback<T>();
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),

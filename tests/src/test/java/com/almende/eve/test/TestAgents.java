@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.agent;
+package com.almende.eve.test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +14,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.agent.AgentConfig;
+import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.WakeServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
@@ -57,7 +59,7 @@ public class TestAgents extends TestCase {
 		final ObjectNode callParams = JOM.createObjectNode();
 		callParams.put("message", "Hello world!");
 		
-		agent.send(new URI("http://localhost:8080/agents/example"),
+		agent.pubSend(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams, new AsyncCallback<String>() {
 					
 					@Override
@@ -74,7 +76,7 @@ public class TestAgents extends TestCase {
 				});
 		
 		LOG.warning("Sync received:'"
-				+ agent.sendSync(
+				+ agent.pubSendSync(
 						new URI("http://localhost:8080/agents/example"),
 						"helloWorld", callParams) + "'");
 		
@@ -93,11 +95,11 @@ public class TestAgents extends TestCase {
 		
 		final AgentConfig ac = new AgentConfig("tester");
 		ac.setTransport(transportConfig);
-		final Agent tester = new Agent() {
+		final ExampleAgent tester = new ExampleAgent() {
 		};
 		tester.setConfig(ac);
 		LOG.warning("Sync received:'"
-				+ tester.sendSync(
+				+ tester.pubSendSync(
 						new URI("http://localhost:8080/agents/example"),
 						"helloWorld",
 						callParams.deepCopy().put("message",
