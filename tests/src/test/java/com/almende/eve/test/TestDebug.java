@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentConfig;
+import com.almende.eve.agent.CalcAgent;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.jackson.JOM;
@@ -48,6 +49,13 @@ public class TestDebug extends TestCase {
 		
 		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
+		
+		final AgentConfig config2 = new AgentConfig("calc");
+		config2.setTransport(transportConfig);
+		
+		final CalcAgent agent2 = new CalcAgent();
+		agent2.setConfig(config2);
+		
 		
 		synchronized (this) {
 			this.wait();
