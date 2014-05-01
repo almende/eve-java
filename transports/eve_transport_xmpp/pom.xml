@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<smack.version>3.1.0</smack.version>
+		<smack.version>3.2.1</smack.version>
 	</properties>
 
 	<dependencies>
@@ -22,7 +22,12 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>jivesoftware</groupId>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>${smack.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smackx</artifactId>
 			<version>${smack.version}</version>
 		</dependency>

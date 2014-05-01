@@ -68,7 +68,7 @@
 			<exclusions>
 				<exclusion>
 					<artifactId>smackx</artifactId>
-					<groupId>jivesoftware</groupId>
+					<groupId>org.igniterealtime.smack</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

@@ -133,15 +133,19 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 		// configure and connect
 		final ConnectionConfiguration connConfig = new ConnectionConfiguration(
 				host, port, serviceName);
-		
+
 		connConfig.setSASLAuthenticationEnabled(true);
 		connConfig.setReconnectionAllowed(true);
 		connConfig.setCompressionEnabled(true);
 		connConfig.setRosterLoadedAtLogin(false);
+		
 		conn = new XMPPConnection(connConfig);
 		try {
 			conn.connect();
 			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {}
 			// login
 			if (resource == null) {
 				conn.login(username, password);
