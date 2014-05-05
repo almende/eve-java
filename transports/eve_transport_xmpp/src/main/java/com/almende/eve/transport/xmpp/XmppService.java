@@ -34,6 +34,7 @@ public class XmppService implements TransportService {
 			// problem loading reconnection manager
 		}
 		SmackConfiguration.setPacketReplyTimeout(15000);
+//		SmackConfiguration.setKeepAliveInterval(-1);
 	}
 	
 	/**

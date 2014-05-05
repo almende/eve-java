@@ -51,7 +51,8 @@ public class MongoStateService implements StateService {
 		LOG.warning("Creating mongoState:" + config);
 		
 		// initialization of client & jongo
-		final MongoClient client = createClient(config.getHost(), config.getPort());
+		final MongoClient client = createClient(config.getHost(),
+				config.getPort());
 		jongo = new Jongo(client.getDB(config.getDatabase()));
 		collectionName = config.getCollection();
 		
@@ -60,13 +61,13 @@ public class MongoStateService implements StateService {
 		
 	}
 	
-	private static MongoClient createClient(final String databaseUri, final int port)
-			throws UnknownHostException {
+	private static MongoClient createClient(final String databaseUri,
+			final int port) throws UnknownHostException {
 		final MongoClientOptions options = MongoClientOptions.builder()
 				.connectionsPerHost(100)
 				.threadsAllowedToBlockForConnectionMultiplier(1500).build();
-		final MongoClient client = new MongoClient(new ServerAddress(databaseUri,
-				port), options);
+		final MongoClient client = new MongoClient(new ServerAddress(
+				databaseUri, port), options);
 		return client;
 	}
 	
@@ -78,20 +79,29 @@ public class MongoStateService implements StateService {
 	 * @return the instance by params
 	 */
 	public static MongoStateService getInstanceByParams(final ObjectNode params) {
-		try {
-			final MongoStateConfig config = new MongoStateConfig(params);
-			final String key = config.getKey();
-			if (instances.containsKey(key)) {
+		final MongoStateConfig config = new MongoStateConfig(params);
+		final String key = config.getKey();
+		
+		if (instances.containsKey(key)) {
+			return instances.get(key);
+		} else {
+			synchronized (instances) {
+				if (!instances.containsKey(key)) {
+					try {
+						
+						final MongoStateService result = new MongoStateService(
+								params);
+						if (result != null) {
+							instances.put(key, result);
+						}
+					} catch (final UnknownHostException e) {
+						LOG.log(Level.WARNING,
+								"Couldn't init MongoStateService", e);
+					}
+				}
 				return instances.get(key);
-			} else {
-				final MongoStateService result = new MongoStateService(params);
-				instances.put(key, result);
-				return result;
 			}
-		} catch (final UnknownHostException e) {
-			LOG.log(Level.WARNING, "Couldn't init MongoStateService", e);
 		}
-		return null;
 	}
 	
 	/**
@@ -122,13 +132,15 @@ public class MongoStateService implements StateService {
 		
 		MongoState result = null;
 		try {
-			result = getCollection().findOne("{_id: #}", id).as(
-					MongoState.class);
-			if (result == null) {
-				result = new MongoState(id, this, params);
-				getCollection().insert(result);
-			} else {
-				result.setService(this);
+			synchronized (this) {
+				result = getCollection().findOne("{_id: #}", id).as(
+						MongoState.class);
+				if (result == null) {
+					result = new MongoState(id, this, params);
+					getCollection().insert(result);
+				} else {
+					result.setService(this);
+				}
 			}
 			result.setCollection(getCollection());
 		} catch (final Exception e) {

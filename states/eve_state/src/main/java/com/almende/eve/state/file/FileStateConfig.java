@@ -4,6 +4,8 @@
  */
 package com.almende.eve.state.file;
 
+import java.util.logging.Logger;
+
 import com.almende.eve.state.StateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,7 +14,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class FileStateConfig.
  */
 public class FileStateConfig extends StateConfig {
-	
+	private static final Logger						LOG			= Logger.getLogger(FileStateConfig.class
+			.getSimpleName());
+
 	/**
 	 * Instantiates a new file state config.
 	 */
@@ -74,6 +78,8 @@ public class FileStateConfig extends StateConfig {
 		if (this.has("path")) {
 			return this.get("path").asText();
 		}
-		return null;
+		LOG.warning("Config parameter 'path' missing in State "
+				+ "configuration. Using the default path '.eveagents'");
+		return ".eveagents";
 	}
 }

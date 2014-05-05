@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,12 +25,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * A factory for creating FileState objects.
  */
 public class FileStateService implements StateService {
-	private static final Logger			LOG			= Logger.getLogger(FileStateService.class
-															.getSimpleName());
-	private String						path		= null;
-	private Boolean						json		= true;
-	private Boolean						multilevel	= false;
-	private final Map<String, State>	states		= new HashMap<String, State>();
+	private static final Logger						LOG			= Logger.getLogger(FileStateService.class
+																		.getSimpleName());
+	private String									path		= null;
+	private Boolean									json		= true;
+	private Boolean									multilevel	= false;
+	private final Map<String, State>				states		= new HashMap<String, State>();
+	private static Map<String, FileStateService>	instances	= new ConcurrentHashMap<String, FileStateService>();
 	
 	/**
 	 * This constructor is called when constructed by the AgentHost.
@@ -257,8 +259,23 @@ public class FileStateService implements StateService {
 	 * @return the instance by params
 	 */
 	public static FileStateService getInstanceByParams(final ObjectNode params) {
-		// TODO: add cache, keyed on path, JSON & multilevel.
-		return new FileStateService(params);
+		
+		final FileStateConfig config = new FileStateConfig(params);
+		String key = config.getPath();
+		
+		if (instances.containsKey(key)) {
+			return instances.get(key);
+		} else {
+			synchronized (instances) {
+				if (!instances.containsKey(key)) {
+					final FileStateService result = new FileStateService(params);
+					if (result != null) {
+						instances.put(key, result);
+					}
+				}
+				return instances.get(key);
+			}
+		}
 	}
 	
 	/*
@@ -275,13 +292,16 @@ public class FileStateService implements StateService {
 		final FileStateConfig config = new FileStateConfig(params);
 		
 		final String id = config.getId();
-		if (exists(id)) {
-			return TypeUtil.inject(get(id, json, params), type);
-		} else {
-			try {
-				return TypeUtil.inject(create(id, json, params), type);
-			} catch (final IOException e) {
-				LOG.log(Level.WARNING, "Couldn't create state file", e);
+		
+		synchronized (this) {
+			if (exists(id)) {
+				return TypeUtil.inject(get(id, json, params), type);
+			} else {
+				try {
+					return TypeUtil.inject(create(id, json, params), type);
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, "Couldn't create state file", e);
+				}
 			}
 		}
 		return null;

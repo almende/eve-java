@@ -16,7 +16,7 @@ import com.almende.eve.test.TestWake;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
-import com.almende.util.jackson.JOM;
+import com.almende.eve.transport.xmpp.XmppTransportConfig;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -56,13 +56,13 @@ public class MyAgent implements Wakeable, Receiver {
 	 */
 	public void init() {
 		
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
-		params.put("address", "xmpp://alex@openid.almende.org/" + wakeKey);
-		params.put("password", "alex");
-		ws.register(wakeKey, params, MyAgent.class.getName());
+		final XmppTransportConfig config = new XmppTransportConfig();
+		config.setAddress("xmpp://alex@openid.almende.org/" + wakeKey);
+		config.setPassword("alex");
 		
-		transport = TransportFactory.getTransport(params,
+		ws.register(wakeKey, config, MyAgent.class.getName());
+		
+		transport = TransportFactory.getTransport(config,
 				new WakeHandler<Receiver>(this, wakeKey, ws));
 		try {
 			transport.connect();

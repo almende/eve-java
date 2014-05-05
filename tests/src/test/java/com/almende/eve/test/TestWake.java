@@ -10,8 +10,9 @@ import org.junit.Test;
 
 import com.almende.eve.agent.MyAgent;
 import com.almende.eve.capabilities.wake.WakeService;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.almende.eve.capabilities.wake.WakeServiceConfig;
+import com.almende.eve.capabilities.wake.WakeServiceFactory;
+import com.almende.eve.state.file.FileStateConfig;
 
 /**
  * The Class TestWake.
@@ -23,15 +24,13 @@ public class TestWake extends TestCase {
 	 */
 	@Test
 	public void testWake() {
-		final ObjectNode params = JOM.createObjectNode();
-		final ObjectNode state = JOM.createObjectNode();
-		state.put("class", "com.almende.eve.state.file.FileStateService");
-		state.put("json", true);
-		state.put("path", ".wakeservices");
-		state.put("id", "testWakeService");
-		params.put("state", state);
+		final WakeServiceConfig config = new WakeServiceConfig();
+		final FileStateConfig stateconfig = new FileStateConfig();
+		stateconfig.setPath( ".wakeservices");
+		stateconfig.setId("testWakeService");
+		config.setState(stateconfig);
 		
-		final WakeService ws = new WakeService(params);
+		final WakeService ws = WakeServiceFactory.get(config);
 		
 		// Create agent without external references, hopefully!
 		new MyAgent("testWakeAgent", ws).init();

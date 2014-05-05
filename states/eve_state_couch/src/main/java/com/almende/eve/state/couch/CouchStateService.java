@@ -78,12 +78,21 @@ public class CouchStateService implements StateService {
 	public static CouchStateService getInstanceByParams(final ObjectNode params) {
 		final CouchStateConfig config = new CouchStateConfig(params);
 		final String key = config.getKey();
+		
 		if (instances.containsKey(key)) {
 			return instances.get(key);
 		} else {
-			final CouchStateService result = new CouchStateService(params);
-			instances.put(key, result);
-			return result;
+			synchronized (instances) {
+				if (!instances.containsKey(key)) {
+					final CouchStateService result = new CouchStateService(
+							params);
+					if (result != null) {
+						instances.put(key, result);
+					}
+				}
+				return instances.get(key);
+			}
+			
 		}
 	}
 	
@@ -103,13 +112,15 @@ public class CouchStateService implements StateService {
 		
 		CouchState state = null;
 		try {
-			if (db.contains(id)) {
-				state = db.get(CouchState.class, id);
-				state.setDb(db);
-				state.setService(this);
-			} else {
-				state = new CouchState(id, db, this, config);
-				db.create(state);
+			synchronized (this) {
+				if (db.contains(id)) {
+					state = db.get(CouchState.class, id);
+					state.setDb(db);
+					state.setService(this);
+				} else {
+					state = new CouchState(id, db, this, config);
+					db.create(state);
+				}
 			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to load agent", e);

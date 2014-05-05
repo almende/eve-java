@@ -47,13 +47,26 @@ public class MemoryStateService implements StateService {
 		final MemoryStateConfig config = new MemoryStateConfig(params);
 		final String id = config.getId();
 		
-		if (states.containsKey(id)) {
-			return TypeUtil.inject(states.get(id), type);
+		// Quick return for existing states
+		final State state = states.get(id);
+		if (state != null) {
+			return TypeUtil.inject(state, type);
 		} else {
-			final MemoryState result = new MemoryState(id, this, params);
-			states.put(id, result);
-			return TypeUtil.inject(result, type);
+			// Synchronized version for creating a new state (preventing race
+			// condition)
+			synchronized (states) {
+				if (!states.containsKey(id)) {
+					final MemoryState result = new MemoryState(id, this, params);
+					if (result != null) {
+						states.put(id, result);
+					}
+				}
+				if (states.containsKey(id)) {
+					return TypeUtil.inject(states.get(id), type);
+				}
+			}
 		}
+		return null;
 	}
 	
 	/*

@@ -19,7 +19,7 @@ public class WakeServiceFactory {
 	 *            the params
 	 * @return the wake service
 	 */
-	public WakeService get(final ObjectNode params) {
+	public static WakeService get(final ObjectNode params) {
 		return CapabilityFactory.get(new WakeServiceConfig(params), null,
 				WakeService.class);
 	}

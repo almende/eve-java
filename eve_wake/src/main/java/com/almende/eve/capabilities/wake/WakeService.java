@@ -32,6 +32,7 @@ public class WakeService implements Capability, CapabilityService {
 	private Map<String, WakeEntry>					agents		= new HashMap<String, WakeEntry>();
 	
 	private State									state		= null;
+	private static final WakeService				singleton	= new WakeService();
 	
 	/**
 	 * Instantiates a new wake service.
@@ -199,6 +200,17 @@ public class WakeService implements Capability, CapabilityService {
 	 */
 	public void setAgents(final Map<String, WakeEntry> agents) {
 		this.agents = agents;
+	}
+	
+	/**
+	 * Gets the instance by params.
+	 * 
+	 * @param params
+	 *            the params
+	 * @return the instance by params
+	 */
+	public static WakeService getInstanceByParams(final ObjectNode params) {
+		return singleton;
 	}
 	
 	@Override
