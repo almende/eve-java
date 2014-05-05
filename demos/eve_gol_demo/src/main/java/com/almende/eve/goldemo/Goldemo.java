@@ -68,7 +68,7 @@ public class Goldemo {
 		
 		if (args.length == 0) {
 			System.err
-					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath>");
+					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath> < <startup_file>");
 			return;
 		}
 		final Config config = YamlReader.load(new FileInputStream(new File(

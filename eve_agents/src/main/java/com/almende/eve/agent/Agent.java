@@ -176,7 +176,7 @@ public class Agent implements Receiver {
 		final ObjectNode sc = config.getState();
 		if (sc != null) {
 			final StateConfig stateConfig = new StateConfig(sc);
-			if (agentId != null && stateConfig.getId() != null) {
+			if (agentId != null && stateConfig.getId() == null) {
 				stateConfig.setId(agentId);
 			}
 			state = StateFactory.getState(stateConfig);
