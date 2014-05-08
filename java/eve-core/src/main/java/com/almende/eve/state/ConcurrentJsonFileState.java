@@ -309,7 +309,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 		JsonNode result = NullNode.getInstance();
 		boolean open = false;
 		try {
-			if (properties == null) {
+			if( properties == null || properties.size() <= 0 ) // NB: properties will _never_ be null,  tymon
+			{
 				open=true;
 				openFile();
 				read();
