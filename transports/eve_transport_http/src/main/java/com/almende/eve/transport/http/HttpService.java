@@ -84,7 +84,6 @@ public class HttpService implements TransportService {
 						}
 						final ServletLauncher launcher = (ServletLauncher) launcherClass
 								.newInstance();
-						// TODO: make the Servlet type configurable
 						
 						final Class<?> servletClass = Class.forName(config
 								.getServletClass());

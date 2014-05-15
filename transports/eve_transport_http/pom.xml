@@ -13,6 +13,8 @@
 	<properties>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<httpclient.version>4.3.3</httpclient.version>
+		<ws.version>1.0</ws.version>
+		<tyrus.version>1.4</tyrus.version>
 	</properties>
 
 	<dependencies>
@@ -28,9 +30,25 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>${ws.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.tyrus</groupId>
+			<artifactId>tyrus-client</artifactId>
+			<version>${tyrus.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.tyrus</groupId>
+			<artifactId>tyrus-container-grizzly-client</artifactId>
+			<version>${tyrus.version}</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -18,6 +18,10 @@ import com.almende.eve.transport.LocalTransportFactory;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.ws.WebsocketTransportConfig;
+import com.almende.eve.transport.ws.WsClientTransport;
+import com.almende.eve.transport.ws.WsClientTransportFactory;
+import com.almende.eve.transport.ws.WsServerTransportFactory;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,7 +47,7 @@ public class TestTransports extends TestCase {
 		params.put("password", "alex");
 		
 		final Transport transport = TransportFactory.getTransport(params,
-				new myReceiver());
+				new MyReceiver());
 		transport.connect();
 		
 		transport.send(URI.create("xmpp:gloria@openid.almende.org"),
@@ -67,7 +71,7 @@ public class TestTransports extends TestCase {
 		config.setAddress("zmq://tcp://127.0.0.1:5678");
 		
 		final Transport transport = TransportFactory.getTransport(config,
-				new myReceiver());
+				new MyReceiver());
 		transport.connect();
 		
 		transport.send(URI.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
@@ -85,15 +89,47 @@ public class TestTransports extends TestCase {
 		final LocalTransportConfig config = new LocalTransportConfig("testMe");
 		
 		final Transport transport = LocalTransportFactory.get(config,
-				new myReceiver());
+				new MyReceiver());
 		
 		transport.send(URI.create("local:testMe"), "Hello World", null);
+	}
+
+	/**
+	 * Test Websocket transport.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testWs() throws IOException {
+		final WebsocketTransportConfig serverConfig = new WebsocketTransportConfig();
+		serverConfig.setAddress("ws://localhost:8082/ws/testServer");
+		
+		serverConfig.setServletLauncher("JettyLauncher");
+		final ObjectNode jettyParms = JOM.createObjectNode();
+		jettyParms.put("port", 8082);
+		serverConfig.put("jetty", jettyParms);
+		
+		final Transport server = WsServerTransportFactory.get(serverConfig, new MyReceiver());
+		
+		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
+		clientConfig.setId("testClient");
+		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
+		
+		final WsClientTransport client = WsClientTransportFactory.get(clientConfig, new MyReceiver());
+		client.connect();
+
+		server.send(URI.create("wsclient:testClient"), "Hi there!", null);
+		
+		client.send(URI.create("ws://localhost:8082/ws/testServer"), "Good day to you!", null);
+		
+		
 	}
 	
 	/**
 	 * The Class myReceiver.
 	 */
-	public class myReceiver implements Receiver, Handler<Receiver> {
+	public class MyReceiver implements Receiver, Handler<Receiver> {
 		
 		/*
 		 * (non-Javadoc)

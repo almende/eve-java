@@ -9,10 +9,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
+import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import com.almende.eve.transport.http.ServletLauncher;
 import com.almende.util.jackson.JOM;
@@ -26,6 +30,7 @@ public class JettyLauncher implements ServletLauncher {
 															.getName());
 	private static Server					server	= null;
 	private static ServletContextHandler	context	= null;
+	private static ServerContainer			wscontainer = null;
 	
 	/**
 	 * Inits the server.
@@ -44,6 +49,7 @@ public class JettyLauncher implements ServletLauncher {
 		
 		context.setContextPath("/");
 		server.setHandler(context);
+		wscontainer = WebSocketServerContainerInitializer.configureContext(context);
 		
 		try {
 			server.start();
@@ -73,5 +79,31 @@ public class JettyLauncher implements ServletLauncher {
 		LOG.info("Registering servlet:" + servletPath.getPath());
 		context.addServlet(new ServletHolder(servlet), servletPath.getPath()
 				+ "*");
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.http.ServletLauncher#add(javax.servlet.Servlet,
+	 * java.net.URI, com.almende.eve.config.Config)
+	 */
+	@Override
+	public void add(final ServerEndpointConfig serverConfig,
+			final ObjectNode config) {
+		// TODO: config hierarchy...
+		if (server == null) {
+			if (config != null) {
+				initServer((ObjectNode) config.get("jetty"));
+			} else {
+				initServer(JOM.createObjectNode());
+			}
+		}
+		LOG.info("Registering websocket server endpoint:" + serverConfig.getPath());
+		try {
+			wscontainer.addEndpoint(serverConfig);
+		} catch (DeploymentException e) {
+			LOG.log(Level.WARNING,"Couldn't initialize websocket server endpoint.",e);
+		}
 	}
 }

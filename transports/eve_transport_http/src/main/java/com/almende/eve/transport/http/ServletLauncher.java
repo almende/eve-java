@@ -7,6 +7,7 @@ package com.almende.eve.transport.http;
 import java.net.URI;
 
 import javax.servlet.Servlet;
+import javax.websocket.server.ServerEndpointConfig;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -32,4 +33,14 @@ public interface ServletLauncher {
 	 */
 	void add(final Servlet servlet, final URI servletPath,
 			final ObjectNode config);
+
+	/**
+	 * Adds a Websocket Server configuration, and potentially starting the container if required.
+	 * 
+	 * @param serverConfig
+	 *            the server config
+	 * @param config
+	 *            the config
+	 */
+	void add(ServerEndpointConfig serverConfig, ObjectNode config);
 }

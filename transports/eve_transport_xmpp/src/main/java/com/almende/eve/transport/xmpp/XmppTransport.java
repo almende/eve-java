@@ -45,8 +45,6 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	/**
 	 * Instantiates a new xmpp transport.
 	 * 
-	 * @param <V>
-	 *            the value type
 	 * @param config
 	 *            the config
 	 * @param handle
@@ -54,7 +52,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 * @param service
 	 *            the service
 	 */
-	public <V> XmppTransport(final XmppTransportConfig config,
+	public XmppTransport(final XmppTransportConfig config,
 			final Handler<Receiver> handle, final TransportService service) {
 		// TODO: support more parameter structures.
 		super(config.getAddress(), handle, service, config);
