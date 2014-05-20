@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,13 @@ public class DebugServlet extends HttpServlet {
 															.getSimpleName());
 	private URI					myUrl				= null;
 	
+	
+	/**
+	 * Instantiates a new eve servlet.
+	 */
+	public DebugServlet() {
+	}
+	
 	/**
 	 * Instantiates a new eve servlet.
 	 * 
@@ -48,6 +56,21 @@ public class DebugServlet extends HttpServlet {
 		if (servletUrl != null) {
 			myUrl = servletUrl;
 		}
+	}
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		String servletUrl = config.getInitParameter("ServletUrl");
+		if (servletUrl != null){
+			try {
+				myUrl = new URI(servletUrl);
+			} catch (URISyntaxException e) {
+				LOG.log(Level.WARNING,"Couldn't init servlet, url invalid. ('ServletUrl' init param)",e);
+			}
+		} else {
+			LOG.warning("Servlet init parameter 'ServletUrl' is required!");
+		}
+		super.init(config);
 	}
 	
 	/**
