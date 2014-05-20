@@ -330,6 +330,12 @@ public class DebugServlet extends HttpServlet {
 							+ "' not found. (filename:'" + filename + "')");
 				}
 				resp.flushBuffer();
+			} else {
+				resp.setContentType("text/plain");
+				resp.getWriter()
+						.println("Agent:" + id+ " is unknown!");
+				resp.getWriter().close();
+				resp.flushBuffer();
 			}
 		} else {
 			resp.setContentType("text/plain");
