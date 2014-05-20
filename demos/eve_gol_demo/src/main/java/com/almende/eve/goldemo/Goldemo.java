@@ -33,10 +33,11 @@ public class Goldemo {
 	/**
 	 * The Constant PATH.
 	 */
-	// final static String PATHodd = "local:";
-	// final static String PATHeven = "local:";
-	private static String		PATHodd		= "http://127.0.0.1:8081/agents/";
-	private static String		PATHeven	= "http://127.0.0.1:8081/agents/";
+	private static String		PATHodd		= "local:";
+	private static String		PATHeven	= "local:";
+	
+	// private static String PATHodd = "http://127.0.0.1:8081/agents/";
+	// private static String PATHeven = "http://127.0.0.1:8081/agents/";
 	
 	// final static String PATHodd = PATH;
 	// final static String PATHeven = PATH;
@@ -172,6 +173,8 @@ public class Goldemo {
 				System.out.print(ESC + "2J");
 			}
 			System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
+			System.out.println(((max_full - 1) * M * N * 8) / (runTime)
+					+ " RPCs/second (" + runTime + " sec)");
 			System.out.print("/");
 			for (int i = 0; i < M * 2; i++) {
 				System.out.print("-");

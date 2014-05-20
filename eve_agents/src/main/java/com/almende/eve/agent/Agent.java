@@ -205,9 +205,6 @@ public class Agent implements Receiver {
 				transport.register(TransportFactory.getTransport(transconfig,
 						receiver));
 			}
-			// All agents have a local transport
-			transport.register(LocalTransportFactory.get(
-					new LocalTransportConfig(agentId), receiver));
 			
 			if (onBoot) {
 				try {
@@ -218,6 +215,9 @@ public class Agent implements Receiver {
 				}
 			}
 		}
+		// All agents have a local transport
+		transport.register(LocalTransportFactory.get(
+				new LocalTransportConfig(agentId), receiver));
 	}
 	
 	@Override
