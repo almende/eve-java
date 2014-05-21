@@ -19,5 +19,6 @@
 		<module>eve_full</module>
 		<module>eve_full_embed</module>
 		<module>eve_android</module>
+		<module>eve_android_ws</module>
 	</modules>
 </project>

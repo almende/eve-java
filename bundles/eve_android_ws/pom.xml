@@ -9,16 +9,48 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-bundle-full-embed</artifactId>
+	<artifactId>eve-bundle-android-ws</artifactId>
 
-	<name>EVE Bundle Full - Embedded Jetty Server</name>
+	<name>EVE Bundle Android - Websocket Client</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
+		<android.version>4.1.1.4</android.version>
 		<maven.shade.version>2.2</maven.shade.version>
+		<jzlib.version>1.1.3</jzlib.version>
 	</properties>
 
+
+	<!-- http://randomizedsort.blogspot.nl/2011/10/configuring-maven-to-use-local-library.html -->
+	<repositories>
+		<repository>
+			<id>lib</id>
+			<url>file://${basedir}/lib</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+		</repository>
+	</repositories>
+
 	<dependencies>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jzlib</artifactId>
+			<version>${jzlib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>${android.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>support-v4</artifactId>
+			<version>r7</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
@@ -27,22 +59,12 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
-			<artifactId>eve-transport-http-jetty</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<version>${project.parent.version}</version>
-			<artifactId>eve-transport-http-debug</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<version>${project.parent.version}</version>
-			<artifactId>eve-transport-xmpp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<version>${project.parent.version}</version>
 			<artifactId>eve-scheduling-persistent</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+			<artifactId>eve-transport-http</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -53,7 +75,6 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>${maven.shade.version}</version>
 				<configuration>
-					<!-- put your configurations here -->
 				</configuration>
 				<executions>
 					<execution>
