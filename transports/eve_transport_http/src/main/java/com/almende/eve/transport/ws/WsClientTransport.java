@@ -33,6 +33,7 @@ public class WsClientTransport extends WebsocketTransport {
 	private Basic				remote		= null;
 	private URI					serverUrl	= null;
 	private String				myId		= null;
+	private ClientManager		client		= null;
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -71,16 +72,44 @@ public class WsClientTransport extends WebsocketTransport {
 	 * @param remote
 	 *            the new remote
 	 */
-	protected void registerRemote(String key, Basic remote){
+	protected void registerRemote(String key, Basic remote) {
 		this.remote = remote;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.ws.WebsocketTransport#receive(java.lang.String, java.net.URI)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.ws.WebsocketTransport#receive(java.lang.String,
+	 * java.net.URI)
 	 */
 	@Override
 	public void receive(final String body, final String id) throws IOException {
 		super.getHandle().get().receive(body, serverUrl, null);
+	}
+	
+	/**
+	 * Send.
+	 * 
+	 * @param message
+	 *            the message
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public void send(byte[] message) throws IOException {
+		send(serverUrl, message, null);
+	}
+	
+	/**
+	 * Send.
+	 * 
+	 * @param message
+	 *            the message
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public void send(String message) throws IOException {
+		send(serverUrl, message, null);
 	}
 	
 	@Override
@@ -90,6 +119,9 @@ public class WsClientTransport extends WebsocketTransport {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
 							+ receiverUri.toASCIIString());
+		}
+		if (remote == null || !isConnected()) {
+			connect();
 		}
 		if (remote != null) {
 			remote.sendText(message);
@@ -106,6 +138,9 @@ public class WsClientTransport extends WebsocketTransport {
 					"Currently it's only possible to send to the server agent directly, not other agents:"
 							+ receiverUri.toASCIIString());
 		}
+		if (remote == null || !isConnected()) {
+			connect();
+		}
 		if (remote != null) {
 			remote.sendBinary(ByteBuffer.wrap(message));
 		} else {
@@ -115,11 +150,14 @@ public class WsClientTransport extends WebsocketTransport {
 	
 	@Override
 	public void connect() throws IOException {
-		ClientManager client = ClientManager.createClient();
+		if (client == null) {
+			client = ClientManager.createClient();
+			client.setDefaultMaxSessionIdleTimeout(-1);
+		}
 		try {
-			ClientEndpointConfig cec = ClientEndpointConfig.Builder
-					.create().build();
-			cec.getUserProperties().put("address",getAddress());
+			ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
+					.build();
+			cec.getUserProperties().put("address", getAddress());
 			
 			client.connectToServer(WebsocketEndpoint.class, cec, new URI(
 					serverUrl + "?id=" + myId));
