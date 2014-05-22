@@ -231,55 +231,40 @@ public class RpcTransform implements Transform {
 	
 	private <T> void addCallback(final JSONRequest request,
 			final AsyncCallback<T> callback) {
+		if (callback == null) {
+			return;
+		}
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
-		// TODO: if JSON-RPC notifications are going to be supported in the
-		// future, this may be skipped if callback == null;
 		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>() {
 			@Override
 			public void onSuccess(final JSONResponse response) {
-				if (callback == null) {
-					final Exception err = response.getError();
-					if (err != null) {
-						LOG.log(Level.WARNING,
-								"async RPC call failed, and no callback handler available.",
-								err);
+				final Exception err = response.getError();
+				if (err != null) {
+					callback.onFailure(err);
+				}
+				final TypeUtil<T> type = TypeUtil.resolve(callback);
+				
+				if (type != null
+						&& !type.getJavaType().getRawClass().equals(Void.class)) {
+					try {
+						final T res = type.inject(response.getResult());
+						callback.onSuccess(res);
+					} catch (final ClassCastException cce) {
+						callback.onFailure(new JSONRPCException(
+								"Incorrect return type received for JSON-RPC call:"
+										+ request.getMethod(), cce));
 					}
-				} else {
-					final Exception err = response.getError();
-					if (err != null) {
-						callback.onFailure(err);
-					}
-					final TypeUtil<T> type = TypeUtil.resolve(callback);
 					
-					if (type != null
-							&& !type.getJavaType().getRawClass()
-									.equals(Void.class)) {
-						try {
-							final T res = type.inject(response.getResult());
-							callback.onSuccess(res);
-						} catch (final ClassCastException cce) {
-							callback.onFailure(new JSONRPCException(
-									"Incorrect return type received for JSON-RPC call:"
-											+ request.getMethod(), cce));
-						}
-						
-					} else {
-						callback.onSuccess(null);
-					}
+				} else {
+					callback.onSuccess(null);
 				}
 			}
 			
 			@Override
 			public void onFailure(final Exception exception) {
-				if (callback == null) {
-					LOG.log(Level.WARNING,
-							"async RPC call failed, and no callback handler available.",
-							exception);
-				} else {
-					callback.onFailure(exception);
-				}
+				callback.onFailure(exception);
 			}
 		};
 		
