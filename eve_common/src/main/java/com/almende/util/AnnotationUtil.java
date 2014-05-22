@@ -78,6 +78,21 @@ public final class AnnotationUtil {
 	private static Map<String, AnnotatedClass>	cache					= new ConcurrentHashMap<String, AnnotatedClass>();
 	private static Map<String, AnnotatedClass>	cacheIncludingObject	= new ConcurrentHashMap<String, AnnotatedClass>();
 	
+	/**
+	 * The Constant HASMETHODHANDLES, Does this VM support MethodHandles?
+	 */
+	public static final boolean					HASMETHODHANDLES;
+	
+	static {
+		boolean check = true;
+		try {
+			Class.forName("java.lang.invoke.MethodHandle", false, null);
+		} catch (Exception e) {
+			check = false;
+		}
+		HASMETHODHANDLES = check;
+	}
+	
 	private AnnotationUtil() {
 	};
 	
@@ -412,7 +427,7 @@ public final class AnnotationUtil {
 		/** The parameters. */
 		private final List<AnnotatedParam>	parameters			= new ArrayList<AnnotatedParam>();
 		
-		private final MethodHandle			methodHandle;
+		private MethodHandle				methodHandle;
 		
 		/**
 		 * Instantiates a new annotated method.
@@ -433,21 +448,23 @@ public final class AnnotationUtil {
 			genericReturnType = method.getGenericReturnType();
 			merge(method);
 			
-			MethodType newType;
-			if (Modifier.isStatic(method.getModifiers())) {
-				newType = MethodType.genericMethodType(parameters.size(),
-						method.isVarArgs());
-			} else {
-				newType = MethodType.genericMethodType(parameters.size() + 1,
-						method.isVarArgs());
+			if (HASMETHODHANDLES) {
+				MethodType newType;
+				if (Modifier.isStatic(method.getModifiers())) {
+					newType = MethodType.genericMethodType(parameters.size(),
+							method.isVarArgs());
+				} else {
+					newType = MethodType.genericMethodType(
+							parameters.size() + 1, method.isVarArgs());
+				}
+				if (method.getReturnType() == Void.class) {
+					newType = newType.changeReturnType(void.class);
+				}
+				methodHandle = new ConstantCallSite(MethodHandles.lookup()
+						.unreflect(method).asType(newType)
+						.asSpreader(Object[].class, newType.parameterCount()))
+						.dynamicInvoker();
 			}
-			if (method.getReturnType() == Void.class) {
-				newType = newType.changeReturnType(void.class);
-			}
-			methodHandle = new ConstantCallSite(MethodHandles.lookup()
-					.unreflect(method).asType(newType)
-					.asSpreader(Object[].class, newType.parameterCount()))
-					.dynamicInvoker();
 		}
 		
 		/**

@@ -161,10 +161,10 @@ public class RpcTransform implements Transform {
 							callback.onSuccess(response);
 						}
 					}
-				} else {
-					LOG.log(Level.WARNING, "Received non-JSON message:'" + msg
-							+ "'");
 				}
+			} else {
+				LOG.log(Level.WARNING, "Received non-JSON message:'" + msg
+						+ "'");
 			}
 		} catch (final Exception e) {
 			// generate JSON error response, skipped if it was an incoming

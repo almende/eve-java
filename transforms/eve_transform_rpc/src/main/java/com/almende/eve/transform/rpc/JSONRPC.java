@@ -47,19 +47,28 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
+
 final class JSONRPC {
-	private static final Logger		LOG				= Logger.getLogger(JSONRPC.class
+	private static final Logger	LOG					= Logger.getLogger(JSONRPC.class
 															.getName());
-	private static final boolean	USEMETHODHANDLE	= false;
+	private static boolean		useMethodHandles	= false;
 	
 	static {
-		if (USEMETHODHANDLE) {
+		if (AnnotationUtil.HASMETHODHANDLES && useMethodHandles) {
 			LOG.log(Level.FINE, "Using MethodHandle i.s.o. plain reflection!");
 		} else {
 			LOG.log(Level.FINE, "Using plain reflection i.s.o. MethodHandle!");
 		}
 	}
 	
+	public static boolean isUseMethodHandles() {
+		return useMethodHandles;
+	}
+
+	public static void setUseMethodHandles(boolean useMethodHandles) {
+		JSONRPC.useMethodHandles = useMethodHandles;
+	}
+
 	/**
 	 * Instantiates a new jsonrpc.
 	 */
@@ -166,7 +175,7 @@ final class JSONRPC {
 			final Method method = annotatedMethod.getActualMethod();
 			
 			Object result;
-			if (USEMETHODHANDLE) {
+			if (useMethodHandles) {
 				final Object[] params = castParams(realDest,
 						request.getParams(), annotatedMethod.getParams(),
 						requestParams);
