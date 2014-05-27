@@ -105,7 +105,6 @@ public class MemoryState extends AbstractState<Serializable> implements State {
 	public Serializable get(final String key) {
 		try {
 			return properties.get(key);
-			// return ClassUtil.cloneThroughSerialize(properties.get(key));
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Couldn't clone object: " + key
 					+ ", returning pointer to original object.", e);

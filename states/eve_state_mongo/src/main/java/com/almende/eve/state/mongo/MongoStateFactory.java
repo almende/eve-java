@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating MemoryState objects.
  */
-public class MongoStateFactory {
+public final class MongoStateFactory {
+	
+	private MongoStateFactory() {
+	}
 	
 	/**
 	 * Gets the state.

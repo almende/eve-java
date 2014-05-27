@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating SimpleScheduler objects.
  */
-public class SimpleSchedulerFactory {
+public final class SimpleSchedulerFactory {
+	
+	private SimpleSchedulerFactory() {
+	}
+	
 	/**
 	 * Gets the scheduler.
 	 * 

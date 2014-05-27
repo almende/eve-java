@@ -97,12 +97,9 @@ public class WebsocketEndpoint extends Endpoint {
 					CloseReason.CloseCodes.CLOSED_ABNORMALLY,
 					"Timeout on Socket!"));
 		}
-		;
 		if (throwable instanceof EOFException) {
 			transport.onClose(session, new CloseReason(
 					CloseReason.CloseCodes.CLOSED_ABNORMALLY, "EOF!"));
 		}
-		;
-		
 	}
 }

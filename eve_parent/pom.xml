@@ -79,6 +79,7 @@
 		<maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
 		<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
+		<maven-sonar-plugin.version>2.2</maven-sonar-plugin.version>
 		<gpg.version>1.5</gpg.version>
 		<junit.version>4.11</junit.version>
 		<java.version>1.7</java.version>
@@ -144,6 +145,11 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${maven-sonar-plugin.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

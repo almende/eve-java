@@ -41,8 +41,8 @@ public class PersistentScheduler extends SimpleScheduler {
 		super(params, handle);
 		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(
 				params);
-		if (clock == null) {
-			clock = new RunnableClock();
+		if (getClock() == null) {
+			setClock(new RunnableClock());
 		}
 		
 		final ObjectNode stateConfig = config.getState();
@@ -60,10 +60,10 @@ public class PersistentScheduler extends SimpleScheduler {
 	
 	private void run(final TaskEntry entry) {
 		if (entry != null) {
-			if (clock == null) {
-				clock = new RunnableClock();
+			if (getClock() == null) {
+				setClock(new RunnableClock());
 			}
-			clock.requestTrigger(entry.getTaskId(), entry.getDue(),
+			getClock().requestTrigger(entry.getTaskId(), entry.getDue(),
 					new Runnable() {
 						
 						@Override
@@ -103,13 +103,13 @@ public class PersistentScheduler extends SimpleScheduler {
 	 */
 	@Override
 	public void cancel(final String id) {
-		if (clock == null) {
-			clock = new RunnableClock();
+		if (getClock() == null) {
+			setClock(new RunnableClock());
 		}
 		if (state != null) {
 			state.remove(id);
 		}
-		clock.cancel(id);
+		getClock().cancel(id);
 	}
 	
 	/*
@@ -119,13 +119,13 @@ public class PersistentScheduler extends SimpleScheduler {
 	 */
 	@Override
 	public void clear() {
-		if (clock == null) {
-			clock = new RunnableClock();
+		if (getClock() == null) {
+			setClock(new RunnableClock());
 		}
 		if (state != null) {
 			state.clear();
 		}
-		clock.clear();
+		getClock().clear();
 	}
 }
 

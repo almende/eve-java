@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating RpcTransform objects.
  */
-public class RpcTransformFactory {
+public final class RpcTransformFactory {
+	
+	private RpcTransformFactory() {
+	}
+	
 	/**
 	 * Gets the transport.
 	 * 

@@ -13,7 +13,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author ludo
  */
-public class TransportFactory {
+public final class TransportFactory {
+	
+	private TransportFactory() {
+	}
 	
 	/**
 	 * Gets the transport.

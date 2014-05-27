@@ -39,7 +39,7 @@ public class ZmqTransport extends AbstractTransport {
 	private Thread									listeningThread;
 	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
-	private static final AsyncCallbackQueue<String>	callbacks			= new AsyncCallbackQueue<String>();
+	private static final AsyncCallbackQueue<String>	CALLBACKS			= new AsyncCallbackQueue<String>();
 	private final List<String>						protocols			= Arrays.asList("zmq");
 	
 	/**
@@ -264,7 +264,7 @@ public class ZmqTransport extends AbstractTransport {
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
-			final AsyncCallback<String> callback = callbacks.pull(key);
+			final AsyncCallback<String> callback = CALLBACKS.pull(key);
 			if (callback != null) {
 				callback.onSuccess(body);
 			} else {
@@ -276,7 +276,7 @@ public class ZmqTransport extends AbstractTransport {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key) && doesAuthentication) {
 				final SyncCallback<String> callback = new SyncCallback<String>();
-				callbacks.push(key, "", callback);
+				CALLBACKS.push(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
 						.getTime().getBytes(), null);
 				

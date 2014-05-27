@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class WebsocketService implements TransportService {
 	private static final Logger					LOG			= Logger.getLogger(WebsocketService.class
 																	.getName());
-	private static final WebsocketService		singleton	= new WebsocketService();
+	private static final WebsocketService		SINGLETON	= new WebsocketService();
 	private final Map<URI, WebsocketTransport>	transports	= new HashMap<URI, WebsocketTransport>();
 	
 	/**
@@ -46,7 +46,7 @@ public class WebsocketService implements TransportService {
 	 * @return the instance by params
 	 */
 	public static WebsocketService getInstanceByParams(final ObjectNode params) {
-		return singleton;
+		return SINGLETON;
 	}
 	
 	/*
@@ -185,6 +185,6 @@ public class WebsocketService implements TransportService {
 	 * @return the ws client transport
 	 */
 	public static WebsocketTransport get(final URI address) {
-		return singleton.getTransport(address);
+		return SINGLETON.getTransport(address);
 	}
 }

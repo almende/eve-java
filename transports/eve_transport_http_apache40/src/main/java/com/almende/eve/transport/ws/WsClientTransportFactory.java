@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating WebsocketTransport objects.
  */
-public class WsClientTransportFactory {
+public final class WsClientTransportFactory {
+	
+	private WsClientTransportFactory() {
+	}
+	
 	/**
 	 * Gets the transport.
 	 * 

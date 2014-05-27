@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating Transform objects.
  */
-public class TransformFactory {
+public final class TransformFactory {
+	
+	private TransformFactory() {
+	}
 	
 	/**
 	 * Gets the transport.

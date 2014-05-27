@@ -35,12 +35,10 @@ public final class JSONResponse extends JSONMessage {
 	 * 
 	 * @param json
 	 *            the json
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public JSONResponse(final String json) throws JSONRPCException, IOException {
+	public JSONResponse(final String json) throws IOException {
 		final ObjectMapper mapper = JOM.getInstance();
 		try {
 			init(mapper.readValue(json, ObjectNode.class));
@@ -55,10 +53,8 @@ public final class JSONResponse extends JSONMessage {
 	 * 
 	 * @param response
 	 *            the response
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
 	 */
-	public JSONResponse(final ObjectNode response) throws JSONRPCException {
+	public JSONResponse(final ObjectNode response) {
 		init(response);
 	}
 	
@@ -111,10 +107,8 @@ public final class JSONResponse extends JSONMessage {
 	 * 
 	 * @param response
 	 *            the response
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
 	 */
-	private void init(final ObjectNode response) throws JSONRPCException {
+	private void init(final ObjectNode response) {
 		if (response == null || response.isNull()) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Response is null");

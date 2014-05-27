@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating HttpTransport objects.
  */
-public class HttpTransportFactory {
+public final class HttpTransportFactory {
+	
+	private HttpTransportFactory() {
+	}
 	
 	/**
 	 * Gets the transport.

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class XmppService implements TransportService {
 	private final Map<URI, Transport>	instances		= new ConcurrentHashMap<URI, Transport>();
 	private boolean						doesShortcut	= true;
-	private static final XmppService	singleton		= new XmppService();
+	private static final XmppService	SINGLETON		= new XmppService();
 	
 	// Needed to force Android loading the ReconnectionManager....
 	static {
@@ -34,7 +34,6 @@ public class XmppService implements TransportService {
 			// problem loading reconnection manager
 		}
 		SmackConfiguration.setPacketReplyTimeout(15000);
-		// SmackConfiguration.setKeepAliveInterval(-1);
 	}
 	
 	/**
@@ -47,9 +46,9 @@ public class XmppService implements TransportService {
 	public static XmppService getInstanceByParams(final ObjectNode params) {
 		// TODO: return different instance if doesShortcut does not agree with
 		// current singleton.
-		singleton.doesShortcut = new XmppTransportConfig(params)
+		SINGLETON.doesShortcut = new XmppTransportConfig(params)
 				.getDoShortcut();
-		return singleton;
+		return SINGLETON;
 	}
 	
 	/*

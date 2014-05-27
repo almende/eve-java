@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LocalService extends AbstractTransport implements TransportService {
 	private static final Logger					LOG			= Logger.getLogger(LocalService.class
 																	.getName());
-	private static final Map<URI, LocalService>	instances	= new ConcurrentHashMap<URI, LocalService>();
-	private static final LocalService			singleton	= new LocalService();
+	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>();
+	private static final LocalService			SINGLETON	= new LocalService();
 	
 	/**
 	 * Instantiates a new local transport.
@@ -38,7 +38,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 */
 	public LocalService(final URI address, final Handler<Receiver> handle,
 			final ObjectNode params) {
-		super(address, handle, singleton, params);
+		super(address, handle, SINGLETON, params);
 	}
 	
 	private LocalService() {
@@ -53,7 +53,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 * @return the instance by params
 	 */
 	public static LocalService getInstanceByParams(final ObjectNode params) {
-		return singleton;
+		return SINGLETON;
 	}
 	
 	/*
@@ -63,7 +63,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 */
 	@Override
 	public LocalService getLocal(final URI address) {
-		return instances.get(address);
+		return INSTANCES.get(address);
 	}
 	
 	/*
@@ -88,7 +88,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 		LocalService result = getLocal(address);
 		if (result == null) {
 			result = new LocalService(address, newHandle, params);
-			instances.put(address, result);
+			INSTANCES.put(address, result);
 		} else {
 			result.getHandle().update(newHandle);
 		}
@@ -156,7 +156,7 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 */
 	@Override
 	public void delete(final Transport instance) {
-		instances.remove(instance.getAddress());
+		INSTANCES.remove(instance.getAddress());
 	}
 	
 }

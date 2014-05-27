@@ -50,12 +50,12 @@ public class Agent implements Receiver {
 	private String				agentId		= null;
 	private AgentConfig			config		= null;
 	private State				state		= null;
-	private final Router				transport	= new Router();
+	private final Router		transport	= new Router();
 	private Scheduler			scheduler	= null;
-	protected RpcTransform		rpc			= RpcTransformFactory
+	private RpcTransform		rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
 															this));
-	protected Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
+	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
 	
 	/**
 	 * Instantiates a new agent.
@@ -102,6 +102,34 @@ public class Agent implements Receiver {
 		loadConfig(onBoot);
 	}
 	
+	/**
+	 * @return the rpc
+	 */
+	protected RpcTransform getRpc() {
+		return rpc;
+	}
+
+	/**
+	 * @param rpc the rpc to set
+	 */
+	protected void setRpc(RpcTransform rpc) {
+		this.rpc = rpc;
+	}
+
+	/**
+	 * @return the receiver
+	 */
+	protected Handler<Receiver> getReceiver() {
+		return receiver;
+	}
+
+	/**
+	 * @param receiver the receiver to set
+	 */
+	protected void setReceiver(Handler<Receiver> receiver) {
+		this.receiver = receiver;
+	}
+
 	/**
 	 * Sets the config.
 	 * 

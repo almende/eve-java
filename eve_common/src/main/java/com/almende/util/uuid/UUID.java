@@ -62,14 +62,14 @@ public class UUID implements Comparable<UUID>, Externalizable, Cloneable {
 	 * 
 	 * @serial
 	 */
-	public long			time;
+	private long		time;
 	
 	/**
 	 * The clock sequence and node field of the UUID.
 	 * 
 	 * @serial
 	 */
-	public long			clockSeqAndNode;
+	private long		clockSeqAndNode;
 	
 	/**
 	 * Constructor for UUID. Constructs a new, unique UUID.

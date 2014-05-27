@@ -20,8 +20,8 @@ public interface Transport extends Capability {
 	/**
 	 * The Constant TYPEUTIL.
 	 */
-	static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
-															};
+	TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
+													};
 	
 	/**
 	 * Send a message to an other agent.

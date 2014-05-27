@@ -21,12 +21,16 @@ import java.util.concurrent.TimeoutException;
  */
 public class AsyncCallbackQueue<T> {
 	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>();
+	// FIXME: provide some means for the Appengine implementation of
+	// ThreadManager.
 	private static ScheduledThreadPoolExecutor	scheduler	= new ScheduledThreadPoolExecutor(
 																	1,
 																	Executors
 																			.defaultThreadFactory());
-	// FIXME: provide some means for the Appengine implementation of
-	// ThreadManager.
+	
+	/** timeout in seconds */
+	// TODO: make the timeout customizable in eve.yaml
+	private static final int					TIMEOUT		= 30;
 	
 	static {
 		try {
@@ -34,12 +38,10 @@ public class AsyncCallbackQueue<T> {
 					"setRemoveOnCancelPolicy", Boolean.class);
 			scheduler.setRemoveOnCancelPolicy(true);
 		} catch (final NoSuchMethodException e) {
+			// Do nothing, Java 6 environment
 		}
 	}
-	/** timeout in seconds */
-	private final int							timeout		= 30;
 	
-	// TODO: make the timeout customizable in eve.yaml
 	/**
 	 * Append a callback to the queue.
 	 * 
@@ -77,7 +79,7 @@ public class AsyncCallbackQueue<T> {
 									+ "': " + description));
 				}
 			}
-		}, timeout, TimeUnit.SECONDS);
+		}, TIMEOUT, TimeUnit.SECONDS);
 		queue.put(id, handler);
 	}
 	

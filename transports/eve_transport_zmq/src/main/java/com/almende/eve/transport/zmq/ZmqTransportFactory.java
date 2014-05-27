@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating ZmqTransport objects.
  */
-public class ZmqTransportFactory {
+public final class ZmqTransportFactory {
+	
+	private ZmqTransportFactory() {
+	}
+	
 	/**
 	 * Gets the transport.
 	 * 

@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author ludo
  */
-public class StateFactory {
+public final class StateFactory {
+	
+	private StateFactory() {
+	}
 	
 	/**
 	 * Gets the state.

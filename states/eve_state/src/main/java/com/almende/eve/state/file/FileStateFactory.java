@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating FileState objects.
  */
-public class FileStateFactory {
+public final class FileStateFactory {
+	
+	private FileStateFactory() {
+	}
 	
 	/**
 	 * Gets the state.

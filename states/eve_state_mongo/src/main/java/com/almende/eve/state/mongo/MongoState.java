@@ -260,7 +260,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		JsonNode result = null;
 		try {
 			result = properties.put(key, value);
-			updateProperties(false); // updateField(key, value);
+			updateProperties(false);
 		} catch (final UpdateConflictException e) {
 			LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "="
 					+ value + "]");
@@ -300,12 +300,12 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
 				properties.put(key, newVal);
-				result = updateProperties(false); // updateField(key, newVal);
+				result = updateProperties(false);
 			}
 		} catch (final UpdateConflictException e) {
 			LOG.log(Level.WARNING, e.getMessage());
 			reloadProperties();
-			// recur if update conflict occurs
+			// retry if update conflict occurs
 			locPutIfUnchanged(key, newVal, oldVal);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "locPutIfUnchanged error", e);

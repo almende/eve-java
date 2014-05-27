@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating CouchState objects.
  */
-public class CouchStateFactory {
+public final class CouchStateFactory {
+	
+	private CouchStateFactory() {
+	}
+	
 	/**
 	 * Gets the state.
 	 * 

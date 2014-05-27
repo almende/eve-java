@@ -27,12 +27,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class WakeService implements Capability, CapabilityService {
 	private static final Logger						LOG			= Logger.getLogger(WakeService.class
 																		.getName());
-	private static final Map<String, WakeService>	services	= new HashMap<String, WakeService>();
+	private static final Map<String, WakeService>	SERVICES	= new HashMap<String, WakeService>();
 	private ObjectNode								myParams	= null;
 	private Map<String, WakeEntry>					agents		= new HashMap<String, WakeEntry>();
 	
 	private State									state		= null;
-	private static final WakeService				singleton	= new WakeService();
+	private static final WakeService				SINGLETON	= new WakeService();
 	
 	/**
 	 * Instantiates a new wake service.
@@ -50,7 +50,7 @@ public class WakeService implements Capability, CapabilityService {
 	public WakeService(final ObjectNode params) {
 		myParams = params;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
-		services.put(state.getId(), this);
+		SERVICES.put(state.getId(), this);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public class WakeService implements Capability, CapabilityService {
 	public void setMyParams(final ObjectNode myParams) {
 		this.myParams = myParams;
 		state = StateFactory.getState((ObjectNode) myParams.get("state"));
-		services.put(state.getId(), this);
+		SERVICES.put(state.getId(), this);
 	}
 	
 	/**
@@ -210,7 +210,7 @@ public class WakeService implements Capability, CapabilityService {
 	 * @return the instance by params
 	 */
 	public static WakeService getInstanceByParams(final ObjectNode params) {
-		return singleton;
+		return SINGLETON;
 	}
 	
 	/*
@@ -227,8 +227,8 @@ public class WakeService implements Capability, CapabilityService {
 		final Config config = new Config(params);
 		final String id = config.get("state", "id");
 		WakeService service = null;
-		if (services.containsKey(id)) {
-			service = services.get(id);
+		if (SERVICES.containsKey(id)) {
+			service = SERVICES.get(id);
 		}
 		service = new WakeService(params);
 		

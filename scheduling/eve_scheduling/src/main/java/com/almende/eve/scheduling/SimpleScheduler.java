@@ -26,7 +26,7 @@ public class SimpleScheduler implements Scheduler {
 														.getName());
 	private URI					schedulerUrl	= null;
 	private Handler<Receiver>	handle			= null;
-	protected Clock				clock			= null;
+	private Clock				clock			= null;
 	private ObjectNode			myParams		= null;
 	
 	/**
@@ -137,6 +137,13 @@ public class SimpleScheduler implements Scheduler {
 		return clock;
 	}
 	
+	/**
+	 * @param clock the clock to set
+	 */
+	protected void setClock(Clock clock) {
+		this.clock = clock;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

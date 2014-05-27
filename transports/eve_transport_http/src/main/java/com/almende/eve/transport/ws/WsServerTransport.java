@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.CloseReason;
@@ -25,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WebsocketTransport.
  */
 public class WsServerTransport extends WebsocketTransport {
-	private final HashMap<URI, Basic>	remotes	= new HashMap<URI, Basic>();
+	private final Map<URI, Basic>	remotes	= new HashMap<URI, Basic>();
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -104,8 +105,8 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final String message,
+			final String tag) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
 			final Basic remote = remotes.get(receiverUri);
 			remote.sendText(message);
@@ -124,8 +125,8 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message, final String tag)
-			throws IOException {
+	public void send(final URI receiverUri, final byte[] message,
+			final String tag) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
 			final Basic remote = remotes.get(receiverUri);
 			remote.sendBinary(ByteBuffer.wrap(message));

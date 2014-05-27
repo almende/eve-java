@@ -51,10 +51,10 @@ public final class ApacheHttpClient {
 		
 		// Allow self-signed SSL certificates:
 		try {
-			final SSLContextBuilder SSLbuilder = new SSLContextBuilder();
-			SSLbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+			final SSLContextBuilder sslbuilder = new SSLContextBuilder();
+			sslbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 			final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-					SSLbuilder.build(),
+					sslbuilder.build(),
 					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			
 			builder.setSSLSocketFactory(sslsf);

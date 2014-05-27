@@ -440,7 +440,7 @@ public final class AnnotationUtil {
 		 *             the wrong method type exception
 		 */
 		public AnnotatedMethod(final Method method)
-				throws IllegalAccessException, WrongMethodTypeException {
+				throws IllegalAccessException {
 			this.method = method;
 			method.setAccessible(true);
 			name = method.getName();

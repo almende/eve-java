@@ -24,8 +24,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 final class NamespaceUtil {
 	
-	private static final Map<String, AnnotatedMethod[]>	cache		= new HashMap<String, AnnotatedMethod[]>();
-	private static final NamespaceUtil					instance	= new NamespaceUtil();
+	private static final Map<String, AnnotatedMethod[]>	CACHE		= new HashMap<String, AnnotatedMethod[]>();
+	private static final NamespaceUtil					INSTANCE	= new NamespaceUtil();
 	private static final Pattern						PATTERN		= Pattern
 																			.compile("\\.[^.]+$");
 	
@@ -54,7 +54,7 @@ final class NamespaceUtil {
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
 		
-		return instance._get(destination, path);
+		return INSTANCE._get(destination, path);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ final class NamespaceUtil {
 			final String path = steps + "."
 					+ method.getAnnotation(Namespace.class).value();
 			methods[methods.length - 1] = method;
-			cache.put(path, Arrays.copyOf(methods, methods.length));
+			CACHE.put(path, Arrays.copyOf(methods, methods.length));
 			
 			final Object newDest = method.getActualMethod().invoke(destination,
 					(Object[]) null);
@@ -119,23 +119,23 @@ final class NamespaceUtil {
 			reducedPath = matcher.replaceFirst("");
 			reducedMethod = matcher.group().substring(1);
 		}
-		if (!cache.containsKey(reducedPath)) {
+		if (!CACHE.containsKey(reducedPath)) {
 			final AnnotatedMethod[] methods = new AnnotatedMethod[1];
 			final String newSteps = destination.getClass().getName();
-			cache.put("", new AnnotatedMethod[0]);
+			CACHE.put("", new AnnotatedMethod[0]);
 			populateCache(destination, newSteps, methods);
 		}
-		if (!cache.containsKey(reducedPath)) {
+		if (!CACHE.containsKey(reducedPath)) {
 			try {
 				throw new IllegalStateException("Non resolveable path given:'"
 						+ path + "' \n checked:"
-						+ JOM.getInstance().writeValueAsString(cache));
+						+ JOM.getInstance().writeValueAsString(CACHE));
 			} catch (final JsonProcessingException e) {
 				throw new IllegalStateException("Non resolveable path given:'"
-						+ path + "' \n checked:" + cache);
+						+ path + "' \n checked:" + CACHE);
 			}
 		}
-		final AnnotatedMethod[] methodPath = cache.get(reducedPath);
+		final AnnotatedMethod[] methodPath = CACHE.get(reducedPath);
 		Object newDestination = destination;
 		for (final AnnotatedMethod method : methodPath) {
 			if (method != null) {

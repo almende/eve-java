@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ZmqService implements TransportService {
 	private final Map<URI, Transport>	instances		= new ConcurrentHashMap<URI, Transport>();
 	private boolean						doesShortcut	= true;
-	private static final ZmqService		singleton		= new ZmqService();
+	private static final ZmqService		SINGLETON		= new ZmqService();
 	
 	/**
 	 * Gets the instance by params.
@@ -34,8 +34,8 @@ public class ZmqService implements TransportService {
 	public static ZmqService getInstanceByParams(final ObjectNode params) {
 		// TODO: return different instance if doesShortcut does not agree with
 		// current singleton.
-		singleton.doesShortcut = new ZmqTransportConfig(params).getDoShortcut();
-		return singleton;
+		SINGLETON.doesShortcut = new ZmqTransportConfig(params).getDoShortcut();
+		return SINGLETON;
 	}
 	
 	/*

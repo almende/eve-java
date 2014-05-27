@@ -202,6 +202,7 @@ final class JSONRPC {
 			resp.setResult(result);
 		} catch (final JSONRPCException err) {
 			resp.setError(err);
+			//TODO: Can this be reduced to Exception? Which Errors do we want to catch?
 		} catch (final Throwable err) {
 			final Throwable cause = err.getCause();
 			if (cause instanceof JSONRPCException) {

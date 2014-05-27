@@ -22,7 +22,7 @@ public interface Scheduler extends Capability {
 	 *            the due
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
-	public String schedule(Object msg, final DateTime due);
+	String schedule(Object msg, final DateTime due);
 	
 	/**
 	 * Cancel task with given id.
@@ -30,11 +30,11 @@ public interface Scheduler extends Capability {
 	 * @param id
 	 *            the id
 	 */
-	public void cancel(String id);
+	void cancel(String id);
 	
 	/**
 	 * Cancel all scheduled tasks, clear queue.
 	 */
-	public void clear();
+	void clear();
 	
 }

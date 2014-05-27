@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating XmppTransport objects.
  */
-public class XmppTransportFactory {
+public final class XmppTransportFactory {
+	
+	private XmppTransportFactory() {
+	}
+	
 	/**
 	 * Gets the transport.
 	 * 

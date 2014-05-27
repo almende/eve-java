@@ -10,7 +10,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A factory for creating WakeService objects.
  */
-public class WakeServiceFactory {
+public final class WakeServiceFactory {
+	
+	private WakeServiceFactory() {
+	}
 	
 	/**
 	 * Gets the.
