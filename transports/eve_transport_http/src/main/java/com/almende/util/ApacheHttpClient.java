@@ -104,6 +104,7 @@ public final class ApacheHttpClient {
 		httpClient = builder.build();
 	}
 	
+	
 	/**
 	 * Gets the.
 	 * 

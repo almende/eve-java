@@ -7,11 +7,12 @@
 		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eve-transport-http</artifactId>
-	<name>EVE Transport HTTP</name>
+	<artifactId>eve-transport-http-common</artifactId>
+	<name>EVE Transport HTTP - Common HTTP artifacts</name>
 
 	<properties>
-		<httpclient.version>4.3.3</httpclient.version>
+		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+		<ws.version>1.0</ws.version>
 	</properties>
 
 	<dependencies>
@@ -21,14 +22,14 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-transport-http-common</artifactId>
-			<version>${project.parent.version}</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javax.servlet-api.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>${ws.version}</version>
 		</dependency>
 	</dependencies>
 </project>

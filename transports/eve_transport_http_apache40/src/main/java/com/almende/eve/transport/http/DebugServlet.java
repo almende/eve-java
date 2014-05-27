@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.almende.eve.transport.http.HttpService;
-import com.almende.eve.transport.http.HttpTransport;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.StreamingUtil;

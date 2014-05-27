@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,9 +20,6 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
  * The Class WebsocketEndpoint.
@@ -42,14 +41,12 @@ public class WebsocketEndpoint extends Endpoint {
 		final URI address = (URI) config.getUserProperties().get("address");
 		transport = WebsocketService.get(address);
 		
-		final URI requestURI = session.getRequestURI();
-		final List<NameValuePair> queryparms = URLEncodedUtils.parse(
-				requestURI, "UTF-8");
-		
+		Map<String,List<String>> queryparms = session.getRequestParameterMap();
+
 		String remoteId = null;
-		for (final NameValuePair param : queryparms) {
-			if (param.getName().equals("id")) {
-				remoteId = param.getValue();
+		for (final Entry<String,List<String>> param : queryparms.entrySet()) {
+			if (param.getKey().equals("id")) {
+				remoteId = param.getValue().get(0);
 			}
 		}
 		if (remoteId != null) {
