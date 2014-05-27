@@ -104,7 +104,7 @@ public class WsServerTransport extends WebsocketTransport {
 			remote.flushBatch();
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
-					+ " is currently not connected.");
+					+ " is currently not connected. ("+getAddress()+" / "+remotes.keySet()+")");
 		}
 	}
 	

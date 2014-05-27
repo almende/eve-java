@@ -118,7 +118,7 @@ public class WsClientTransport extends WebsocketTransport {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
-							+ receiverUri.toASCIIString());
+							+ receiverUri.toASCIIString() + " serverUrl:"+serverUrl.toASCIIString());
 		}
 		if (remote == null || !isConnected()) {
 			connect();

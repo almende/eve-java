@@ -47,7 +47,7 @@ public class Agent implements Receiver {
 	private String				agentId		= null;
 	private AgentConfig			config		= null;
 	private State				state		= null;
-	private Router				transport	= null;
+	private Router				transport	= new Router();
 	private Scheduler			scheduler	= null;
 	protected RpcTransform		rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
@@ -159,8 +159,44 @@ public class Agent implements Receiver {
 	
 	protected void loadConfig(final boolean onBoot) {
 		agentId = config.getId();
-		
-		final ObjectNode schedulerConfig = config.getScheduler();
+		loadScheduler(config.getScheduler());
+		loadState(config.getState());
+		loadTransports(config.getTransport(), onBoot);
+		// All agents have a local transport
+		transport.register(LocalTransportFactory.get(
+				new LocalTransportConfig(agentId), receiver));
+	}
+	
+	@Override
+	public void receive(final Object msg, final URI senderUrl, final String tag) {
+		final JSONResponse response = rpc.invoke(msg, senderUrl);
+		if (response != null) {
+			try {
+				transport.send(senderUrl, response.toString(), tag);
+			} catch (final IOException e) {
+				LOG.log(Level.WARNING, "Couldn't send message", e);
+			}
+		}
+	}
+	
+	/**
+	 * Sets the scheduler.
+	 * 
+	 * @param scheduler
+	 *            the new scheduler
+	 */
+	@JsonIgnore
+	public void setScheduler(final Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+	
+	/**
+	 * Load scheduler.
+	 * 
+	 * @param schedulerConfig
+	 *            the scheduler config
+	 */
+	public void loadScheduler(final ObjectNode schedulerConfig){
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
@@ -173,7 +209,37 @@ public class Agent implements Receiver {
 			scheduler = SchedulerFactory
 					.getScheduler(schedulerConfig, receiver);
 		}
-		final ObjectNode sc = config.getState();
+	}
+	
+	/**
+	 * Gets the scheduler.
+	 * 
+	 * @return the scheduler
+	 */
+	@Namespace("scheduler")
+	@JsonIgnore
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
+	
+	/**
+	 * Sets the state.
+	 * 
+	 * @param state
+	 *            the new state
+	 */
+	@JsonIgnore
+	public void setState(final State state) {
+		this.state = state;
+	}
+	
+	/**
+	 * Load state.
+	 * 
+	 * @param sc
+	 *            the sc
+	 */
+	public void loadState(final ObjectNode sc){
 		if (sc != null) {
 			final StateConfig stateConfig = new StateConfig(sc);
 			if (agentId != null && stateConfig.getId() == null) {
@@ -181,9 +247,28 @@ public class Agent implements Receiver {
 			}
 			state = StateFactory.getState(stateConfig);
 		}
-		transport = new Router();
-		
-		final JsonNode transportConfig = config.getTransport();
+	}
+	
+	/**
+	 * Gets the state.
+	 * 
+	 * @return the state
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	@JsonIgnore
+	public State getState() {
+		return state;
+	}
+	
+	/**
+	 * Load transport.
+	 * 
+	 * @param transportConfig
+	 *            the transport config
+	 * @param onBoot
+	 *            the on boot
+	 */
+	public void loadTransports(final JsonNode transportConfig, final boolean onBoot){
 		if (transportConfig != null) {
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
@@ -215,65 +300,6 @@ public class Agent implements Receiver {
 				}
 			}
 		}
-		// All agents have a local transport
-		transport.register(LocalTransportFactory.get(
-				new LocalTransportConfig(agentId), receiver));
-	}
-	
-	@Override
-	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		final JSONResponse response = rpc.invoke(msg, senderUrl);
-		if (response != null) {
-			try {
-				transport.send(senderUrl, response.toString(), tag);
-			} catch (final IOException e) {
-				LOG.log(Level.WARNING, "Couldn't send message", e);
-			}
-		}
-	}
-	
-	/**
-	 * Sets the scheduler.
-	 * 
-	 * @param scheduler
-	 *            the new scheduler
-	 */
-	@JsonIgnore
-	public void setScheduler(final Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
-	
-	/**
-	 * Gets the scheduler.
-	 * 
-	 * @return the scheduler
-	 */
-	@Namespace("scheduler")
-	@JsonIgnore
-	public Scheduler getScheduler() {
-		return scheduler;
-	}
-	
-	/**
-	 * Sets the state.
-	 * 
-	 * @param state
-	 *            the new state
-	 */
-	@JsonIgnore
-	public void setState(final State state) {
-		this.state = state;
-	}
-	
-	/**
-	 * Gets the state.
-	 * 
-	 * @return the state
-	 */
-	@Access(AccessType.UNAVAILABLE)
-	@JsonIgnore
-	public State getState() {
-		return state;
 	}
 	
 	/**
