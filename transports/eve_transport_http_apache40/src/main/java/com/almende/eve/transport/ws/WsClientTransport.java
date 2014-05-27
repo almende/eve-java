@@ -83,6 +83,9 @@ public class WsClientTransport extends WebsocketTransport {
 		super.getHandle().get().receive(body, serverUrl, null);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void send(URI receiverUri, String message, String tag)
 			throws IOException {
@@ -98,6 +101,9 @@ public class WsClientTransport extends WebsocketTransport {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	 */
 	@Override
 	public void send(URI receiverUri, byte[] message, String tag)
 			throws IOException {
@@ -113,6 +119,9 @@ public class WsClientTransport extends WebsocketTransport {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.ws.WebsocketTransport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 		ClientManager client = ClientManager.createClient();
@@ -131,10 +140,16 @@ public class WsClientTransport extends WebsocketTransport {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.ws.WebsocketTransport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
 	@Override
 	public List<String> getProtocols() {
 		return Arrays.asList("wss", "ws");

@@ -28,11 +28,11 @@ import com.mongodb.WriteResult;
  * The Class MongoState.
  */
 public class MongoState extends AbstractState<JsonNode> implements State {
+	
 	/**
-	 * internal exception signifying update conflict
+	 * internal exception signifying update conflict.
 	 * 
 	 * @author ronny
-	 * 
 	 */
 	class UpdateConflictException extends Exception {
 		
@@ -47,14 +47,18 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		private final Long			timestamp;
 		
 		/**
-		 * default constructor for class specific exception
+		 * default constructor for class specific exception.
 		 * 
 		 * @param timestamp
+		 *            the timestamp
 		 */
 		public UpdateConflictException(final Long timestamp) {
 			this.timestamp = timestamp;
 		}
 		
+		/* (non-Javadoc)
+		 * @see java.lang.Throwable#getMessage()
+		 */
 		@Override
 		public String getMessage() {
 			return "Document updated on [" + timestamp
@@ -73,6 +77,9 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	@JsonIgnore
 	private MongoCollection			collection;
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.state.AbstractState#getId()
+	 */
 	@Id
 	@Override
 	public String getId() {

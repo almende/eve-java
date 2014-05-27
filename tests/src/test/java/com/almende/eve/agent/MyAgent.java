@@ -73,6 +73,9 @@ public class MyAgent implements Wakeable, Receiver {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.wake.Wakeable#wake(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, boolean)
+	 */
 	@Override
 	public void wake(final String wakeKey, final ObjectNode params,
 			final boolean onBoot) {
@@ -89,6 +92,9 @@ public class MyAgent implements Wakeable, Receiver {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+	 */
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		LOG.warning("Received msg:'" + msg + "' from: "

@@ -89,6 +89,9 @@ public class XmppService implements TransportService {
 		instances.remove(instance.getAddress());
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
+	 */
 	@Override
 	public Transport getLocal(final URI address) {
 		if (doesShortcut && instances.containsKey(address)) {

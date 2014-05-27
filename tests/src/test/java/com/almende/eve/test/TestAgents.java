@@ -34,9 +34,12 @@ public class TestAgents extends TestCase {
 	/**
 	 * Test agents.
 	 * 
-	 * @throws URISyntaxException
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws URISyntaxException
+	 *             the URI syntax exception
 	 * @throws InterruptedException
+	 *             the interrupted exception
 	 */
 	@Test
 	public void testAgent() throws IOException, URISyntaxException,

@@ -51,11 +51,17 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 */
 	public abstract void receive(final String body, final String id) throws IOException;
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 		// Nothing to do on the server side.
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 		// Nothing to do on the server side.

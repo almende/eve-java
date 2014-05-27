@@ -92,6 +92,9 @@ public abstract class AbstractTransport implements Transport {
 		return service;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
 	@Override
 	public ObjectNode getParams() {
 		return myParams;

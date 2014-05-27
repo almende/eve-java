@@ -61,10 +61,21 @@ final class JSONRPC {
 		}
 	}
 	
+	/**
+	 * Checks if is use method handles.
+	 * 
+	 * @return true, if is use method handles
+	 */
 	public static boolean isUseMethodHandles() {
 		return useMethodHandles;
 	}
 
+	/**
+	 * Sets the use method handles.
+	 * 
+	 * @param useMethodHandles
+	 *            the new use method handles
+	 */
 	public static void setUseMethodHandles(boolean useMethodHandles) {
 		JSONRPC.useMethodHandles = useMethodHandles;
 	}

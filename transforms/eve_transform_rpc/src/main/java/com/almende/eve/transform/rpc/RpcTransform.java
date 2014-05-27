@@ -283,6 +283,9 @@ public class RpcTransform implements Transform {
 		return destination;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
 	@Override
 	public ObjectNode getParams() {
 		return myParams;

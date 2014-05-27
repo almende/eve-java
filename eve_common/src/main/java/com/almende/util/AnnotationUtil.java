@@ -79,7 +79,7 @@ public final class AnnotationUtil {
 	private static Map<String, AnnotatedClass>	cacheIncludingObject	= new ConcurrentHashMap<String, AnnotatedClass>();
 	
 	/**
-	 * The Constant HASMETHODHANDLES, Does this VM support MethodHandles?
+	 * The Constant HASMETHODHANDLES, Does this VM support MethodHandles?.
 	 */
 	public static final boolean					HASMETHODHANDLES;
 	

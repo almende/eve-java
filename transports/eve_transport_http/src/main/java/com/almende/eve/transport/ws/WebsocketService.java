@@ -49,6 +49,9 @@ public class WebsocketService implements TransportService {
 		return singleton;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	 */
 	@Override
 	public <T extends Capability, V> T get(ObjectNode params,
 			Handler<V> handle, Class<T> type) {
@@ -136,11 +139,17 @@ public class WebsocketService implements TransportService {
 		return TypeUtil.inject(result, type);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	 */
 	@Override
 	public void delete(Transport instance) {
 		transports.remove(instance.getAddress());
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
+	 */
 	@Override
 	public Transport getLocal(final URI address) {
 		return null;

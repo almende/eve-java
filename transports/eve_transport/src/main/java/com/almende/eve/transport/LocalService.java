@@ -55,11 +55,17 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return singleton;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
+	 */
 	@Override
 	public LocalService getLocal(final URI address) {
 		return instances.get(address);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	 */
 	@Override
 	public <T extends Capability, V> T get(final ObjectNode params,
 			final Handler<V> handle, final Class<T> type) {
@@ -81,31 +87,49 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return TypeUtil.inject(result, type);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final String message,
 			final String tag) throws IOException {
 		sendLocal(receiverUri, message);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final byte[] message,
 			final String tag) throws IOException {
 		sendLocal(receiverUri, message);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
 	@Override
 	public List<String> getProtocols() {
 		return Arrays.asList("local");
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	 */
 	@Override
 	public void delete(final Transport instance) {
 		instances.remove(instance.getAddress());

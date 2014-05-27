@@ -148,6 +148,7 @@ public class HttpTransport extends AbstractTransport {
 	 *            the sender url
 	 * @return the response string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public String receive(final String body, final URI senderUrl)
 			throws IOException {

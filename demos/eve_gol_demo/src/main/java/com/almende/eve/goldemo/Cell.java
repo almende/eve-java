@@ -35,10 +35,16 @@ public class Cell extends Agent {
 	}
 	
 	/**
+	 * Creates the.
+	 * 
 	 * @param odd
+	 *            the odd
 	 * @param even
+	 *            the even
 	 * @param initState
+	 *            the init state
 	 * @param totalSize
+	 *            the total size
 	 */
 	public void create(@Name("pathOdd") final String odd,
 			@Name("pathEven") final String even,
@@ -117,7 +123,7 @@ public class Cell extends Agent {
 	}
 	
 	/**
-	 * 
+	 * Start.
 	 */
 	public void start() {
 		if (neighbors == null) {
@@ -142,9 +148,14 @@ public class Cell extends Agent {
 	}
 	
 	/**
+	 * Collect.
+	 * 
 	 * @param alive
+	 *            the alive
 	 * @param cycle
+	 *            the cycle
 	 * @param neighborNo
+	 *            the neighbor no
 	 */
 	public void collect(@Name("alive") final boolean alive,
 			@Name("cycle") final int cycle, @Name("from") final int neighborNo) {

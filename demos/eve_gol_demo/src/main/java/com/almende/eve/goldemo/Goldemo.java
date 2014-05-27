@@ -21,9 +21,10 @@ import com.almende.eve.transform.rpc.formats.JSONRPCException;
  * The Class Goldemo.
  */
 public class Goldemo {
+	
 	/**
- * 
- */
+	 * The Constant AGENTPREFIX.
+	 */
 	// final static String BASE = "inproc://";
 	// final static String BASE = "ipc:///tmp/zmq-socket-";
 	// final static String PATH = "zmq:"+BASE;

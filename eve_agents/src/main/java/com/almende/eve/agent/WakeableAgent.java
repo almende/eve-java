@@ -51,6 +51,9 @@ public class WakeableAgent extends Agent implements Wakeable {
 		ws.register(getId(), getConfig(), this.getClass().getName());
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.wake.Wakeable#wake(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, boolean)
+	 */
 	@Override
 	public void wake(final String wakeKey, final ObjectNode params, final boolean onBoot) {
 		rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,

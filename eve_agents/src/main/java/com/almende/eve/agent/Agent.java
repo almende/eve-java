@@ -185,6 +185,9 @@ public class Agent implements Receiver {
 				new LocalTransportConfig(agentId), receiver));
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+	 */
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		final JSONResponse response = rpc.invoke(msg, senderUrl);

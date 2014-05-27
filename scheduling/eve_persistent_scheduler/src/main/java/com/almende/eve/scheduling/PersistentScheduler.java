@@ -78,6 +78,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.SimpleScheduler#schedule(java.lang.Object, org.joda.time.DateTime)
+	 */
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
 		
@@ -89,6 +92,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		return entry.getTaskId();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.SimpleScheduler#cancel(java.lang.String)
+	 */
 	@Override
 	public void cancel(final String id) {
 		if (clock == null) {
@@ -100,6 +106,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		clock.cancel(id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.SimpleScheduler#clear()
+	 */
 	@Override
 	public void clear() {
 		if (clock == null) {

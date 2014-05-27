@@ -44,6 +44,9 @@ public class SimpleHandler<T> implements Handler<T> {
 		this.referent = newHandler.get();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#getKey()
+	 */
 	@Override
 	public String getKey() {
 		return null;

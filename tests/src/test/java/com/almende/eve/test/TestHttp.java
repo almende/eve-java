@@ -92,6 +92,9 @@ public class TestHttp extends TestCase {
 			// Not used, data should be the same.
 		}
 		
+		/* (non-Javadoc)
+		 * @see com.almende.eve.capabilities.handler.Handler#getKey()
+		 */
 		@Override
 		public String getKey() {
 			// Not used, data should be the same.

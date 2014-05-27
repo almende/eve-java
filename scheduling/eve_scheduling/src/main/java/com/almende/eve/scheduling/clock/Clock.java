@@ -24,14 +24,15 @@ public interface Clock {
 	void requestTrigger(String triggerId, DateTime due, Runnable callback);
 	
 	/**
-	 * Cancel a triggerRequest
+	 * Cancel a triggerRequest.
 	 * 
 	 * @param triggerId
+	 *            the trigger id
 	 */
 	void cancel(String triggerId);
 	
 	/**
-	 * Clear all triggerRequests!
+	 * Clear all triggerRequests!.
 	 */
 	void clear();
 	

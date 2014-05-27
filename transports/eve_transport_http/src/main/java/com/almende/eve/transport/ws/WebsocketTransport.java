@@ -86,11 +86,17 @@ public abstract class WebsocketTransport extends AbstractTransport {
 		setConnected(true);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 		// Nothing to do on the server side.
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 		// Nothing to do on the server side.

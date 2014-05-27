@@ -27,6 +27,10 @@ public class WebsocketEndpoint extends Endpoint {
 	private static final Logger	LOG			= Logger.getLogger(WebsocketEndpoint.class
 													.getName());
 	private WebsocketTransport	transport	= null;
+	
+	/* (non-Javadoc)
+	 * @see javax.websocket.Endpoint#onOpen(javax.websocket.Session, javax.websocket.EndpointConfig)
+	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
 		final RemoteEndpoint.Basic remote = session.getBasicRemote();

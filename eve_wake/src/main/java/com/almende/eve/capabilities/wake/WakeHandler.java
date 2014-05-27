@@ -105,6 +105,9 @@ public class WakeHandler<T> implements Handler<T> {
 		this.wakeKey = wakeKey;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#getKey()
+	 */
 	@Override
 	public String getKey() {
 		return wakeKey;

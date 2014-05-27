@@ -59,6 +59,9 @@ public class SimpleScheduler implements Scheduler {
 		myParams = params;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.Scheduler#schedule(java.lang.Object, org.joda.time.DateTime)
+	 */
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
 		if (clock == null) {
@@ -76,6 +79,9 @@ public class SimpleScheduler implements Scheduler {
 		return uuid;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.Scheduler#cancel(java.lang.String)
+	 */
 	@Override
 	public void cancel(final String id) {
 		if (clock == null) {
@@ -85,6 +91,9 @@ public class SimpleScheduler implements Scheduler {
 		clock.cancel(id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.Scheduler#clear()
+	 */
 	@Override
 	public void clear() {
 		if (clock == null) {
@@ -121,6 +130,9 @@ public class SimpleScheduler implements Scheduler {
 		return clock;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
 	@Override
 	public ObjectNode getParams() {
 		return myParams;

@@ -29,6 +29,7 @@ public final class AgentProxyFactory {
 	 * @param <T>
 	 *            the generic type
 	 * @param sender
+	 *            the sender
 	 * @param receiverUrl
 	 *            the receiver url
 	 * @param proxyInterface

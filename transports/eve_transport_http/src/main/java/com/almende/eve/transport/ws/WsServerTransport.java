@@ -44,6 +44,9 @@ public class WsServerTransport extends WebsocketTransport {
 		super(address, handle, service, params);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.ws.WebsocketTransport#onClose(javax.websocket.Session, javax.websocket.CloseReason)
+	 */
 	@Override
 	public void onClose(final Session session, final CloseReason closeReason) {
 		if (session.getUserProperties().containsKey("remoteId")) {

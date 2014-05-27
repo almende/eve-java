@@ -21,11 +21,15 @@ import javax.websocket.server.ServerEndpointConfig;
  * component's <code>addWebsocketContextListener<code> method. When
  * the websocketContext event occurs, that object's appropriate
  * method is invoked.
+ * 
  */
 public class WsServerContextListener implements ServletContextListener {
 	private static final Logger	LOG	= Logger.getLogger(WsServerContextListener.class
 											.getName());
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		javax.websocket.server.ServerContainer serverContainer = (javax.websocket.server.ServerContainer) sce
@@ -44,6 +48,9 @@ public class WsServerContextListener implements ServletContextListener {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// TODO Auto-generated method stub

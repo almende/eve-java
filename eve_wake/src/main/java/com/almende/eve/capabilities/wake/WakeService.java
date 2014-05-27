@@ -150,10 +150,10 @@ public class WakeService implements Capability, CapabilityService {
 	 * 
 	 * @param wakeKey
 	 *            the wake key
-	 * @param className
-	 *            the class name
 	 * @param params
 	 *            the params
+	 * @param className
+	 *            the class name
 	 */
 	@JsonIgnore
 	public void register(final String wakeKey, final ObjectNode params,
@@ -213,6 +213,9 @@ public class WakeService implements Capability, CapabilityService {
 		return singleton;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	 */
 	@Override
 	public <T extends Capability, V> T get(final ObjectNode params,
 			final Handler<V> handle, final Class<T> type) {
@@ -227,6 +230,9 @@ public class WakeService implements Capability, CapabilityService {
 		return TypeUtil.inject(service, type);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
 	@Override
 	public ObjectNode getParams() {
 		return myParams;

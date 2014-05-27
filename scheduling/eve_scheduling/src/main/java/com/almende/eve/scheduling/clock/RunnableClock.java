@@ -76,6 +76,9 @@ public class RunnableClock implements Runnable, Clock {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.clock.Clock#cancel(java.lang.String)
+	 */
 	@Override
 	public void cancel(final String triggerId) {
 		synchronized (TIMELINE) {
@@ -84,6 +87,9 @@ public class RunnableClock implements Runnable, Clock {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.scheduling.clock.Clock#clear()
+	 */
 	@Override
 	public void clear() {
 		synchronized (TIMELINE) {

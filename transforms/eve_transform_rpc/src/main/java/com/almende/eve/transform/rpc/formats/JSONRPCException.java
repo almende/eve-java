@@ -25,8 +25,20 @@ public class JSONRPCException extends RuntimeException {
 															.getCanonicalName());
 	private final ObjectNode	error				= JOM.createObjectNode();
 	private boolean				remote				= false;
+	
+	/**
+	 * The Constant CODE_S.
+	 */
 	static final String			CODE_S				= "code";
+	
+	/**
+	 * The Constant MESSAGE_S.
+	 */
 	static final String			MESSAGE_S			= "message";
+	
+	/**
+	 * The Constant DATA_S.
+	 */
 	static final String			DATA_S				= "data";
 	
 	/**
@@ -330,7 +342,10 @@ public class JSONRPCException extends RuntimeException {
 	}
 	
 	/**
+	 * Sets the remote.
+	 * 
 	 * @param remote
+	 *            the new remote
 	 */
 	public void setRemote(final boolean remote) {
 		this.remote = remote;

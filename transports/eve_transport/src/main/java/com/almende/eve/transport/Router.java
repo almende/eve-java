@@ -39,6 +39,9 @@ public class Router implements Transport {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final String message,
 			final String tag) throws IOException {
@@ -52,6 +55,9 @@ public class Router implements Transport {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	 */
 	@Override
 	public void send(final URI receiverUri, final byte[] message,
 			final String tag) throws IOException {
@@ -65,26 +71,41 @@ public class Router implements Transport {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#connect()
+	 */
 	@Override
 	public void connect() throws IOException {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#disconnect()
+	 */
 	@Override
 	public void disconnect() {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#delete()
+	 */
 	@Override
 	public void delete() {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getHandle()
+	 */
 	@Override
 	public Handler<Receiver> getHandle() {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getAddress()
+	 */
 	@Override
 	public URI getAddress() {
 		return null;
@@ -103,11 +124,17 @@ public class Router implements Transport {
 		return new ArrayList<URI>(result);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#getProtocols()
+	 */
 	@Override
 	public List<String> getProtocols() {
 		return new ArrayList<String>(transports.keySet());
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.Capability#getParams()
+	 */
 	@Override
 	public ObjectNode getParams() {
 		final ArrayNode transportConfs = JOM.createArrayNode();

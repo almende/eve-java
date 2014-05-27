@@ -42,6 +42,7 @@ public class MongoStateService implements StateService {
 	 * @param params
 	 *            the params
 	 * @throws UnknownHostException
+	 *             the unknown host exception
 	 */
 	public MongoStateService(final ObjectNode params)
 			throws UnknownHostException {

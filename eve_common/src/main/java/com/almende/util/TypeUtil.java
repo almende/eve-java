@@ -30,7 +30,7 @@ public abstract class TypeUtil<T> {
 	private final JavaType	valueType;
 	
 	/**
-	 * Gets an instances of this TypeUtil
+	 * Gets an instances of this TypeUtil.
 	 * 
 	 * @param <T>
 	 *            the generic type

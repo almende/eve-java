@@ -53,6 +53,9 @@ public class EveServlet extends HttpServlet {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
+	 */
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		String servletUrl = config.getInitParameter("ServletUrl");
@@ -212,6 +215,9 @@ public class EveServlet extends HttpServlet {
 		return id;
 	}
 	
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doPost(final HttpServletRequest req,
 			final HttpServletResponse resp) throws IOException,
