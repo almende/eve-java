@@ -4,7 +4,9 @@
  */
 package com.almende.eve.transport.ws;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,7 +52,12 @@ public class WebsocketEndpoint extends Endpoint {
 				remoteId = param.getValue();
 			}
 		}
+		if (remoteId != null) {
+			session.getUserProperties().put("remoteId", remoteId);
+		}
 		transport.registerRemote(remoteId, remote);
+		transport.setConnected(true);
+		
 		final String id = remoteId;
 		session.addMessageHandler(new MessageHandler.Whole<String>() {
 			@Override
@@ -73,6 +80,7 @@ public class WebsocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(final Session session, final CloseReason closeReason) {
+		transport.onClose(session, closeReason);
 	}
 	
 	/*
@@ -84,5 +92,14 @@ public class WebsocketEndpoint extends Endpoint {
 	@Override
 	public void onError(final Session session, final Throwable throwable) {
 		LOG.log(Level.WARNING, "Websocket connection error:", throwable);
+		if (throwable instanceof SocketTimeoutException) {
+			transport.onClose(session, new CloseReason(
+					CloseReason.CloseCodes.CLOSED_ABNORMALLY,
+					"Timeout on Socket!"));
+		}
+		if (throwable instanceof EOFException) {
+			transport.onClose(session, new CloseReason(
+					CloseReason.CloseCodes.CLOSED_ABNORMALLY, "EOF!"));
+		}
 	}
 }

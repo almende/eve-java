@@ -11,8 +11,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.websocket.CloseReason;
 import javax.websocket.RemoteEndpoint.Basic;
+import javax.websocket.Session;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
@@ -40,6 +43,32 @@ public class WsServerTransport extends WebsocketTransport {
 	public WsServerTransport(final URI address, final Handler<Receiver> handle,
 			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.ws.WebsocketTransport#onClose(javax.websocket
+	 * .Session, javax.websocket.CloseReason)
+	 */
+	@Override
+	public void onClose(final Session session, final CloseReason closeReason) {
+		if (session.getUserProperties().containsKey("remoteId")) {
+			final String remoteId = (String) session.getUserProperties().get(
+					"remoteId");
+			final URI key = URI.create("wsclient:" + remoteId);
+			remotes.remove(key);
+		}
+	}
+	
+	/**
+	 * Gets the remotes.
+	 * 
+	 * @return the remotes
+	 */
+	public Set<URI> getRemotes() {
+		return remotes.keySet();
 	}
 	
 	/**
@@ -84,7 +113,8 @@ public class WsServerTransport extends WebsocketTransport {
 			remote.flushBatch();
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
-					+ " is currently not connected.");
+					+ " is currently not connected. (" + getAddress() + " / "
+					+ remotes.keySet() + ")");
 		}
 	}
 	

@@ -33,6 +33,7 @@ public class WsClientTransport extends WebsocketTransport {
 	private Basic				remote		= null;
 	private URI					serverUrl	= null;
 	private String				myId		= null;
+	private ClientManager		client		= null;
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -88,6 +89,30 @@ public class WsClientTransport extends WebsocketTransport {
 		super.getHandle().get().receive(body, serverUrl, null);
 	}
 	
+	/**
+	 * Send.
+	 * 
+	 * @param message
+	 *            the message
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public void send(final byte[] message) throws IOException {
+		send(serverUrl, message, null);
+	}
+	
+	/**
+	 * Send.
+	 * 
+	 * @param message
+	 *            the message
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public void send(final String message) throws IOException {
+		send(serverUrl, message, null);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -100,7 +125,12 @@ public class WsClientTransport extends WebsocketTransport {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
-							+ receiverUri.toASCIIString());
+							+ receiverUri.toASCIIString()
+							+ " serverUrl:"
+							+ serverUrl.toASCIIString());
+		}
+		if (remote == null || !isConnected()) {
+			connect();
 		}
 		if (remote != null) {
 			remote.sendText(message);
@@ -123,6 +153,9 @@ public class WsClientTransport extends WebsocketTransport {
 					"Currently it's only possible to send to the server agent directly, not other agents:"
 							+ receiverUri.toASCIIString());
 		}
+		if (remote == null || !isConnected()) {
+			connect();
+		}
 		if (remote != null) {
 			remote.sendBinary(ByteBuffer.wrap(message));
 		} else {
@@ -137,7 +170,10 @@ public class WsClientTransport extends WebsocketTransport {
 	 */
 	@Override
 	public void connect() throws IOException {
-		final ClientManager client = ClientManager.createClient();
+		if (client == null) {
+			client = ClientManager.createClient();
+			client.setDefaultMaxSessionIdleTimeout(-1);
+		}
 		try {
 			final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
 					.build();
