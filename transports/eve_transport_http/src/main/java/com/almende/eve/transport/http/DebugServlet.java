@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.transport.http.debug;
+package com.almende.eve.transport.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.almende.eve.transport.http.HttpService;
-import com.almende.eve.transport.http.HttpTransport;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.StreamingUtil;

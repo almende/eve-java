@@ -7,7 +7,7 @@
 
 	<servlet>
 		<servlet-name>war</servlet-name>
-		<servlet-class>com.almende.eve.transport.http.debug.DebugServlet</servlet-class>
+		<servlet-class>com.almende.eve.transport.http.DebugServletlet-class>
 		<init-param>
 			<param-name>ServletUrl</param-name>
 			<param-value>http://localhost:8080/war/agents/</param-value>

@@ -22,7 +22,6 @@
 		<module>eve_transport_http</module>
 		<module>eve_transport_http_apache40</module>
 		<module>eve_transport_http_jetty</module>
-		<module>eve_transport_http_debug</module>
 	</modules>
 
 	<properties>
