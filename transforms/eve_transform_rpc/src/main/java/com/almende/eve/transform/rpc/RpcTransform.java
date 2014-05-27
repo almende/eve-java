@@ -143,13 +143,13 @@ public class RpcTransform implements Transform {
 			final JSONMessage jsonMsg = jsonConvert(msg);
 			if (jsonMsg != null) {
 				id = jsonMsg.getId();
-				if (jsonMsg instanceof JSONRequest) {
+				if (jsonMsg.isRequest()) {
 					final JSONRequest request = (JSONRequest) jsonMsg;
 					final RequestParams params = new RequestParams();
 					params.put(Sender.class, senderUrl.toASCIIString());
 					return JSONRPC.invoke(destination.get(), request, params,
 							auth);
-				} else if (jsonMsg instanceof JSONResponse && callbacks != null
+				} else if (jsonMsg.isResponse() && callbacks != null
 						&& id != null && !id.isNull()) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
 					final AsyncCallback<JSONResponse> callback = callbacks

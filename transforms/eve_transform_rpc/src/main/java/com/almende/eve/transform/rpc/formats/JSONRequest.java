@@ -167,6 +167,7 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	private void init(final JsonNode id, final String method,
 			final ObjectNode params) {
+		this.setRequest(true);
 		setVersion();
 		setId(id);
 		setMethod(method);

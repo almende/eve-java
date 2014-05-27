@@ -147,6 +147,7 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	private void init(final JsonNode id, final Object result,
 			final JSONRPCException error) {
+		this.setRequest(false);
 		setVersion();
 		setId(id);
 		setResult(result);
