@@ -29,12 +29,15 @@ import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.LocalTransportFactory;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
+import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportConfig;
 import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -81,6 +84,21 @@ public class Agent implements Receiver {
 	public Agent(final String agentId, final ObjectNode config) {
 		this.config = new AgentConfig(agentId, config);
 		loadConfig(false);
+	}
+	
+	/**
+	 * Instantiates a new agent.
+	 * 
+	 * @param agentId
+	 *            the agent id
+	 * @param config
+	 *            the config
+	 * @param onBoot
+	 *            the on boot
+	 */
+	public Agent(final String agentId, final ObjectNode config, final boolean onBoot) {
+		this.config = new AgentConfig(agentId, config);
+		loadConfig(onBoot);
 	}
 	
 	/**
@@ -188,6 +206,7 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public void setScheduler(final Scheduler scheduler) {
 		this.scheduler = scheduler;
+		config.put("scheduler",scheduler.getParams());
 	}
 	
 	/**
@@ -208,6 +227,8 @@ public class Agent implements Receiver {
 			}
 			scheduler = SchedulerFactory
 					.getScheduler(schedulerConfig, receiver);
+
+			config.put("scheduler",schedulerConfig);
 		}
 	}
 	
@@ -231,6 +252,7 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public void setState(final State state) {
 		this.state = state;
+		config.put("state",state.getParams());
 	}
 	
 	/**
@@ -246,6 +268,7 @@ public class Agent implements Receiver {
 				stateConfig.setId(agentId);
 			}
 			state = StateFactory.getState(stateConfig);
+			config.put("state",stateConfig);
 		}
 	}
 	
@@ -258,6 +281,26 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public State getState() {
 		return state;
+	}
+	
+	/**
+	 * Adds the transport.
+	 * 
+	 * @param transport
+	 *            the transport
+	 */
+	public void addTransport(final Transport transport){
+		this.transport.register(transport);
+		
+		final JsonNode transportConfig = config.get("transport");
+		if (transportConfig.isArray()){
+			((ArrayNode)transportConfig).add(transport.getParams());
+		} else {
+			final ArrayNode transports = JOM.createArrayNode();
+			transports.add(transportConfig);
+			transports.add(transport.getParams());
+			config.put("transport", transports);
+		}
 	}
 	
 	/**
@@ -299,6 +342,7 @@ public class Agent implements Receiver {
 							"Couldn't connect transports on boot", e);
 				}
 			}
+			config.put("transport", transportConfig);
 		}
 	}
 	
