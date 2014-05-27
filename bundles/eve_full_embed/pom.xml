@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
-			<artifactId>eve-transport-http-debug</artifactId>
+			<artifactId>eve-transport-ws</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
