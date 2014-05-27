@@ -108,28 +108,30 @@ public class Agent implements Receiver {
 	protected RpcTransform getRpc() {
 		return rpc;
 	}
-
+	
 	/**
-	 * @param rpc the rpc to set
+	 * @param rpc
+	 *            the rpc to set
 	 */
 	protected void setRpc(RpcTransform rpc) {
 		this.rpc = rpc;
 	}
-
+	
 	/**
 	 * @return the receiver
 	 */
 	protected Handler<Receiver> getReceiver() {
 		return receiver;
 	}
-
+	
 	/**
-	 * @param receiver the receiver to set
+	 * @param receiver
+	 *            the receiver to set
 	 */
 	protected void setReceiver(Handler<Receiver> receiver) {
 		this.receiver = receiver;
 	}
-
+	
 	/**
 	 * Sets the config.
 	 * 
@@ -212,24 +214,6 @@ public class Agent implements Receiver {
 		// All agents have a local transport
 		transport.register(LocalTransportFactory.get(new LocalTransportConfig(
 				agentId), receiver));
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
-	 * java.net.URI, java.lang.String)
-	 */
-	@Override
-	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		final JSONResponse response = rpc.invoke(msg, senderUrl);
-		if (response != null) {
-			try {
-				transport.send(senderUrl, response.toString(), tag);
-			} catch (final IOException e) {
-				LOG.log(Level.WARNING, "Couldn't send message", e);
-			}
-		}
 	}
 	
 	/**
@@ -490,4 +474,21 @@ public class Agent implements Receiver {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
+	 * java.net.URI, java.lang.String)
+	 */
+	@Override
+	public void receive(final Object msg, final URI senderUrl, final String tag) {
+		final JSONResponse response = rpc.invoke(msg, senderUrl);
+		if (response != null) {
+			try {
+				transport.send(senderUrl, response.toString(), tag);
+			} catch (final IOException e) {
+				LOG.log(Level.WARNING, "Couldn't send message", e);
+			}
+		}
+	}
 }
