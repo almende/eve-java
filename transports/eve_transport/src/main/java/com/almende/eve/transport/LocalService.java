@@ -36,7 +36,8 @@ public class LocalService extends AbstractTransport implements TransportService 
 	 * @param params
 	 *            the params
 	 */
-	public LocalService(final URI address, final Handler<Receiver> handle, final ObjectNode params) {
+	public LocalService(final URI address, final Handler<Receiver> handle,
+			final ObjectNode params) {
 		super(address, handle, singleton, params);
 	}
 	
@@ -55,7 +56,9 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override
@@ -63,8 +66,13 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return instances.get(address);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson
+	 * .databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler,
+	 * java.lang.Class)
 	 */
 	@Override
 	public <T extends Capability, V> T get(final ObjectNode params,
@@ -87,8 +95,11 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return TypeUtil.inject(result, type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void send(final URI receiverUri, final String message,
@@ -96,8 +107,11 @@ public class LocalService extends AbstractTransport implements TransportService 
 		sendLocal(receiverUri, message);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
 	public void send(final URI receiverUri, final byte[] message,
@@ -105,21 +119,27 @@ public class LocalService extends AbstractTransport implements TransportService 
 		sendLocal(receiverUri, message);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
 	public void connect() throws IOException {
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
 	public void disconnect() {
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
@@ -127,8 +147,12 @@ public class LocalService extends AbstractTransport implements TransportService 
 		return Arrays.asList("local");
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.transport
+	 * .Transport)
 	 */
 	@Override
 	public void delete(final Transport instance) {

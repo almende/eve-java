@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WebsocketTransport.
  */
 public class WsServerTransport extends WebsocketTransport {
-	private HashMap<URI, Basic>	remotes	= new HashMap<URI, Basic>();
+	private final HashMap<URI, Basic>	remotes	= new HashMap<URI, Basic>();
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -36,11 +36,11 @@ public class WsServerTransport extends WebsocketTransport {
 	 * @param params
 	 *            the params
 	 */
-	public WsServerTransport(URI address, Handler<Receiver> handle,
-			TransportService service, ObjectNode params) {
+	public WsServerTransport(final URI address, final Handler<Receiver> handle,
+			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
 	}
-
+	
 	/**
 	 * Register remote.
 	 * 
@@ -49,54 +49,66 @@ public class WsServerTransport extends WebsocketTransport {
 	 * @param remote
 	 *            the remote
 	 */
-	protected void registerRemote(String id, Basic remote){
-		final URI key = URI.create("wsclient:"+id);
+	@Override
+	protected void registerRemote(final String id, final Basic remote) {
+		final URI key = URI.create("wsclient:" + id);
 		remotes.put(key, remote);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.ws.WebsocketTransport#receive(java.lang.String, java.net.URI)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.ws.WebsocketTransport#receive(java.lang.String,
+	 * java.net.URI)
 	 */
 	@Override
-	public void receive(final String body, final String id)
-			throws IOException {
-		final URI senderUrl = URI.create("wsclient:"+id);
+	public void receive(final String body, final String id) throws IOException {
+		final URI senderUrl = URI.create("wsclient:" + id);
 		super.getHandle().get().receive(body, senderUrl, null);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			Basic remote = remotes.get(receiverUri);
-			System.err.println("Sending message:"+message);
+			final Basic remote = remotes.get(receiverUri);
+			System.err.println("Sending message:" + message);
 			remote.sendText(message);
 			remote.flushBatch();
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
 					+ " is currently not connected.");
-		}		
+		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			Basic remote = remotes.get(receiverUri);
+			final Basic remote = remotes.get(receiverUri);
 			remote.sendBinary(ByteBuffer.wrap(message));
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
 					+ " is currently not connected.");
-		}		
+		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override

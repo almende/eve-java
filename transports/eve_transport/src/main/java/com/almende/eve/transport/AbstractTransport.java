@@ -92,7 +92,9 @@ public abstract class AbstractTransport implements Transport {
 		return service;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override

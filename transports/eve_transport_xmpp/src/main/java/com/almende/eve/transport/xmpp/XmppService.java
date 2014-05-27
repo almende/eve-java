@@ -34,7 +34,7 @@ public class XmppService implements TransportService {
 			// problem loading reconnection manager
 		}
 		SmackConfiguration.setPacketReplyTimeout(15000);
-//		SmackConfiguration.setKeepAliveInterval(-1);
+		// SmackConfiguration.setKeepAliveInterval(-1);
 	}
 	
 	/**
@@ -89,7 +89,9 @@ public class XmppService implements TransportService {
 		instances.remove(instance.getAddress());
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override

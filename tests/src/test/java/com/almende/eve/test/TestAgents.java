@@ -79,9 +79,9 @@ public class TestAgents extends TestCase {
 				});
 		
 		LOG.warning("Sync received:'"
-				+ agent.pubSendSync(
-						new URI("http://localhost:8080/agents/example"),
-						"helloWorld", callParams) + "'");
+				+ agent.pubSendSync(new URI(
+						"http://localhost:8080/agents/example"), "helloWorld",
+						callParams) + "'");
 		
 		final WakeServiceConfig wsconfig = new WakeServiceConfig();
 		final FileStateConfig state = new FileStateConfig();

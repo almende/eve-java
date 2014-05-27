@@ -19,7 +19,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 * @param node
 	 *            the node
 	 */
-	public WebsocketTransportConfig(ObjectNode node) {
+	public WebsocketTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
 			this.put("class", WebsocketService.class.getName());
@@ -39,7 +39,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 * @param server
 	 *            the new server
 	 */
-	public void setServer(boolean server) {
+	public void setServer(final boolean server) {
 		this.put("server", server);
 	}
 	
@@ -110,7 +110,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 */
 	public void setId(final String id) {
 		this.put("id", id);
-		this.setAddress("wsclient:" + id);
+		setAddress("wsclient:" + id);
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 * @param serverUrl
 	 *            the new server url
 	 */
-	public void setServerUrl(String serverUrl) {
+	public void setServerUrl(final String serverUrl) {
 		this.put("serverUrl", serverUrl);
 	}
 	

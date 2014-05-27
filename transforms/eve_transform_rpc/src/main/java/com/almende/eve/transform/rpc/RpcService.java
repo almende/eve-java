@@ -44,7 +44,8 @@ public class RpcService implements TransformService {
 	public <T extends Capability, V> T get(final ObjectNode params,
 			final Handler<V> handle, final Class<T> type) {
 		RpcTransform result;
-		if (handle != null && handle.getKey() != null && instances.containsKey(handle.getKey())) {
+		if (handle != null && handle.getKey() != null
+				&& instances.containsKey(handle.getKey())) {
 			result = instances.get(handle.getKey());
 			final Handler<Object> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(handle));

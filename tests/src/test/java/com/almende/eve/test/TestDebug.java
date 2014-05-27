@@ -60,7 +60,6 @@ public class TestDebug extends TestCase {
 		final CalcAgent agent2 = new CalcAgent();
 		agent2.setConfig(config2);
 		
-		
 		synchronized (this) {
 			this.wait();
 		}

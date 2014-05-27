@@ -53,10 +53,12 @@ public class CalcAgent extends Agent {
 	/**
 	 * Evaluate given expression For example expr="2.5 + 3 / sqrt(16)" will
 	 * return "3.25"
-	 *
-	 * @param expr the expr
+	 * 
+	 * @param expr
+	 *            the expr
 	 * @return result
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public String eval(@Name("expr") final String expr) throws IOException {
 		final String url = CALC_API_URL + "?expr="

@@ -76,7 +76,9 @@ public class RunnableClock implements Runnable, Clock {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.scheduling.clock.Clock#cancel(java.lang.String)
 	 */
 	@Override
@@ -87,7 +89,9 @@ public class RunnableClock implements Runnable, Clock {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.scheduling.clock.Clock#clear()
 	 */
 	@Override

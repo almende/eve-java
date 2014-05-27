@@ -61,8 +61,11 @@ public class TestScheduling extends TestCase {
 	 */
 	class MyReceiver implements Receiver {
 		
-		/* (non-Javadoc)
-		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
+		 * java.net.URI, java.lang.String)
 		 */
 		@Override
 		public void receive(final Object msg, final URI senderUrl,

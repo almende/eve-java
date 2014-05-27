@@ -39,8 +39,11 @@ public class Router implements Transport {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void send(final URI receiverUri, final String message,
@@ -55,8 +58,11 @@ public class Router implements Transport {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
 	public void send(final URI receiverUri, final byte[] message,
@@ -71,7 +77,9 @@ public class Router implements Transport {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -79,7 +87,9 @@ public class Router implements Transport {
 		
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
@@ -87,7 +97,9 @@ public class Router implements Transport {
 		
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#delete()
 	 */
 	@Override
@@ -95,7 +107,9 @@ public class Router implements Transport {
 		
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getHandle()
 	 */
 	@Override
@@ -103,7 +117,9 @@ public class Router implements Transport {
 		return null;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getAddress()
 	 */
 	@Override
@@ -124,7 +140,9 @@ public class Router implements Transport {
 		return new ArrayList<URI>(result);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
@@ -132,7 +150,9 @@ public class Router implements Transport {
 		return new ArrayList<String>(transports.keySet());
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override

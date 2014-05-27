@@ -24,11 +24,11 @@ public class WsServerTransportFactory {
 	 */
 	public static WsServerTransport get(final ObjectNode params,
 			final Handler<Receiver> handle) {
-		if (params.isObject()){
-			if(!params.has("class")) {
-			params.put("class", WebsocketService.class.getName());
+		if (params.isObject()) {
+			if (!params.has("class")) {
+				params.put("class", WebsocketService.class.getName());
 			}
-			if (!params.has("server")){
+			if (!params.has("server")) {
 				params.put("server", true);
 			}
 		}

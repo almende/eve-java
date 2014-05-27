@@ -69,17 +69,17 @@ final class JSONRPC {
 	public static boolean isUseMethodHandles() {
 		return useMethodHandles;
 	}
-
+	
 	/**
 	 * Sets the use method handles.
 	 * 
 	 * @param useMethodHandles
 	 *            the new use method handles
 	 */
-	public static void setUseMethodHandles(boolean useMethodHandles) {
+	public static void setUseMethodHandles(final boolean useMethodHandles) {
 		JSONRPC.useMethodHandles = useMethodHandles;
 	}
-
+	
 	/**
 	 * Instantiates a new jsonrpc.
 	 */

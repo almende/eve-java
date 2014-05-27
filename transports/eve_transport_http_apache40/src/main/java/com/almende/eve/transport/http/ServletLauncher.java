@@ -33,9 +33,10 @@ public interface ServletLauncher {
 	 */
 	void add(final Servlet servlet, final URI servletPath,
 			final ObjectNode config);
-
+	
 	/**
-	 * Adds a Websocket Server configuration, and potentially starting the container if required.
+	 * Adds a Websocket Server configuration, and potentially starting the
+	 * container if required.
 	 * 
 	 * @param serverConfig
 	 *            the server config

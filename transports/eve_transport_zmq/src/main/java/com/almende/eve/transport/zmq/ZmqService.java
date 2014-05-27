@@ -75,7 +75,9 @@ public class ZmqService implements TransportService {
 		instances.remove(instance.getAddress());
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override

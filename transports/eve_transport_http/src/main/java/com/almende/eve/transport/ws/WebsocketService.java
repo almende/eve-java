@@ -49,12 +49,17 @@ public class WebsocketService implements TransportService {
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson
+	 * .databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler,
+	 * java.lang.Class)
 	 */
 	@Override
-	public <T extends Capability, V> T get(ObjectNode params,
-			Handler<V> handle, Class<T> type) {
+	public <T extends Capability, V> T get(final ObjectNode params,
+			final Handler<V> handle, final Class<T> type) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final WebsocketTransportConfig config = new WebsocketTransportConfig(
 				params);
@@ -92,7 +97,7 @@ public class WebsocketService implements TransportService {
 								final ServletLauncher launcher = (ServletLauncher) launcherClass
 										.newInstance();
 								
-								ServerEndpointConfig sec = ServerEndpointConfig.Builder
+								final ServerEndpointConfig sec = ServerEndpointConfig.Builder
 										.create(WebsocketEndpoint.class,
 												serverUri.getPath()).build();
 								sec.getUserProperties().put("address",
@@ -139,15 +144,21 @@ public class WebsocketService implements TransportService {
 		return TypeUtil.inject(result, type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.TransportService#delete(com.almende.eve.transport.Transport)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.transport
+	 * .Transport)
 	 */
 	@Override
-	public void delete(Transport instance) {
+	public void delete(final Transport instance) {
 		transports.remove(instance.getAddress());
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override

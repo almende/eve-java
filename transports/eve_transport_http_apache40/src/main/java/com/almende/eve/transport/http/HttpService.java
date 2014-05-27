@@ -226,7 +226,9 @@ public class HttpService implements TransportService {
 		return myParams.getDoAuthentication();
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override

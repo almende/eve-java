@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class ApacheHttpClient.
  */
 public final class ApacheHttpClient {
-	private static final Logger	LOG			= Logger.getLogger(ApacheHttpClient.class
-													.getCanonicalName());
+	private static final Logger			LOG			= Logger.getLogger(ApacheHttpClient.class
+															.getCanonicalName());
 	private static DefaultHttpClient	httpClient	= null;
 	static {
 		new ApacheHttpClient();
@@ -42,24 +42,24 @@ public final class ApacheHttpClient {
 	 */
 	private ApacheHttpClient() {
 		
-				// generate httpclient
-				httpClient = new DefaultHttpClient();
-				
-				// Set cookie policy and persistent cookieStore
-				try {
-					httpClient.setCookieStore(new MyCookieStore());
-				} catch (final Exception e) {
-					LOG.log(Level.WARNING,
-							"Failed to initialize persistent cookieStore!", e);
-				}
-				final HttpParams params = httpClient.getParams();
-				
-				params.setParameter(ClientPNames.COOKIE_POLICY,
-						CookiePolicy.BROWSER_COMPATIBILITY);
-				params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
-				params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
-				params.setParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-				httpClient.setParams(params);
+		// generate httpclient
+		httpClient = new DefaultHttpClient();
+		
+		// Set cookie policy and persistent cookieStore
+		try {
+			httpClient.setCookieStore(new MyCookieStore());
+		} catch (final Exception e) {
+			LOG.log(Level.WARNING,
+					"Failed to initialize persistent cookieStore!", e);
+		}
+		final HttpParams params = httpClient.getParams();
+		
+		params.setParameter(ClientPNames.COOKIE_POLICY,
+				CookiePolicy.BROWSER_COMPATIBILITY);
+		params.setParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
+		params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+		params.setParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
+		httpClient.setParams(params);
 	}
 	
 	/**

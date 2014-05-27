@@ -261,7 +261,7 @@ public class FileStateService implements StateService {
 	public static FileStateService getInstanceByParams(final ObjectNode params) {
 		
 		final FileStateConfig config = new FileStateConfig(params);
-		String key = config.getPath();
+		final String key = config.getPath();
 		
 		if (instances.containsKey(key)) {
 			return instances.get(key);

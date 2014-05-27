@@ -28,39 +28,43 @@ public class WebsocketEndpoint extends Endpoint {
 													.getName());
 	private WebsocketTransport	transport	= null;
 	
-	/* (non-Javadoc)
-	 * @see javax.websocket.Endpoint#onOpen(javax.websocket.Session, javax.websocket.EndpointConfig)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.websocket.Endpoint#onOpen(javax.websocket.Session,
+	 * javax.websocket.EndpointConfig)
 	 */
 	@Override
-	public void onOpen(Session session, EndpointConfig config) {
+	public void onOpen(final Session session, final EndpointConfig config) {
 		final RemoteEndpoint.Basic remote = session.getBasicRemote();
 		final URI address = (URI) config.getUserProperties().get("address");
 		transport = WebsocketService.get(address);
 		
 		final URI requestURI = session.getRequestURI();
-		final List<NameValuePair> queryparms = URLEncodedUtils.parse(requestURI,
-				"UTF-8");
+		final List<NameValuePair> queryparms = URLEncodedUtils.parse(
+				requestURI, "UTF-8");
 		
 		String remoteId = null;
-		for (NameValuePair param : queryparms) {
+		for (final NameValuePair param : queryparms) {
 			if (param.getName().equals("id")) {
 				remoteId = param.getValue();
 			}
 		}
-		transport.registerRemote(remoteId,remote);
+		transport.registerRemote(remoteId, remote);
 		final String id = remoteId;
 		session.addMessageHandler(new MessageHandler.Whole<String>() {
-			public void onMessage(String text) {
+			@Override
+			public void onMessage(final String text) {
 				try {
 					transport.receive(text, id);
-				} catch (IOException e) {
-					LOG.log(Level.WARNING,"Failed to receive message", e);
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, "Failed to receive message", e);
 				}
 			}
 			
 		});
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -79,6 +83,6 @@ public class WebsocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onError(final Session session, final Throwable throwable) {
-		LOG.log(Level.WARNING,"Websocket connection error:",throwable);
+		LOG.log(Level.WARNING, "Websocket connection error:", throwable);
 	}
 }

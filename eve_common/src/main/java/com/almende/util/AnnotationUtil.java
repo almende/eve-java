@@ -87,7 +87,7 @@ public final class AnnotationUtil {
 		boolean check = true;
 		try {
 			Class.forName("java.lang.invoke.MethodHandle", false, null);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			check = false;
 		}
 		HASMETHODHANDLES = check;

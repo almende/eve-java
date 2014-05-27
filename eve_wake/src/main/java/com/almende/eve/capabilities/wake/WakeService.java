@@ -213,8 +213,13 @@ public class WakeService implements Capability, CapabilityService {
 		return singleton;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson
+	 * .databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler,
+	 * java.lang.Class)
 	 */
 	@Override
 	public <T extends Capability, V> T get(final ObjectNode params,
@@ -230,7 +235,9 @@ public class WakeService implements Capability, CapabilityService {
 		return TypeUtil.inject(service, type);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override

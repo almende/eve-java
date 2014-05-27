@@ -93,7 +93,7 @@ public class TestTransports extends TestCase {
 		
 		transport.send(URI.create("local:testMe"), "Hello World", null);
 	}
-
+	
 	/**
 	 * Test Websocket transport.
 	 * 
@@ -110,19 +110,21 @@ public class TestTransports extends TestCase {
 		jettyParms.put("port", 8082);
 		serverConfig.put("jetty", jettyParms);
 		
-		final Transport server = WsServerTransportFactory.get(serverConfig, new MyReceiver());
+		final Transport server = WsServerTransportFactory.get(serverConfig,
+				new MyReceiver());
 		
 		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
 		clientConfig.setId("testClient");
 		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
 		
-		final WsClientTransport client = WsClientTransportFactory.get(clientConfig, new MyReceiver());
+		final WsClientTransport client = WsClientTransportFactory.get(
+				clientConfig, new MyReceiver());
 		client.connect();
-
+		
 		server.send(URI.create("wsclient:testClient"), "Hi there!", null);
 		
-		client.send(URI.create("ws://localhost:8082/ws/testServer"), "Good day to you!", null);
-		
+		client.send(URI.create("ws://localhost:8082/ws/testServer"),
+				"Good day to you!", null);
 		
 	}
 	
@@ -167,7 +169,9 @@ public class TestTransports extends TestCase {
 			// Not used, data should be the same.
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#getKey()
 		 */
 		@Override

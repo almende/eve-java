@@ -27,32 +27,39 @@ public class WsServerContextListener implements ServletContextListener {
 	private static final Logger	LOG	= Logger.getLogger(WsServerContextListener.class
 											.getName());
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
+	 * .ServletContextEvent)
 	 */
 	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		javax.websocket.server.ServerContainer serverContainer = (javax.websocket.server.ServerContainer) sce
+	public void contextInitialized(final ServletContextEvent sce) {
+		final javax.websocket.server.ServerContainer serverContainer = (javax.websocket.server.ServerContainer) sce
 				.getServletContext().getAttribute(
 						"javax.websocket.server.ServerContainer");
 		try {
-			final URI myUrl = URI.create(sce.getServletContext().getInitParameter("servletUrl")); 
-			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(
-					WebsocketEndpoint.class, myUrl.getPath())
-					.build();
-			config.getUserProperties().put("servletUrl",myUrl);
+			final URI myUrl = URI.create(sce.getServletContext()
+					.getInitParameter("servletUrl"));
+			final ServerEndpointConfig config = ServerEndpointConfig.Builder
+					.create(WebsocketEndpoint.class, myUrl.getPath()).build();
+			config.getUserProperties().put("servletUrl", myUrl);
 			serverContainer.addEndpoint(config);
-		} catch (DeploymentException e) {
+		} catch (final DeploymentException e) {
 			LOG.log(Level.WARNING,
 					"Couldn't initialize websocket server endpoint.", e);
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+	 * ServletContextEvent)
 	 */
 	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
+	public void contextDestroyed(final ServletContextEvent sce) {
 		// TODO Auto-generated method stub
 		
 	}

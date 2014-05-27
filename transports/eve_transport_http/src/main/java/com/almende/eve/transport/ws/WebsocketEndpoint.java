@@ -30,11 +30,14 @@ public class WebsocketEndpoint extends Endpoint {
 													.getName());
 	private WebsocketTransport	transport	= null;
 	
-	/* (non-Javadoc)
-	 * @see javax.websocket.Endpoint#onOpen(javax.websocket.Session, javax.websocket.EndpointConfig)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.websocket.Endpoint#onOpen(javax.websocket.Session,
+	 * javax.websocket.EndpointConfig)
 	 */
 	@Override
-	public void onOpen(Session session, EndpointConfig config) {
+	public void onOpen(final Session session, final EndpointConfig config) {
 		final RemoteEndpoint.Basic remote = session.getBasicRemote();
 		final URI address = (URI) config.getUserProperties().get("address");
 		transport = WebsocketService.get(address);
@@ -44,7 +47,7 @@ public class WebsocketEndpoint extends Endpoint {
 				requestURI, "UTF-8");
 		
 		String remoteId = null;
-		for (NameValuePair param : queryparms) {
+		for (final NameValuePair param : queryparms) {
 			if (param.getName().equals("id")) {
 				remoteId = param.getValue();
 			}
@@ -57,10 +60,11 @@ public class WebsocketEndpoint extends Endpoint {
 		
 		final String id = remoteId;
 		session.addMessageHandler(new MessageHandler.Whole<String>() {
-			public void onMessage(String text) {
+			@Override
+			public void onMessage(final String text) {
 				try {
 					transport.receive(text, id);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOG.log(Level.WARNING, "Failed to receive message", e);
 				}
 			}
@@ -88,12 +92,17 @@ public class WebsocketEndpoint extends Endpoint {
 	@Override
 	public void onError(final Session session, final Throwable throwable) {
 		LOG.log(Level.WARNING, "Websocket connection error:", throwable);
-		if (throwable instanceof SocketTimeoutException){
-			transport.onClose(session, new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, "Timeout on Socket!"));
-		};
-		if (throwable instanceof EOFException){
-			transport.onClose(session, new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, "EOF!"));
-		};
-
+		if (throwable instanceof SocketTimeoutException) {
+			transport.onClose(session, new CloseReason(
+					CloseReason.CloseCodes.CLOSED_ABNORMALLY,
+					"Timeout on Socket!"));
+		}
+		;
+		if (throwable instanceof EOFException) {
+			transport.onClose(session, new CloseReason(
+					CloseReason.CloseCodes.CLOSED_ABNORMALLY, "EOF!"));
+		}
+		;
+		
 	}
 }

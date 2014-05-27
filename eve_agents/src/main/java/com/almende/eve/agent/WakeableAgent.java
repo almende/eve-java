@@ -44,20 +44,24 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 *            the ws
 	 */
 	public void registerAt(final WakeService ws) {
-		rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
-				getId(), ws));
+		rpc = RpcTransformFactory
+				.get(new WakeHandler<Object>(this, getId(), ws));
 		receiver = new WakeHandler<Receiver>(this, getId(), ws);
 		loadConfig(false);
 		ws.register(getId(), getConfig(), this.getClass().getName());
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.capabilities.wake.Wakeable#wake(java.lang.String, com.fasterxml.jackson.databind.node.ObjectNode, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.capabilities.wake.Wakeable#wake(java.lang.String,
+	 * com.fasterxml.jackson.databind.node.ObjectNode, boolean)
 	 */
 	@Override
-	public void wake(final String wakeKey, final ObjectNode params, final boolean onBoot) {
-		rpc = RpcTransformFactory.get(new WakeHandler<Object>(this,
-				wakeKey, ws));
+	public void wake(final String wakeKey, final ObjectNode params,
+			final boolean onBoot) {
+		rpc = RpcTransformFactory
+				.get(new WakeHandler<Object>(this, wakeKey, ws));
 		receiver = new WakeHandler<Receiver>(this, wakeKey, ws);
 		setConfig(params, onBoot);
 	}

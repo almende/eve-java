@@ -14,9 +14,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class FileStateConfig.
  */
 public class FileStateConfig extends StateConfig {
-	private static final Logger						LOG			= Logger.getLogger(FileStateConfig.class
-			.getSimpleName());
-
+	private static final Logger	LOG	= Logger.getLogger(FileStateConfig.class
+											.getSimpleName());
+	
 	/**
 	 * Instantiates a new file state config.
 	 */

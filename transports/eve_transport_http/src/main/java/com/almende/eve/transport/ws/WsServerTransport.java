@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WebsocketTransport.
  */
 public class WsServerTransport extends WebsocketTransport {
-	private HashMap<URI, Basic>	remotes	= new HashMap<URI, Basic>();
+	private final HashMap<URI, Basic>	remotes	= new HashMap<URI, Basic>();
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -39,18 +39,22 @@ public class WsServerTransport extends WebsocketTransport {
 	 * @param params
 	 *            the params
 	 */
-	public WsServerTransport(URI address, Handler<Receiver> handle,
-			TransportService service, ObjectNode params) {
+	public WsServerTransport(final URI address, final Handler<Receiver> handle,
+			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.ws.WebsocketTransport#onClose(javax.websocket.Session, javax.websocket.CloseReason)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.almende.eve.transport.ws.WebsocketTransport#onClose(javax.websocket
+	 * .Session, javax.websocket.CloseReason)
 	 */
 	@Override
 	public void onClose(final Session session, final CloseReason closeReason) {
 		if (session.getUserProperties().containsKey("remoteId")) {
-			String remoteId = (String) session.getUserProperties().get(
+			final String remoteId = (String) session.getUserProperties().get(
 					"remoteId");
 			final URI key = URI.create("wsclient:" + remoteId);
 			remotes.remove(key);
@@ -74,7 +78,8 @@ public class WsServerTransport extends WebsocketTransport {
 	 * @param remote
 	 *            the remote
 	 */
-	protected void registerRemote(String id, Basic remote) {
+	@Override
+	protected void registerRemote(final String id, final Basic remote) {
 		final URI key = URI.create("wsclient:" + id);
 		remotes.put(key, remote);
 	}
@@ -99,15 +104,16 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			Basic remote = remotes.get(receiverUri);
+			final Basic remote = remotes.get(receiverUri);
 			remote.sendText(message);
 			remote.flushBatch();
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
-					+ " is currently not connected. ("+getAddress()+" / "+remotes.keySet()+")");
+					+ " is currently not connected. (" + getAddress() + " / "
+					+ remotes.keySet() + ")");
 		}
 	}
 	
@@ -118,10 +124,10 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			Basic remote = remotes.get(receiverUri);
+			final Basic remote = remotes.get(receiverUri);
 			remote.sendBinary(ByteBuffer.wrap(message));
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()

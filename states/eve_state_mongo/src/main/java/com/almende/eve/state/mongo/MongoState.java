@@ -56,7 +56,9 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			this.timestamp = timestamp;
 		}
 		
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Throwable#getMessage()
 		 */
 		@Override
@@ -77,7 +79,9 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	@JsonIgnore
 	private MongoCollection			collection;
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.state.AbstractState#getId()
 	 */
 	@Id

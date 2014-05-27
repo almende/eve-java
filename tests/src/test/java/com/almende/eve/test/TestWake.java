@@ -26,7 +26,7 @@ public class TestWake extends TestCase {
 	public void testWake() {
 		final WakeServiceConfig config = new WakeServiceConfig();
 		final FileStateConfig stateconfig = new FileStateConfig();
-		stateconfig.setPath( ".wakeservices");
+		stateconfig.setPath(".wakeservices");
 		stateconfig.setId("testWakeService");
 		config.setState(stateconfig);
 		

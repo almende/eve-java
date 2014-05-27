@@ -32,9 +32,9 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 * @param params
 	 *            the params
 	 */
-	public WebsocketTransport(URI address, Handler<Receiver> handle,
-			TransportService service, ObjectNode params) {
-		super(address,handle,service,params);
+	public WebsocketTransport(final URI address, final Handler<Receiver> handle,
+			final TransportService service, final ObjectNode params) {
+		super(address, handle, service, params);
 	}
 	
 	protected abstract void registerRemote(String key, Basic remote);
@@ -49,9 +49,12 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public abstract void receive(final String body, final String id) throws IOException;
+	public abstract void receive(final String body, final String id)
+			throws IOException;
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -59,7 +62,9 @@ public abstract class WebsocketTransport extends AbstractTransport {
 		// Nothing to do on the server side.
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override

@@ -53,17 +53,21 @@ public class EveServlet extends HttpServlet {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
 	 */
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		String servletUrl = config.getInitParameter("ServletUrl");
-		if (servletUrl != null){
+	public void init(final ServletConfig config) throws ServletException {
+		final String servletUrl = config.getInitParameter("ServletUrl");
+		if (servletUrl != null) {
 			try {
 				myUrl = new URI(servletUrl);
-			} catch (URISyntaxException e) {
-				LOG.log(Level.WARNING,"Couldn't init servlet, url invalid. ('ServletUrl' init param)",e);
+			} catch (final URISyntaxException e) {
+				LOG.log(Level.WARNING,
+						"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
+						e);
 			}
 		} else {
 			LOG.warning("Servlet init parameter 'ServletUrl' is required!");
@@ -215,8 +219,12 @@ public class EveServlet extends HttpServlet {
 		return id;
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doPost(final HttpServletRequest req,

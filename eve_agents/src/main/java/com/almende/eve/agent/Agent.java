@@ -50,7 +50,7 @@ public class Agent implements Receiver {
 	private String				agentId		= null;
 	private AgentConfig			config		= null;
 	private State				state		= null;
-	private Router				transport	= new Router();
+	private final Router				transport	= new Router();
 	private Scheduler			scheduler	= null;
 	protected RpcTransform		rpc			= RpcTransformFactory
 													.get(new SimpleHandler<Object>(
@@ -96,7 +96,8 @@ public class Agent implements Receiver {
 	 * @param onBoot
 	 *            the on boot
 	 */
-	public Agent(final String agentId, final ObjectNode config, final boolean onBoot) {
+	public Agent(final String agentId, final ObjectNode config,
+			final boolean onBoot) {
 		this.config = new AgentConfig(agentId, config);
 		loadConfig(onBoot);
 	}
@@ -181,12 +182,15 @@ public class Agent implements Receiver {
 		loadState(config.getState());
 		loadTransports(config.getTransport(), onBoot);
 		// All agents have a local transport
-		transport.register(LocalTransportFactory.get(
-				new LocalTransportConfig(agentId), receiver));
+		transport.register(LocalTransportFactory.get(new LocalTransportConfig(
+				agentId), receiver));
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object, java.net.URI, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
+	 * java.net.URI, java.lang.String)
 	 */
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
@@ -209,7 +213,7 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public void setScheduler(final Scheduler scheduler) {
 		this.scheduler = scheduler;
-		config.put("scheduler",scheduler.getParams());
+		config.put("scheduler", scheduler.getParams());
 	}
 	
 	/**
@@ -218,7 +222,7 @@ public class Agent implements Receiver {
 	 * @param schedulerConfig
 	 *            the scheduler config
 	 */
-	public void loadScheduler(final ObjectNode schedulerConfig){
+	public void loadScheduler(final ObjectNode schedulerConfig) {
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
@@ -230,8 +234,8 @@ public class Agent implements Receiver {
 			}
 			scheduler = SchedulerFactory
 					.getScheduler(schedulerConfig, receiver);
-
-			config.put("scheduler",schedulerConfig);
+			
+			config.put("scheduler", schedulerConfig);
 		}
 	}
 	
@@ -255,7 +259,7 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public void setState(final State state) {
 		this.state = state;
-		config.put("state",state.getParams());
+		config.put("state", state.getParams());
 	}
 	
 	/**
@@ -264,14 +268,14 @@ public class Agent implements Receiver {
 	 * @param sc
 	 *            the sc
 	 */
-	public void loadState(final ObjectNode sc){
+	public void loadState(final ObjectNode sc) {
 		if (sc != null) {
 			final StateConfig stateConfig = new StateConfig(sc);
 			if (agentId != null && stateConfig.getId() == null) {
 				stateConfig.setId(agentId);
 			}
 			state = StateFactory.getState(stateConfig);
-			config.put("state",stateConfig);
+			config.put("state", stateConfig);
 		}
 	}
 	
@@ -292,12 +296,12 @@ public class Agent implements Receiver {
 	 * @param transport
 	 *            the transport
 	 */
-	public void addTransport(final Transport transport){
+	public void addTransport(final Transport transport) {
 		this.transport.register(transport);
 		
 		final JsonNode transportConfig = config.get("transport");
-		if (transportConfig.isArray()){
-			((ArrayNode)transportConfig).add(transport.getParams());
+		if (transportConfig.isArray()) {
+			((ArrayNode) transportConfig).add(transport.getParams());
 		} else {
 			final ArrayNode transports = JOM.createArrayNode();
 			transports.add(transportConfig);
@@ -314,7 +318,8 @@ public class Agent implements Receiver {
 	 * @param onBoot
 	 *            the on boot
 	 */
-	public void loadTransports(final JsonNode transportConfig, final boolean onBoot){
+	public void loadTransports(final JsonNode transportConfig,
+			final boolean onBoot) {
 		if (transportConfig != null) {
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();

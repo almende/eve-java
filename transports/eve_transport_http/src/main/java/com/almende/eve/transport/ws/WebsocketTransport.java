@@ -39,8 +39,9 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 * @param params
 	 *            the params
 	 */
-	public WebsocketTransport(URI address, Handler<Receiver> handle,
-			TransportService service, ObjectNode params) {
+	public WebsocketTransport(final URI address,
+			final Handler<Receiver> handle, final TransportService service,
+			final ObjectNode params) {
 		super(address, handle, service, params);
 	}
 	
@@ -82,11 +83,13 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 * @param config
 	 *            the config
 	 */
-	public void onOpen(Session session, EndpointConfig config) {
+	public void onOpen(final Session session, final EndpointConfig config) {
 		setConnected(true);
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -94,14 +97,16 @@ public abstract class WebsocketTransport extends AbstractTransport {
 		// Nothing to do on the server side.
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
 	public void disconnect() {
 		// Nothing to do on the server side.
 	}
-
+	
 	/**
 	 * Checks if is connected.
 	 * 
@@ -110,14 +115,14 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	public boolean isConnected() {
 		return connected;
 	}
-
+	
 	/**
 	 * Sets the connected.
 	 * 
 	 * @param connected
 	 *            the new connected
 	 */
-	public void setConnected(boolean connected) {
+	public void setConnected(final boolean connected) {
 		this.connected = connected;
 	}
 }

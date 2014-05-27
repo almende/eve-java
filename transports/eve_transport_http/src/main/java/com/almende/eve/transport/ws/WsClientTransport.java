@@ -47,16 +47,16 @@ public class WsClientTransport extends WebsocketTransport {
 	 * @param params
 	 *            the params
 	 */
-	public WsClientTransport(URI address, Handler<Receiver> handle,
-			TransportService service, ObjectNode params) {
+	public WsClientTransport(final URI address, final Handler<Receiver> handle,
+			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
 		final WebsocketTransportConfig config = new WebsocketTransportConfig(
 				params);
-		String sURL = config.getServerUrl();
+		final String sURL = config.getServerUrl();
 		if (sURL != null) {
 			try {
 				serverUrl = new URI(sURL);
-			} catch (URISyntaxException e) {
+			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING,
 						"'serverUrl' parameter couldn't be parsed", e);
 			}
@@ -72,7 +72,8 @@ public class WsClientTransport extends WebsocketTransport {
 	 * @param remote
 	 *            the new remote
 	 */
-	protected void registerRemote(String key, Basic remote) {
+	@Override
+	protected void registerRemote(final String key, final Basic remote) {
 		this.remote = remote;
 	}
 	
@@ -96,7 +97,7 @@ public class WsClientTransport extends WebsocketTransport {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public void send(byte[] message) throws IOException {
+	public void send(final byte[] message) throws IOException {
 		send(serverUrl, message, null);
 	}
 	
@@ -108,20 +109,25 @@ public class WsClientTransport extends WebsocketTransport {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public void send(String message) throws IOException {
+	public void send(final String message) throws IOException {
 		send(serverUrl, message, null);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public void send(final URI receiverUri, final String message, final String tag)
 			throws IOException {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
-							+ receiverUri.toASCIIString() + " serverUrl:"+serverUrl.toASCIIString());
+							+ receiverUri.toASCIIString()
+							+ " serverUrl:"
+							+ serverUrl.toASCIIString());
 		}
 		if (remote == null || !isConnected()) {
 			connect();
@@ -133,11 +139,14 @@ public class WsClientTransport extends WebsocketTransport {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
@@ -154,7 +163,9 @@ public class WsClientTransport extends WebsocketTransport {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.ws.WebsocketTransport#connect()
 	 */
 	@Override
@@ -164,28 +175,32 @@ public class WsClientTransport extends WebsocketTransport {
 			client.setDefaultMaxSessionIdleTimeout(-1);
 		}
 		try {
-			ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
+			final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
 					.build();
 			cec.getUserProperties().put("address", getAddress());
 			
 			client.connectToServer(WebsocketEndpoint.class, cec, new URI(
 					serverUrl + "?id=" + myId));
-		} catch (DeploymentException e) {
+		} catch (final DeploymentException e) {
 			LOG.log(Level.WARNING, "Can't connect to server", e);
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Can't parse server address", e);
 		}
 		
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.ws.WebsocketTransport#disconnect()
 	 */
 	@Override
 	public void disconnect() {
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override

@@ -39,7 +39,6 @@ public class DebugServlet extends HttpServlet {
 															.getSimpleName());
 	private URI					myUrl				= null;
 	
-	
 	/**
 	 * Instantiates a new eve servlet.
 	 */
@@ -58,17 +57,21 @@ public class DebugServlet extends HttpServlet {
 		}
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
 	 */
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		String servletUrl = config.getInitParameter("ServletUrl");
-		if (servletUrl != null){
+	public void init(final ServletConfig config) throws ServletException {
+		final String servletUrl = config.getInitParameter("ServletUrl");
+		if (servletUrl != null) {
 			try {
 				myUrl = new URI(servletUrl);
-			} catch (URISyntaxException e) {
-				LOG.log(Level.WARNING,"Couldn't init servlet, url invalid. ('ServletUrl' init param)",e);
+			} catch (final URISyntaxException e) {
+				LOG.log(Level.WARNING,
+						"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
+						e);
 			}
 		} else {
 			LOG.warning("Servlet init parameter 'ServletUrl' is required!");
@@ -232,8 +235,12 @@ public class DebugServlet extends HttpServlet {
 		return id.indexOf('/') < 0 ? null : id.substring(id.indexOf('/') + 1);
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doPost(final HttpServletRequest req,
@@ -338,8 +345,7 @@ public class DebugServlet extends HttpServlet {
 				resp.flushBuffer();
 			} else {
 				resp.setContentType("text/plain");
-				resp.getWriter()
-						.println("Agent:" + id+ " is unknown!");
+				resp.getWriter().println("Agent:" + id + " is unknown!");
 				resp.getWriter().close();
 				resp.flushBuffer();
 			}

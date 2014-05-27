@@ -26,11 +26,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JettyLauncher.
  */
 public class JettyLauncher implements ServletLauncher {
-	private static final Logger				LOG		= Logger.getLogger(JettyLauncher.class
-															.getName());
-	private static Server					server	= null;
-	private static ServletContextHandler	context	= null;
-	private static ServerContainer			wscontainer = null;
+	private static final Logger				LOG			= Logger.getLogger(JettyLauncher.class
+																.getName());
+	private static Server					server		= null;
+	private static ServletContextHandler	context		= null;
+	private static ServerContainer			wscontainer	= null;
 	
 	/**
 	 * Inits the server.
@@ -49,7 +49,8 @@ public class JettyLauncher implements ServletLauncher {
 		
 		context.setContextPath("/");
 		server.setHandler(context);
-		wscontainer = WebSocketServerContainerInitializer.configureContext(context);
+		wscontainer = WebSocketServerContainerInitializer
+				.configureContext(context);
 		
 		try {
 			server.start();
@@ -99,11 +100,13 @@ public class JettyLauncher implements ServletLauncher {
 				initServer(JOM.createObjectNode());
 			}
 		}
-		LOG.info("Registering websocket server endpoint:" + serverConfig.getPath());
+		LOG.info("Registering websocket server endpoint:"
+				+ serverConfig.getPath());
 		try {
 			wscontainer.addEndpoint(serverConfig);
-		} catch (DeploymentException e) {
-			LOG.log(Level.WARNING,"Couldn't initialize websocket server endpoint.",e);
+		} catch (final DeploymentException e) {
+			LOG.log(Level.WARNING,
+					"Couldn't initialize websocket server endpoint.", e);
 		}
 	}
 }
