@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.CloseReason;
-import javax.websocket.RemoteEndpoint.Basic;
+import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 
 import com.almende.eve.capabilities.handler.Handler;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WebsocketTransport.
  */
 public class WsServerTransport extends WebsocketTransport {
-	private final Map<URI, Basic>	remotes	= new HashMap<URI, Basic>();
+	private final Map<URI, Async>	remotes	= new HashMap<URI, Async>();
 	
 	/**
 	 * Instantiates a new websocket transport.
@@ -80,7 +80,7 @@ public class WsServerTransport extends WebsocketTransport {
 	 *            the remote
 	 */
 	@Override
-	protected void registerRemote(final String id, final Basic remote) {
+	protected void registerRemote(final String id, final Async remote) {
 		final URI key = URI.create("wsclient:" + id);
 		remotes.put(key, remote);
 	}
@@ -108,7 +108,7 @@ public class WsServerTransport extends WebsocketTransport {
 	public void send(final URI receiverUri, final String message,
 			final String tag) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			final Basic remote = remotes.get(receiverUri);
+			final Async remote = remotes.get(receiverUri);
 			remote.sendText(message);
 			remote.flushBatch();
 		} else {
@@ -128,8 +128,9 @@ public class WsServerTransport extends WebsocketTransport {
 	public void send(final URI receiverUri, final byte[] message,
 			final String tag) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
-			final Basic remote = remotes.get(receiverUri);
+			final Async remote = remotes.get(receiverUri);
 			remote.sendBinary(ByteBuffer.wrap(message));
+			remote.flushBatch();
 		} else {
 			throw new IOException("Remote: " + receiverUri.toASCIIString()
 					+ " is currently not connected.");

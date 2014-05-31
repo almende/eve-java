@@ -275,7 +275,7 @@ public class ZmqTransport extends AbstractTransport {
 		} else {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key) && doesAuthentication) {
-				final SyncCallback<String> callback = new SyncCallback<String>();
+				final SyncCallback<String> callback = new SyncCallback<String>(){};
 				CALLBACKS.push(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
 						.getTime().getBytes(), null);

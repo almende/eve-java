@@ -37,14 +37,13 @@ public class WebsocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onOpen(final Session session, final EndpointConfig config) {
-		final RemoteEndpoint.Basic remote = session.getBasicRemote();
+		final RemoteEndpoint.Async remote = session.getAsyncRemote();
 		final URI address = (URI) config.getUserProperties().get("address");
 		transport = WebsocketService.get(address);
 		
-		Map<String,List<String>> queryparms = session.getRequestParameterMap();
-
+		Map<String, List<String>> queryparms = session.getRequestParameterMap();
 		String remoteId = null;
-		for (final Entry<String,List<String>> param : queryparms.entrySet()) {
+		for (final Entry<String, List<String>> param : queryparms.entrySet()) {
 			if (param.getKey().equals("id")) {
 				remoteId = param.getValue().get(0);
 			}
@@ -52,6 +51,12 @@ public class WebsocketEndpoint extends Endpoint {
 		if (remoteId != null) {
 			session.getUserProperties().put("remoteId", remoteId);
 		}
+		try {
+			remote.setBatchingAllowed(true);
+		} catch (IOException e1) {
+			LOG.log(Level.WARNING, "Failed to switch on Batching", e1);
+		}
+		
 		transport.registerRemote(remoteId, remote);
 		transport.setConnected(true);
 		
@@ -59,11 +64,19 @@ public class WebsocketEndpoint extends Endpoint {
 		session.addMessageHandler(new MessageHandler.Whole<String>() {
 			@Override
 			public void onMessage(final String text) {
-				try {
-					transport.receive(text, id);
-				} catch (final IOException e) {
-					LOG.log(Level.WARNING, "Failed to receive message", e);
-				}
+				
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							transport.receive(text, id);
+						} catch (final IOException e) {
+							LOG.log(Level.WARNING, "Failed to receive message",
+									e);
+						}
+					}
+				}).start();
 			}
 			
 		});

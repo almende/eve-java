@@ -70,9 +70,13 @@ public abstract class TypeUtil<T> {
 			};
 		}
 		final Type gsc = target.getClass().getGenericSuperclass();
-		ParameterizedType ptype = (ParameterizedType) TypeResolver
-				.resolveGenericType((Class<?>) gsc, target.getClass());
-		
+		ParameterizedType ptype = null;
+		if (gsc instanceof ParameterizedType) {
+			ptype = (ParameterizedType) gsc;
+		} else {
+			ptype = (ParameterizedType) TypeResolver.resolveGenericType(
+					(Class<?>) gsc, target.getClass());
+		}
 		if (ptype == null) {
 			ptype = (ParameterizedType) target.getClass()
 					.getGenericInterfaces()[0];

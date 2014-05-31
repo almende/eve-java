@@ -16,6 +16,7 @@
 
 	<properties>
 		<jodah.version>0.3.0</jodah.version>
+		<joda-convert.version>1.6</joda-convert.version>
 		<codec.version>1.9</codec.version>
 		<jackson.version>2.3.3</jackson.version>
 	</properties>
@@ -25,6 +26,11 @@
 			<groupId>org.jodah</groupId>
 			<artifactId>typetools</artifactId>
 			<version>${jodah.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.joda</groupId>
+			<artifactId>joda-convert</artifactId>
+			<version>${joda-convert.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

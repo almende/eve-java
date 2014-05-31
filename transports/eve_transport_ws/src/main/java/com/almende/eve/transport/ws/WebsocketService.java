@@ -4,6 +4,7 @@
  */
 package com.almende.eve.transport.ws;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -124,9 +125,12 @@ public class WebsocketService implements TransportService {
 			if (id != null) {
 				try {
 					final URI key = new URI("wsclient:" + id);
-					
+					LOG.log(Level.WARNING,"Looking up:"+key);
 					if (transports.containsKey(key)) {
 						result = transports.get(key);
+						if (!(new WebsocketTransportConfig(result.getParams())).getServerUrl().equals(config.getServerUrl())){
+							((WsClientTransport)result).updateConfig(config);
+						}
 						result.getHandle().update(newHandle);
 					} else {
 						result = new WsClientTransport(key, newHandle, this,
@@ -136,6 +140,8 @@ public class WebsocketService implements TransportService {
 				} catch (final URISyntaxException e) {
 					LOG.log(Level.WARNING,
 							"Couldn't parse Client Url: wsclient:" + id, e);
+				} catch (IOException e) {
+					LOG.log(Level.WARNING,"Couldn't reconnect with new config.",e);
 				}
 			} else {
 				LOG.warning("Parameter 'id' is required.");

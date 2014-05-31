@@ -464,7 +464,7 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final SyncCallback<T> callback = new SyncCallback<T>();
+		final SyncCallback<T> callback = new SyncCallback<T>(){};
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
 				null);
 		try {

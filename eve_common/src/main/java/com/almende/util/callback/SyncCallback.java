@@ -10,7 +10,7 @@ package com.almende.util.callback;
  * @param <T>
  *            the generic type
  */
-public class SyncCallback<T> implements AsyncCallback<T> {
+public abstract class SyncCallback<T> implements AsyncCallback<T> {
 	private T			response	= null;
 	private Exception	exception	= null;
 	private boolean		done		= false;

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import javax.websocket.CloseReason;
 import javax.websocket.EndpointConfig;
-import javax.websocket.RemoteEndpoint.Basic;
+import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 
 import com.almende.eve.capabilities.handler.Handler;
@@ -45,7 +45,7 @@ public abstract class WebsocketTransport extends AbstractTransport {
 		super(address, handle, service, params);
 	}
 	
-	protected abstract void registerRemote(String key, Basic remote);
+	protected abstract void registerRemote(String key, Async remote);
 	
 	/**
 	 * Receive.

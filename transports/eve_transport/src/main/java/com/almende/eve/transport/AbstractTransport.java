@@ -101,7 +101,17 @@ public abstract class AbstractTransport implements Transport {
 	public ObjectNode getParams() {
 		return myParams;
 	}
-	
+
+	/**
+	 * Sets the params.
+	 * 
+	 * @param params
+	 *            the new params
+	 */
+	public void setParams(ObjectNode params) {
+		this.myParams = params;
+	}
+
 	/**
 	 * Send local.
 	 * 

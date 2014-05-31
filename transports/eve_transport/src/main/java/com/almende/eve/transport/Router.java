@@ -84,7 +84,13 @@ public class Router implements Transport {
 	 */
 	@Override
 	public void connect() throws IOException {
-		
+		final Set<Transport> result = new HashSet<Transport>(transports.size());
+		for (final Transport transport : transports.values()) {
+			result.add(transport);
+		}
+		for (final Transport transport : result) {
+			transport.connect();
+		}
 	}
 	
 	/*
@@ -94,7 +100,13 @@ public class Router implements Transport {
 	 */
 	@Override
 	public void disconnect() {
-		
+		final Set<Transport> result = new HashSet<Transport>(transports.size());
+		for (final Transport transport : transports.values()) {
+			result.add(transport);
+		}
+		for (final Transport transport : result) {
+			transport.disconnect();
+		}
 	}
 	
 	/*

@@ -153,7 +153,7 @@ public class HttpTransport extends AbstractTransport {
 	public String receive(final String body, final URI senderUrl)
 			throws IOException {
 		final String tag = new UUID().toString();
-		final SyncCallback<String> callback = new SyncCallback<String>();
+		final SyncCallback<String> callback = new SyncCallback<String>(){};
 		callbacks.push(tag, "", callback);
 		
 		super.getHandle().get().receive(body, senderUrl, tag);

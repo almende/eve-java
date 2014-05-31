@@ -48,7 +48,7 @@ public final class AgentProxyFactory {
 					public Object invoke(final Object proxy,
 							final Method method, final Object[] args) {
 						
-						final SyncCallback<Object> callback = new SyncCallback<Object>();
+						final SyncCallback<Object> callback = new SyncCallback<Object>(){};
 						try {
 							sender.send(receiverUrl, method, args, callback);
 						} catch (final IOException e) {
