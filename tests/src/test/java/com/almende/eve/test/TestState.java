@@ -8,10 +8,14 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.almende.eve.capabilities.CapabilityFactory;
+import com.almende.eve.capabilities.CapabilityBuilder;
 import com.almende.eve.state.State;
-import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.StateBuilder;
+import com.almende.eve.state.couch.CouchState;
+import com.almende.eve.state.couch.CouchStateBuilder;
 import com.almende.eve.state.couch.CouchStateConfig;
+import com.almende.eve.state.mongo.MongoState;
+import com.almende.eve.state.mongo.MongoStateBuilder;
 import com.almende.eve.state.mongo.MongoStateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -47,12 +51,12 @@ public class TestState extends TestCase {
 		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
 		params.put("id", "TestAgent");
 		
-		State myState = CapabilityFactory.get(params, null, State.class);
-		State myState2 = StateFactory.getState(params);
+		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+		State myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
-		myState = CapabilityFactory.get(params, null, State.class);
-		myState2 = StateFactory.getState(params);
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
 	
@@ -66,17 +70,17 @@ public class TestState extends TestCase {
 		params.put("json", false);
 		params.put("id", "TestAgent");
 		
-		State myState = CapabilityFactory.get(params, null, State.class);
-		State myState2 = StateFactory.getState(params);
+		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+		State myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
-		myState = CapabilityFactory.get(params, null, State.class);
-		myState2 = StateFactory.getState(params);
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
 		params = params.deepCopy();
 		params.put("json", true);
-		myState = CapabilityFactory.get(params, null, State.class);
-		myState2 = StateFactory.getState(params);
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
 	}
@@ -86,15 +90,15 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testMongoState() {
-		final MongoStateConfig config = new MongoStateConfig();
-		config.setId("TestAgent");
+		final MongoStateConfig params = new MongoStateConfig();
+		params.setId("TestAgent");
 		
-		State myState = CapabilityFactory.get(config, null, State.class);
-		State myState2 = StateFactory.getState(config);
+		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+		MongoState myState2 = new MongoStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
-		myState = CapabilityFactory.get(config, null, State.class);
-		myState2 = StateFactory.getState(config);
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new MongoStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
 	
@@ -103,16 +107,16 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testCouchState() {
-		final CouchStateConfig config = new CouchStateConfig();
-		config.setId("TestAgent");
-		config.setUrl("http://localhost:5984");
+		final CouchStateConfig params = new CouchStateConfig();
+		params.setId("TestAgent");
+		params.setUrl("http://localhost:5984");
 		
-		State myState = CapabilityFactory.get(config, null, State.class);
-		State myState2 = StateFactory.getState(config);
+		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+		CouchState myState2 = new CouchStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
-		myState = CapabilityFactory.get(config, null, State.class);
-		myState2 = StateFactory.getState(config);
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new CouchStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
 }

@@ -21,7 +21,7 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 
 import com.almende.eve.state.State;
-import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.StateBuilder;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -96,7 +96,7 @@ public final class ApacheHttpClient {
 					"com.almende.eve.state.memory.MemoryStateService");
 			params.put("id", COOKIESTORE);
 			
-			myState = StateFactory.getState(params);
+			myState = new StateBuilder().withConfig(params).build();
 		}
 		
 		/*

@@ -14,14 +14,12 @@ import org.junit.Test;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.LocalTransportConfig;
-import com.almende.eve.transport.LocalTransportFactory;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
-import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.ws.WebsocketTransportConfig;
 import com.almende.eve.transport.ws.WsClientTransport;
-import com.almende.eve.transport.ws.WsClientTransportFactory;
-import com.almende.eve.transport.ws.WsServerTransportFactory;
+import com.almende.eve.transport.ws.WsClientTransportBuilder;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -46,8 +44,8 @@ public class TestTransports extends TestCase {
 		params.put("address", "xmpp://alex@openid.almende.org/test");
 		params.put("password", "alex");
 		
-		final Transport transport = TransportFactory.getTransport(params,
-				new MyReceiver());
+		final Transport transport = new TransportBuilder().withConfig(params)
+				.withHandle(new MyReceiver()).build();
 		transport.connect();
 		
 		transport.send(URI.create("xmpp:gloria@openid.almende.org"),
@@ -70,8 +68,8 @@ public class TestTransports extends TestCase {
 		final ZmqTransportConfig config = new ZmqTransportConfig();
 		config.setAddress("zmq://tcp://127.0.0.1:5678");
 		
-		final Transport transport = TransportFactory.getTransport(config,
-				new MyReceiver());
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(new MyReceiver()).build();
 		transport.connect();
 		
 		transport.send(URI.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
@@ -88,8 +86,8 @@ public class TestTransports extends TestCase {
 	public void testLocal() throws IOException {
 		final LocalTransportConfig config = new LocalTransportConfig("testMe");
 		
-		final Transport transport = LocalTransportFactory.get(config,
-				new MyReceiver());
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(new MyReceiver()).build();
 		
 		transport.send(URI.create("local:testMe"), "Hello World", null);
 	}
@@ -110,15 +108,15 @@ public class TestTransports extends TestCase {
 		jettyParms.put("port", 8082);
 		serverConfig.put("jetty", jettyParms);
 		
-		final Transport server = WsServerTransportFactory.get(serverConfig,
-				new MyReceiver());
+		final Transport server = new TransportBuilder().withConfig(serverConfig)
+				.withHandle(new MyReceiver()).build();
 		
 		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
 		clientConfig.setId("testClient");
 		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
 		
-		final WsClientTransport client = WsClientTransportFactory.get(
-				clientConfig, new MyReceiver());
+		final WsClientTransport client = new WsClientTransportBuilder().withConfig(clientConfig)
+				.withHandle(new MyReceiver()).build();
 		client.connect();
 		
 		server.send(URI.create("wsclient:testClient"), "Hi there!", null);

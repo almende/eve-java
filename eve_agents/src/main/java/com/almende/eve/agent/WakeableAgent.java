@@ -7,7 +7,7 @@ package com.almende.eve.agent;
 import com.almende.eve.capabilities.wake.WakeHandler;
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.Wakeable;
-import com.almende.eve.transform.rpc.RpcTransformFactory;
+import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transport.Receiver;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -44,8 +44,8 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 *            the ws
 	 */
 	public void registerAt(final WakeService ws) {
-		setRpc(RpcTransformFactory
-				.get(new WakeHandler<Object>(this, getId(), ws)));
+		setRpc(new RpcTransformBuilder().withHandle(
+				new WakeHandler<Object>(this, getId(), ws)).build());
 		setReceiver(new WakeHandler<Receiver>(this, getId(), ws));
 		loadConfig(false);
 		ws.register(getId(), getConfig(), this.getClass().getName());
@@ -60,8 +60,8 @@ public class WakeableAgent extends Agent implements Wakeable {
 	@Override
 	public void wake(final String wakeKey, final ObjectNode params,
 			final boolean onBoot) {
-		setRpc(RpcTransformFactory
-				.get(new WakeHandler<Object>(this, wakeKey, ws)));
+		setRpc(new RpcTransformBuilder().withHandle(
+				new WakeHandler<Object>(this, getId(), ws)).build());
 		setReceiver(new WakeHandler<Receiver>(this, wakeKey, ws));
 		setConfig(params, onBoot);
 	}

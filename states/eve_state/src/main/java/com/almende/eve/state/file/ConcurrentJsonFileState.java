@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.state.AbstractState;
+import com.almende.eve.state.file.FileStateBuilder.FileStateProvider;
 import com.almende.util.jackson.JOM;
 import com.almende.util.jackson.JsonNullAwareDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -84,7 +85,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 *            the params
 	 */
 	public ConcurrentJsonFileState(final String agentId, final String filename,
-			final FileStateService service, final ObjectNode params) {
+			final FileStateProvider service, final ObjectNode params) {
 		super(agentId, service, params);
 		this.filename = filename;
 		om = JOM.getInstance();

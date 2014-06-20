@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.scheduling.clock.RunnableClock;
 import com.almende.eve.state.State;
-import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.StateBuilder;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
@@ -49,7 +49,7 @@ public class PersistentScheduler extends SimpleScheduler {
 		if (stateConfig == null) {
 			LOG.warning("Parameter 'state' is required, falling back to SimpleScheduler.");
 		} else {
-			state = StateFactory.getState(stateConfig);
+			state = new StateBuilder().withConfig(stateConfig).build();
 			for (final String key : state.keySet()) {
 				final TaskEntry entry = state.get(key, TaskEntry.class);
 				run(entry);

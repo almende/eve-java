@@ -12,9 +12,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.almende.eve.capabilities.CapabilityFactory;
 import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.transform.rpc.RpcTransform;
+import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
@@ -36,8 +36,8 @@ public class TestRpc extends TestCase {
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("class", "com.almende.eve.transform.rpc.RpcService");
 		
-		final RpcTransform transform = CapabilityFactory.get(params,
-				new SimpleHandler<Object>(new MyClass()), RpcTransform.class);
+		final RpcTransform transform = new RpcTransformBuilder().withConfig(params).withHandle(
+				new SimpleHandler<Object>(new MyClass())).build();
 		
 		final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
 			

@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import com.almende.eve.agent.MyAgent;
 import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.capabilities.wake.WakeServiceBuilder;
 import com.almende.eve.capabilities.wake.WakeServiceConfig;
-import com.almende.eve.capabilities.wake.WakeServiceFactory;
 import com.almende.eve.state.file.FileStateConfig;
 
 /**
@@ -30,7 +30,7 @@ public class TestWake extends TestCase {
 		stateconfig.setId("testWakeService");
 		config.setState(stateconfig);
 		
-		final WakeService ws = WakeServiceFactory.get(config);
+		final WakeService ws = new WakeServiceBuilder().withConfig(config).build();
 		
 		// Create agent without external references, hopefully!
 		new MyAgent("testWakeAgent", ws).init();

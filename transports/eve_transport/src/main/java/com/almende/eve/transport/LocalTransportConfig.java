@@ -21,7 +21,7 @@ public class LocalTransportConfig extends TransportConfig {
 	public LocalTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", LocalService.class.getName());
+			this.put("class", LocalTransportBuilder.class.getName());
 		}
 	}
 	

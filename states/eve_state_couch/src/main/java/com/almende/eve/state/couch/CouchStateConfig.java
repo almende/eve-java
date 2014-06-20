@@ -30,7 +30,7 @@ public class CouchStateConfig extends StateConfig {
 	public CouchStateConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", CouchStateService.class.getName());
+			this.put("class", CouchStateBuilder.class.getName());
 		}
 	}
 	

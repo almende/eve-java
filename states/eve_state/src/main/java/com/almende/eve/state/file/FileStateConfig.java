@@ -33,7 +33,7 @@ public class FileStateConfig extends StateConfig {
 	public FileStateConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", FileStateService.class.getName());
+			this.put("class", FileStateBuilder.class.getName());
 		}
 	}
 	

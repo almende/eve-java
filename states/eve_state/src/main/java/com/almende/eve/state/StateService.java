@@ -4,12 +4,11 @@
  */
 package com.almende.eve.state;
 
-import com.almende.eve.capabilities.CapabilityService;
 
 /**
  * A service for managing State objects.
  */
-public interface StateService extends CapabilityService {
+public interface StateService {
 	
 	/**
 	 * Delete.

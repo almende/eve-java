@@ -30,7 +30,7 @@ public class MongoStateConfig extends StateConfig {
 	public MongoStateConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", MongoStateService.class.getName());
+			this.put("class", MongoStateBuilder.class.getName());
 		}
 	}
 	

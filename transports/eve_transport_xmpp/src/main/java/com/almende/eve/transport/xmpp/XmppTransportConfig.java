@@ -35,7 +35,7 @@ public class XmppTransportConfig extends TransportConfig {
 	public XmppTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!this.has("class")) {
-			setClassName(XmppService.class.getName());
+			setClassName(XmppTransportBuilder.class.getName());
 		}
 	}
 	

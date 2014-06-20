@@ -15,7 +15,7 @@ import org.junit.Test;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
-import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,8 +43,8 @@ public class TestHttp extends TestCase {
 		jettyParms.put("port", 8080);
 		config.put("jetty", jettyParms);
 		
-		final Transport transport = TransportFactory.getTransport(config,
-				new myReceiver());
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(new myReceiver()).build();
 		
 		transport.send(URI.create("http://localhost:8080/agents/testAgent"),
 				"Hello World", null);

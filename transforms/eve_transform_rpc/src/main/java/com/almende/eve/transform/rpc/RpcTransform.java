@@ -14,7 +14,6 @@ import com.almende.eve.auth.Authorizor;
 import com.almende.eve.auth.DefaultAuthorizor;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transform.Transform;
-import com.almende.eve.transform.TransformService;
 import com.almende.eve.transform.rpc.annotation.Sender;
 import com.almende.eve.transform.rpc.formats.JSONMessage;
 import com.almende.eve.transform.rpc.formats.JSONRPCException;
@@ -50,11 +49,8 @@ public class RpcTransform implements Transform {
 	 *            the params
 	 * @param handle
 	 *            the handle
-	 * @param service
-	 *            the service
 	 */
-	public RpcTransform(final ObjectNode params, final Handler<Object> handle,
-			final TransformService service) {
+	public RpcTransform(final ObjectNode params, final Handler<Object> handle) {
 		destination = handle;
 		myParams = params;
 	}

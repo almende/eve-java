@@ -35,7 +35,7 @@ public class ZmqTransportConfig extends TransportConfig {
 	public ZmqTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!this.has("class")) {
-			setClassName(ZmqService.class.getName());
+			setClassName(ZmqTransportBuilder.class.getName());
 		}
 	}
 	

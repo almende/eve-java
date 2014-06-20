@@ -29,7 +29,7 @@ public class SimpleSchedulerConfig extends Config {
 	public SimpleSchedulerConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			setClassName(SimpleSchedulerService.class.getName());
+			setClassName(SimpleSchedulerBuilder.class.getName());
 		}
 	}
 }

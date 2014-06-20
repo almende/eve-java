@@ -29,7 +29,7 @@ public class WakeServiceConfig extends Config {
 	public WakeServiceConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", WakeService.class.getName());
+			this.put("class", WakeServiceBuilder.class.getName());
 		}
 	}
 	

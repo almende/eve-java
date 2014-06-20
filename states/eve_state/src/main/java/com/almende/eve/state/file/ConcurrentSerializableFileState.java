@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.state.AbstractState;
+import com.almende.eve.state.file.FileStateBuilder.FileStateProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -82,7 +83,7 @@ public class ConcurrentSerializableFileState extends
 	 *            the params
 	 */
 	public ConcurrentSerializableFileState(final String agentId,
-			final String filename, final FileStateService service,
+			final String filename, final FileStateProvider service,
 			final ObjectNode params) {
 		super(agentId, service, params);
 		this.filename = filename;

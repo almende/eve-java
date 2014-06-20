@@ -29,7 +29,7 @@ public class PersistentSchedulerConfig extends Config {
 	public PersistentSchedulerConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			setClassName(PersistentSchedulerService.class.getName());
+			setClassName(PersistentSchedulerBuilder.class.getName());
 		}
 	}
 	

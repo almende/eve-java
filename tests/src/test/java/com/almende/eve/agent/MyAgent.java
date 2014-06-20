@@ -15,7 +15,7 @@ import com.almende.eve.capabilities.wake.Wakeable;
 import com.almende.eve.test.TestWake;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
-import com.almende.eve.transport.TransportFactory;
+import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.xmpp.XmppTransportConfig;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -62,8 +62,9 @@ public class MyAgent implements Wakeable, Receiver {
 		
 		ws.register(wakeKey, config, MyAgent.class.getName());
 		
-		transport = TransportFactory.getTransport(config,
-				new WakeHandler<Receiver>(this, wakeKey, ws));
+		transport = new TransportBuilder().withConfig(config)
+				.withHandle(new WakeHandler<Receiver>(this, wakeKey, ws))
+				.build();
 		try {
 			transport.connect();
 			transport.send(URI.create("xmpp:gloria@openid.almende.org"),
@@ -83,8 +84,9 @@ public class MyAgent implements Wakeable, Receiver {
 	public void wake(final String wakeKey, final ObjectNode params,
 			final boolean onBoot) {
 		this.wakeKey = wakeKey;
-		transport = TransportFactory.getTransport(params,
-				new WakeHandler<Receiver>(this, this.wakeKey, ws));
+		transport = new TransportBuilder().withConfig(params)
+				.withHandle(new WakeHandler<Receiver>(this, wakeKey, ws))
+				.build();
 		
 		if (onBoot) {
 			try {

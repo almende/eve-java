@@ -15,23 +15,23 @@ import java.util.logging.Logger;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.scheduling.Scheduler;
-import com.almende.eve.scheduling.SchedulerFactory;
+import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.State;
+import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.StateConfig;
-import com.almende.eve.state.StateFactory;
 import com.almende.eve.transform.rpc.RpcTransform;
-import com.almende.eve.transform.rpc.RpcTransformFactory;
+import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
 import com.almende.eve.transform.rpc.formats.JSONResponse;
+import com.almende.eve.transport.LocalTransportBuilder;
 import com.almende.eve.transport.LocalTransportConfig;
-import com.almende.eve.transport.LocalTransportFactory;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
+import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.TransportConfig;
-import com.almende.eve.transport.TransportFactory;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
@@ -52,9 +52,11 @@ public class Agent implements Receiver {
 	private State				state		= null;
 	private final Router		transport	= new Router();
 	private Scheduler			scheduler	= null;
-	private RpcTransform		rpc			= RpcTransformFactory
-													.get(new SimpleHandler<Object>(
-															this));
+	private RpcTransform		rpc			= new RpcTransformBuilder()
+													.withHandle(
+															new SimpleHandler<Object>(
+																	this))
+													.build();
 	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
 	
 	/**
@@ -212,8 +214,9 @@ public class Agent implements Receiver {
 		loadState(config.getState());
 		loadTransports(config.getTransport(), onBoot);
 		// All agents have a local transport
-		transport.register(LocalTransportFactory.get(new LocalTransportConfig(
-				agentId), receiver));
+		transport.register(new LocalTransportBuilder()
+				.withConfig(new LocalTransportConfig(agentId))
+				.withHandle(receiver).build());
 	}
 	
 	/**
@@ -244,8 +247,8 @@ public class Agent implements Receiver {
 					stateConfig.setId("scheduler_" + agentId);
 				}
 			}
-			scheduler = SchedulerFactory
-					.getScheduler(schedulerConfig, receiver);
+			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
+					.withHandle(receiver).build();
 			
 			config.put("scheduler", schedulerConfig);
 		}
@@ -286,7 +289,7 @@ public class Agent implements Receiver {
 			if (agentId != null && stateConfig.getId() == null) {
 				stateConfig.setId(agentId);
 			}
-			state = StateFactory.getState(stateConfig);
+			state = new StateBuilder().withConfig(stateConfig).build();
 			config.put("state", stateConfig);
 		}
 	}
@@ -341,8 +344,7 @@ public class Agent implements Receiver {
 					if (transconfig.get("id") == null) {
 						transconfig.put("id", agentId);
 					}
-					transport.register(TransportFactory.getTransport(
-							transconfig, receiver));
+					transport.register(new TransportBuilder().withConfig(transconfig).withHandle(receiver).build());
 				}
 			} else {
 				final TransportConfig transconfig = new TransportConfig(
@@ -350,8 +352,7 @@ public class Agent implements Receiver {
 				if (transconfig.get("id") == null) {
 					transconfig.put("id", agentId);
 				}
-				transport.register(TransportFactory.getTransport(transconfig,
-						receiver));
+				transport.register(new TransportBuilder().withConfig(transconfig).withHandle(receiver).build());
 			}
 			
 			if (onBoot) {
@@ -464,7 +465,8 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected <T> T sendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final SyncCallback<T> callback = new SyncCallback<T>(){};
+		final SyncCallback<T> callback = new SyncCallback<T>() {
+		};
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
 				null);
 		try {

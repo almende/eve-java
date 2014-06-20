@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.scheduling.Scheduler;
-import com.almende.eve.scheduling.SchedulerFactory;
+import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,8 +42,8 @@ public class TestScheduling extends TestCase {
 		params.put("class",
 				"com.almende.eve.scheduling.PersistentSchedulerService");
 		
-		final Scheduler test = SchedulerFactory.getScheduler(params,
-				new SimpleHandler<Receiver>(new MyReceiver()));
+		final Scheduler test = new SchedulerBuilder().withConfig(params).withHandle(
+				new SimpleHandler<Receiver>(new MyReceiver())).build();
 		
 		test.schedule("Hi there!", DateTime.now());
 		

@@ -22,7 +22,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	public WebsocketTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", WebsocketService.class.getName());
+			this.put("class", WebsocketTransportBuilder.class.getName());
 		}
 	}
 	

@@ -29,7 +29,7 @@ public class MemoryStateConfig extends StateConfig {
 	public MemoryStateConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", MemoryStateService.class.getName());
+			this.put("class", MemoryStateBuilder.class.getName());
 		}
 	}
 	

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import org.joda.time.DateTime;
 
 import com.almende.eve.state.State;
-import com.almende.eve.state.StateFactory;
+import com.almende.eve.state.StateBuilder;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,7 +40,7 @@ public final class TokenStore {
 		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
 		params.put("id", TOKENSTORE);
 		
-		tokens = StateFactory.getState(params);
+		tokens = new StateBuilder().withConfig(params).build();
 	}
 	
 	/**

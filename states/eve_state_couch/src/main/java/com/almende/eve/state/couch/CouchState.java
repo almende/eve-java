@@ -17,6 +17,7 @@ import org.ektorp.UpdateConflictException;
 
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
+import com.almende.eve.state.couch.CouchStateBuilder.CouchStateProvider;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -54,7 +55,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 *            the params
 	 */
 	public CouchState(final String id, final CouchDbConnector db,
-			final CouchStateService service, final ObjectNode params) {
+			final CouchStateProvider service, final ObjectNode params) {
 		super(id, service, params);
 		this.db = db;
 	}

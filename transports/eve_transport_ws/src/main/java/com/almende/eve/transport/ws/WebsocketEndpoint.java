@@ -39,7 +39,7 @@ public class WebsocketEndpoint extends Endpoint {
 	public void onOpen(final Session session, final EndpointConfig config) {
 		final RemoteEndpoint.Async remote = session.getAsyncRemote();
 		final URI address = (URI) config.getUserProperties().get("address");
-		transport = WebsocketService.get(address);
+		transport = WebsocketTransportBuilder.get(address);
 		
 		Map<String, List<String>> queryparms = session.getRequestParameterMap();
 		String remoteId = null;

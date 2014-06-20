@@ -19,7 +19,6 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.ClassUtil;
-import com.almende.util.TypeUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpService implements TransportService {
 	private static final Logger				LOG			= Logger.getLogger(HttpService.class
 																.getName());
-	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
 	private URI								myUrl		= null;
 	private final Map<URI, HttpTransport>	transports	= new HashMap<URI, HttpTransport>();
 	private HttpTransportConfig				myParams	= null;
@@ -44,92 +42,60 @@ public class HttpService implements TransportService {
 	public HttpService(final URI servletUrl, final ObjectNode params) {
 		myUrl = servletUrl;
 		myParams = new HttpTransportConfig(params);
+		
+		String servletLauncher = myParams.getServletLauncher();
+		if (servletLauncher != null) {
+			if (servletLauncher.equals("JettyLauncher")) {
+				servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
+			}
+			try {
+				final Class<?> launcherClass = Class.forName(servletLauncher);
+				if (!ClassUtil.hasInterface(launcherClass,
+						ServletLauncher.class)) {
+					throw new IllegalArgumentException("ServletLauncher class "
+							+ launcherClass.getName() + " must implement "
+							+ ServletLauncher.class.getName());
+				}
+				final ServletLauncher launcher = (ServletLauncher) launcherClass
+						.newInstance();
+				
+				final Class<?> servletClass = Class.forName(myParams
+						.getServletClass());
+				if (!ClassUtil.hasInterface(servletClass, Servlet.class)) {
+					throw new IllegalArgumentException("Servlet class "
+							+ servletClass.getName() + " must implement "
+							+ Servlet.class.getName());
+				}
+				final Servlet servlet = (Servlet) servletClass.getConstructor(
+						URI.class).newInstance(myUrl);
+				if (servlet != null) {
+					launcher.add(servlet, myUrl, params);
+				} else {
+					LOG.log(Level.WARNING, "Couldn't instantiate servlet!");
+				}
+				
+			} catch (final Exception e1) {
+				LOG.log(Level.WARNING,
+						"Failed to load servlet in servletlauncher!", e1);
+			}
+		}
 	}
 	
 	/**
-	 * Gets the instance by params.
+	 * Gets the.
 	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param <V>
+	 *            the value type
 	 * @param params
 	 *            the params
-	 * @return the instance by params
+	 * @param handle
+	 *            the handle
+	 * @return the http transport
 	 */
-	public static HttpService getInstanceByParams(final ObjectNode params) {
-		HttpService service = null;
-		final HttpTransportConfig config = new HttpTransportConfig(params);
-		final String servletUrl = config.getServletUrl();
-		if (servletUrl != null) {
-			try {
-				final URI servletUri = new URI(servletUrl);
-				if (services.containsKey(servletUri)) {
-					// Shortcut, it already exists and is launched.
-					return services.get(servletUri);
-				}
-				service = new HttpService(servletUri, params);
-				services.put(servletUri, service);
-				String servletLauncher = config.getServletLauncher();
-				if (servletLauncher != null) {
-					if (servletLauncher.equals("JettyLauncher")) {
-						servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
-					}
-					try {
-						final Class<?> launcherClass = Class
-								.forName(servletLauncher);
-						if (!ClassUtil.hasInterface(launcherClass,
-								ServletLauncher.class)) {
-							throw new IllegalArgumentException(
-									"ServletLauncher class "
-											+ launcherClass.getName()
-											+ " must implement "
-											+ ServletLauncher.class.getName());
-						}
-						final ServletLauncher launcher = (ServletLauncher) launcherClass
-								.newInstance();
-						
-						final Class<?> servletClass = Class.forName(config
-								.getServletClass());
-						if (!ClassUtil
-								.hasInterface(servletClass, Servlet.class)) {
-							throw new IllegalArgumentException("Servlet class "
-									+ servletClass.getName()
-									+ " must implement "
-									+ Servlet.class.getName());
-						}
-						final Servlet servlet = (Servlet) servletClass
-								.getConstructor(URI.class).newInstance(
-										servletUri);
-						if (servlet != null) {
-							launcher.add(servlet, servletUri, params);
-						} else {
-							LOG.log(Level.WARNING,
-									"Couldn't instantiate servlet!");
-						}
-						
-					} catch (final Exception e1) {
-						LOG.log(Level.WARNING,
-								"Failed to load servlet in servletlauncher!",
-								e1);
-					}
-				}
-			} catch (final URISyntaxException e) {
-				LOG.log(Level.WARNING, "Couldn't parse 'servletUrl'", e);
-			}
-		} else {
-			LOG.warning("Parameter 'servletUrl' is required.");
-		}
-		return service;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.
-	 * databind
-	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
-	 */
-	@Override
-	public <T extends Capability, V> T get(final ObjectNode params,
-			final Handler<V> handle, final Class<T> type) {
+	public <T extends Capability, V> HttpTransport get(final ObjectNode params,
+			final Handler<V> handle) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
 		final HttpTransportConfig config = new HttpTransportConfig(params);
 		HttpTransport result = null;
@@ -151,14 +117,15 @@ public class HttpService implements TransportService {
 		} else {
 			LOG.warning("Parameter 'id' is required.");
 		}
-		return TypeUtil.inject(result, type);
+		return result;
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.transport
+	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
+	 * transport
 	 * .Transport)
 	 */
 	@Override
@@ -184,7 +151,8 @@ public class HttpService implements TransportService {
 	}
 	
 	/**
-	 * Gets a pre-existing HttpTransport by URI and id. Called from Servlets to
+	 * Gets a pre-existing HttpTransport by URI and id. Called from Servlets
+	 * to
 	 * retrieve the HttpTransport. Returns null if no callbacks have been
 	 * registered for the given URL/id combination.
 	 * 
@@ -195,7 +163,7 @@ public class HttpService implements TransportService {
 	 * @return the http transport
 	 */
 	public static HttpTransport get(final URI servletUrl, final String id) {
-		final HttpService service = services.get(servletUrl);
+		final HttpService service = HttpTransportBuilder.getServices().get(servletUrl);
 		if (service != null) {
 			return service.get(id);
 		}
@@ -210,7 +178,7 @@ public class HttpService implements TransportService {
 	 * @return true, if authentication is needed.
 	 */
 	public static boolean doAuthentication(final URI servletUrl) {
-		final HttpService service = services.get(servletUrl);
+		final HttpService service = HttpTransportBuilder.getServices().get(servletUrl);
 		if (service != null) {
 			return service.doAuthentication();
 		}
@@ -229,7 +197,8 @@ public class HttpService implements TransportService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.transport.TransportService#getLocal(java.net.URI)
+	 * @see
+	 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */
 	@Override
 	public Transport getLocal(final URI address) {
@@ -243,5 +212,4 @@ public class HttpService implements TransportService {
 		}
 		return null;
 	}
-	
 }
