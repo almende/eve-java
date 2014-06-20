@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.jackson.JOM;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  */
 public class Router implements Transport {
-	
+	private static final Logger LOG = Logger.getLogger(Router.class.getName());
 	private final Map<String, Transport>	transports	= new HashMap<String, Transport>();
 	
 	/**
@@ -34,6 +35,10 @@ public class Router implements Transport {
 	 *            the transport
 	 */
 	public void register(final Transport transport) {
+		if (transport == null){
+			LOG.warning("Not registering a null transport.");
+			return;
+		}
 		for (final String protocol : transport.getProtocols()) {
 			transports.put(protocol, transport);
 		}

@@ -13,8 +13,10 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.handler.SimpleHandler;
+import com.almende.eve.scheduling.PersistentSchedulerConfig;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
+import com.almende.eve.state.file.FileStateBuilder;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,16 +33,14 @@ public class TestScheduling extends TestCase {
 	 */
 	@Test
 	public void testScheduling() {
-		final ObjectNode params = JOM.createObjectNode();
+		final PersistentSchedulerConfig params = new PersistentSchedulerConfig();
 		final ObjectNode state = JOM.createObjectNode();
-		state.put("class", "com.almende.eve.state.file.FileStateService");
+		state.put("class", FileStateBuilder.class.getName());
 		state.put("json", true);
 		state.put("path", ".eveagents_schedulingtest");
 		state.put("id", "testScheduling");
-		params.put("state", state);
-		params.put("senderUrl", "local:scheduler");
-		params.put("class",
-				"com.almende.eve.scheduling.PersistentSchedulerService");
+		params.setState(state);
+		params.setSenderUrl("local:scheduler");
 		
 		final Scheduler test = new SchedulerBuilder().withConfig(params).withHandle(
 				new SimpleHandler<Receiver>(new MyReceiver())).build();

@@ -20,6 +20,7 @@ import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.ws.WebsocketTransportConfig;
 import com.almende.eve.transport.ws.WsClientTransport;
 import com.almende.eve.transport.ws.WsClientTransportBuilder;
+import com.almende.eve.transport.xmpp.XmppTransportBuilder;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,7 +41,7 @@ public class TestTransports extends TestCase {
 	@Test
 	public void testXmpp() throws IOException {
 		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transport.xmpp.XmppService");
+		params.put("class", XmppTransportBuilder.class.getName());
 		params.put("address", "xmpp://alex@openid.almende.org/test");
 		params.put("password", "alex");
 		
@@ -102,7 +103,7 @@ public class TestTransports extends TestCase {
 	public void testWs() throws IOException {
 		final WebsocketTransportConfig serverConfig = new WebsocketTransportConfig();
 		serverConfig.setAddress("ws://localhost:8082/ws/testServer");
-		
+		serverConfig.setServer(true);
 		serverConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8082);

@@ -32,4 +32,26 @@ public class SimpleSchedulerConfig extends Config {
 			setClassName(SimpleSchedulerBuilder.class.getName());
 		}
 	}
+	
+	/**
+	 * Sets the sender url.
+	 * 
+	 * @param senderUrl
+	 *            the new sender url
+	 */
+	public void setSenderUrl(String senderUrl){
+		this.put("senderUrl",senderUrl);
+	}
+	
+	/**
+	 * Gets the sender url.
+	 * 
+	 * @return the sender url
+	 */
+	public String getSenderUrl(){
+		if (this.has("senderUrl")){
+			return this.get("senderUrl").asText();
+		}
+		return null;
+	}
 }

@@ -4,14 +4,13 @@
  */
 package com.almende.eve.scheduling;
 
-import com.almende.eve.capabilities.Config;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class PersistentSchedulerConfig.
  */
-public class PersistentSchedulerConfig extends Config {
+public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	
 	/**
 	 * Instantiates a new simple scheduler config.

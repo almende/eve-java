@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
@@ -169,9 +170,16 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		public State get(final ObjectNode params) {
 			final FileStateConfig config = new FileStateConfig(params);
 			final String agentId = config.getId();
-
+			
 			State state = null;
-			if (exists(agentId)) {
+			try {
+				if (!exists(agentId)) {
+					final String filename = getFilename(agentId);
+					final File file = new File(filename);
+					
+					file.createNewFile();
+				}
+
 				if (states.containsKey(agentId)) {
 					state = states.get(agentId);
 				} else {
@@ -179,54 +187,14 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 						state = new ConcurrentJsonFileState(agentId,
 								getFilename(agentId), this, params);
 					} else {
-						state = new ConcurrentSerializableFileState(agentId,
-								getFilename(agentId), this, params);
+						state = new ConcurrentSerializableFileState(
+								agentId, getFilename(agentId), this, params);
 					}
 					states.put(agentId, state);
 				}
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "Couldn't create FileState", e);
 			}
-			return state;
-		}
-		
-		/**
-		 * Create a state with given id. Will throw an exception when already.
-		 * existing.
-		 * 
-		 * @param agentId
-		 *            the agent id
-		 * @param json
-		 *            the json
-		 * @param params
-		 *            the params
-		 * @return state
-		 * @throws IOException
-		 *             Signals that an I/O exception has occurred.
-		 */
-		public synchronized State create(final String agentId,
-				final boolean json, final ObjectNode params) throws IOException {
-			if (exists(agentId)) {
-				throw new IllegalStateException("Cannot create state, "
-						+ "state with id '" + agentId + "' already exists.");
-			}
-			
-			// store the new (empty) file
-			// TODO: it is not so nice solution to create an empty file to mark
-			// the
-			// state as created.
-			final String filename = getFilename(agentId);
-			final File file = new File(filename);
-			file.createNewFile();
-			
-			State state = null;
-			// instantiate the state
-			if (json) {
-				state = new ConcurrentJsonFileState(agentId, filename, this,
-						params);
-			} else {
-				state = new ConcurrentSerializableFileState(agentId, filename,
-						this, params);
-			}
-			states.put(agentId, state);
 			return state;
 		}
 		

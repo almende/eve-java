@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.state.file.FileStateBuilder;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -24,7 +25,7 @@ public class TestBoot extends TestCase {
 	public void testBoot() {
 		final ObjectNode params = JOM.createObjectNode();
 		final ObjectNode state = JOM.createObjectNode();
-		state.put("class", "com.almende.eve.state.file.FileStateService");
+		state.put("class", FileStateBuilder.class.getName());
 		state.put("json", true);
 		state.put("path", ".wakeservices");
 		state.put("id", "testWakeService");

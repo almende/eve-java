@@ -29,7 +29,7 @@ public class HttpTransportConfig extends TransportConfig {
 	public HttpTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			setClassName(HttpService.class.getName());
+			setClassName(HttpTransportBuilder.class.getName());
 		}
 	}
 	

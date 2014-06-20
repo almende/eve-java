@@ -39,9 +39,9 @@ public class XmppTransportBuilder extends
 	@Override
 	public XmppTransport build() {
 		if (SINGLETON == null) {
+			SINGLETON = new XmppService();
 			SINGLETON.doesShortcut = new XmppTransportConfig(getParams())
 					.getDoShortcut();
-			SINGLETON = new XmppService();
 		}
 		return SINGLETON.get(getParams(), getHandle());
 	}

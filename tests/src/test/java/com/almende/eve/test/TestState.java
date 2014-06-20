@@ -14,6 +14,8 @@ import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.couch.CouchState;
 import com.almende.eve.state.couch.CouchStateBuilder;
 import com.almende.eve.state.couch.CouchStateConfig;
+import com.almende.eve.state.file.FileStateBuilder;
+import com.almende.eve.state.memory.MemoryStateBuilder;
 import com.almende.eve.state.mongo.MongoState;
 import com.almende.eve.state.mongo.MongoStateBuilder;
 import com.almende.eve.state.mongo.MongoStateConfig;
@@ -34,6 +36,8 @@ public class TestState extends TestCase {
 	 *            the my state2
 	 */
 	public void runTest(final State myState, final State myState2) {
+		assertNotNull(myState2);
+		assertNotNull(myState);
 		myState.put("msg", "Hi There!");
 		assertEquals("Hi There!", myState.get("msg", String.class));
 		assertEquals("Hi There!", myState2.get("msg", String.class));
@@ -48,7 +52,7 @@ public class TestState extends TestCase {
 	@Test
 	public void testState() {
 		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
+		params.put("class", MemoryStateBuilder.class.getName());
 		params.put("id", "TestAgent");
 		
 		State myState = new CapabilityBuilder<State>().withConfig(params).build();
@@ -66,12 +70,12 @@ public class TestState extends TestCase {
 	@Test
 	public void testFileState() {
 		ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.state.file.FileStateService");
+		params.put("class", FileStateBuilder.class.getName());
 		params.put("json", false);
 		params.put("id", "TestAgent");
 		
 		State myState = new CapabilityBuilder<State>().withConfig(params).build();
-		State myState2 = new StateBuilder().withConfig(params).build();
+		State myState2 = new StateBuilder().withConfig(params).build();		
 		runTest(myState, myState2);
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new StateBuilder().withConfig(params).build();
