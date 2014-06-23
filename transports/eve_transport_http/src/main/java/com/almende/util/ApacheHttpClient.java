@@ -27,8 +27,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.almende.eve.state.memory.MemoryStateConfig;
 
 /**
  * The Class ApacheHttpClient.
@@ -133,12 +132,9 @@ public final class ApacheHttpClient {
 		 *             Signals that an I/O exception has occurred.
 		 */
 		MyCookieStore() throws IOException {
-			// TODO: use Config service
-			final ObjectNode params = JOM.createObjectNode();
-			params.put("class",
-					"com.almende.eve.state.memory.MemoryStateService");
-			params.put("id", COOKIESTORE);
-			
+			final MemoryStateConfig params = new MemoryStateConfig();
+			params.setId(COOKIESTORE);
+
 			myState = new StateBuilder().withConfig(params).build();
 		}
 		
@@ -151,7 +147,7 @@ public final class ApacheHttpClient {
 		 */
 		@Override
 		public void addCookie(final Cookie cookie) {
-			myState.put(Integer.valueOf(COOKIESTORE.hashCode()).toString(),
+			myState.put(cookie.getDomain()+cookie.getPath()+cookie.getName(),
 					cookie);
 		}
 		
