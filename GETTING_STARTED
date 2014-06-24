@@ -1,2 +1,6 @@
-You can compile the Eve libraries by going to the "eve_parent" folder and running "#mvn install" from there.
+You can compile Eve through Maven:
+
+#From working copy base:
+cd eve_parent
+mvn install
 
