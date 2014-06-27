@@ -24,6 +24,7 @@ import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -34,6 +35,9 @@ public class RpcTransform implements Transform {
 	private static final Logger						LOG					= Logger.getLogger(RpcTransform.class
 																				.getName());
 	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
+	private static final JavaType					OBJECTNODETYPE		= JOM.getTypeFactory()
+																				.constructType(
+																						ObjectNode.class);
 	static {
 		EVEREQUESTPARAMS.put(Sender.class, null);
 	}
@@ -94,7 +98,7 @@ public class RpcTransform implements Transform {
 							|| message.trim().startsWith("{")) {
 						
 						json = JOM.getInstance().readValue(message,
-								ObjectNode.class);
+								OBJECTNODETYPE);
 					}
 				} else if (msg instanceof ObjectNode) {
 					json = (ObjectNode) msg;

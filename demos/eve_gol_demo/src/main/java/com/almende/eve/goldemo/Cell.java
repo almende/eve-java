@@ -13,6 +13,7 @@ import com.almende.eve.agent.Agent;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.transform.rpc.annotation.Sender;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -135,7 +136,6 @@ public class Cell extends Agent {
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("alive", myState.isAlive());
 		params.put("cycle", 0);
-		params.put("from", getId().substring(6));
 		for (final String neighbor : neighbors) {
 			final URI uri = URI.create(neighbor);
 			try {
@@ -154,37 +154,23 @@ public class Cell extends Agent {
 	 *            the alive
 	 * @param cycle
 	 *            the cycle
-	 * @param neighborNo
-	 *            the neighbor no
+	 * @param neighbor
+	 *            the neighbor
 	 */
 	public void collect(@Name("alive") final boolean alive,
-			@Name("cycle") final int cycle, @Name("from") final int neighborNo) {
+			@Name("cycle") final int cycle, @Sender String neighbor) {
 		if (neighbors == null) {
 			neighbors = getState().get("neighbors",
 					new TypeUtil<ArrayList<String>>() {
 					});
 		}
 		final CycleState state = new CycleState(cycle, alive);
-		// System.out.println(getId()+": Received state:" + state + " from:" +
-		// neighborNo);
-		getState().put(neighborNo + "_" + state.getCycle(), state);
+		getState().put(neighbor + "_" + state.getCycle(), state);
 		try {
 			calcCycle();
 		} catch (final URISyntaxException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private String getNeighborId(final String neighbor) {
-		String neighborId = null;
-		if (neighbor.startsWith("local:")) {
-			neighborId = neighbor.replace("local:", "");
-		} else {
-			final URI neighborUrl = URI.create(neighbor);
-			neighborId = neighborUrl.getPath().replaceFirst("agents/", "");
-		}
-		neighborId = neighborId.replaceFirst(".*_", "");
-		return neighborId;
 	}
 	
 	private static final TypeUtil<CycleState>	CYCLESTATETYPE	= new TypeUtil<CycleState>() {
@@ -201,9 +187,8 @@ public class Cell extends Agent {
 			int aliveNeighbors = 0;
 			int knownNeighbors = 0;
 			for (final String neighbor : neighbors) {
-				final String neighborId = getNeighborId(neighbor);
 				final CycleState nState = getState().get(
-						neighborId + "_" + (currentCycle - 1), CYCLESTATETYPE);
+						neighbor + "_" + (currentCycle - 1), CYCLESTATETYPE);
 				if (nState == null) {
 					return;
 					// continue;
@@ -236,7 +221,6 @@ public class Cell extends Agent {
 				final ObjectNode params = JOM.createObjectNode();
 				params.put("alive", newState.isAlive());
 				params.put("cycle", currentCycle);
-				params.put("from", getId().substring(6));
 				for (final String neighbor : neighbors) {
 					final URI uri = URI.create(neighbor);
 					try {
@@ -246,8 +230,7 @@ public class Cell extends Agent {
 					}
 				}
 				for (final String neighbor : neighbors) {
-					final String neighborId = getNeighborId(neighbor);
-					getState().remove(neighborId + "_" + (currentCycle - 1));
+					getState().remove(neighbor + "_" + (currentCycle - 1));
 				}
 				calcCycle();
 			}
