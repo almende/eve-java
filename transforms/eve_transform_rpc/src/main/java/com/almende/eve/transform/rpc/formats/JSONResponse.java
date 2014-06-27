@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,10 +19,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONResponse.
  */
 public final class JSONResponse extends JSONMessage {
-	private static final long	serialVersionUID	= 12392962249054051L;
-	private final ObjectNode	resp				= JOM.createObjectNode();
-	private static final Logger	LOG					= Logger.getLogger(JSONResponse.class
-															.getName());
+	private static final long		serialVersionUID	= 12392962249054051L;
+	private final ObjectNode		resp				= JOM.createObjectNode();
+	private static final Logger		LOG					= Logger.getLogger(JSONResponse.class
+																.getName());
+	private static final JavaType	JSONNODETYPE		= JOM.getTypeFactory()
+																.constructType(
+																		JsonNode.class);
 	
 	/**
 	 * Instantiates a new jSON response.
@@ -183,7 +187,8 @@ public final class JSONResponse extends JSONMessage {
 	public void setResult(final Object result) {
 		if (result != null) {
 			final ObjectMapper mapper = JOM.getInstance();
-			resp.put(RESULT, mapper.convertValue(result, JsonNode.class));
+			resp.put(RESULT,
+					(JsonNode) mapper.convertValue(result, JSONNODETYPE));
 			setError(null);
 		} else {
 			if (resp.has(RESULT)) {

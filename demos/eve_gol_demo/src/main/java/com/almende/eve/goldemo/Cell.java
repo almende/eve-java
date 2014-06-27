@@ -187,17 +187,23 @@ public class Cell extends Agent {
 		return neighborId;
 	}
 	
+	private static final TypeUtil<CycleState>	CYCLESTATETYPE	= new TypeUtil<CycleState>() {
+																};
+	private static final TypeUtil<Boolean>		BOOLEANSTATE	= new TypeUtil<Boolean>() {
+																};
+	private static final TypeUtil<Integer>		INTEGERSTATE	= new TypeUtil<Integer>() {
+																};
+	
 	private void calcCycle() throws URISyntaxException {
 		final Integer currentCycle = getState().get("current_cycle",
-				Integer.class);
+				INTEGERSTATE);
 		if (currentCycle != null && currentCycle != 0) {
 			int aliveNeighbors = 0;
 			int knownNeighbors = 0;
 			for (final String neighbor : neighbors) {
 				final String neighborId = getNeighborId(neighbor);
-				final CycleState nState = getState()
-						.get(neighborId + "_" + (currentCycle - 1),
-								CycleState.class);
+				final CycleState nState = getState().get(
+						neighborId + "_" + (currentCycle - 1), CYCLESTATETYPE);
 				if (nState == null) {
 					return;
 					// continue;
@@ -211,7 +217,7 @@ public class Cell extends Agent {
 				return;
 			}
 			final CycleState myState = getState().get(
-					"val_" + (currentCycle - 1), CycleState.class);
+					"val_" + (currentCycle - 1), CYCLESTATETYPE);
 			CycleState newState = null;
 			if (aliveNeighbors < 2 || aliveNeighbors > 3) {
 				newState = new CycleState(currentCycle, false);
@@ -224,7 +230,7 @@ public class Cell extends Agent {
 					.putIfUnchanged("val_" + currentCycle, newState, null)) {
 				// System.out.println(getId()+" :"+newState);
 				getState().put("current_cycle", currentCycle + 1);
-				if (getState().get("Stopped", Boolean.class)) {
+				if (getState().get("Stopped", BOOLEANSTATE)) {
 					return;
 				}
 				final ObjectNode params = JOM.createObjectNode();
