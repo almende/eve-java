@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
 import com.almende.eve.transform.rpc.formats.JSONRPCException;
@@ -133,8 +134,8 @@ public class Goldemo {
 						"Incorrect input line detected:" + input);
 			}
 			for (int cM = 0; cM < M; cM++) {
-				final Config agent_config = new Config(config);
-				agent_config.put("id", AGENTPREFIX + no++);
+				final AgentConfig agent_config = new AgentConfig(config);
+				agent_config.setId(AGENTPREFIX + no++);
 				final Cell cell = new Cell(agent_config);
 				cell.create(PATHodd, PATHeven,
 						(trimmedInput.charAt(cM) == '+'), M * N);

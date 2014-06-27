@@ -341,6 +341,7 @@ public class Agent implements Receiver {
 				while (iter.hasNext()) {
 					final TransportConfig transconfig = new TransportConfig(
 							(ObjectNode) iter.next());
+					//TODO: Somewhat ugly, not every transport requires an id.
 					if (transconfig.get("id") == null) {
 						transconfig.put("id", agentId);
 					}

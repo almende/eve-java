@@ -21,6 +21,7 @@ import com.almende.eve.transport.ws.WebsocketTransportConfig;
 import com.almende.eve.transport.ws.WsClientTransport;
 import com.almende.eve.transport.ws.WsClientTransportBuilder;
 import com.almende.eve.transport.xmpp.XmppTransportBuilder;
+import com.almende.eve.transport.xmpp.XmppTransportConfig;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,13 +41,15 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testXmpp() throws IOException {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", XmppTransportBuilder.class.getName());
-		params.put("address", "xmpp://alex@openid.almende.org/test");
-		params.put("password", "alex");
+		final XmppTransportConfig params = new XmppTransportConfig();
+		params.setAddress("xmpp://alex@openid.almende.org/test");
+		params.setPassword("alex");
 		
-		final Transport transport = new TransportBuilder().withConfig(params)
-				.withHandle(new MyReceiver()).build();
+		final Transport transport = 
+				new XmppTransportBuilder()
+				.withConfig(params)
+				.withHandle(new MyReceiver())
+				.build();
 		transport.connect();
 		
 		transport.send(URI.create("xmpp:gloria@openid.almende.org"),
@@ -109,15 +112,15 @@ public class TestTransports extends TestCase {
 		jettyParms.put("port", 8082);
 		serverConfig.put("jetty", jettyParms);
 		
-		final Transport server = new TransportBuilder().withConfig(serverConfig)
-				.withHandle(new MyReceiver()).build();
+		final Transport server = new TransportBuilder()
+				.withConfig(serverConfig).withHandle(new MyReceiver()).build();
 		
 		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
 		clientConfig.setId("testClient");
 		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
 		
-		final WsClientTransport client = new WsClientTransportBuilder().withConfig(clientConfig)
-				.withHandle(new MyReceiver()).build();
+		final WsClientTransport client = new WsClientTransportBuilder()
+				.withConfig(clientConfig).withHandle(new MyReceiver()).build();
 		client.connect();
 		
 		server.send(URI.create("wsclient:testClient"), "Hi there!", null);

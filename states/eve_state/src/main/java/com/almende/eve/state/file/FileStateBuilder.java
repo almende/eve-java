@@ -6,6 +6,7 @@ package com.almende.eve.state.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		private String						path		= null;
 		private Boolean						json		= true;
 		private Boolean						multilevel	= false;
-		private final Map<String, State>	states		= new HashMap<String, State>();
+		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>();
 		
 		/**
 		 * Instantiates a new file state provider.
@@ -181,8 +182,12 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 				}
 
 				if (states.containsKey(agentId)) {
-					state = states.get(agentId);
-				} else {
+					WeakReference<State> ref = states.get(agentId);
+					if (ref != null){
+						state = ref.get();
+					}
+				}
+				if (state == null){
 					if (json) {
 						state = new ConcurrentJsonFileState(agentId,
 								getFilename(agentId), this, params);
@@ -190,7 +195,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 						state = new ConcurrentSerializableFileState(
 								agentId, getFilename(agentId), this, params);
 					}
-					states.put(agentId, state);
+					states.put(agentId, new WeakReference<State>(state));
 				}
 			} catch (IOException e) {
 				LOG.log(Level.WARNING, "Couldn't create FileState", e);
