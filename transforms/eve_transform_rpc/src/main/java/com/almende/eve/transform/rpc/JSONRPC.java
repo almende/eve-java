@@ -202,7 +202,8 @@ final class JSONRPC {
 			resp.setResult(result);
 		} catch (final JSONRPCException err) {
 			resp.setError(err);
-			//TODO: Can this be reduced to Exception? Which Errors do we want to catch?
+			// TODO: Can this be reduced to Exception? Which Errors do we want
+			// to catch?
 		} catch (final Throwable err) {
 			final Throwable cause = err.getCause();
 			if (cause instanceof JSONRPCException) {
@@ -430,9 +431,9 @@ final class JSONRPC {
 	 * @param params
 	 * @param annotatedParams
 	 * @param requestParams
-	 * @return the Object[], including the target object.
+	 * @return the Object[]
 	 */
-	private static Object[] castParams(final Object params,
+	private static Object[] castParams(final ObjectNode params,
 			final List<AnnotatedParam> annotatedParams,
 			final RequestParams requestParams) {
 		return castParams(null, params, annotatedParams, requestParams);
@@ -450,34 +451,31 @@ final class JSONRPC {
 	 * @return the object[]
 	 */
 	private static Object[] castParams(final Object realDest,
-			final Object params, final List<AnnotatedParam> annotatedParams,
+			final ObjectNode params,
+			final List<AnnotatedParam> annotatedParams,
 			final RequestParams requestParams) {
 		
-		if (annotatedParams.size() == 0) {
-			if (realDest != null) {
-				return new Object[] { realDest };
-			} else {
-				return new Object[0];
-			}
-		}
-		
-		if (params instanceof ObjectNode) {
-			// JSON-RPC 2.0 with named parameters in a JSONObject
-			
-			if (annotatedParams.size() == 1
-					&& annotatedParams.get(0).getType()
-							.equals(ObjectNode.class)
-					&& annotatedParams.get(0).getAnnotations().size() == 0) {
-				
-				// the method expects one parameter of type JSONObject
-				// feed the params object itself to it.
+		switch (annotatedParams.size()) {
+			case 0:
 				if (realDest != null) {
-					return new Object[] { realDest, params };
+					return new Object[] { realDest };
 				} else {
-					return new Object[] { params };
+					return new Object[0];
 				}
-			} else {
-				
+				/* -- Unreachable, explicit no break --*/
+			case 1:
+				if (annotatedParams.get(0).getType().equals(ObjectNode.class)
+						&& annotatedParams.get(0).getAnnotations().size() == 0) {
+					// the method expects one parameter of type JSONObject
+					// feed the params object itself to it.
+					if (realDest != null) {
+						return new Object[] { realDest, params };
+					} else {
+						return new Object[] { params };
+					}
+				}
+				/* -- Explicit no break -- */
+			default:
 				final ObjectNode paramsObject = (ObjectNode) params;
 				int offset = 0;
 				if (realDest != null) {
@@ -528,9 +526,6 @@ final class JSONRPC {
 					}
 				}
 				return objects;
-			}
-		} else {
-			throw new ClassCastException("params must be a JSONObject");
 		}
 	}
 	

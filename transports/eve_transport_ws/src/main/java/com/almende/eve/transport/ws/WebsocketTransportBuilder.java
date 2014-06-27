@@ -77,95 +77,105 @@ public class WebsocketTransportBuilder extends
 					.inject(handle);
 			final WebsocketTransportConfig config = new WebsocketTransportConfig(
 					params);
-			WebsocketTransport result = null;
 			if (config.isServer()) {
-				final String address = config.getAddress();
-				
-				if (address != null) {
-					try {
-						final URI serverUri = new URI(address);
-						if (transports.containsKey(serverUri)) {
-							result = transports.get(serverUri);
-							result.getHandle().update(newHandle);
-						} else {
-							result = new WsServerTransport(serverUri,
-									newHandle, this, params);
-							transports.put(serverUri, result);
-							String servletLauncher = config
-									.getServletLauncher();
-							if (servletLauncher != null) {
-								if (servletLauncher.equals("JettyLauncher")) {
-									servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
+				return getServer(config, newHandle);
+			} else {
+				return getClient(config, newHandle);
+			}
+		}
+
+		private WebsocketTransport getServer(final WebsocketTransportConfig config, final Handler<Receiver> handle){
+			WebsocketTransport result = null;
+			final String address = config.getAddress();
+			
+			if (address != null) {
+				try {
+					final URI serverUri = new URI(address);
+					if (transports.containsKey(serverUri)) {
+						result = transports.get(serverUri);
+						result.getHandle().update(handle);
+					} else {
+						result = new WsServerTransport(serverUri,
+								handle, this, config);
+						transports.put(serverUri, result);
+						String servletLauncher = config
+								.getServletLauncher();
+						if (servletLauncher != null) {
+							if (servletLauncher.equals("JettyLauncher")) {
+								servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
+							}
+							try {
+								final Class<?> launcherClass = Class
+										.forName(servletLauncher);
+								if (!ClassUtil.hasInterface(launcherClass,
+										ServletLauncher.class)) {
+									throw new IllegalArgumentException(
+											"ServletLauncher class "
+													+ launcherClass
+															.getName()
+													+ " must implement "
+													+ ServletLauncher.class
+															.getName());
 								}
-								try {
-									final Class<?> launcherClass = Class
-											.forName(servletLauncher);
-									if (!ClassUtil.hasInterface(launcherClass,
-											ServletLauncher.class)) {
-										throw new IllegalArgumentException(
-												"ServletLauncher class "
-														+ launcherClass
-																.getName()
-														+ " must implement "
-														+ ServletLauncher.class
-																.getName());
-									}
-									final ServletLauncher launcher = (ServletLauncher) launcherClass
-											.newInstance();
-									
-									final ServerEndpointConfig sec = ServerEndpointConfig.Builder
-											.create(WebsocketEndpoint.class,
-													serverUri.getPath())
-											.build();
-									sec.getUserProperties().put("address",
-											serverUri);
-									
-									launcher.add(sec, params);
-									
-								} catch (final Exception e1) {
-									LOG.log(Level.WARNING,
-											"Failed to load servlet in servletlauncher!",
-											e1);
-								}
+								final ServletLauncher launcher = (ServletLauncher) launcherClass
+										.newInstance();
+								
+								final ServerEndpointConfig sec = ServerEndpointConfig.Builder
+										.create(WebsocketEndpoint.class,
+												serverUri.getPath())
+										.build();
+								sec.getUserProperties().put("address",
+										serverUri);
+								
+								launcher.add(sec, config);
+								
+							} catch (final Exception e1) {
+								LOG.log(Level.WARNING,
+										"Failed to load servlet in servletlauncher!",
+										e1);
 							}
 						}
-					} catch (final URISyntaxException e) {
-						LOG.log(Level.WARNING, "Couldn't parse address:"
-								+ address, e);
 					}
-				} else {
-					LOG.warning("Parameter 'address' is required.");
+				} catch (final URISyntaxException e) {
+					LOG.log(Level.WARNING, "Couldn't parse address:"
+							+ address, e);
 				}
 			} else {
-				final String id = config.getId();
-				if (id != null) {
-					try {
-						final URI key = new URI("wsclient:" + id);
-						LOG.log(Level.WARNING, "Looking up:" + key);
-						if (transports.containsKey(key)) {
-							result = transports.get(key);
-							if (!(new WebsocketTransportConfig(
-									result.getParams())).getServerUrl().equals(
-									config.getServerUrl())) {
-								((WsClientTransport) result)
-										.updateConfig(config);
-							}
-							result.getHandle().update(newHandle);
-						} else {
-							result = new WsClientTransport(key, newHandle,
-									this, params);
-							transports.put(key, result);
+				LOG.warning("Parameter 'address' is required.");
+			}
+			return result;
+		}
+		
+		private WebsocketTransport getClient(final WebsocketTransportConfig config, final Handler<Receiver> handle){
+			WebsocketTransport result = null;
+			final String id = config.getId();
+			if (id != null) {
+				try {
+					final URI key = new URI("wsclient:" + id);
+					LOG.log(Level.WARNING, "Looking up:" + key);
+					if (transports.containsKey(key)) {
+						result = transports.get(key);
+						if (!(new WebsocketTransportConfig(
+								result.getParams())).getServerUrl().equals(
+								config.getServerUrl())) {
+							((WsClientTransport) result)
+									.updateConfig(config);
 						}
-					} catch (final URISyntaxException e) {
-						LOG.log(Level.WARNING,
-								"Couldn't parse Client Url: wsclient:" + id, e);
-					} catch (IOException e) {
-						LOG.log(Level.WARNING,
-								"Couldn't reconnect with new config.", e);
+						result.getHandle().update(handle);
+					} else {
+						result = new WsClientTransport(key, handle,
+								this, config);
+						transports.put(key, result);
 					}
-				} else {
-					LOG.warning("Parameter 'id' is required.");
+				} catch (final URISyntaxException e) {
+					LOG.log(Level.WARNING,
+							"Couldn't parse Client Url: wsclient:" + id, e);
+				} catch (IOException e) {
+					LOG.log(Level.WARNING,
+							"Couldn't reconnect with new config.", e);
 				}
+			} else {
+				LOG.warning("Parameter 'id' is required.");
 			}
 			return result;
 		}

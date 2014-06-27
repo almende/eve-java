@@ -79,7 +79,8 @@ public class RpcTransform implements Transform {
 	}
 	
 	/**
-	 * Json convert.
+	 * Convert incoming message object to JSONMessage if possible. Returns null
+	 * if the message can't be interpreted as a JSONMessage.
 	 * 
 	 * @param msg
 	 *            the msg
@@ -87,6 +88,10 @@ public class RpcTransform implements Transform {
 	 */
 	public static JSONMessage jsonConvert(final Object msg) {
 		JSONMessage jsonMsg = null;
+		if (msg == null) {
+			LOG.warning("Message null!");
+			return null;
+		}
 		try {
 			if (msg instanceof JSONMessage) {
 				jsonMsg = (JSONMessage) msg;
@@ -102,8 +107,6 @@ public class RpcTransform implements Transform {
 					}
 				} else if (msg instanceof ObjectNode) {
 					json = (ObjectNode) msg;
-				} else if (msg == null) {
-					LOG.warning("Message null!");
 				} else {
 					LOG.warning("Message unknown type:" + msg.getClass());
 				}
@@ -138,33 +141,30 @@ public class RpcTransform implements Transform {
 	 * @return the JSON response
 	 */
 	public JSONResponse invoke(final Object msg, final URI senderUrl) {
-		JsonNode id = null;
+		final JSONMessage jsonMsg = jsonConvert(msg);
+		if (jsonMsg == null) {
+			LOG.log(Level.WARNING, "Received non-JSONRPC message:'" + msg + "'");
+			return null;
+		}
+		final JsonNode id = jsonMsg.getId();
 		try {
-			final JSONMessage jsonMsg = jsonConvert(msg);
-			if (jsonMsg != null) {
-				id = jsonMsg.getId();
-				if (jsonMsg.isRequest()) {
-					final JSONRequest request = (JSONRequest) jsonMsg;
-					final RequestParams params = new RequestParams();
-					params.put(Sender.class, senderUrl.toASCIIString());
-					return JSONRPC.invoke(destination.get(), request, params,
-							auth);
-				} else if (jsonMsg.isResponse() && callbacks != null
-						&& id != null && !id.isNull()) {
+			if (jsonMsg.isRequest()) {
+				final JSONRequest request = (JSONRequest) jsonMsg;
+				final RequestParams params = new RequestParams();
+				params.put(Sender.class, senderUrl.toASCIIString());
+				return JSONRPC.invoke(destination.get(), request, params, auth);
+			} else if (jsonMsg.isResponse() && callbacks != null && id != null
+					&& !id.isNull()) {
+				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
+				if (callback != null) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
-					final AsyncCallback<JSONResponse> callback = callbacks
-							.pull(id);
-					if (callback != null) {
-						if (response.getError() != null) {
-							callback.onFailure(response.getError());
-						} else {
-							callback.onSuccess(response);
-						}
+					final JSONRPCException error = response.getError();
+					if (error != null) {
+						callback.onFailure(error);
+					} else {
+						callback.onSuccess(response);
 					}
 				}
-			} else {
-				LOG.log(Level.WARNING, "Received non-JSON message:'" + msg
-						+ "'");
 			}
 		} catch (final Exception e) {
 			// generate JSON error response, skipped if it was an incoming
@@ -234,6 +234,8 @@ public class RpcTransform implements Transform {
 		if (callback == null) {
 			return;
 		}
+		final TypeUtil<T> type = TypeUtil.resolve(callback);
+		
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
@@ -244,8 +246,6 @@ public class RpcTransform implements Transform {
 				if (err != null) {
 					callback.onFailure(err);
 				}
-				final TypeUtil<T> type = TypeUtil.resolve(callback);
-				
 				if (type != null
 						&& !type.getJavaType().getRawClass().equals(Void.class)) {
 					try {
@@ -268,7 +268,7 @@ public class RpcTransform implements Transform {
 			}
 		};
 		
-		if (responseCallback != null && callbacks != null) {
+		if (callbacks != null) {
 			callbacks.push(((JSONMessage) request).getId(), request.toString(),
 					responseCallback);
 		}
