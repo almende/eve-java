@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class XmppTransportBuilder extends
 		AbstractCapabilityBuilder<XmppTransport> {
 	private final Map<URI, XmppTransport>	instances	= new ConcurrentHashMap<URI, XmppTransport>();
-	private static XmppService				SINGLETON	= null;
+	private static XmppService				singleton	= null;
 	
 	// Needed to force Android loading the ReconnectionManager....
 	static {
@@ -38,17 +38,30 @@ public class XmppTransportBuilder extends
 	
 	@Override
 	public XmppTransport build() {
-		if (SINGLETON == null) {
-			SINGLETON = new XmppService();
-			SINGLETON.doesShortcut = new XmppTransportConfig(getParams())
+		if (singleton == null) {
+			singleton = new XmppService();
+			singleton.doesShortcut = new XmppTransportConfig(getParams())
 					.getDoShortcut();
 		}
-		return SINGLETON.get(getParams(), getHandle());
+		return singleton.get(getParams(), getHandle());
 	}
 	
 	class XmppService implements TransportService {
 		private boolean	doesShortcut	= true;
 		
+		/**
+		 * Gets the actual XMPP transport
+		 * 
+		 * @param <T>
+		 *            the generic type
+		 * @param <V>
+		 *            the value type
+		 * @param params
+		 *            the params
+		 * @param handle
+		 *            the handle
+		 * @return the xmpp transport
+		 */
 		public <T extends Capability, V> XmppTransport get(
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL

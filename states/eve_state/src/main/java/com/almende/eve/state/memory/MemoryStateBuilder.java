@@ -16,7 +16,7 @@ import com.almende.eve.state.StateService;
  */
 public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState> implements StateService {
 	//MemoryStates are currently a Singleton implementation:
-	private static final Map<String, MemoryState>	states		= new ConcurrentHashMap<String, MemoryState>();
+	private static final Map<String, MemoryState>	STATES		= new ConcurrentHashMap<String, MemoryState>();
 	
 	
 	/*
@@ -33,21 +33,21 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState> i
 		final String id = config.getId();
 		
 		// Quick return for existing states
-		final MemoryState state = states.get(id);
+		final MemoryState state = STATES.get(id);
 		if (state != null) {
 			return state;
 		} else {
 			// Synchronized version for creating a new state (preventing race
 			// condition)
-			synchronized (states) {
-				if (!states.containsKey(id)) {
+			synchronized (STATES) {
+				if (!STATES.containsKey(id)) {
 					final MemoryState result = new MemoryState(id, this, getParams());
 					if (result != null) {
-						states.put(id, result);
+						STATES.put(id, result);
 					}
 				}
-				if (states.containsKey(id)) {
-					return states.get(id);
+				if (STATES.containsKey(id)) {
+					return STATES.get(id);
 				}
 			}
 		}
@@ -62,7 +62,7 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState> i
 	 */
 	@Override
 	public void delete(final State instance) {
-		states.remove(instance.getId());
+		STATES.remove(instance.getId());
 	}
 	
 }

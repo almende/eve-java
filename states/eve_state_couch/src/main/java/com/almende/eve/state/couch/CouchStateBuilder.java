@@ -111,6 +111,13 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 			}
 		}
 		
+		/**
+		 * Gets the CouchState.
+		 * 
+		 * @param params
+		 *            the params
+		 * @return the couch state
+		 */
 		public CouchState get(final ObjectNode params) {
 			final CouchStateConfig config = new CouchStateConfig(params);
 			final String id = couchify(config.getId());

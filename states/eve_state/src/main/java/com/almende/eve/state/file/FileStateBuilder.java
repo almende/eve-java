@@ -136,20 +136,21 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		 * @param path
 		 *            the new path
 		 */
-		private synchronized void setPath(String path) {
-			if (path == null) {
-				path = ".eveagents";
+		private synchronized void setPath(final String path) {
+			String actualPath = path;
+			if (actualPath == null) {
+				actualPath = ".eveagents";
 				LOG.warning("Config parameter 'path' missing in State "
 						+ "configuration. Using the default path '" + path
 						+ "'");
 			}
-			if (!path.endsWith("/")) {
-				path += "/";
+			if (!actualPath.endsWith("/")) {
+				actualPath += "/";
 			}
-			this.path = path;
+			this.path = actualPath;
 			
 			// make the directory
-			final File file = new File(path);
+			final File file = new File(actualPath);
 			if (!file.exists() && !file.mkdir()) {
 				LOG.severe("Could not create State folder!");
 				throw new IllegalStateException();
@@ -160,7 +161,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			try {
 				info += file.getCanonicalPath();
 			} catch (final IOException e) {
-				info += path;
+				info += actualPath;
 			}
 			LOG.info(info
 					+ ". "
@@ -168,6 +169,13 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 							: "(stored in JavaObject format)"));
 		}
 		
+		/**
+		 * Gets the.
+		 * 
+		 * @param params
+		 *            the params
+		 * @return the state
+		 */
 		public State get(final ObjectNode params) {
 			final FileStateConfig config = new FileStateConfig(params);
 			final String agentId = config.getId();

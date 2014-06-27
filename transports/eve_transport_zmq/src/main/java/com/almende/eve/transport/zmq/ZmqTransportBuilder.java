@@ -22,21 +22,34 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ZmqTransportBuilder extends
 		AbstractCapabilityBuilder<ZmqTransport> {
 	private final Map<URI, ZmqTransport>	instances	= new ConcurrentHashMap<URI, ZmqTransport>();
-	private static ZmqService				SINGLETON	= null;
+	private static ZmqService				singleton	= null;
 	
 	@Override
 	public ZmqTransport build() {
-		if (SINGLETON == null) {
-			SINGLETON = new ZmqService();
-			SINGLETON.doesShortcut = new ZmqTransportConfig(getParams())
+		if (singleton == null) {
+			singleton = new ZmqService();
+			singleton.doesShortcut = new ZmqTransportConfig(getParams())
 					.getDoShortcut();
 		}
-		return SINGLETON.get(getParams(), getHandle());
+		return singleton.get(getParams(), getHandle());
 	}
 	
 	class ZmqService implements TransportService {
 		private boolean	doesShortcut	= true;
 		
+		/**
+		 * Gets the ZMQ transport.
+		 * 
+		 * @param <T>
+		 *            the generic type
+		 * @param <V>
+		 *            the value type
+		 * @param params
+		 *            the params
+		 * @param handle
+		 *            the handle
+		 * @return the zmq transport
+		 */
 		public <T extends Capability, V> ZmqTransport get(
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL

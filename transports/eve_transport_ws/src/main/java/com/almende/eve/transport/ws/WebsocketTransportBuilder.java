@@ -31,14 +31,14 @@ public class WebsocketTransportBuilder extends
 		AbstractCapabilityBuilder<WebsocketTransport> {
 	private static final Logger		LOG			= Logger.getLogger(WebsocketService.class
 														.getName());
-	private static WebsocketService	SINGLETON	= null;
+	private static WebsocketService	singleton	= null;
 	
 	@Override
 	public WebsocketTransport build() {
-		if (SINGLETON == null) {
-			SINGLETON = new WebsocketService();
+		if (singleton == null) {
+			singleton = new WebsocketService();
 		}
-		return SINGLETON.get(getParams(), getHandle());
+		return singleton.get(getParams(), getHandle());
 	}
 	
 	/**
@@ -49,8 +49,8 @@ public class WebsocketTransportBuilder extends
 	 * @return the ws client transport
 	 */
 	public static WebsocketTransport get(final URI address) {
-		if (SINGLETON != null) {
-			return SINGLETON.getTransport(address);
+		if (singleton != null) {
+			return singleton.getTransport(address);
 		}
 		return null;
 	}
