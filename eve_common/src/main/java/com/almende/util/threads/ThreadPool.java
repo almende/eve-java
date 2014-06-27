@@ -6,15 +6,43 @@ package com.almende.util.threads;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The Class ThreadPool.
  */
 public class ThreadPool {
-	private static ThreadFactory	factory	= Executors.defaultThreadFactory();
-	private static ExecutorService	pool	= Executors
-													.newCachedThreadPool(factory);
+	private static int					nofCores = 8;
+	private static ThreadFactory		factory	= Executors
+														.defaultThreadFactory();
+	private static ThreadPoolExecutor	pool	= new ThreadPoolExecutor(
+														nofCores,
+														nofCores,
+														60,
+														TimeUnit.SECONDS,
+														new LinkedBlockingQueue<Runnable>(),
+														factory);
+	
+	static {
+		pool.allowCoreThreadTimeOut(true);
+	}
+	
+	/**
+	 * Sets the nof CPU cores, for efficient resource usage.
+	 * 
+	 * @param nofCores
+	 *            the new nof cores
+	 */
+	public static void setNofCores(int nofCores){
+		ThreadPool.nofCores=nofCores;
+		pool.shutdownNow();
+		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>(), factory);
+		pool.allowCoreThreadTimeOut(true);
+	}
 	
 	/**
 	 * Gets the pool.
@@ -43,6 +71,8 @@ public class ThreadPool {
 	public static void setFactory(final ThreadFactory factory) {
 		ThreadPool.factory = factory;
 		pool.shutdownNow();
-		pool = Executors.newCachedThreadPool(factory);
+		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>(), factory);
+		pool.allowCoreThreadTimeOut(true);
 	}
 }
