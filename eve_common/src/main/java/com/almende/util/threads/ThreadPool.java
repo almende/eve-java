@@ -4,7 +4,6 @@
  */
 package com.almende.util.threads;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -24,10 +23,11 @@ public class ThreadPool {
 														60,
 														TimeUnit.SECONDS,
 														new LinkedBlockingQueue<Runnable>(),
-														factory);
+														factory,
+														new ThreadPoolExecutor.CallerRunsPolicy());
 	
 	static {
-		pool.allowCoreThreadTimeOut(true);
+	//	pool.allowCoreThreadTimeOut(true);
 	}
 	
 	/**
@@ -38,9 +38,11 @@ public class ThreadPool {
 	 */
 	public static void setNofCores(int nofCores){
 		ThreadPool.nofCores=nofCores;
+		pool.purge();
 		pool.shutdownNow();
 		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), factory);
+				new LinkedBlockingQueue<Runnable>(), factory,
+				new ThreadPoolExecutor.CallerRunsPolicy());
 		pool.allowCoreThreadTimeOut(true);
 	}
 	
@@ -49,7 +51,7 @@ public class ThreadPool {
 	 * 
 	 * @return the pool
 	 */
-	public static ExecutorService getPool() {
+	public static ThreadPoolExecutor getPool() {
 		return pool;
 	}
 	
@@ -70,9 +72,11 @@ public class ThreadPool {
 	 */
 	public static void setFactory(final ThreadFactory factory) {
 		ThreadPool.factory = factory;
+		pool.purge();
 		pool.shutdownNow();
 		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), factory);
+				new LinkedBlockingQueue<Runnable>(), factory,
+				new ThreadPoolExecutor.CallerRunsPolicy());
 		pool.allowCoreThreadTimeOut(true);
 	}
 }

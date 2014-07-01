@@ -38,6 +38,7 @@ public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
 	private final AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
+	private final TokenStore					tokenstore	=	new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
 																	"https",
@@ -99,8 +100,8 @@ public class HttpTransport extends AbstractTransport {
 					// invoke via Apache HttpClient request:
 					httpPost.setEntity(new StringEntity(message));
 					
-					// Add token for HTTP handshake
-					httpPost.addHeader("X-Eve-Token", TokenStore.create()
+//					// Add token for HTTP handshake
+					httpPost.addHeader("X-Eve-Token", tokenstore.create()
 							.toString());
 					httpPost.addHeader("X-Eve-SenderUrl", senderUrl);
 					final HttpResponse webResp = ApacheHttpClient.get()
@@ -153,7 +154,8 @@ public class HttpTransport extends AbstractTransport {
 	public String receive(final String body, final URI senderUrl)
 			throws IOException {
 		final String tag = new UUID().toString();
-		final SyncCallback<String> callback = new SyncCallback<String>(){};
+		final SyncCallback<String> callback = new SyncCallback<String>() {
+		};
 		callbacks.push(tag, "", callback);
 		
 		super.getHandle().get().receive(body, senderUrl, tag);
@@ -165,6 +167,15 @@ public class HttpTransport extends AbstractTransport {
 		}
 	}
 	
+	/**
+	 * Gets the tokenstore of this transport
+	 * 
+	 * @return the tokenstore
+	 */
+	public TokenStore getTokenstore() {
+		return tokenstore;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

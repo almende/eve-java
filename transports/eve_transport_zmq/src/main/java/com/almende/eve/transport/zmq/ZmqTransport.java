@@ -40,7 +40,9 @@ public class ZmqTransport extends AbstractTransport {
 	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
 	private static final AsyncCallbackQueue<String>	CALLBACKS			= new AsyncCallbackQueue<String>();
+	private final TokenStore tokenstore = new TokenStore();
 	private final List<String>						protocols			= Arrays.asList("zmq");
+
 	
 	/**
 	 * Instantiates a new zmq transport.
@@ -113,7 +115,7 @@ public class ZmqTransport extends AbstractTransport {
 		if (sendLocal(receiverUri, message)) {
 			return;
 		}
-		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
+		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message.getBytes(), tag);
 	}
 	
@@ -129,7 +131,7 @@ public class ZmqTransport extends AbstractTransport {
 		if (sendLocal(receiverUri, message)) {
 			return;
 		}
-		sendAsync(ZMQ.NORMAL, TokenStore.create().toString(), receiverUri,
+		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message, tag);
 	}
 	
@@ -258,7 +260,7 @@ public class ZmqTransport extends AbstractTransport {
 		
 		if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE)) {
 			// Reply token corresponding to timestamp.
-			final String res = TokenStore.get(body);
+			final String res = tokenstore.get(body);
 			sendAsync(ZMQ.HANDSHAKE_RESPONSE, res, senderUrl, res.getBytes(),
 					null);
 			return;

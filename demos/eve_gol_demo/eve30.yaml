@@ -4,11 +4,21 @@
 #   class: com.almende.eve.transport.LocalService
 #   servletUrl: http://127.0.0.1:8081/agents/
 
+transport:
+    class: com.almende.eve.transport.http.HttpTransportBuilder
+    servletUrl: http://127.0.0.1:8081/agents/
+    servletLauncher: JettyLauncher
+    doShortcut : false
+    doAuthentication: false
+    jetty: 
+        port: 8081
+
 state:
   class: com.almende.eve.state.memory.MemoryStateBuilder
 
 gol:
-  runTime: 50
+  runTime: 10
   columns: 30
   rows: 30
-
+  OddUrl: http://127.0.0.1:8081/agents/
+  EvenUrl: http://127.0.0.1:8081/agents/

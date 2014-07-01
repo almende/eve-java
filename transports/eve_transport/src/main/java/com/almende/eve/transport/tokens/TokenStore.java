@@ -4,16 +4,14 @@
  */
 package com.almende.eve.transport.tokens;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
 
-import com.almende.eve.state.State;
-import com.almende.eve.state.StateBuilder;
-import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Simple token system: Each outbound call gets a token, which is newly
@@ -27,26 +25,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  */
 public final class TokenStore {
-	private static final Logger	LOG			= Logger.getLogger(TokenStore.class
-													.getCanonicalName());
-	private static final int	SIZE		= 5;
-	private static State		tokens;
-	private static DateTime		last		= DateTime.now();
-	private static final String	TOKENSTORE	= "_TokenStore";
-	
-	static {
-		// TODO: use Config service
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.state.memory.MemoryStateService");
-		params.put("id", TOKENSTORE);
-		
-		tokens = new StateBuilder().withConfig(params).build();
-	}
+	private static final Logger	LOG		= Logger.getLogger(TokenStore.class
+												.getCanonicalName());
+	private final int			SIZE	= 5;
+	private Map<String, String>	tokens	= new ConcurrentHashMap<String, String>();
+	private DateTime			last	= DateTime.now();
 	
 	/**
 	 * Instantiates a new token store.
 	 */
-	private TokenStore() {
+	public TokenStore() {
 	};
 	
 	/**
@@ -56,9 +44,9 @@ public final class TokenStore {
 	 *            the time
 	 * @return the string
 	 */
-	public static String get(final String time) {
+	public String get(final String time) {
 		try {
-			return tokens.get(time, String.class);
+			return tokens.get(time);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Exception during TokenStore get:", e);
 			return null;
@@ -70,37 +58,33 @@ public final class TokenStore {
 	 * 
 	 * @return the token ret
 	 */
-	public static TokenRet create() {
-		synchronized (tokens) {
-			TokenRet result;
-			if (tokens.size() == 0
-					|| tokens.get(last.toString(), String.class) == null
-					|| last.plus(3600000).isBeforeNow()) {
-				final DateTime now = DateTime.now();
-				final String token = new UUID().toString();
-				result = new TokenRet(token, now);
-				tokens.put(now.toString(), token);
-				last = now;
-				
-				if (tokens.size() > SIZE + 2) {
-					DateTime oldest = last;
-					for (final String time : tokens.keySet()) {
-						try {
-							if (DateTime.parse(time).isBefore(oldest)) {
-								oldest = DateTime.parse(time);
-							}
-						} catch (final Exception e) {
-							LOG.log(Level.WARNING,
-									"Failed in eviction of tokens:", e);
+	public TokenRet create() {
+		TokenRet result;
+		if (tokens.size() == 0 || tokens.get(last.toString()) == null
+				|| last.plus(3600000).isBeforeNow()) {
+			final DateTime now = DateTime.now();
+			final String token = new UUID().toString();
+			result = new TokenRet(token, now);
+			tokens.put(now.toString(), token);
+			last = now;
+			
+			if (tokens.size() > SIZE + 2) {
+				DateTime oldest = last;
+				for (final String time : tokens.keySet()) {
+					try {
+						if (DateTime.parse(time).isBefore(oldest)) {
+							oldest = DateTime.parse(time);
 						}
+					} catch (final Exception e) {
+						LOG.log(Level.WARNING, "Failed in eviction of tokens:",
+								e);
 					}
-					tokens.remove(oldest.toString());
 				}
-			} else {
-				result = new TokenRet(
-						tokens.get(last.toString(), String.class), last);
+				tokens.remove(oldest.toString());
 			}
-			return result;
+		} else {
+			result = new TokenRet(tokens.get(last.toString()), last);
 		}
+		return result;
 	}
 }

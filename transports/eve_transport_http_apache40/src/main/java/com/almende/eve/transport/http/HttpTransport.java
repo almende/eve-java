@@ -38,6 +38,7 @@ public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
 	private final AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
+	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
 																	"https",
@@ -60,6 +61,15 @@ public class HttpTransport extends AbstractTransport {
 		super(address, handle, service, params);
 	}
 	
+	/**
+	 * Gets the tokenstore.
+	 * 
+	 * @return the tokenstore
+	 */
+	public TokenStore getTokenstore() {
+		return tokenstore;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -100,7 +110,7 @@ public class HttpTransport extends AbstractTransport {
 					httpPost.setEntity(new StringEntity(message));
 					
 					// Add token for HTTP handshake
-					httpPost.addHeader("X-Eve-Token", TokenStore.create()
+					httpPost.addHeader("X-Eve-Token", tokenstore.create()
 							.toString());
 					httpPost.addHeader("X-Eve-SenderUrl", senderUrl);
 					final HttpResponse webResp = ApacheHttpClient.get()

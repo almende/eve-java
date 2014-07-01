@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.StringUtil;
 import com.almende.util.jackson.JOM;
@@ -106,14 +105,18 @@ public class EveServlet extends HttpServlet {
 		if (time == null) {
 			return false;
 		}
-		
-		final String token = TokenStore.get(time);
-		if (token == null) {
-			res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-		} else {
-			res.setHeader("X-Eve-replyToken", token);
-			res.setStatus(HttpServletResponse.SC_OK);
-			res.flushBuffer();
+		final String url = req.getRequestURI();
+		final String id = getId(url);
+		final HttpTransport transport = HttpService.get(myUrl, id);
+		if (transport != null) {
+			final String token = transport.getTokenstore().get(time);
+			if (token == null) {
+				res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+			} else {
+				res.setHeader("X-Eve-replyToken", token);
+				res.setStatus(HttpServletResponse.SC_OK);
+				res.flushBuffer();
+			}
 		}
 		return true;
 	}

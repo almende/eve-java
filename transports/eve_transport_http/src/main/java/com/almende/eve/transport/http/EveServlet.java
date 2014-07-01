@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.StringUtil;
 import com.almende.util.jackson.JOM;
@@ -60,17 +59,19 @@ public class EveServlet extends HttpServlet {
 	 */
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
-		final String servletUrl = config.getInitParameter("ServletUrl");
-		if (servletUrl != null) {
-			try {
-				myUrl = new URI(servletUrl);
-			} catch (final URISyntaxException e) {
-				LOG.log(Level.WARNING,
-						"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
-						e);
+		if (myUrl == null) {
+			final String servletUrl = config.getInitParameter("ServletUrl");
+			if (servletUrl != null) {
+				try {
+					myUrl = new URI(servletUrl);
+				} catch (final URISyntaxException e) {
+					LOG.log(Level.WARNING,
+							"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
+							e);
+				}
+			} else {
+				LOG.warning("Servlet init parameter 'ServletUrl' is required!");
 			}
-		} else {
-			LOG.warning("Servlet init parameter 'ServletUrl' is required!");
 		}
 		super.init(config);
 	}
@@ -106,14 +107,18 @@ public class EveServlet extends HttpServlet {
 		if (time == null) {
 			return false;
 		}
-		
-		final String token = TokenStore.get(time);
-		if (token == null) {
-			res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-		} else {
-			res.setHeader("X-Eve-replyToken", token);
-			res.setStatus(HttpServletResponse.SC_OK);
-			res.flushBuffer();
+		final String url = req.getRequestURI();
+		final String id = getId(url);
+		final HttpTransport transport = HttpService.get(myUrl, id);
+		if (transport != null) {
+			final String token = transport.getTokenstore().get(time);
+			if (token == null) {
+				res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+			} else {
+				res.setHeader("X-Eve-replyToken", token);
+				res.setStatus(HttpServletResponse.SC_OK);
+				res.flushBuffer();
+			}
 		}
 		return true;
 	}
@@ -128,6 +133,7 @@ public class EveServlet extends HttpServlet {
 	private Handshake doHandShake(final HttpServletRequest req) {
 		final String tokenTupple = req.getHeader("X-Eve-Token");
 		if (tokenTupple == null) {
+			//This is a webpage, no HandShake available.
 			return Handshake.NAK;
 		}
 		
@@ -179,25 +185,30 @@ public class EveServlet extends HttpServlet {
 			if (req.getSession(false) != null) {
 				return true;
 			}
-			// TODO: make sure connection is secure if configured to enforce
-			// that.
-			final Handshake hs = doHandShake(req);
-			if (hs.equals(Handshake.INVALID)) {
-				return false;
-			}
 			
 			final boolean doAuthentication = HttpService
 					.doAuthentication(myUrl);
-			if (hs.equals(Handshake.NAK) && doAuthentication) {
-				if (!req.isSecure()) {
-					res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							"Request needs to be secured with SSL for session management!");
+			if (doAuthentication) {
+				// TODO: make sure connection is secure if configured to enforce
+				// that.
+				final Handshake hs = doHandShake(req);
+				if (hs.equals(Handshake.INVALID)) {
 					return false;
 				}
-				if (!req.authenticate(res)) {
-					return false;
+				
+				if (hs.equals(Handshake.NAK)) {
+					if (!req.isSecure()) {
+						res.sendError(HttpServletResponse.SC_BAD_REQUEST,
+								"Request needs to be secured with SSL for session management!");
+						return false;
+					}
+					if (!req.authenticate(res)) {
+						return false;
+					}
 				}
 			}
+			
+			
 			// generate new session:
 			req.getSession(true);
 		} catch (final Exception e) {
