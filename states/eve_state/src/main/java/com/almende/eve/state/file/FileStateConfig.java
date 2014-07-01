@@ -82,4 +82,5 @@ public class FileStateConfig extends StateConfig {
 				+ "configuration. Using the default path '.eveagents'");
 		return ".eveagents";
 	}
+	
 }

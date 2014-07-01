@@ -15,7 +15,7 @@ import com.almende.eve.state.couch.CouchState;
 import com.almende.eve.state.couch.CouchStateBuilder;
 import com.almende.eve.state.couch.CouchStateConfig;
 import com.almende.eve.state.file.FileStateBuilder;
-import com.almende.eve.state.memory.MemoryStateBuilder;
+import com.almende.eve.state.memory.MemoryStateConfig;
 import com.almende.eve.state.mongo.MongoState;
 import com.almende.eve.state.mongo.MongoStateBuilder;
 import com.almende.eve.state.mongo.MongoStateConfig;
@@ -51,9 +51,8 @@ public class TestState extends TestCase {
 	 */
 	@Test
 	public void testState() {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", MemoryStateBuilder.class.getName());
-		params.put("id", "TestAgent");
+		final MemoryStateConfig params = new MemoryStateConfig();
+		params.setId("TestAgent");
 		
 		State myState = new CapabilityBuilder<State>().withConfig(params).build();
 		State myState2 = new StateBuilder().withConfig(params).build();

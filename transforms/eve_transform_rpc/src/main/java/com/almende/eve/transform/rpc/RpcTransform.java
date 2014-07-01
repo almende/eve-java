@@ -57,6 +57,8 @@ public class RpcTransform implements Transform {
 	public RpcTransform(final ObjectNode params, final Handler<Object> handle) {
 		destination = handle;
 		myParams = params;
+		final RpcTransformConfig config = new RpcTransformConfig(params);
+		callbacks.setDefTimeout(config.getCallbackTimeout());
 	}
 	
 	/**

@@ -29,8 +29,7 @@ public class AsyncCallbackQueue<T> {
 																			.defaultThreadFactory());
 	
 	/** timeout in seconds */
-	// TODO: make the timeout customizable in eve.yaml
-	private static final int					TIMEOUT		= 30;
+	private int									defTimeout	= 30;
 	
 	static {
 		try {
@@ -79,7 +78,7 @@ public class AsyncCallbackQueue<T> {
 									+ "': " + description));
 				}
 			}
-		}, TIMEOUT, TimeUnit.SECONDS);
+		}, defTimeout, TimeUnit.SECONDS);
 		queue.put(id, handler);
 	}
 	
@@ -120,6 +119,25 @@ public class AsyncCallbackQueue<T> {
 	private class CallbackHandler {
 		private AsyncCallback<T>	callback;
 		private ScheduledFuture<?>	timeout;
+	}
+	
+	/**
+	 * Gets the default callback timeout.
+	 * 
+	 * @return the default timeout
+	 */
+	public int getDefTimeout() {
+		return defTimeout;
+	}
+	
+	/**
+	 * Sets the default callback timeout.
+	 * 
+	 * @param defTimeout
+	 *            the new default timeout
+	 */
+	public void setDefTimeout(int defTimeout) {
+		this.defTimeout = defTimeout;
 	}
 	
 }

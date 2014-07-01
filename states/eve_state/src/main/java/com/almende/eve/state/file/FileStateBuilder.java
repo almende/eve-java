@@ -179,6 +179,10 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		public State get(final ObjectNode params) {
 			final FileStateConfig config = new FileStateConfig(params);
 			final String agentId = config.getId();
+			if (agentId == null){
+				LOG.warning("Parameter 'id' is required for a file State.");
+				return null;
+			}
 			
 			State state = null;
 			try {

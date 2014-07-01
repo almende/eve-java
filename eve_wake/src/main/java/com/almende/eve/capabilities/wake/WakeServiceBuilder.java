@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.state.StateConfig;
 
 /**
  * The Class WakeService.
@@ -20,13 +20,14 @@ public class WakeServiceBuilder extends AbstractCapabilityBuilder<WakeService> {
 	
 	@Override
 	public WakeService build(){
-		final Config config = new Config(getParams());
-		final String id = config.get("state", "id");
+		final WakeServiceConfig config = new WakeServiceConfig(getParams());
+		final String id = new StateConfig(config.getState()).getId();
+		
 		WakeService service = null;
 		if (SERVICES.containsKey(id)) {
 			service = SERVICES.get(id);
 		}
-		service = new WakeService(getParams());
+		service = new WakeService(config);
 		
 		return service;
 	}

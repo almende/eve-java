@@ -32,4 +32,26 @@ public class RpcTransformConfig extends Config {
 			setClassName(RpcTransformBuilder.class.getName());
 		}
 	}
+	
+	/**
+	 * Sets the callback timeout. (in seconds)
+	 * 
+	 * @param timeout
+	 *            the new callback timeout
+	 */
+	public void setCallbackTimeout(final int timeout){
+		this.put("rpcTimeout", timeout);
+	}
+	
+	/**
+	 * Gets the callback timeout. (in seconds)
+	 * 
+	 * @return the callback timeout
+	 */
+	public int getCallbackTimeout(){
+		if (this.has("rpcTimeout")){
+			return this.get("rpcTimeout").asInt();
+		}
+		return 30;
+	}
 }

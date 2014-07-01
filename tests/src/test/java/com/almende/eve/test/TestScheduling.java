@@ -17,9 +17,8 @@ import com.almende.eve.scheduling.PersistentSchedulerConfig;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.file.FileStateBuilder;
+import com.almende.eve.state.file.FileStateConfig;
 import com.almende.eve.transport.Receiver;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class TestScheduling.
@@ -34,11 +33,11 @@ public class TestScheduling extends TestCase {
 	@Test
 	public void testScheduling() {
 		final PersistentSchedulerConfig params = new PersistentSchedulerConfig();
-		final ObjectNode state = JOM.createObjectNode();
+		final FileStateConfig state = new FileStateConfig();
 		state.put("class", FileStateBuilder.class.getName());
-		state.put("json", true);
 		state.put("path", ".eveagents_schedulingtest");
 		state.put("id", "testScheduling");
+		
 		params.setState(state);
 		params.setSenderUrl("local:scheduler");
 		

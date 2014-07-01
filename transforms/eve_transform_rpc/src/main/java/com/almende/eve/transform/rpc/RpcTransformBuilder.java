@@ -30,6 +30,9 @@ public class RpcTransformBuilder extends AbstractCapabilityBuilder<RpcTransform>
 	 */
 	@Override
 	public RpcTransform build() {
+		if (getParams() == null){
+			withConfig(new RpcTransformConfig());
+		}
 		RpcTransform result;
 		if (getHandle() != null && getHandle().getKey() != null
 				&& INSTANCES.containsKey(getHandle().getKey())) {
