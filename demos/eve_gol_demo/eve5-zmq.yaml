@@ -13,22 +13,22 @@ transport:
     doShortcut: false
     doAuthentication: false
 
-state:
-  class: com.almende.eve.state.memory.MemoryStateBuilder
+#state:
+#  class: com.almende.eve.state.memory.MemoryStateBuilder
 
 #state:
 #   class: com.almende.eve.state.file.FileStateBuilder
 #   json: true
 #   path: .eveagents_gol_demo
 
-#state:
-#    class: com.almende.eve.state.mongo.MongoStateBuilder
+state:
+    class: com.almende.eve.state.mongo.MongoStateBuilder
 
 gol:
   runTime: 50
-  columns: 30
-  rows: 30
+  columns: 5
+  rows: 5
 #  OddUrl: http://127.0.0.1:8081/agents/
 #  EvenUrl: http://127.0.0.1:8081/agents/
-#  OddUrl: zmq://ipc:///tmp/zmq-socket-
-#  EvenUrl: zmq://ipc:///tmp/zmq-socket-
+  OddUrl: zmq://ipc:///tmp/zmq-socket-
+  EvenUrl: zmq://ipc:///tmp/zmq-socket-

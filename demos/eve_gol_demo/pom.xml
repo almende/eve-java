@@ -23,6 +23,16 @@
 		</dependency>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-state-mongo</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-state-couch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
 			<artifactId>eve-transport-zmq</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

@@ -57,6 +57,11 @@ public class Cell extends Agent {
 		final String id = getId();
 		final int agentNo = Integer.parseInt(id.substring(id.indexOf('_') + 1));
 		calcNeighbours(odd, even, agentNo, totalSize);
+		try {
+			this.connect();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
