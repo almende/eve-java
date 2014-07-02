@@ -4,4 +4,4 @@
 .classpath
 /pom.xml.asc
 /pom.xml.versionsBackup
-
+dependency-reduced-pom.xml

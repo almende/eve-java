@@ -11,7 +11,7 @@
 	<name>EVE Transport HTTP</name>
 
 	<properties>
-		<httpclient.version>4.3.3</httpclient.version>
+		<httpclient.version>4.3.4</httpclient.version>
 	</properties>
 
 	<dependencies>

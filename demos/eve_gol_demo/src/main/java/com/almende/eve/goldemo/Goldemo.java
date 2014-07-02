@@ -143,6 +143,14 @@ public class Goldemo {
 			}
 			cN++;
 		}
+		
+		System.err.println("Waiting before start, 10s");
+		try {
+			Thread.sleep(10000);
+		} catch (final InterruptedException e) {
+			System.err.println("Early interrupt");
+		}
+		System.err.println("Trigger start!");
 		for (final Cell cell : cells) {
 			cell.start();
 		}
