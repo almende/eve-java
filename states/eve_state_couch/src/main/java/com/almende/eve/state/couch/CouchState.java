@@ -150,9 +150,11 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 */
 	@Override
 	public synchronized Object remove(final String key) {
+		final String ckey = couchify(key);
+		
 		Object result = null;
 		try {
-			result = properties.remove(key);
+			result = properties.remove(ckey);
 			update();
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
