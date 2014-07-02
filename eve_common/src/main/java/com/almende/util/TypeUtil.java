@@ -227,6 +227,9 @@ public abstract class TypeUtil<T> {
 		}
 		final ObjectMapper mapper = JOM.getInstance();
 		if (value instanceof JsonNode) {
+			if (fullType.getRawClass().equals(JsonNode.class)){
+				return (T) value;
+			}
 			if (((JsonNode) value).isNull()) {
 				return null;
 			}

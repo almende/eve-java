@@ -16,9 +16,7 @@ import java.nio.channels.FileLock;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -28,6 +26,8 @@ import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.file.FileStateBuilder.FileStateProvider;
 import com.almende.util.jackson.JOM;
 import com.almende.util.jackson.JsonNullAwareDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,16 +61,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *        System.out.println(state.get("key")); // "value"<br>
  */
 public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
-	private static final Logger			LOG			= Logger.getLogger("ConcurrentFileState");
-	private String						filename	= null;
-	private FileChannel					channel		= null;
-	private FileLock					lock		= null;
-	private InputStream					fis			= null;
-	private OutputStream				fos			= null;
-	private ObjectMapper				om			= null;
-	private static Map<String, Boolean>	locked		= new ConcurrentHashMap<String, Boolean>();
-	private final Map<String, JsonNode>	properties	= Collections
-															.synchronizedMap(new HashMap<String, JsonNode>());
+	private class Lock {
+		boolean	locked	= false;
+	}
+	
+	private static final Logger				LOG			= Logger.getLogger("ConcurrentFileState");
+	private String							filename	= null;
+	private FileChannel						channel		= null;
+	private FileLock						lock		= null;
+	private InputStream						fis			= null;
+	private OutputStream					fos			= null;
+	private ObjectMapper					om			= null;
+	private static final Map<String, Lock>	locked		= new ConcurrentHashMap<String, Lock>();
+	private Map<String, JsonNode>			properties	= Collections
+																.synchronizedMap(new HashMap<String, JsonNode>());
+	private static final JavaType			MAPTYPE		= JOM.getTypeFactory()
+																.constructMapLikeType(
+																		HashMap.class,
+																		String.class,
+																		JsonNode.class);
 	
 	/**
 	 * Instantiates a new concurrent json file state.
@@ -110,19 +119,27 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 */
 	@SuppressWarnings("resource")
 	protected void openFile() throws IOException {
+		Lock llock = null;
 		synchronized (locked) {
-			while (locked.containsKey(filename) && locked.get(filename)) {
+			llock = locked.get(filename);
+			if (llock == null) {
+				llock = new Lock();
+				locked.put(filename, llock);
+			}
+		}
+		synchronized (llock) {
+			while (llock.locked) {
 				try {
-					locked.wait();
+					llock.wait();
 				} catch (final InterruptedException e) {
 				}
 			}
-			locked.put(filename, true);
+			llock.locked = true;
 			
 			final File file = new File(filename);
 			if (!file.exists()) {
-				locked.put(filename, false);
-				locked.notifyAll();
+				llock.locked = false;
+				llock.notifyAll();
 				throw new IllegalStateException(
 						"Warning: File doesn't exist (anymore):'" + filename
 								+ "'");
@@ -138,8 +155,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 				channel.close();
 				channel = null;
 				lock = null;
-				locked.put(filename, false);
-				locked.notifyAll();
+				llock.locked = false;
+				llock.notifyAll();
 				throw new IllegalStateException(
 						"error, couldn't obtain file lock on:" + filename, e);
 			}
@@ -152,11 +169,14 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * Close file.
 	 */
 	protected void closeFile() {
-		synchronized (locked) {
+		final Lock llock = locked.get(filename);
+		if (llock == null) {
+			return;
+		}
+		synchronized (llock) {
 			
 			if (lock != null && lock.isValid()) {
 				try {
-					
 					lock.release();
 				} catch (final IOException e) {
 					LOG.log(Level.WARNING, "", e);
@@ -181,8 +201,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			fis = null;
 			fos = null;
 			lock = null;
-			locked.put(filename, false);
-			locked.notifyAll();
+			llock.locked = false;
+			llock.notifyAll();
 		}
 	}
 	
@@ -213,6 +233,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @throws ClassNotFoundException
 	 *             the class not found exception
 	 */
+	@SuppressWarnings("unchecked")
 	@JsonDeserialize(using = JsonNullAwareDeserializer.class)
 	private void read() throws IOException, ClassNotFoundException {
 		try {
@@ -220,13 +241,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 				channel.position(0);
 			}
 			properties.clear();
-			final JsonNode data = om.readTree(fis);
-			final Iterator<Entry<String, JsonNode>> fieldIter = data.fields();
-			
-			while (fieldIter.hasNext()) {
-				final Entry<String, JsonNode> item = fieldIter.next();
-				properties.put(item.getKey(), item.getValue());
-			}
+			properties.putAll((Map<String, JsonNode>) om
+					.readValue(fis, MAPTYPE));
 		} catch (final EOFException eof) {
 			// empty file, new agent?
 		} catch (final JsonMappingException jme) {
@@ -240,13 +256,14 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.State#clear()
 	 */
 	@Override
-	public synchronized void clear() {
+	public void clear() {
 		try {
 			openFile();
 			properties.clear();
 			write();
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -259,14 +276,15 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.State#keySet()
 	 */
 	@Override
-	public synchronized Set<String> keySet() {
+	public Set<String> keySet() {
 		Set<String> result = null;
 		try {
 			openFile();
 			read();
 			result = new HashSet<String>(properties.keySet());
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -280,14 +298,15 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.State#containsKey(java.lang.String)
 	 */
 	@Override
-	public synchronized boolean containsKey(final String key) {
+	public boolean containsKey(final String key) {
 		boolean result = false;
 		try {
 			openFile();
 			read();
 			result = properties.containsKey(key);
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -301,14 +320,16 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.AbstractState#get(java.lang.String)
 	 */
 	@Override
-	public synchronized JsonNode get(final String key) {
+	@JsonIgnore
+	public JsonNode get(final String key) {
 		JsonNode result = NullNode.getInstance();
 		try {
 			openFile();
 			read();
 			result = properties.get(key);
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -323,7 +344,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
-	public synchronized JsonNode locPut(final String key, JsonNode value) {
+	public JsonNode locPut(final String key, JsonNode value) {
 		JsonNode result = null;
 		try {
 			openFile();
@@ -334,7 +355,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			result = properties.put(key, value);
 			write();
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -351,8 +373,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
-	public synchronized boolean locPutIfUnchanged(final String key,
-			final JsonNode newVal, JsonNode oldVal) {
+	public boolean locPutIfUnchanged(final String key, final JsonNode newVal,
+			JsonNode oldVal) {
 		boolean result = false;
 		try {
 			openFile();
@@ -374,7 +396,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 				result = true;
 			}
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 			// Don't let users loop if exception is thrown. They
@@ -391,7 +414,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.State#remove(java.lang.String)
 	 */
 	@Override
-	public synchronized Object remove(final String key) {
+	public Object remove(final String key) {
 		Object result = null;
 		try {
 			openFile();
@@ -400,7 +423,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			
 			write();
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -414,7 +438,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * @see com.almende.eve.state.State#size()
 	 */
 	@Override
-	public synchronized int size() {
+	public int size() {
 		int result = -1;
 		try {
 			openFile();
@@ -422,7 +446,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			result = properties.size();
 			
 		} catch (final IllegalStateException e) {
-			LOG.log(Level.WARNING, "Statefile is missing: " + e.getMessage());
+			LOG.log(Level.WARNING,
+					"Couldn't handle Statefile: " + e.getMessage(), e);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
