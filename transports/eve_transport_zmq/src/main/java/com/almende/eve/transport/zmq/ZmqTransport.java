@@ -84,7 +84,6 @@ public class ZmqTransport extends AbstractTransport {
 				final String addr = receiverUrl.toString().replaceFirst(
 						"zmq:/?/?", "");
 				final Socket socket = ZMQ.getSocket(org.zeromq.ZMQ.PUSH);
-				LOG.warning("trying to connect to:" + addr);
 				try {
 					socket.connect(addr);
 					socket.send(zmqType, org.zeromq.ZMQ.SNDMORE);

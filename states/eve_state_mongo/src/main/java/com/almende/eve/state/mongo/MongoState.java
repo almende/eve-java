@@ -228,6 +228,17 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
+	/**
+	 * Esc.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the string
+	 */
+	private String esc(final String key){
+		return key.replace('$', '\uFF04').replace('.', '\uFF0E');
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -238,10 +249,10 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	public JsonNode get(final String key) {
 		JsonNode result = null;
 		try {
-			result = properties.get(key);
+			result = properties.get(esc(key));
 			if (result == null) {
 				reloadProperties();
-				result = properties.get(key);
+				result = properties.get(esc(key));
 			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "get error", e);
@@ -259,7 +270,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	public synchronized JsonNode locPut(final String key, final JsonNode value) {
 		JsonNode result = null;
 		try {
-			result = properties.put(key, value);
+			result = properties.put(esc(key), value);
 			updateProperties(false);
 		} catch (final UpdateConflictException e) {
 			LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "="
@@ -268,7 +279,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			// go recursive if update conflict occurs
 			result = locPut(key, value);
 		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "locPut error", e);
+			LOG.log(Level.WARNING, "locPut error: Adding [" + key + "="
+					+ value + "] "+properties, e);
 		}
 		
 		return result;
@@ -288,8 +300,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		boolean result = false;
 		try {
 			JsonNode cur = NullNode.getInstance();
-			if (properties.containsKey(key)) {
-				cur = properties.get(key);
+			if (properties.containsKey(esc(key))) {
+				cur = properties.get(esc(key));
 			}
 			if (oldVal == null) {
 				oldVal = NullNode.getInstance();
@@ -299,7 +311,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			// e.g.
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
-				properties.put(key, newVal);
+				properties.put(esc(key), newVal);
 				result = updateProperties(false);
 			}
 		} catch (final UpdateConflictException e) {
@@ -324,7 +336,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	}
 	
 	/**
-	 * set all property values from a collection.
+	 * set all property values from a collection. (Warning, keys in the properties map should be MongoDB safe: no '$', nor '.' in the keys!)
 	 * 
 	 * @param properties
 	 *            the properties
@@ -387,7 +399,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		if (result.getN() == 0 && result.getError() == null) {
 			throw new UpdateConflictException(timestamp);
 		} else if (result.getN() != 1) {
-			throw new MongoException(result.getError());
+			throw new MongoException(result.getError()+ " <--- "+properties);
 		}
 		timestamp = now;
 		return updatedExisting;

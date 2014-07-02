@@ -96,8 +96,6 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 			
 			final MongoStateConfig config = new MongoStateConfig(params);
 			
-			LOG.warning("Creating mongoState:" + config);
-			
 			// initialization of client & jongo
 			final MongoClient client = createClient(config.getHost(),
 					config.getPort());
@@ -140,7 +138,6 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 			final StateConfig config = new StateConfig(params);
 			final String id = config.getId();
 			
-			LOG.warning("Looking for:" + config);
 			
 			MongoState result = null;
 			try {
