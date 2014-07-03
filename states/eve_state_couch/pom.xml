@@ -15,7 +15,7 @@
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
-		<ektorp.version>1.4.1</ektorp.version>
+		<ektorp.version>1.4.2</ektorp.version>
 	</properties>
 
 	<dependencies>

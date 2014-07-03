@@ -4,11 +4,10 @@
  */
 package com.almende.eve.state.couch;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,8 +31,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	private static final Logger		LOG			= Logger.getLogger(CouchState.class
 														.getName());
 	private String					revision	= null;
-	private Map<String, JsonNode>	properties	= Collections
-														.synchronizedMap(new HashMap<String, JsonNode>());
+	private Map<String, JsonNode>	properties	= new ConcurrentHashMap<String, JsonNode>();
 	private CouchDbConnector		db			= null;
 	
 	/**
@@ -65,20 +63,16 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 */
 	private void read() {
 		try {
-			final CouchState state = db.get(CouchState.class, getId());
-			if (state != null) {
-				revision = state.revision;
-				properties = state.properties;
+			synchronized (properties) {
+				final CouchState state = db.get(CouchState.class, getId());
+				if (state != null) {
+					revision = state.revision;
+					properties.clear();
+					properties.putAll(state.properties);
+				}
 			}
 		} catch (final org.ektorp.DocumentNotFoundException e) {
 		}
-	}
-	
-	/**
-	 * Update.
-	 */
-	private synchronized void update() {
-		db.update(this);
 	}
 	
 	/*
@@ -88,12 +82,14 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
-	public synchronized JsonNode locPut(final String key, final JsonNode value) {
+	public JsonNode locPut(final String key, final JsonNode value) {
 		final String ckey = couchify(key);
 		JsonNode result = null;
 		try {
-			result = properties.put(ckey, value);
-			update();
+			synchronized (properties) {
+				result = properties.put(ckey, value);
+			}
+			db.update(this);
 		} catch (final UpdateConflictException uce) {
 			read();
 			return locPut(ckey, value);
@@ -113,8 +109,8 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
 	@Override
-	public synchronized boolean locPutIfUnchanged(final String key,
-			final JsonNode newVal, JsonNode oldVal) {
+	public boolean locPutIfUnchanged(final String key, final JsonNode newVal,
+			JsonNode oldVal) {
 		final String ckey = couchify(key);
 		boolean result = false;
 		try {
@@ -129,8 +125,10 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 			// Poor mans equality as some Numbers are compared incorrectly: e.g.
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
-				properties.put(ckey, newVal);
-				update();
+				synchronized (properties) {
+					properties.put(ckey, newVal);
+				}
+				db.update(this);
 				result = true;
 			}
 		} catch (final UpdateConflictException uce) {
@@ -149,13 +147,15 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * @see com.almende.eve.state.State#remove(java.lang.String)
 	 */
 	@Override
-	public synchronized Object remove(final String key) {
+	public Object remove(final String key) {
 		final String ckey = couchify(key);
 		
 		Object result = null;
 		try {
-			result = properties.remove(ckey);
-			update();
+			synchronized (properties) {
+				result = properties.remove(ckey);
+			}
+			db.update(this);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
@@ -209,10 +209,12 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	 * @see com.almende.eve.state.State#clear()
 	 */
 	@Override
-	public synchronized void clear() {
+	public void clear() {
 		try {
-			properties.clear();
-			update();
+			synchronized (properties) {
+				properties.clear();
+			}
+			db.update(this);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed clearing state", e);
 		}

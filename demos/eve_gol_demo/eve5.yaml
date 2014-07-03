@@ -12,16 +12,17 @@ transport:
 #state:
 #  class: com.almende.eve.state.memory.MemoryStateBuilder
 
-state:
-   class: com.almende.eve.state.file.FileStateBuilder
-   json: true
-   path: .eveagents_gol_demo
+#state:
+#   class: com.almende.eve.state.file.FileStateBuilder
+#   json: true
+#   path: .eveagents_gol_demo
 
 #state:
 #    class: com.almende.eve.state.mongo.MongoStateBuilder
 
-#state:
-#    class: com.almende.eve.state.couch.CouchStateBuilder
+state:
+    class: com.almende.eve.state.couch.CouchStateBuilder
+
 
 gol:
   runTime: 50
