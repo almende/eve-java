@@ -9,8 +9,8 @@ transport:
     jetty: 
         port: 8081
 
-#state:
-#  class: com.almende.eve.state.memory.MemoryStateBuilder
+state:
+  class: com.almende.eve.state.memory.MemoryStateBuilder
 
 #state:
 #   class: com.almende.eve.state.file.FileStateBuilder
@@ -20,13 +20,13 @@ transport:
 #state:
 #    class: com.almende.eve.state.mongo.MongoStateBuilder
 
-state:
-    class: com.almende.eve.state.couch.CouchStateBuilder
+#state:
+#    class: com.almende.eve.state.couch.CouchStateBuilder
 
 
 gol:
   runTime: 50
   columns: 30
   rows: 30
-  OddUrl: http://127.0.0.1:8081/agents/
-  EvenUrl: http://127.0.0.1:8081/agents/
+#  OddUrl: http://127.0.0.1:8081/agents/
+#  EvenUrl: http://127.0.0.1:8081/agents/
