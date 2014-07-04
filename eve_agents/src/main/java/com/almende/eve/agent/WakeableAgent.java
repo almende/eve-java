@@ -33,7 +33,12 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 */
 	public WakeableAgent(final ObjectNode config, final WakeService ws) {
 		this.ws = ws;
-		setConfig(config, true);
+		final AgentConfig conf = new AgentConfig(config);
+		setRpc(new RpcTransformBuilder().withHandle(
+				new WakeHandler<Object>(this, conf.getId(), ws)).build());
+		setReceiver(new WakeHandler<Receiver>(this, conf.getId(), ws));
+		
+		setConfig(conf, true);
 		registerAt(ws);
 	}
 	
@@ -44,10 +49,6 @@ public class WakeableAgent extends Agent implements Wakeable {
 	 *            the ws
 	 */
 	public void registerAt(final WakeService ws) {
-		setRpc(new RpcTransformBuilder().withHandle(
-				new WakeHandler<Object>(this, getId(), ws)).build());
-		setReceiver(new WakeHandler<Receiver>(this, getId(), ws));
-		loadConfig(false);
 		ws.register(getId(), getConfig(), this.getClass().getName());
 	}
 	

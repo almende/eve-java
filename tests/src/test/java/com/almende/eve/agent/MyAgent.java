@@ -4,109 +4,54 @@
  */
 package com.almende.eve.agent;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.almende.eve.capabilities.wake.WakeHandler;
 import com.almende.eve.capabilities.wake.WakeService;
-import com.almende.eve.capabilities.wake.Wakeable;
-import com.almende.eve.test.TestWake;
-import com.almende.eve.transport.Receiver;
-import com.almende.eve.transport.Transport;
-import com.almende.eve.transport.TransportBuilder;
-import com.almende.eve.transport.xmpp.XmppTransportConfig;
+import com.almende.eve.transform.rpc.annotation.Access;
+import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class MyAgent.
  */
-public class MyAgent implements Wakeable, Receiver {
-	private static final Logger	LOG			= Logger.getLogger(TestWake.class
-													.getName());
-	private WakeService			ws			= new WakeService();
-	private Transport			transport	= null;
-	private String				wakeKey		= null;
+public class MyAgent extends WakeableAgent {
 	
 	/**
 	 * Instantiates a new my agent.
 	 */
 	public MyAgent() {
-	}
+	};
 	
 	/**
 	 * Instantiates a new my agent.
 	 * 
-	 * @param wakeKey
-	 *            the wake key
+	 * @param id
+	 *            the id
 	 * @param ws
 	 *            the ws
 	 */
-	public MyAgent(final String wakeKey, final WakeService ws) {
-		this.wakeKey = wakeKey;
-		if (ws != null) {
-			this.ws = ws;
-		}
-		
-	}
-	
-	/**
-	 * Inits the agent.
-	 */
-	public void init() {
-		
-		final XmppTransportConfig config = new XmppTransportConfig();
-		config.setAddress("xmpp://alex@openid.almende.org/" + wakeKey);
-		config.setPassword("alex");
-		
-		ws.register(wakeKey, config, MyAgent.class.getName());
-		
-		transport = new TransportBuilder().withConfig(config)
-				.withHandle(new WakeHandler<Receiver>(this, wakeKey, ws))
-				.build();
-		try {
-			transport.connect();
-			transport.send(URI.create("xmpp:gloria@openid.almende.org"),
-					"I'm awake!", null);
-		} catch (final IOException e) {
-			LOG.log(Level.WARNING, "Failed to connect XMPP.", e);
-		}
+	public MyAgent(final String id, final WakeService ws) {
+		super(new AgentConfig(id), ws);
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.almende.eve.capabilities.wake.Wakeable#wake(java.lang.String,
+	 * @see com.almende.eve.agent.WakeableAgent#wake(java.lang.String,
 	 * com.fasterxml.jackson.databind.node.ObjectNode, boolean)
 	 */
 	@Override
 	public void wake(final String wakeKey, final ObjectNode params,
 			final boolean onBoot) {
-		this.wakeKey = wakeKey;
-		transport = new TransportBuilder().withConfig(params)
-				.withHandle(new WakeHandler<Receiver>(this, wakeKey, ws))
-				.build();
-		
-		if (onBoot) {
-			try {
-				transport.connect();
-			} catch (final IOException e) {
-				LOG.log(Level.WARNING, "Failed to connect XMPP.", e);
-			}
-		}
+		super.wake(wakeKey, params, onBoot);
+		System.out.println("Wake called, so the agent was actually unloaded!");
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Hello world.
 	 * 
-	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
-	 * java.net.URI, java.lang.String)
+	 * @return the string
 	 */
-	@Override
-	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		LOG.warning("Received msg:'" + msg + "' from: "
-				+ senderUrl.toASCIIString());
+	@Access(AccessType.PUBLIC)
+	public String helloWorld() {
+		return("Hello World");
 	}
-	
 }

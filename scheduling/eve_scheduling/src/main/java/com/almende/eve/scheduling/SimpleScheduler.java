@@ -153,5 +153,10 @@ public class SimpleScheduler implements Scheduler {
 	public ObjectNode getParams() {
 		return myParams;
 	}
+
+	@Override
+	public String schedule(Object msg, int delay) {
+		return schedule(msg,DateTime.now().plus(delay));
+	}
 	
 }

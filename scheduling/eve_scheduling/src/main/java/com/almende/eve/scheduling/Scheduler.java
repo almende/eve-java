@@ -25,6 +25,17 @@ public interface Scheduler extends Capability {
 	String schedule(Object msg, final DateTime due);
 	
 	/**
+	 * Schedule.
+	 * 
+	 * @param msg
+	 *            the msg
+	 * @param delay
+	 *            the delay
+	 * @return the scheduled id, can be used to cancel the schedule
+	 */
+	String schedule(Object msg, final int delay);
+	
+	/**
 	 * Cancel task with given id.
 	 * 
 	 * @param id

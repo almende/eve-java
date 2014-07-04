@@ -4,47 +4,100 @@
  */
 package com.almende.eve.test;
 
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.MyAgent;
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.WakeServiceBuilder;
 import com.almende.eve.capabilities.wake.WakeServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
+import com.almende.util.callback.AsyncCallback;
 
 /**
  * The Class TestWake.
  */
 public class TestWake extends TestCase {
+	final Ret called = new Ret();
+	
+	class Ret{
+		boolean value = false;
+	}
 	
 	/**
-	 * Test wake.
+	 * Test wake example.
 	 */
 	@Test
-	public void testWake() {
+	public void testWake(){
+		
+		//First we need to setup the WakeService: (Either keep a global pointer to the wake service, or obtain it again through the same configuration)
 		final WakeServiceConfig config = new WakeServiceConfig();
 		final FileStateConfig stateconfig = new FileStateConfig();
 		stateconfig.setPath(".wakeservices");
 		stateconfig.setId("testWakeService");
 		config.setState(stateconfig);
+				
+		final WakeService ws = 
+			new WakeServiceBuilder()
+			.withConfig(config)
+			.build();
+
+		// Now create a WakeAble Agent
+		WeakReference<Agent> test = new WeakReference<Agent>(new MyAgent("testWakeAgent", ws));
 		
-		final WakeService ws = new WakeServiceBuilder().withConfig(config).build();
-		
-		// Create agent without external references, hopefully!
-		new MyAgent("testWakeAgent", ws).init();
-		// Try to get rid of the agent instance from memory
+		//after a while the agent is unloaded:
 		System.gc();
 		System.gc();
-		
-		// Sleep for 10seconds, allowing external XMPP call.
 		try {
-			Thread.sleep(20000);
+			Thread.sleep(1000);
 		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.gc();
+		System.gc();
+		
+		// By now the agent should be unloaded:
+		assertNull(test.get());
+		
+		//Now some other agent calls the agent:
+		new Agent("other",null){
+			public void test(){
+				try {
+					send(new URI("local:testWakeAgent"),"helloWorld",null,new AsyncCallback<String>(){
+
+						@Override
+						public void onSuccess(String result) {
+							called.value=true;
+						}
+
+						@Override
+						public void onFailure(Exception exception) {
+							fail();
+						}
+						
+					});
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		}.test();
+		
+		//Give the async call time to reach the agent (and wake the agent in the proces);
+		try {
+			Thread.sleep(1000);
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+		assertTrue(called.value);
 	}
 	
 }

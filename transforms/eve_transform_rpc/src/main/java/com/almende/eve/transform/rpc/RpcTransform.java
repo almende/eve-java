@@ -190,6 +190,23 @@ public class RpcTransform implements Transform {
 	public List<Object> getMethods() {
 		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS);
 	}
+
+	/**
+	 * Builds the msg.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @return the JSON request
+	 */
+	public <T> JSONRequest buildMsg(final String method,
+			final ObjectNode params) {
+		final JSONRequest request = new JSONRequest(method, params);
+		return request;
+	}
 	
 	/**
 	 * Builds the msg.

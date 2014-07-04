@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
+
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.scheduling.Scheduler;
@@ -43,14 +45,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Agent.
  */
-@Access(AccessType.PUBLIC)
+@Access(AccessType.UNAVAILABLE)
 public class Agent implements Receiver {
 	private static final Logger	LOG			= Logger.getLogger(Agent.class
 													.getName());
 	private String				agentId		= null;
 	private AgentConfig			config		= null;
 	private State				state		= null;
-	private final Router		transport	= new Router();
+	protected Router			transport	= new Router();
 	private Scheduler			scheduler	= null;
 	private RpcTransform		rpc			= new RpcTransformBuilder()
 													.withHandle(
@@ -107,6 +109,7 @@ public class Agent implements Receiver {
 	/**
 	 * @return the rpc
 	 */
+	@JsonIgnore
 	protected RpcTransform getRpc() {
 		return rpc;
 	}
@@ -122,6 +125,7 @@ public class Agent implements Receiver {
 	/**
 	 * @return the receiver
 	 */
+	@JsonIgnore
 	protected Handler<Receiver> getReceiver() {
 		return receiver;
 	}
@@ -163,6 +167,7 @@ public class Agent implements Receiver {
 	 * 
 	 * @return the id
 	 */
+	@Access(AccessType.PUBLIC)
 	public String getId() {
 		return agentId;
 	}
@@ -204,6 +209,7 @@ public class Agent implements Receiver {
 	 * 
 	 * @return the config
 	 */
+	@Access(AccessType.PUBLIC)
 	public AgentConfig getConfig() {
 		return config;
 	}
@@ -341,11 +347,13 @@ public class Agent implements Receiver {
 				while (iter.hasNext()) {
 					final TransportConfig transconfig = new TransportConfig(
 							(ObjectNode) iter.next());
-					//TODO: Somewhat ugly, not every transport requires an id.
+					// TODO: Somewhat ugly, not every transport requires an id.
 					if (transconfig.get("id") == null) {
 						transconfig.put("id", agentId);
 					}
-					transport.register(new TransportBuilder().withConfig(transconfig).withHandle(receiver).build());
+					transport.register(new TransportBuilder()
+							.withConfig(transconfig).withHandle(receiver)
+							.build());
 				}
 			} else {
 				final TransportConfig transconfig = new TransportConfig(
@@ -353,7 +361,8 @@ public class Agent implements Receiver {
 				if (transconfig.get("id") == null) {
 					transconfig.put("id", agentId);
 				}
-				transport.register(new TransportBuilder().withConfig(transconfig).withHandle(receiver).build());
+				transport.register(new TransportBuilder()
+						.withConfig(transconfig).withHandle(receiver).build());
 			}
 			
 			if (onBoot) {
@@ -377,6 +386,51 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	public void connect() throws IOException {
 		transport.connect();
+	}
+	
+	/**
+	 * Schedule an RPC call at a specified due time.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param due
+	 *            the due
+	 * @return the string
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public String schedule(final String method, final ObjectNode params,
+			final DateTime due) {
+		return getScheduler().schedule(rpc.buildMsg(method, params), due);
+	}
+	
+	/**
+	 * Schedule an RPC call at a specified due time.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param delay
+	 *            the delay
+	 * @return the string
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public String schedule(final String method, final ObjectNode params,
+			final int delay) {
+		return getScheduler().schedule(rpc.buildMsg(method, params), delay);
+	}
+	
+	/**
+	 * Cancel.
+	 * 
+	 * @param taskId
+	 *            the task id
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public void cancel(final String taskId) {
+		getScheduler().cancel(taskId);
 	}
 	
 	/**
