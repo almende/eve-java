@@ -1,0 +1,20 @@
+
+templates:
+   defaultAgent:
+      class: com.almende.eve.agent.ExampleAgent
+      state:
+         class: com.almende.eve.state.memory.MemoryStateBuilder
+      scheduler:
+         class: com.almende.eve.scheduling.SimpleSchedulerBuilder
+   specialAgent:
+      extends: templates/defaultAgent
+      scheduler: 
+         class: com.almende.eve.scheduling.PersistentSchedulerBuilder
+
+agents:
+-  id: example
+   extends: templates/defaultAgent
+-  id: another
+   extends: templates/specialAgent
+
+

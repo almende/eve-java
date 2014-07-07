@@ -9,14 +9,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
-import com.almende.eve.transform.rpc.formats.JSONRPCException;
 
 /**
  * The Class Goldemo.
@@ -51,24 +49,9 @@ public class Goldemo {
 	 *            the arguments
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
-	 * @throws JSONRPCException
-	 *             the jSONRPC exception
-	 * @throws ClassNotFoundException
-	 *             the class not found exception
-	 * @throws InstantiationException
-	 *             the instantiation exception
-	 * @throws IllegalAccessException
-	 *             the illegal access exception
-	 * @throws InvocationTargetException
-	 *             the invocation target exception
-	 * @throws NoSuchMethodException
-	 *             the no such method exception
 	 */
-	public static void main(final String[] args) throws IOException,
-			JSONRPCException, ClassNotFoundException, InstantiationException,
-			IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
-		
+	public static void main(final String[] args) throws IOException {
+
 		if (args.length == 0) {
 			System.err
 					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath> < <startup_file>");
@@ -76,21 +59,7 @@ public class Goldemo {
 		}
 		final Config config = YamlReader.load(new FileInputStream(new File(
 				args[0])));
-		/*
-		 * //Temporary:
-		 * ObjectNode golConfig = JOM.createObjectNode();
-		 * golConfig.put("runTime", 50);
-		 * golConfig.put("columns", 5);
-		 * golConfig.put("rows", 5);
-		 * config.put("gol", golConfig);
-		 * 
-		 * HttpTransportConfig transport = new HttpTransportConfig();
-		 * transport.setServletUrl("http://127.0.0.1:8081/agents/");
-		 * config.put("transport", transport);
-		 * 
-		 * MemoryStateConfig state = new MemoryStateConfig();
-		 * config.put("state", state);
-		 */
+
 		final Integer runTime = config.get("gol", "runTime");
 		final Integer N = config.get("gol", "columns");
 		final Integer M = config.get("gol", "rows");
