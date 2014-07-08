@@ -54,7 +54,7 @@ public class MyListener implements ServletContextListener {
 						(ObjectNode) agent);
 				final Agent newAgent = new AgentBuilder().with(agentConfig)
 						.build();
-				System.out.println("Created agent:" + newAgent.getId());
+				LOG.info("Created agent:" + newAgent.getId());
 			}
 		}
 		
