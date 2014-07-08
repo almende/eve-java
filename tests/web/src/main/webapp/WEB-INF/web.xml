@@ -5,6 +5,16 @@
 	id="WebApp_ID" metadata-complete="true" version="3.0">
 	<display-name>WAR test - Demo</display-name>
 
+	<context-param>
+		<description>eve configuration (yaml file)</description>
+		<param-name>eve_config</param-name>
+		<param-value>eve.yaml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>com.almende.eve.test.MyListener</listener-class>
+	</listener>
+
 	<servlet>
 		<servlet-name>war</servlet-name>
 		<servlet-class>com.almende.eve.transport.http.DebugServlet</servlet-class>

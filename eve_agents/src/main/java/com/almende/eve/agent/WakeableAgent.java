@@ -43,6 +43,25 @@ public class WakeableAgent extends Agent implements Wakeable {
 	}
 	
 	/**
+	 * Sets the config.
+	 * 
+	 * @param config
+	 *            the config
+	 * @param ws
+	 *            the ws
+	 */
+	public void setConfig(final ObjectNode config, final WakeService ws){
+		this.ws = ws;
+		final AgentConfig conf = new AgentConfig(config);
+		setRpc(new RpcTransformBuilder().withHandle(
+				new WakeHandler<Object>(this, conf.getId(), ws)).build());
+		setReceiver(new WakeHandler<Receiver>(this, conf.getId(), ws));
+		
+		setConfig(conf, true);
+		registerAt(ws);
+	}
+	
+	/**
 	 * Register at.
 	 * 
 	 * @param ws

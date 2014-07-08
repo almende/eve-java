@@ -7,6 +7,7 @@ package com.almende.eve.agent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.util.ClassUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -17,6 +18,7 @@ public class AgentBuilder {
 	private static final Logger	LOG			= Logger.getLogger(AgentBuilder.class
 													.getName());
 	private AgentConfig			parameters	= null;
+	private WakeService			ws			= null;
 	
 	/**
 	 * With config
@@ -25,8 +27,20 @@ public class AgentBuilder {
 	 *            the config
 	 * @return the agent builder
 	 */
-	public AgentBuilder with(final ObjectNode config){
+	public AgentBuilder with(final ObjectNode config) {
 		parameters = new AgentConfig(config);
+		return this;
+	}
+	
+	/**
+	 * With WakeService ws.
+	 * 
+	 * @param ws
+	 *            the ws
+	 * @return the agent builder
+	 */
+	public AgentBuilder withWakeService(final WakeService ws) {
+		this.ws = ws;
 		return this;
 	}
 	
@@ -48,9 +62,18 @@ public class AgentBuilder {
 		try {
 			final Class<?> clazz = Class.forName(className);
 			if (ClassUtil.hasSuperClass(clazz, Agent.class)) {
-				Agent agent = (Agent) clazz.newInstance();
-				agent.setConfig(parameters);
-				return agent;
+				if (ws != null && ClassUtil.hasSuperClass(clazz, WakeableAgent.class)){
+					final WakeableAgent wagent = (WakeableAgent) clazz.newInstance();
+					wagent.setConfig(parameters, ws);
+					return wagent;
+				} else {
+					if (ws != null) {
+						LOG.warning("Requested to build an agent with a WakeService, but agent doesn't extend WakeableAgent!");
+					}
+					final Agent agent = (Agent) clazz.newInstance();
+					agent.setConfig(parameters);
+					return agent;
+				}
 			} else {
 				LOG.warning("The requested class doesn't extend Agent, which is required for the AgentBuilder");
 			}

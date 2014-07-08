@@ -43,7 +43,7 @@ public class TestConfigDOM extends TestCase {
 	public void testDOM() throws IOException {
 		// First obtain the configuration:
 		final Config config = YamlReader.load(
-				new FileInputStream(new File("target/test-classes/test.yaml")))
+				new FileInputStream(new File("target/classes/test.yaml")))
 				.expand();
 		
 		final ArrayNode agents = (ArrayNode) config.get("agents");
