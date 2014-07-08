@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Config.
  */
 public class Config extends ObjectNode {
-	private static final Logger LOG = Logger.getLogger(Config.class.getName());
+	private static final Logger	LOG	= Logger.getLogger(Config.class.getName());
 	
 	/**
 	 * Instantiates a new config.
@@ -36,8 +36,6 @@ public class Config extends ObjectNode {
 		if (node != null) {
 			this.setAll(node);
 		}
-		expand();
-		
 	}
 	
 	/**
@@ -50,7 +48,6 @@ public class Config extends ObjectNode {
 	 */
 	public Config extend(final ObjectNode other) {
 		this.setAll(other);
-
 		return this;
 	}
 	
@@ -110,18 +107,20 @@ public class Config extends ObjectNode {
 	}
 	
 	/**
-	 * Expand.
+	 * Expand this config (replace all occurences of 'extends' with referenced part of the tree)
+	 * 
+	 * @return the config
 	 */
-	public void expand(){
-		int count=0;
-		while(lexpand()){
+	public Config expand() {
+		int count = 0;
+		while (lexpand()) {
 			count++;
-			if (count >= 100){
+			if (count >= 100) {
 				LOG.warning("Too deep 'extends' nesting in configuration!");
 				break;
 			}
-		};
-		
+		}
+		return this;
 	}
 	
 	private boolean lexpand() {
@@ -130,13 +129,16 @@ public class Config extends ObjectNode {
 			return false;
 		}
 		for (final JsonNode node : extendNodes) {
-			final String path = node.get("extends").textValue();
 			final ObjectNode parent = (ObjectNode) node;
-			final ObjectNode clone = ((ObjectNode) this.lget(path.split("/")))
-					.deepCopy();
-			parent.remove("extends");
-			clone.setAll(parent);
-			parent.setAll(clone);
+			final String path = parent.remove("extends").textValue();
+			if (path != null && !path.equals("")){
+				final ObjectNode reference = (ObjectNode) this.lget(path.split("/"));
+				if (reference != null && !reference.isNull()){
+					final ObjectNode clone = reference.deepCopy();
+					clone.setAll(parent);
+					parent.setAll(clone);
+				}
+			}
 		}
 		return true;
 	}
