@@ -9,6 +9,7 @@ templates:
       transport:
          class: com.almende.eve.transport.http.HttpTransportBuilder
          servletUrl: http://localhost:8080/war/agents/
+         doAuthentication: false
 
 #Here we define the agents themselves:
 agents:
