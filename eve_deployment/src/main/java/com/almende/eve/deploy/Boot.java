@@ -7,6 +7,7 @@ package com.almende.eve.deploy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,17 +92,65 @@ public class Boot {
 		loadAgents(configFileName, ws, null);
 	}
 	
-	private static void loadAgents(final String configFileName,
-			final WakeService ws, final ClassLoader cl) {
-		Config config;
+	/**
+	 * Load agents.
+	 * 
+	 * @param configFileName
+	 *            the config file name
+	 * @param ws
+	 *            The WakeService
+	 * @param cl
+	 *            the custom classloader
+	 */
+	public static void loadAgents(final String configFileName, final WakeService ws,
+			final ClassLoader cl) {
 		try {
-			config = YamlReader.load(
-					new FileInputStream(new File(configFileName))).expand();
+			InputStream is = new FileInputStream(new File(configFileName));
+			loadAgents(is, ws, cl);
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
 					"Couldn't find configfile:" + configFileName, e);
 			return;
 		}
+	}
+	
+	/**
+	 * Load agents from config file, agent classes should be in the classpath.
+	 * 
+	 * @param is
+	 *            An Inputstream to the yaml data
+	 */
+	public static void loadAgents(final InputStream is) {
+		loadAgents(is, null, null);
+	}
+	
+	/**
+	 * Load agents from config file, agent classes should be in the classpath.
+	 * This variant can load WakeableAgents.
+	 * 
+	 * @param is
+	 *            An Inputstream to the yaml data
+	 * @param ws
+	 *            The WakeService
+	 */
+	public static void loadAgents(final InputStream is,
+			final WakeService ws) {
+		loadAgents(is, ws, null);
+	}
+	
+	/**
+	 * Load agents.
+	 * 
+	 * @param is
+	 *            An Inputstream to the yaml data
+	 * @param ws
+	 *            The WakeService
+	 * @param cl
+	 *            the custom classloader
+	 */
+	public static void loadAgents(final InputStream is, final WakeService ws,
+			final ClassLoader cl) {
+		final Config config = YamlReader.load(is).expand();
 		
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		for (final JsonNode agent : agents) {
