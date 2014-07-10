@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-agents</artifactId>
+			<artifactId>eve-deploy</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>

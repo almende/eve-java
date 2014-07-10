@@ -19,6 +19,8 @@ public class AgentBuilder {
 													.getName());
 	private AgentConfig			parameters	= null;
 	private WakeService			ws			= null;
+	private ClassLoader			cl			= Thread.currentThread()
+													.getContextClassLoader();
 	
 	/**
 	 * With config
@@ -45,6 +47,20 @@ public class AgentBuilder {
 	}
 	
 	/**
+	 * Set a specific classloader for creating this agent.
+	 * 
+	 * @param cl
+	 *            the cl
+	 * @return the agent builder
+	 */
+	public AgentBuilder withClassLoader(ClassLoader cl) {
+		if (cl != null) {
+			this.cl = cl;
+		}
+		return this;
+	}
+	
+	/**
 	 * Builds the.
 	 * 
 	 * @return the agent
@@ -60,10 +76,12 @@ public class AgentBuilder {
 			return null;
 		}
 		try {
-			final Class<?> clazz = Class.forName(className);
+			final Class<?> clazz = Class.forName(className, true, cl);
 			if (ClassUtil.hasSuperClass(clazz, Agent.class)) {
-				if (ws != null && ClassUtil.hasSuperClass(clazz, WakeableAgent.class)){
-					final WakeableAgent wagent = (WakeableAgent) clazz.newInstance();
+				if (ws != null
+						&& ClassUtil.hasSuperClass(clazz, WakeableAgent.class)) {
+					final WakeableAgent wagent = (WakeableAgent) clazz
+							.newInstance();
 					wagent.setConfig(parameters, ws);
 					return wagent;
 				} else {

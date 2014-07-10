@@ -177,7 +177,7 @@ public class Cell extends Agent {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static final TypeUtil<CycleState>	CYCLESTATETYPE	= new TypeUtil<CycleState>() {
 																};
 	private static final TypeUtil<Boolean>		BOOLEANSTATE	= new TypeUtil<Boolean>() {
@@ -218,7 +218,6 @@ public class Cell extends Agent {
 			}
 			if (getState()
 					.putIfUnchanged("val_" + currentCycle, newState, null)) {
-				// System.out.println(getId()+" :"+newState);
 				getState().put("current_cycle", currentCycle + 1);
 				if (getState().get("Stopped", BOOLEANSTATE)) {
 					return;

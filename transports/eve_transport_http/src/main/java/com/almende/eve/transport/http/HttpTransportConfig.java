@@ -4,6 +4,8 @@
  */
 package com.almende.eve.transport.http;
 
+import java.util.logging.Logger;
+
 import com.almende.eve.transport.TransportConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class HttpTransportConfig.
  */
 public class HttpTransportConfig extends TransportConfig {
+	private static final Logger	LOG	= Logger.getLogger(HttpTransportConfig.class
+											.getName());
 	
 	/**
 	 * Instantiates a new http transport config.
@@ -119,5 +123,19 @@ public class HttpTransportConfig extends TransportConfig {
 			return this.get("servletClass").asText();
 		}
 		return EveServlet.class.getName();
+	}
+	
+	/**
+	 * Gets the do authentication. (Overriden to change the default to false)
+	 * 
+	 * @return the do authentication
+	 */
+	@Override
+	public boolean getDoAuthentication() {
+		if (this.has("doAuthentication")) {
+			return this.get("doAuthentication").asBoolean();
+		}
+		LOG.warning("HTTP's authentication check is switched off per default");
+		return false;
 	}
 }

@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+		<relativePath>../eve_parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eve-deploy</artifactId>
+
+	<name>EVE Deployment Tooling</name>
+	<url>http://almende.github.com/eve</url>
+
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-agents</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-transport-http-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+</project>

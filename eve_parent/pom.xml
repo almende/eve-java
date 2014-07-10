@@ -63,6 +63,7 @@
 		<module>../scheduling</module>
 		<module>../eve_wake</module>
 		<module>../eve_agents</module>
+		<module>../eve_deployment</module>
 		<module>../tests</module>
 		<module>../tests/web</module>
 		<module>../bundles</module>

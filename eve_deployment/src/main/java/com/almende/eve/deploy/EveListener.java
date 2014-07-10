@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.test;
+package com.almende.eve.deploy;
 
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The listener interface for receiving ServletContext events.
  */
-public class MyListener implements ServletContextListener {
-	private static final Logger	LOG	= Logger.getLogger(MyListener.class
+public class EveListener implements ServletContextListener {
+	private static final Logger	LOG	= Logger.getLogger(EveListener.class
 											.getName());
 	
 	@Override
