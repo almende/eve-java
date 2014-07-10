@@ -27,7 +27,7 @@ import com.almende.util.uuid.UUID;
 public final class TokenStore {
 	private static final Logger	LOG		= Logger.getLogger(TokenStore.class
 												.getCanonicalName());
-	private final int			SIZE	= 5;
+	private static final int	SIZE	= 5;
 	private Map<String, String>	tokens	= new ConcurrentHashMap<String, String>();
 	private DateTime			last	= DateTime.now();
 	

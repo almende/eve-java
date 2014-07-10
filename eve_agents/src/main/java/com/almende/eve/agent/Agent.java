@@ -52,7 +52,7 @@ public class Agent implements Receiver {
 	private String				agentId		= null;
 	private AgentConfig			config		= null;
 	private State				state		= null;
-	protected Router			transport	= new Router();
+	private Router				transport	= new Router();
 	private Scheduler			scheduler	= null;
 	private RpcTransform		rpc			= new RpcTransformBuilder()
 													.withHandle(
@@ -138,6 +138,25 @@ public class Agent implements Receiver {
 		this.receiver = receiver;
 	}
 	
+	/**
+	 * Gets the transport.
+	 * 
+	 * @return the transport
+	 */
+	protected Router getTransport() {
+		return transport;
+	}
+
+	/**
+	 * Sets the transport.
+	 * 
+	 * @param transport
+	 *            the new transport
+	 */
+	protected void setTransport(Router transport) {
+		this.transport = transport;
+	}
+
 	/**
 	 * Sets the config.
 	 * 

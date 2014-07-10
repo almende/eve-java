@@ -62,7 +62,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	private class Lock {
-		boolean	locked	= false;
+		private boolean	locked	= false;
 	}
 	
 	private static final Logger				LOG			= Logger.getLogger("ConcurrentFileState");
@@ -72,7 +72,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	private InputStream						fis			= null;
 	private OutputStream					fos			= null;
 	private ObjectMapper					om			= null;
-	private static final Map<String, Lock>	locked		= new ConcurrentHashMap<String, Lock>();
+	private static final Map<String, Lock>	LOCKED		= new ConcurrentHashMap<String, Lock>();
 	private Map<String, JsonNode>			properties	= Collections
 																.synchronizedMap(new HashMap<String, JsonNode>());
 	private static final JavaType			MAPTYPE		= JOM.getTypeFactory()
@@ -120,11 +120,11 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	@SuppressWarnings("resource")
 	protected void openFile() throws IOException {
 		Lock llock = null;
-		synchronized (locked) {
-			llock = locked.get(filename);
+		synchronized (LOCKED) {
+			llock = LOCKED.get(filename);
 			if (llock == null) {
 				llock = new Lock();
-				locked.put(filename, llock);
+				LOCKED.put(filename, llock);
 			}
 		}
 		synchronized (llock) {
@@ -169,7 +169,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 * Close file.
 	 */
 	protected void closeFile() {
-		final Lock llock = locked.get(filename);
+		final Lock llock = LOCKED.get(filename);
 		if (llock == null) {
 			return;
 		}

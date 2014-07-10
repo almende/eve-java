@@ -24,8 +24,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Boot.
  */
-public class Boot {
+public final class Boot {
 	private static final Logger	LOG	= Logger.getLogger(Boot.class.getName());
+	
+	private Boot() {
+	}
 	
 	/**
 	 * The default agent booter. It takes an EVE yaml file and creates all
@@ -44,9 +47,12 @@ public class Boot {
 			@Override
 			protected Class<?> findClass(final String name)
 					throws ClassNotFoundException {
+				Class<?> result = null;
 				try {
-					return super.findClass(name);
+					result = super.findClass(name);
 				} catch (ClassNotFoundException cne) {
+				}
+				if (result == null) {
 					FileInputStream fi = null;
 					try {
 						
@@ -59,9 +65,13 @@ public class Boot {
 						return defineClass(name, classBytes, 0,
 								classBytes.length);
 					} catch (Exception e) {
-						throw new ClassNotFoundException(name);
+						LOG.log(Level.WARNING, "Failed to load class:", e);
 					}
 				}
+				if (result == null) {
+					throw new ClassNotFoundException(name);
+				}
+				return result;
 			}
 		};
 		
@@ -102,8 +112,8 @@ public class Boot {
 	 * @param cl
 	 *            the custom classloader
 	 */
-	public static void loadAgents(final String configFileName, final WakeService ws,
-			final ClassLoader cl) {
+	public static void loadAgents(final String configFileName,
+			final WakeService ws, final ClassLoader cl) {
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
 			loadAgents(is, ws, cl);
@@ -133,8 +143,7 @@ public class Boot {
 	 * @param ws
 	 *            The WakeService
 	 */
-	public static void loadAgents(final InputStream is,
-			final WakeService ws) {
+	public static void loadAgents(final InputStream is, final WakeService ws) {
 		loadAgents(is, ws, null);
 	}
 	

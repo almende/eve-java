@@ -4,6 +4,8 @@
  */
 package com.almende.eve.agent;
 
+import java.util.logging.Logger;
+
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
@@ -13,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class MyAgent.
  */
 public class MyAgent extends WakeableAgent {
-	
+	private static final Logger LOG = Logger.getLogger(MyAgent.class.getName());
 	/**
 	 * Instantiates a new my agent.
 	 */
@@ -42,7 +44,7 @@ public class MyAgent extends WakeableAgent {
 	public void wake(final String wakeKey, final ObjectNode params,
 			final boolean onBoot) {
 		super.wake(wakeKey, params, onBoot);
-		System.out.println("Wake called, so the agent was actually unloaded!");
+		LOG.warning("Wake called, so the agent was actually unloaded!");
 	}
 	
 	/**

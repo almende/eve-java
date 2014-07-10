@@ -26,9 +26,6 @@ public class ThreadPool {
 														factory,
 														new ThreadPoolExecutor.CallerRunsPolicy());
 	
-	static {
-	//	pool.allowCoreThreadTimeOut(true);
-	}
 	
 	/**
 	 * Sets the nof CPU cores, for efficient resource usage.

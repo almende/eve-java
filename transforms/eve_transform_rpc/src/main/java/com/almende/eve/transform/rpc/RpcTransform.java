@@ -204,8 +204,7 @@ public class RpcTransform implements Transform {
 	 */
 	public <T> JSONRequest buildMsg(final String method,
 			final ObjectNode params) {
-		final JSONRequest request = new JSONRequest(method, params);
-		return request;
+		return new JSONRequest(method, params);
 	}
 	
 	/**
