@@ -50,7 +50,7 @@ public final class AgentProxyFactory {
 						
 						final SyncCallback<Object> callback = new SyncCallback<Object>(){};
 						try {
-							sender.send(receiverUrl, method, args, callback);
+							sender.call(receiverUrl, method, args, callback);
 						} catch (final IOException e) {
 							throw new JSONRPCException(CODE.REMOTE_EXCEPTION, e
 									.getLocalizedMessage(), e);

@@ -70,7 +70,7 @@ public class TestWake extends TestCase {
 		new Agent("other",null){
 			public void test(){
 				try {
-					send(new URI("local:testWakeAgent"),"helloWorld",null,new AsyncCallback<String>(){
+					call(new URI("local:testWakeAgent"),"helloWorld",null,new AsyncCallback<String>(){
 
 						@Override
 						public void onSuccess(String result) {

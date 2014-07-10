@@ -144,7 +144,7 @@ public class Cell extends Agent {
 		for (final String neighbor : neighbors) {
 			final URI uri = URI.create(neighbor);
 			try {
-				send(uri, "collect", params, null);
+				call(uri, "collect", params, null);
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
@@ -228,7 +228,7 @@ public class Cell extends Agent {
 				for (final String neighbor : neighbors) {
 					final URI uri = URI.create(neighbor);
 					try {
-						send(uri, "collect", params, null);
+						call(uri, "collect", params, null);
 					} catch (final IOException e) {
 						e.printStackTrace();
 					}

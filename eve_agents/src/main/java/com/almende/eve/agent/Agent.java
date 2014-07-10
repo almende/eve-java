@@ -450,7 +450,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected <T> void send(final URI url, final String method,
+	protected <T> void call(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
@@ -474,7 +474,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected <T> void send(final URI url, final Method method,
+	protected <T> void call(final URI url, final Method method,
 			final Object[] params, final AsyncCallback<T> callback)
 			throws IOException {
 		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
@@ -496,7 +496,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected <T> void send(final URI url, final String method,
+	protected <T> void call(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		transport
 				.send(url, rpc.buildMsg(method, params, null).toString(), null);
@@ -518,7 +518,7 @@ public class Agent implements Receiver {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	protected <T> T sendSync(final URI url, final String method,
+	protected <T> T callSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
 		final SyncCallback<T> callback = new SyncCallback<T>() {
 		};
@@ -537,6 +537,7 @@ public class Agent implements Receiver {
 	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
 	 * java.net.URI, java.lang.String)
 	 */
+	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		final JSONResponse response = rpc.invoke(msg, senderUrl);

@@ -51,7 +51,7 @@ public class ExampleAgent extends WakeableAgent implements
 	public <T> void pubSend(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
-		super.send(url, method, params, callback);
+		super.call(url, method, params, callback);
 	}
 	
 	/**
@@ -71,6 +71,6 @@ public class ExampleAgent extends WakeableAgent implements
 	 */
 	public <T> T pubSendSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		return super.sendSync(url, method, params);
+		return super.callSync(url, method, params);
 	}
 }
