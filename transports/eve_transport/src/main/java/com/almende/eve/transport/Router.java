@@ -12,10 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.jackson.JOM;
+import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -24,7 +26,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  */
 public class Router implements Transport {
-	private static final Logger LOG = Logger.getLogger(Router.class.getName());
+	private static final Logger				LOG			= Logger.getLogger(Router.class
+																.getName());
 	private final Map<String, Transport>	transports	= new HashMap<String, Transport>();
 	
 	/**
@@ -35,7 +38,7 @@ public class Router implements Transport {
 	 *            the transport
 	 */
 	public void register(final Transport transport) {
-		if (transport == null){
+		if (transport == null) {
 			LOG.warning("Not registering a null transport.");
 			return;
 		}
@@ -94,7 +97,32 @@ public class Router implements Transport {
 			result.add(transport);
 		}
 		for (final Transport transport : result) {
-			transport.connect();
+			ThreadPool.getPool().submit(new Runnable() {
+				long	sleep	= 1000L;
+				
+				@Override
+				public void run() {
+					try {
+						try {
+							double rnd = Math.random();
+							
+							Thread.sleep((long) (sleep * rnd));
+						} catch (InterruptedException e) {
+						}
+						
+						transport.connect();
+					} catch (IOException e) {
+						LOG.log(Level.WARNING,
+								"Failed to reconnect agent on new transport.",
+								e);
+						if (sleep <= 80000) {
+							sleep *= 2;
+							run();
+						}
+					}
+				}
+				
+			});
 		}
 	}
 	

@@ -408,6 +408,23 @@ public class Agent implements Receiver {
 	}
 	
 	/**
+	 * Creates a proxy for given URL and interface, with this agent as sender.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param agentInterface
+	 *            the agent interface
+	 * @return the t
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public final <T> T createAgentProxy(final URI url,
+			final Class<T> agentInterface) {
+		return AgentProxyFactory.genProxy(this, url, agentInterface);
+	}
+	
+	/**
 	 * Schedule an RPC call at a specified due time.
 	 * 
 	 * @param method
