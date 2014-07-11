@@ -252,6 +252,9 @@ public class Agent implements Receiver {
 	 */
 	@JsonIgnore
 	public void setScheduler(final Scheduler scheduler) {
+		if (this.scheduler != null){
+			this.scheduler.clear();
+		}
 		this.scheduler = scheduler;
 		config.put("scheduler", scheduler.getParams());
 	}
