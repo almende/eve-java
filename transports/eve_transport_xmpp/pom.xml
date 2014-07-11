@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve-transport</artifactId>
+		<version>3.0.0</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<artifactId>eve-transport-xmpp</artifactId>
+	<name>EVE Transport XMPP</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<smack.version>3.2.1</smack.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-transport-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>${smack.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<version>${smack.version}</version>
+		</dependency>
+	</dependencies>
+</project>

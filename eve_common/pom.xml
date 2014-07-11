@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve</artifactId>
+		<version>3.0.0</version>
+		<relativePath>../eve_parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eve-common</artifactId>
+
+	<name>EVE Common tools</name>
+	<url>http://almende.github.com/eve</url>
+
+	<properties>
+		<jodah.version>0.3.0</jodah.version>
+		<joda-convert.version>1.6</joda-convert.version>
+		<codec.version>1.9</codec.version>
+		<jackson.version>2.3.3</jackson.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jodah</groupId>
+			<artifactId>typetools</artifactId>
+			<version>${jodah.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.joda</groupId>
+			<artifactId>joda-convert</artifactId>
+			<version>${joda-convert.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${codec.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+	</dependencies>
+</project>

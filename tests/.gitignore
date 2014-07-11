@@ -1,0 +1,15 @@
+target
+.settings
+.project
+.classpath
+.eveagents
+.evecookies
+.testStates
+.wakeservices
+/pom.xml.asc
+/pom.xml.versionsBackup
+/.eveagents_resultmonitor
+/.eveagents_schedulerTest
+/.eveagents_schedulingtest
+TestXMPPAsk.java
+

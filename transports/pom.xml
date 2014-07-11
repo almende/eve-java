@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve</artifactId>
+		<version>3.0.0</version>
+		<relativePath>../eve_parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eve-transport</artifactId>
+	<packaging>pom</packaging>
+
+	<name>EVE Transport Parent</name>
+	<url>http://almende.github.com/eve</url>
+
+	<modules>
+		<module>eve_transport</module>
+		<module>eve_transport_xmpp</module>
+		<module>eve_transport_zmq</module>
+		<module>eve_transport_http_common</module>
+		<module>eve_transport_http</module>
+		<module>eve_transport_http_apache40</module>
+		<module>eve_transport_http_jetty</module>
+		<module>eve_transport_ws</module>
+	</modules>
+
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+</project>

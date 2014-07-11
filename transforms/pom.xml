@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.almende.eve</groupId>
+		<artifactId>eve</artifactId>
+		<version>3.0.0</version>
+		<relativePath>../eve_parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eve-transform</artifactId>
+	<packaging>pom</packaging>
+
+	<name>EVE Transform Parent</name>
+	<url>http://almende.github.com/eve</url>
+
+	<modules>
+		<module>eve_transform</module>
+		<module>eve_transform_rpc</module>
+	</modules>
+
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+</project>

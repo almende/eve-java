@@ -1,0 +1,14 @@
+# Eve configuration
+
+#transport:
+#   class: com.almende.eve.transport.LocalService
+#   servletUrl: http://127.0.0.1:8081/agents/
+
+state:
+  class: com.almende.eve.state.memory.MemoryStateService
+
+gol:
+  runTime: 50
+  columns: 5
+  rows: 5
+
