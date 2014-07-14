@@ -67,6 +67,7 @@
 		<module>../tests</module>
 		<module>../tests/web</module>
 		<module>../bundles</module>
+		<module>transition</module>
 	</modules>
 
 	<properties>
@@ -81,6 +82,7 @@
 		<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
 		<maven-sonar-plugin.version>2.2</maven-sonar-plugin.version>
+		<maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
 		<gpg.version>1.5</gpg.version>
 		<junit.version>4.11</junit.version>
 		<java.version>1.7</java.version>
@@ -240,6 +242,12 @@
 								<id>attach-javadocs</id>
 								<goals>
 									<goal>jar</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>aggregate</id>
+								<goals>
+									<goal>aggregate-jar</goal>
 								</goals>
 							</execution>
 						</executions>

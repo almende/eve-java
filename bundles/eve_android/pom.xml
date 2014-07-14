@@ -111,8 +111,30 @@
 							<createSourcesJar>true</createSourcesJar>
 						</configuration>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>${maven-antrun-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>copy-javadoc-files</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target name="copy javadoc file to bundle projects">
+										<copy
+											tofile="target/${artifactId}-${project.parent.version}-javadoc.jar"
+											file="../../eve_parent/target/eve-${project.parent.version}-javadoc.jar" />
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
+
 		</profile>
 	</profiles>
 </project>
