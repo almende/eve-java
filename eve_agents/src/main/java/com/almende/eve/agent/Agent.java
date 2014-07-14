@@ -256,7 +256,7 @@ public class Agent implements Receiver {
 			this.scheduler.clear();
 		}
 		this.scheduler = scheduler;
-		config.put("scheduler", scheduler.getParams());
+		config.set("scheduler", scheduler.getParams());
 	}
 	
 	/**
@@ -278,7 +278,7 @@ public class Agent implements Receiver {
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
 					.withHandle(receiver).build();
 			
-			config.put("scheduler", schedulerConfig);
+			config.set("scheduler", schedulerConfig);
 		}
 	}
 	
@@ -302,7 +302,7 @@ public class Agent implements Receiver {
 	@JsonIgnore
 	public void setState(final State state) {
 		this.state = state;
-		config.put("state", state.getParams());
+		config.set("state", state.getParams());
 	}
 	
 	/**
@@ -318,7 +318,7 @@ public class Agent implements Receiver {
 				stateConfig.setId(agentId);
 			}
 			state = new StateBuilder().withConfig(stateConfig).build();
-			config.put("state", stateConfig);
+			config.set("state", stateConfig);
 		}
 	}
 	
@@ -349,7 +349,7 @@ public class Agent implements Receiver {
 			final ArrayNode transports = JOM.createArrayNode();
 			transports.add(transportConfig);
 			transports.add(transport.getParams());
-			config.put("transport", transports);
+			config.set("transport", transports);
 		}
 	}
 	
@@ -395,7 +395,7 @@ public class Agent implements Receiver {
 							"Couldn't connect transports on boot", e);
 				}
 			}
-			config.put("transport", transportConfig);
+			config.set("transport", transportConfig);
 		}
 	}
 	

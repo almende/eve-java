@@ -319,7 +319,7 @@ public class JSONRPCException extends RuntimeException {
 	 */
 	public final void setData(final Object data) {
 		final ObjectMapper mapper = JOM.getInstance();
-		error.put(DATA_S,
+		error.set(DATA_S,
 				data != null ? mapper.convertValue(data, JsonNode.class) : null);
 	}
 	

@@ -110,7 +110,7 @@ public class TestTransports extends TestCase {
 		serverConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8082);
-		serverConfig.put("jetty", jettyParms);
+		serverConfig.set("jetty", jettyParms);
 		
 		final Transport server = new TransportBuilder()
 				.withConfig(serverConfig).withHandle(new MyReceiver()).build();

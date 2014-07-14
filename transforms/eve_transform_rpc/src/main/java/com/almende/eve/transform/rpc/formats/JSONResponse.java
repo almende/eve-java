@@ -165,7 +165,7 @@ public final class JSONResponse extends JSONMessage {
 	 *            the new id
 	 */
 	public void setId(final JsonNode id) {
-		resp.put(ID, id);
+		resp.set(ID, id);
 	}
 	
 	/*
@@ -187,7 +187,7 @@ public final class JSONResponse extends JSONMessage {
 	public void setResult(final Object result) {
 		if (result != null) {
 			final ObjectMapper mapper = JOM.getInstance();
-			resp.put(RESULT,
+			resp.set(RESULT,
 					(JsonNode) mapper.convertValue(result, JSONNODETYPE));
 			setError(null);
 		} else {
@@ -214,7 +214,7 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public void setError(final JSONRPCException error) {
 		if (error != null) {
-			resp.put(ERROR, error.getObjectNode());
+			resp.set(ERROR, error.getObjectNode());
 			setResult(null);
 		} else {
 			if (resp.has(ERROR)) {

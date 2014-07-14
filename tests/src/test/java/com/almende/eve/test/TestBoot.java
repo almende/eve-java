@@ -29,7 +29,7 @@ public class TestBoot extends TestCase {
 		state.put("json", true);
 		state.put("path", ".wakeservices");
 		state.put("id", "testWakeService");
-		params.put("state", state);
+		params.set("state", state);
 		
 		final WakeService ws = new WakeService(params);
 		ws.boot();

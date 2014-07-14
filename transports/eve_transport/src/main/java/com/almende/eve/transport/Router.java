@@ -207,7 +207,7 @@ public class Router implements Transport {
 			transportConfs.add(transport.getParams());
 		}
 		final ObjectNode result = JOM.createObjectNode();
-		result.put("transports", transportConfs);
+		result.set("transports", transportConfs);
 		return result;
 	}
 	

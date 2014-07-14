@@ -37,7 +37,7 @@ public class TestProxy extends TestCase {
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8081);
-		transportConfig.put("jetty", jettyParms);
+		transportConfig.set("jetty", jettyParms);
 		
 		final AgentConfig config = new AgentConfig("example");
 		config.setTransport(transportConfig);

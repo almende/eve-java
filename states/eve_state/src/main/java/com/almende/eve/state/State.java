@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JavaType;
  */
 public interface State extends Capability {
 	/**
-	 * Delete.
+	 * Delete this state.
 	 */
 	void delete();
 	

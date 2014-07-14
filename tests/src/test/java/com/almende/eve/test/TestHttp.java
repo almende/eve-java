@@ -41,7 +41,7 @@ public class TestHttp extends TestCase {
 		config.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
-		config.put("jetty", jettyParms);
+		config.set("jetty", jettyParms);
 		
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new myReceiver()).build();

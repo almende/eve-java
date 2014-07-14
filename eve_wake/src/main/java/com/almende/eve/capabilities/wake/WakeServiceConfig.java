@@ -40,7 +40,7 @@ public class WakeServiceConfig extends Config {
 	 *            the new state
 	 */
 	public void setState(final ObjectNode state) {
-		this.put("state", state);
+		this.set("state", state);
 	}
 	
 	/**

@@ -39,7 +39,7 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	 *            the new state
 	 */
 	public void setState(final ObjectNode node) {
-		this.put("state", node);
+		this.set("state", node);
 	}
 	
 	/**

@@ -184,7 +184,7 @@ public final class JSONRequest extends JSONMessage {
 		if (id == null || id.isNull()) {
 			req.put(ID, new UUID().toString());
 		} else {
-			req.put(ID, id);
+			req.set(ID, id);
 		}
 	}
 	
@@ -231,7 +231,7 @@ public final class JSONRequest extends JSONMessage {
 		if (params != null) {
 			newParams.setAll(params);
 		}
-		req.put(PARAMS, newParams);
+		req.set(PARAMS, newParams);
 	}
 	
 	/**
@@ -253,7 +253,7 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	public void putParam(final String name, final Object value) {
 		final ObjectMapper mapper = JOM.getInstance();
-		req.with(PARAMS).put(name, mapper.convertValue(value, JsonNode.class));
+		req.with(PARAMS).set(name, mapper.convertValue(value, JsonNode.class));
 	}
 	
 	/**
@@ -302,7 +302,7 @@ public final class JSONRequest extends JSONMessage {
 		final ObjectNode callback = JOM.createObjectNode();
 		callback.put(URL, url);
 		callback.put(METHOD, method);
-		req.put(CALLBACK, callback);
+		req.set(CALLBACK, callback);
 	}
 	
 	/**

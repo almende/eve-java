@@ -89,7 +89,7 @@ public class AgentConfig extends Config {
 	 *            ArrayNode, the latter indicating multiple transports)
 	 */
 	public void setTransport(final JsonNode transport) {
-		this.put("transport", transport);
+		this.set("transport", transport);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class AgentConfig extends Config {
 	 *            the new state config
 	 */
 	public void setState(final ObjectNode state) {
-		this.put("state", state);
+		this.set("state", state);
 	}
 	
 	/**
@@ -135,7 +135,7 @@ public class AgentConfig extends Config {
 	 *            the new scheduler config
 	 */
 	public void setScheduler(final ObjectNode scheduler) {
-		this.put("scheduler", scheduler);
+		this.set("scheduler", scheduler);
 	}
 	
 	/**

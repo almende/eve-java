@@ -561,7 +561,7 @@ final class JSONRPC {
 				if (name != null) {
 					final JsonNode paramValue = JOM.getInstance().valueToTree(
 							args[i]);
-					params.put(name, paramValue);
+					params.set(name, paramValue);
 				} else {
 					throw new IllegalArgumentException("Parameter " + i
 							+ " in method '" + method.getName()
