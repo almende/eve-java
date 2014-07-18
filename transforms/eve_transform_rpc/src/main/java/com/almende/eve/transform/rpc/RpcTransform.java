@@ -188,7 +188,7 @@ public class RpcTransform implements Transform {
 	 * @return the methods
 	 */
 	public List<Object> getMethods() {
-		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS);
+		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
 	}
 
 	/**

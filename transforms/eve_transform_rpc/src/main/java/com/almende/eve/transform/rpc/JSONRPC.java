@@ -296,10 +296,12 @@ final class JSONRPC {
 	 *            the request params
 	 * @param namespace
 	 *            the namespace
+	 * @param auth
+	 *            the auth
 	 * @return the map
 	 */
 	private static Map<String, Object> _describe(final Object c,
-			final RequestParams requestParams, final String namespace) {
+			final RequestParams requestParams, final String namespace, final Authorizor auth) {
 		final Map<String, Object> methods = new TreeMap<String, Object>();
 		try {
 			if (c == null) {
@@ -308,7 +310,7 @@ final class JSONRPC {
 			final AnnotatedClass annotatedClass = AnnotationUtil.get(c
 					.getClass());
 			for (final AnnotatedMethod method : annotatedClass.getMethods()) {
-				if (isAvailable(method, null, requestParams, null)) {
+				if (isAvailable(method, null, requestParams, auth)) {
 					// format as JSON
 					final List<Object> descParams = new ArrayList<Object>();
 					for (final AnnotatedParam param : method.getParams()) {
@@ -342,7 +344,7 @@ final class JSONRPC {
 						Namespace.class).value();
 				methods.putAll(_describe(
 						method.getActualMethod().invoke(c, (Object[]) null),
-						requestParams, innerNamespace));
+						requestParams, innerNamespace, auth));
 			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to describe class:" + c.toString(),
@@ -359,12 +361,14 @@ final class JSONRPC {
 	 *            The class to be described
 	 * @param requestParams
 	 *            Optional request parameters.
+	 * @param auth
+	 *            the authorizor
 	 * @return the list
 	 */
 	public static List<Object> describe(final Object c,
-			final RequestParams requestParams) {
+			final RequestParams requestParams, final Authorizor auth) {
 		try {
-			final Map<String, Object> methods = _describe(c, requestParams, "");
+			final Map<String, Object> methods = _describe(c, requestParams, "", auth);
 			
 			// create a sorted array
 			final List<Object> sortedMethods = new ArrayList<Object>();
