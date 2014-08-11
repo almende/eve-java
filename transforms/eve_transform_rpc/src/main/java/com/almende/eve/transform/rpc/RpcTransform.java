@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.almende.eve.auth.Authorizor;
-import com.almende.eve.auth.DefaultAuthorizor;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transform.Transform;
+import com.almende.eve.transform.auth.Authorizor;
+import com.almende.eve.transform.auth.DefaultAuthorizor;
 import com.almende.eve.transform.rpc.annotation.Sender;
 import com.almende.eve.transform.rpc.formats.JSONMessage;
 import com.almende.eve.transform.rpc.formats.JSONRPCException;

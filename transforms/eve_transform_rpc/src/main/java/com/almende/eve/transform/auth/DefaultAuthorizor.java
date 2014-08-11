@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.auth;
+package com.almende.eve.transform.auth;
 
 /**
  * The Class DefaultAuthorizor.

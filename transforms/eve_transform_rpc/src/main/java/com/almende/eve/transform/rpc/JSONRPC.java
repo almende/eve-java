@@ -22,7 +22,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.almende.eve.auth.Authorizor;
+import com.almende.eve.transform.auth.Authorizor;
 import com.almende.eve.transform.rpc.NamespaceUtil.CallTuple;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
