@@ -61,6 +61,22 @@ public class RpcTransform implements Transform {
 		callbacks.setDefTimeout(config.getCallbackTimeout());
 	}
 	
+	@Override
+	public Object inbound(Object msg, URI senderUrl) {
+		final JSONResponse response = invoke(msg,senderUrl);
+		if (response == null){
+			//Couldn't handle this message, allow chaining
+			return msg;
+		} else {
+			//Consumed message entirely
+			return response;
+		}
+	}
+	public Object outbound(Object msg, URI recipientUrl){
+		//RPC transform doesn't change existing messages
+		return msg;
+	}
+	
 	/**
 	 * Gets the auth.
 	 * 
@@ -110,7 +126,7 @@ public class RpcTransform implements Transform {
 				} else if (msg instanceof ObjectNode) {
 					json = (ObjectNode) msg;
 				} else {
-					LOG.warning("Message unknown type:" + msg.getClass());
+					LOG.info("Message unknown type:" + msg.getClass());
 				}
 				if (json != null) {
 					if (JSONRPC.isResponse(json)) {
@@ -120,7 +136,7 @@ public class RpcTransform implements Transform {
 						final JSONRequest request = new JSONRequest(json);
 						jsonMsg = request;
 					} else {
-						LOG.warning("Message contains valid JSON, but is not JSON-RPC:"
+						LOG.info("Message contains valid JSON, but is not JSON-RPC:"
 								+ json);
 					}
 				}
@@ -145,7 +161,7 @@ public class RpcTransform implements Transform {
 	public JSONResponse invoke(final Object msg, final URI senderUrl) {
 		final JSONMessage jsonMsg = jsonConvert(msg);
 		if (jsonMsg == null) {
-			LOG.log(Level.WARNING, "Received non-JSONRPC message:'" + msg + "'");
+			LOG.log(Level.INFO, "Received non-JSONRPC message:'" + msg + "'");
 			return null;
 		}
 		final JsonNode id = jsonMsg.getId();

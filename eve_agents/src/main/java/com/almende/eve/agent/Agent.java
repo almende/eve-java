@@ -21,12 +21,12 @@ import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.StateConfig;
+import com.almende.eve.transform.TransformStack;
 import com.almende.eve.transform.rpc.RpcTransform;
 import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
-import com.almende.eve.transform.rpc.formats.JSONResponse;
 import com.almende.eve.transport.LocalTransportBuilder;
 import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.Receiver;
@@ -54,19 +54,16 @@ public class Agent implements Receiver {
 	private State				state		= null;
 	private Router				transport	= new Router();
 	private Scheduler			scheduler	= null;
-	private RpcTransform		rpc			= new RpcTransformBuilder()
-													.withHandle(
-															new SimpleHandler<Object>(
-																	this))
-													.build();
+	private TransformStack		transforms	= new TransformStack();
 	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
-	
+	private Handler<Object>		handler		= new SimpleHandler<Object>(this);
+
 	/**
 	 * Instantiates a new agent.
 	 */
 	public Agent() {
 	}
-	
+
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -76,7 +73,7 @@ public class Agent implements Receiver {
 	public Agent(final ObjectNode config) {
 		setConfig(config);
 	}
-	
+
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -89,7 +86,7 @@ public class Agent implements Receiver {
 		this.config = new AgentConfig(agentId, config);
 		loadConfig(false);
 	}
-	
+
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -105,23 +102,7 @@ public class Agent implements Receiver {
 		this.config = new AgentConfig(agentId, config);
 		loadConfig(onBoot);
 	}
-	
-	/**
-	 * @return the rpc
-	 */
-	@JsonIgnore
-	protected RpcTransform getRpc() {
-		return rpc;
-	}
-	
-	/**
-	 * @param rpc
-	 *            the rpc to set
-	 */
-	protected void setRpc(RpcTransform rpc) {
-		this.rpc = rpc;
-	}
-	
+
 	/**
 	 * @return the receiver
 	 */
@@ -129,7 +110,27 @@ public class Agent implements Receiver {
 	protected Handler<Receiver> getReceiver() {
 		return receiver;
 	}
+
+	/**
+	 * Sets the handler.
+	 *
+	 * @param handler
+	 *            the new handler
+	 */
+	protected void setHandler(Handler<Object> handler) {
+		this.handler = handler;
+	}
 	
+	/**
+	 * Gets the handler.
+	 *
+	 * @return the receiver
+	 */
+	@JsonIgnore
+	protected Handler<Object> getHandler() {
+		return handler;
+	}
+
 	/**
 	 * @param receiver
 	 *            the receiver to set
@@ -137,7 +138,6 @@ public class Agent implements Receiver {
 	protected void setReceiver(Handler<Receiver> receiver) {
 		this.receiver = receiver;
 	}
-	
 	/**
 	 * Gets the transport.
 	 * 
@@ -167,7 +167,7 @@ public class Agent implements Receiver {
 		this.config = new AgentConfig(config);
 		loadConfig(false);
 	}
-	
+
 	/**
 	 * Sets the config.
 	 * 
@@ -180,7 +180,7 @@ public class Agent implements Receiver {
 		this.config = new AgentConfig(config);
 		loadConfig(onBoot);
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -190,7 +190,7 @@ public class Agent implements Receiver {
 	public String getId() {
 		return agentId;
 	}
-	
+
 	/**
 	 * Gets the type.
 	 * 
@@ -200,7 +200,7 @@ public class Agent implements Receiver {
 	public String getType() {
 		return this.getClass().getName();
 	}
-	
+
 	/**
 	 * Gets the urls.
 	 * 
@@ -211,7 +211,7 @@ public class Agent implements Receiver {
 	public List<URI> getUrls() {
 		return transport.getAddresses();
 	}
-	
+
 	/**
 	 * Gets the methods.
 	 * 
@@ -220,9 +220,9 @@ public class Agent implements Receiver {
 	@Access(AccessType.PUBLIC)
 	@JsonIgnore
 	public List<Object> getMethods() {
-		return rpc.getMethods();
+		return ((RpcTransform) transforms.getLast()).getMethods();
 	}
-	
+
 	/**
 	 * Gets the config.
 	 * 
@@ -232,7 +232,13 @@ public class Agent implements Receiver {
 	public AgentConfig getConfig() {
 		return config;
 	}
-	
+
+	/**
+	 * Load config.
+	 *
+	 * @param onBoot
+	 *            the on boot
+	 */
 	protected void loadConfig(final boolean onBoot) {
 		agentId = config.getId();
 		loadScheduler(config.getScheduler());
@@ -242,6 +248,20 @@ public class Agent implements Receiver {
 		transport.register(new LocalTransportBuilder()
 				.withConfig(new LocalTransportConfig(agentId))
 				.withHandle(receiver).build());
+		loadTransforms(config.getTransforms());
+	}
+
+	/**
+	 * Load transforms.
+	 *
+	 * @param config
+	 *            the config
+	 */
+	public void loadTransforms(final ArrayNode config){
+		//TODO: load transforms from config
+		
+		//each agent has at least a RPC transform
+		transforms.add(new RpcTransformBuilder().withHandle(handler).build());
 	}
 	
 	/**
@@ -252,13 +272,13 @@ public class Agent implements Receiver {
 	 */
 	@JsonIgnore
 	public void setScheduler(final Scheduler scheduler) {
-		if (this.scheduler != null){
+		if (this.scheduler != null) {
 			this.scheduler.clear();
 		}
 		this.scheduler = scheduler;
 		config.set("scheduler", scheduler.getParams());
 	}
-	
+
 	/**
 	 * Load scheduler.
 	 * 
@@ -270,18 +290,18 @@ public class Agent implements Receiver {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
 						(ObjectNode) schedulerConfig.get("state"));
-				
+
 				if (stateConfig.getId() == null) {
 					stateConfig.setId("scheduler_" + agentId);
 				}
 			}
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
 					.withHandle(receiver).build();
-			
+
 			config.set("scheduler", schedulerConfig);
 		}
 	}
-	
+
 	/**
 	 * Gets the scheduler.
 	 * 
@@ -292,7 +312,7 @@ public class Agent implements Receiver {
 	public Scheduler getScheduler() {
 		return scheduler;
 	}
-	
+
 	/**
 	 * Sets the state.
 	 * 
@@ -304,7 +324,7 @@ public class Agent implements Receiver {
 		this.state = state;
 		config.set("state", state.getParams());
 	}
-	
+
 	/**
 	 * Load state.
 	 * 
@@ -321,7 +341,7 @@ public class Agent implements Receiver {
 			config.set("state", stateConfig);
 		}
 	}
-	
+
 	/**
 	 * Gets the state.
 	 * 
@@ -332,7 +352,7 @@ public class Agent implements Receiver {
 	public State getState() {
 		return state;
 	}
-	
+
 	/**
 	 * Adds the transport.
 	 * 
@@ -341,7 +361,7 @@ public class Agent implements Receiver {
 	 */
 	public void addTransport(final Transport transport) {
 		this.transport.register(transport);
-		
+
 		final JsonNode transportConfig = config.get("transport");
 		if (transportConfig.isArray()) {
 			((ArrayNode) transportConfig).add(transport.getParams());
@@ -352,7 +372,7 @@ public class Agent implements Receiver {
 			config.set("transport", transports);
 		}
 	}
-	
+
 	/**
 	 * Load transport.
 	 * 
@@ -386,7 +406,7 @@ public class Agent implements Receiver {
 				transport.register(new TransportBuilder()
 						.withConfig(transconfig).withHandle(receiver).build());
 			}
-			
+
 			if (onBoot) {
 				try {
 					transport.connect();
@@ -398,7 +418,7 @@ public class Agent implements Receiver {
 			config.set("transport", transportConfig);
 		}
 	}
-	
+
 	/**
 	 * Connect all transports.
 	 * 
@@ -409,7 +429,7 @@ public class Agent implements Receiver {
 	public void connect() throws IOException {
 		transport.connect();
 	}
-	
+
 	/**
 	 * Creates a proxy for given URL and interface, with this agent as sender.
 	 * 
@@ -426,7 +446,7 @@ public class Agent implements Receiver {
 			final Class<T> agentInterface) {
 		return AgentProxyFactory.genProxy(this, url, agentInterface);
 	}
-	
+
 	/**
 	 * Schedule an RPC call at a specified due time.
 	 * 
@@ -441,9 +461,11 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	public String schedule(final String method, final ObjectNode params,
 			final DateTime due) {
-		return getScheduler().schedule(rpc.buildMsg(method, params), due);
+		return getScheduler().schedule(
+				((RpcTransform) transforms.getLast()).buildMsg(method, params),
+				due);
 	}
-	
+
 	/**
 	 * Schedule an RPC call at a specified due time.
 	 * 
@@ -458,9 +480,11 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	public String schedule(final String method, final ObjectNode params,
 			final int delay) {
-		return getScheduler().schedule(rpc.buildMsg(method, params), delay);
+		return getScheduler().schedule(
+				((RpcTransform) transforms.getLast()).buildMsg(method, params),
+				delay);
 	}
-	
+
 	/**
 	 * Cancel.
 	 * 
@@ -471,7 +495,7 @@ public class Agent implements Receiver {
 	public void cancel(final String taskId) {
 		getScheduler().cancel(taskId);
 	}
-	
+
 	/**
 	 * Send async.
 	 * 
@@ -492,10 +516,11 @@ public class Agent implements Receiver {
 	protected <T> void call(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
-		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
-				null);
+		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
+				method, params, callback);
+		transport.send(url, transforms.outbound(message, url).toString(), null);
 	}
-	
+
 	/**
 	 * Send async for usage in proxies.
 	 * 
@@ -516,10 +541,11 @@ public class Agent implements Receiver {
 	protected <T> void call(final URI url, final Method method,
 			final Object[] params, final AsyncCallback<T> callback)
 			throws IOException {
-		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
-				null);
+		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
+				method, params, callback);
+		transport.send(url, transforms.outbound(message, url).toString(), null);
 	}
-	
+
 	/**
 	 * Send async.
 	 * 
@@ -537,10 +563,11 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected <T> void call(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		transport
-				.send(url, rpc.buildMsg(method, params, null).toString(), null);
+		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
+				method, params, null);
+		transport.send(url, transforms.outbound(message, url).toString(), null);
 	}
-	
+
 	/**
 	 * Send sync, expecting a response.
 	 * 
@@ -559,27 +586,27 @@ public class Agent implements Receiver {
 	@Access(AccessType.UNAVAILABLE)
 	protected <T> T callSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final SyncCallback<T> callback = new SyncCallback<T>() {
-		};
-		transport.send(url, rpc.buildMsg(method, params, callback).toString(),
-				null);
+		final SyncCallback<T> callback = new SyncCallback<T>() {};
+		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
+				method, params, callback);
+		transport.send(url, transforms.outbound(message, url).toString(), null);
 		try {
 			return callback.get();
 		} catch (final Exception e) {
 			throw new IOException(e);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
 	 * java.net.URI, java.lang.String)
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		final JSONResponse response = rpc.invoke(msg, senderUrl);
+		final Object response = transforms.outbound(
+				transforms.inbound(msg, senderUrl), senderUrl);
 		if (response != null) {
 			try {
 				transport.send(senderUrl, response.toString(), tag);

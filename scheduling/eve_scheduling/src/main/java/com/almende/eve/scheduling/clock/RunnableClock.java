@@ -20,6 +20,7 @@ import com.almende.util.threads.ThreadPool;
  * The Class RunnableClock.
  */
 public class RunnableClock implements Runnable, Clock {
+
 	private static final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
 	private static final ScheduledExecutorService				POOL		= Executors
 																					.newScheduledThreadPool(
@@ -27,10 +28,9 @@ public class RunnableClock implements Runnable, Clock {
 																							ThreadPool
 																									.getFactory());
 	private static ScheduledFuture<?>							future		= null;
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -55,10 +55,9 @@ public class RunnableClock implements Runnable, Clock {
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.scheduler.clock.Clock#requestTrigger(java.lang.String,
 	 * org.joda.time.DateTime, java.lang.Runnable)
@@ -75,10 +74,9 @@ public class RunnableClock implements Runnable, Clock {
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.clock.Clock#cancel(java.lang.String)
 	 */
 	@Override
@@ -88,10 +86,9 @@ public class RunnableClock implements Runnable, Clock {
 			TIMELINE.remove(ce);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.clock.Clock#clear()
 	 */
 	@Override
@@ -108,17 +105,21 @@ public class RunnableClock implements Runnable, Clock {
 
 /**
  * @author Almende
- * 
  */
 class ClockEntry implements Comparable<ClockEntry> {
 	private String		triggerId;
 	private DateTime	due;
 	private Runnable	callback;
-	
+
 	/**
+	 * Instantiates a new clock entry.
+	 *
 	 * @param triggerId
+	 *            the trigger id
 	 * @param due
+	 *            the due
 	 * @param callback
+	 *            the callback
 	 */
 	public ClockEntry(final String triggerId, final DateTime due,
 			final Runnable callback) {
@@ -126,52 +127,60 @@ class ClockEntry implements Comparable<ClockEntry> {
 		this.due = due;
 		this.callback = callback;
 	}
-	
+
 	/**
 	 * @return AgentId
 	 */
 	public String getAgentId() {
 		return triggerId;
 	}
-	
+
 	/**
+	 * Sets the agent id.
+	 *
 	 * @param agentId
+	 *            the new agent id
 	 */
 	public void setAgentId(final String agentId) {
 		triggerId = agentId;
 	}
-	
+
 	/**
 	 * @return Due date
 	 */
 	public DateTime getDue() {
 		return due;
 	}
-	
+
 	/**
+	 * Sets the due.
+	 *
 	 * @param due
+	 *            the new due
 	 */
 	public void setDue(final DateTime due) {
 		this.due = due;
 	}
-	
+
 	/**
 	 * @return This tasks callback.
 	 */
 	public Runnable getCallback() {
 		return callback;
 	}
-	
+
 	/**
+	 * Sets the callback.
+	 *
 	 * @param callback
+	 *            the new callback
 	 */
 	public void setCallback(final Runnable callback) {
 		this.callback = callback;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -185,20 +194,18 @@ class ClockEntry implements Comparable<ClockEntry> {
 		final ClockEntry other = (ClockEntry) o;
 		return triggerId.equals(other.triggerId);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		return triggerId.hashCode();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override

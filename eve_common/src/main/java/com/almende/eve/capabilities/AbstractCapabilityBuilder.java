@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class CapabilityBuilder.
- * @param <T> 
+ *
+ * @param <T> the generic type
  */
 public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	private static final Logger	LOG		= Logger.getLogger(AbstractCapabilityBuilder.class
@@ -88,10 +89,20 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 		return null;
 	}
 	
+	/**
+	 * Gets the params.
+	 *
+	 * @return the params
+	 */
 	protected final ObjectNode getParams() {
 		return params;
 	}
 	
+	/**
+	 * Gets the handle.
+	 *
+	 * @return the handle
+	 */
 	protected final Handler<?> getHandle() {
 		return handle;
 	}

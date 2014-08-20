@@ -35,6 +35,9 @@ public final class JOM {
 		MAPPER = createInstance();
 	}
 	
+	/**
+	 * Instantiates a new jom.
+	 */
 	protected JOM() {
 	}
 	
@@ -139,8 +142,14 @@ public final class JOM {
 		return MAPPER.getTypeFactory().uncheckedSimpleType(c);
 	}
 	
+	/**
+	 * The Class CustomBitSetSerializer.
+	 */
 	public class CustomBitSetSerializer extends StdSerializer<BitSet> {
 
+		/**
+		 * Instantiates a new custom bit set serializer.
+		 */
 		public CustomBitSetSerializer() {
 			super(BitSet.class, true);
 		}
@@ -157,9 +166,15 @@ public final class JOM {
 
 	}
 
+	/**
+	 * The Class CustomBitSetDeserializer.
+	 */
 	public class CustomBitSetDeserializer extends StdDeserializer<BitSet> {
 		private static final long serialVersionUID = 8734051359812526123L;
 
+		/**
+		 * Instantiates a new custom bit set deserializer.
+		 */
 		public CustomBitSetDeserializer() {
 			super(BitSet.class);
 		}

@@ -22,9 +22,7 @@ public abstract class JSONMessage implements Serializable {
 	protected static final String	URL					= "url";
 	protected static final String	CALLBACK			= "callback";
 	protected static final String	VERSION				= "2.0";
-	private boolean				request				= false;
-	
-
+	private boolean					request				= false;
 
 	/**
 	 * Gets the id.
@@ -32,27 +30,28 @@ public abstract class JSONMessage implements Serializable {
 	 * @return the id
 	 */
 	public abstract JsonNode getId();
-	
+
 	/**
 	 * Checks if is request.
 	 * 
 	 * @return true, if is request
 	 */
-	public boolean isRequest(){
+	public boolean isRequest() {
 		return request;
 	}
-	
+
 	/**
 	 * Checks if is response.
 	 * 
 	 * @return true, if is response
 	 */
-	public boolean isResponse(){
+	public boolean isResponse() {
 		return !request;
 	}
-	
+
 	/**
-	 * @param request the request to set
+	 * @param request
+	 *            the request to set
 	 */
 	protected void setRequest(boolean request) {
 		this.request = request;

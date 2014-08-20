@@ -8,6 +8,7 @@ import com.almende.eve.capabilities.Config;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -146,6 +147,29 @@ public class AgentConfig extends Config {
 	public ObjectNode getScheduler() {
 		if (this.has("scheduler")) {
 			return (ObjectNode) this.get("scheduler");
+		}
+		return null;
+	}
+
+	/**
+	 * Sets the transform config. The agent will add a rpctransform to the stack.
+	 * 
+	 * @param transform
+	 *            the new transform config array
+	 *            
+	 */
+	public void setTransforms(final ArrayNode transform) {
+		this.set("transforms", transform);
+	}
+	
+	/**
+	 * Gets the transforms.
+	 *
+	 * @return the transforms
+	 */
+	public ArrayNode getTransforms() {
+		if (this.has("transforms")) {
+			return (ArrayNode) this.get("transforms");
 		}
 		return null;
 	}
