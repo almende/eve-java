@@ -61,17 +61,19 @@ public class DebugServlet extends HttpServlet {
 	 */
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
-		final String servletUrl = config.getInitParameter("ServletUrl");
-		if (servletUrl != null) {
-			try {
-				myUrl = new URI(servletUrl);
-			} catch (final URISyntaxException e) {
-				LOG.log(Level.WARNING,
-						"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
-						e);
+		if (myUrl == null) {
+			final String servletUrl = config.getInitParameter("ServletUrl");
+			if (servletUrl != null) {
+				try {
+					myUrl = new URI(servletUrl);
+				} catch (final URISyntaxException e) {
+					LOG.log(Level.WARNING,
+							"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
+							e);
+				}
+			} else {
+				LOG.warning("Servlet init parameter 'ServletUrl' is required!");
 			}
-		} else {
-			LOG.warning("Servlet init parameter 'ServletUrl' is required!");
 		}
 		super.init(config);
 	}
