@@ -3,14 +3,26 @@
  */
 package com.almende.util.jackson;
 
+import java.io.IOException;
+import java.util.BitSet;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
@@ -82,6 +94,13 @@ public final class JOM {
 		
 		mapper.registerModule(new JodaModule());
 		
+		SimpleModule bitSetModule = new SimpleModule("BitSetModule",
+				new Version(1, 0, 0, null, null, null));
+		bitSetModule.addSerializer(new JOM().new CustomBitSetSerializer());
+		bitSetModule.addDeserializer(BitSet.class,
+				new JOM().new CustomBitSetDeserializer());
+		mapper.registerModule(bitSetModule);
+		
 		return mapper;
 	}
 	
@@ -118,5 +137,71 @@ public final class JOM {
 	@Deprecated
 	public static JavaType getSimpleType(final Class<?> c) {
 		return MAPPER.getTypeFactory().uncheckedSimpleType(c);
+	}
+	
+	public class CustomBitSetSerializer extends StdSerializer<BitSet> {
+
+		public CustomBitSetSerializer() {
+			super(BitSet.class, true);
+		}
+
+		@Override
+		public void serialize(BitSet value, JsonGenerator jgen,
+				SerializerProvider provider) throws IOException,
+				JsonGenerationException {
+			jgen.writeStartObject();
+			jgen.writeNumberField("size", value.size());
+			jgen.writeStringField("hex", bytesToHex(value.toByteArray()));
+			jgen.writeEndObject();
+		}
+
+	}
+
+	public class CustomBitSetDeserializer extends StdDeserializer<BitSet> {
+		private static final long serialVersionUID = 8734051359812526123L;
+
+		public CustomBitSetDeserializer() {
+			super(BitSet.class);
+		}
+
+		@Override
+		public BitSet deserialize(JsonParser jpar, DeserializationContext ctx)
+				throws IOException, JsonProcessingException {
+			final JsonNode node = jpar.readValueAsTree();
+			if (!node.isObject()){
+				throw ctx.mappingException(BitSet.class);
+			}
+			final ObjectNode obj = (ObjectNode) node;
+			final int size = obj.get("size").asInt();
+			final byte[] value = hexToBytes(obj.get("hex").asText());
+			final BitSet result = BitSet.valueOf(value);
+			result.set(result.length(), size, false);
+			return result;
+		}
+
+	}
+
+	// From: http://stackoverflow.com/a/9855338
+	final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+	private static String bytesToHex(byte[] bytes) {
+		char[] hexChars = new char[bytes.length * 2];
+		for (int j = 0; j < bytes.length; j++) {
+			int v = bytes[j] & 0xFF;
+			hexChars[j * 2] = hexArray[v >>> 4];
+			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+		}
+		return new String(hexChars);
+	}
+
+	// From: http://stackoverflow.com/a/140861
+	private static byte[] hexToBytes(String s) {
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
+					.digit(s.charAt(i + 1), 16));
+		}
+		return data;
 	}
 }
