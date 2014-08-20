@@ -250,10 +250,11 @@ public class WsClientTransport extends WebsocketTransport {
 	
 	/**
 	 * Update config.
-	 * 
+	 *
 	 * @param config
 	 *            the config
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public void updateConfig(WebsocketTransportConfig config)
 			throws IOException {
