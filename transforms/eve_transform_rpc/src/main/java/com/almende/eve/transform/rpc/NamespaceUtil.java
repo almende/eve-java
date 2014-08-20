@@ -23,18 +23,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * The Class NamespaceUtil.
  */
 final class NamespaceUtil {
-	
+
 	private static final Map<String, AnnotatedMethod[]>	CACHE		= new HashMap<String, AnnotatedMethod[]>();
 	private static final NamespaceUtil					INSTANCE	= new NamespaceUtil();
 	private static final Pattern						PATTERN		= Pattern
 																			.compile("\\.[^.]+$");
-	
+
 	/**
 	 * Instantiates a new namespace util.
 	 */
-	private NamespaceUtil() {
-	};
-	
+	private NamespaceUtil() {};
+
 	/**
 	 * Gets the.
 	 * 
@@ -53,10 +52,10 @@ final class NamespaceUtil {
 	public static CallTuple get(final Object destination, final String path)
 			throws IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException {
-		
+
 		return INSTANCE._get(destination, path);
 	}
-	
+
 	/**
 	 * Populate cache.
 	 * 
@@ -77,13 +76,24 @@ final class NamespaceUtil {
 		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		for (final AnnotatedMethod method : clazz
 				.getAnnotatedMethods(Namespace.class)) {
-			final String path = steps + "."
-					+ method.getAnnotation(Namespace.class).value();
-			methods[methods.length - 1] = method;
-			CACHE.put(path, Arrays.copyOf(methods, methods.length));
-			
+			String namespace = method.getAnnotation(Namespace.class).value();
 			final Object newDest = method.getActualMethod().invoke(destination,
 					(Object[]) null);
+			if (namespace.equals("*")) {
+				// divert namespace labeling to referred class.
+				if (newDest != null) {
+					final AnnotatedClass destClazz = AnnotationUtil.get(newDest
+							.getClass());
+					namespace = destClazz.getAnnotation(Namespace.class)
+							.value();
+				} else {
+					return;
+				}
+			}
+			final String path = steps + "." + namespace;
+			methods[methods.length - 1] = method;
+			CACHE.put(path, Arrays.copyOf(methods, methods.length));
+
 			// recurse:
 			if (newDest != null) {
 				populateCache(newDest, path,
@@ -91,7 +101,7 @@ final class NamespaceUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * _get.
 	 * 
@@ -157,18 +167,18 @@ final class NamespaceUtil {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * The Class CallTuple.
 	 */
 	public class CallTuple {
-		
+
 		/** The destination. */
 		private Object			destination;
-		
+
 		/** The method name. */
 		private AnnotatedMethod	method;
-		
+
 		/**
 		 * Gets the destination.
 		 * 
@@ -177,7 +187,7 @@ final class NamespaceUtil {
 		public Object getDestination() {
 			return destination;
 		}
-		
+
 		/**
 		 * Sets the destination.
 		 * 
@@ -187,7 +197,7 @@ final class NamespaceUtil {
 		public void setDestination(final Object destination) {
 			this.destination = destination;
 		}
-		
+
 		/**
 		 * Gets the method name.
 		 * 
@@ -196,7 +206,7 @@ final class NamespaceUtil {
 		public AnnotatedMethod getMethod() {
 			return method;
 		}
-		
+
 		/**
 		 * Sets the method name.
 		 * 
