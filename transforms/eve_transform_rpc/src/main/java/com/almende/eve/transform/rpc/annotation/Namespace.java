@@ -14,10 +14,10 @@ import java.lang.annotation.Target;
  * The Interface Namespace.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ ElementType.METHOD, ElementType.TYPE })
 @Documented
 public @interface Namespace {
-	
+
 	/**
 	 * Value.
 	 * 

@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
-
 final class JSONRPC {
 	private static final Logger	LOG					= Logger.getLogger(JSONRPC.class
 															.getName());
@@ -301,7 +300,7 @@ final class JSONRPC {
 	 * @return the map
 	 */
 	private static Map<String, Object> _describe(final Object c,
-			final RequestParams requestParams, final String namespace, final Authorizor auth) {
+			final RequestParams requestParams, String namespace, final Authorizor auth) {
 		final Map<String, Object> methods = new TreeMap<String, Object>();
 		try {
 			if (c == null) {
@@ -330,6 +329,9 @@ final class JSONRPC {
 							typeToString(method.getGenericReturnType()));
 					
 					final Map<String, Object> desc = new HashMap<String, Object>();
+					if (namespace.equals("*")){
+						namespace = annotatedClass.getAnnotation(Namespace.class).value();
+					}
 					final String methodName = namespace.equals("") ? method
 							.getName() : namespace + "." + method.getName();
 					desc.put("method", methodName);
