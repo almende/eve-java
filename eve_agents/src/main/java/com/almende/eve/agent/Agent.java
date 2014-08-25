@@ -27,6 +27,7 @@ import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
+import com.almende.eve.transport.Caller;
 import com.almende.eve.transport.LocalTransportBuilder;
 import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.Receiver;
@@ -57,12 +58,101 @@ public class Agent implements Receiver {
 	private TransformStack		transforms	= new TransformStack();
 	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
 	private Handler<Object>		handler		= new SimpleHandler<Object>(this);
+	protected Caller			caller		= new Caller() {
+												public <T> void call(
+														final URI url,
+														final String method,
+														final ObjectNode params,
+														final AsyncCallback<T> callback)
+														throws IOException {
+													final Object message = ((RpcTransform) transforms
+															.getLast())
+															.buildMsg(method,
+																	params,
+																	callback);
+													transport
+															.send(url,
+																	transforms
+																			.outbound(
+																					message,
+																					url)
+																			.toString(),
+																	null);
+												}
+
+												public <T> void call(
+														final URI url,
+														final Method method,
+														final Object[] params,
+														final AsyncCallback<T> callback)
+														throws IOException {
+													final Object message = ((RpcTransform) transforms
+															.getLast())
+															.buildMsg(method,
+																	params,
+																	callback);
+													transport
+															.send(url,
+																	transforms
+																			.outbound(
+																					message,
+																					url)
+																			.toString(),
+																	null);
+												}
+
+												public <T> void call(
+														final URI url,
+														final String method,
+														final ObjectNode params)
+														throws IOException {
+													final Object message = ((RpcTransform) transforms
+															.getLast())
+															.buildMsg(method,
+																	params,
+																	null);
+													transport
+															.send(url,
+																	transforms
+																			.outbound(
+																					message,
+																					url)
+																			.toString(),
+																	null);
+												}
+
+												public <T> T callSync(
+														final URI url,
+														final String method,
+														final ObjectNode params)
+														throws IOException {
+													final SyncCallback<T> callback = new SyncCallback<T>() {};
+													final Object message = ((RpcTransform) transforms
+															.getLast())
+															.buildMsg(method,
+																	params,
+																	callback);
+													transport
+															.send(url,
+																	transforms
+																			.outbound(
+																					message,
+																					url)
+																			.toString(),
+																	null);
+													try {
+														return callback.get();
+													} catch (final Exception e) {
+														throw new IOException(e);
+													}
+												}
+											};
+	private Handler<Caller>		sender		= new SimpleHandler<Caller>(caller);
 
 	/**
 	 * Instantiates a new agent.
 	 */
-	public Agent() {
-	}
+	public Agent() {}
 
 	/**
 	 * Instantiates a new agent.
@@ -104,6 +194,14 @@ public class Agent implements Receiver {
 	}
 
 	/**
+	 * @param receiver
+	 *            the receiver to set
+	 */
+	protected void setReceiver(Handler<Receiver> receiver) {
+		this.receiver = receiver;
+	}
+
+	/**
 	 * @return the receiver
 	 */
 	@JsonIgnore
@@ -120,7 +218,7 @@ public class Agent implements Receiver {
 	protected void setHandler(Handler<Object> handler) {
 		this.handler = handler;
 	}
-	
+
 	/**
 	 * Gets the handler.
 	 *
@@ -132,12 +230,25 @@ public class Agent implements Receiver {
 	}
 
 	/**
-	 * @param receiver
-	 *            the receiver to set
+	 * Sets the sender.
+	 *
+	 * @param sender
+	 *            the new sender
 	 */
-	protected void setReceiver(Handler<Receiver> receiver) {
-		this.receiver = receiver;
+	public void setSender(Handler<Caller> sender) {
+		this.sender = sender;
 	}
+
+	/**
+	 * Gets the sender.
+	 *
+	 * @return the sender
+	 */
+	@JsonIgnore
+	public Handler<Caller> getSender() {
+		return sender;
+	}
+
 	/**
 	 * Gets the transport.
 	 * 
@@ -257,13 +368,13 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the config
 	 */
-	public void loadTransforms(final ArrayNode config){
-		//TODO: load transforms from config
-		
-		//each agent has at least a RPC transform
+	public void loadTransforms(final ArrayNode config) {
+		// TODO: load transforms from config
+
+		// each agent has at least a RPC transform
 		transforms.add(new RpcTransformBuilder().withHandle(handler).build());
 	}
-	
+
 	/**
 	 * Sets the scheduler.
 	 * 
@@ -512,13 +623,10 @@ public class Agent implements Receiver {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	@Access(AccessType.UNAVAILABLE)
 	protected <T> void call(final URI url, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback)
 			throws IOException {
-		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
-				method, params, callback);
-		transport.send(url, transforms.outbound(message, url).toString(), null);
+		caller.call(url, method, params, callback);
 	}
 
 	/**
@@ -537,13 +645,10 @@ public class Agent implements Receiver {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	@Access(AccessType.UNAVAILABLE)
 	protected <T> void call(final URI url, final Method method,
 			final Object[] params, final AsyncCallback<T> callback)
 			throws IOException {
-		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
-				method, params, callback);
-		transport.send(url, transforms.outbound(message, url).toString(), null);
+		caller.call(url, method, params, callback);
 	}
 
 	/**
@@ -560,12 +665,9 @@ public class Agent implements Receiver {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	@Access(AccessType.UNAVAILABLE)
 	protected <T> void call(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
-				method, params, null);
-		transport.send(url, transforms.outbound(message, url).toString(), null);
+		caller.call(url, method, params);
 	}
 
 	/**
@@ -583,18 +685,9 @@ public class Agent implements Receiver {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	@Access(AccessType.UNAVAILABLE)
 	protected <T> T callSync(final URI url, final String method,
 			final ObjectNode params) throws IOException {
-		final SyncCallback<T> callback = new SyncCallback<T>() {};
-		final Object message = ((RpcTransform) transforms.getLast()).buildMsg(
-				method, params, callback);
-		transport.send(url, transforms.outbound(message, url).toString(), null);
-		try {
-			return callback.get();
-		} catch (final Exception e) {
-			throw new IOException(e);
-		}
+		return caller.callSync(url, method, params);
 	}
 
 	/*

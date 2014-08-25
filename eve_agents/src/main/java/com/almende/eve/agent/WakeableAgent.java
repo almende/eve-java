@@ -7,6 +7,7 @@ package com.almende.eve.agent;
 import com.almende.eve.capabilities.wake.WakeHandler;
 import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.capabilities.wake.Wakeable;
+import com.almende.eve.transport.Caller;
 import com.almende.eve.transport.Receiver;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -35,6 +36,7 @@ public class WakeableAgent extends Agent implements Wakeable {
 		final AgentConfig conf = new AgentConfig(config);
 		setHandler(new WakeHandler<Object>(this, conf.getId(), ws));
 		setReceiver(new WakeHandler<Receiver>(this, conf.getId(), ws));
+		setSender(new WakeHandler<Caller>(caller, conf.getId(), ws));
 		
 		setConfig(conf, true);
 		registerAt(ws);
@@ -53,6 +55,7 @@ public class WakeableAgent extends Agent implements Wakeable {
 		final AgentConfig conf = new AgentConfig(config);
 		setHandler(new WakeHandler<Object>(this, conf.getId(), ws));
 		setReceiver(new WakeHandler<Receiver>(this, conf.getId(), ws));
+		setSender(new WakeHandler<Caller>(caller, conf.getId(), ws));
 		
 		setConfig(conf, true);
 		registerAt(ws);
@@ -79,6 +82,7 @@ public class WakeableAgent extends Agent implements Wakeable {
 			final boolean onBoot) {
 		setHandler(new WakeHandler<Object>(this, wakeKey, ws));
 		setReceiver(new WakeHandler<Receiver>(this, wakeKey, ws));
+		setSender(new WakeHandler<Caller>(caller, wakeKey, ws));
 		setConfig(params, onBoot);
 	}
 	
