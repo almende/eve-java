@@ -9,6 +9,6 @@ state:
 
 gol:
   runTime: 50
-  columns: 5
-  rows: 5
+  columns: 30
+  rows: 30
 

@@ -34,30 +34,13 @@ public class TestThreads extends TestCase {
 			ThreadPool.getPool().execute(new Runnable() {
 				@Override
 				public void run() {
-					ThreadPool.getPool().execute(new Runnable() {
-						@Override
-						public void run() {
-							ThreadPool.getPool().execute(new Runnable() {
-								@Override
-								public void run() {
-									ThreadPool.getPool().execute(
-											new Runnable() {
-
-												@Override
-												public void run() {
-													int count=0;
-													while(count<10000){
-														count++;
-														String.valueOf(count);
-													}
-													flags[j]=false;
-												}
-											});
-								};
-							});
-						};
-					});
-				};
+					int count = 0;
+					while (count < 10000) {
+						count++;
+						String.valueOf(count);
+					}
+					flags[j] = false;
+				}
 			});
 		}
 		try {

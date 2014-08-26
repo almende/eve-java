@@ -6,7 +6,6 @@ package com.almende.eve.scheduling.clock;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -22,11 +21,7 @@ import com.almende.util.threads.ThreadPool;
 public class RunnableClock implements Runnable, Clock {
 
 	private static final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
-	private static final ScheduledExecutorService				POOL		= Executors
-																					.newScheduledThreadPool(
-																							4,
-																							ThreadPool
-																									.getFactory());
+	private static final ScheduledExecutorService				POOL		= ThreadPool.getScheduledPool();
 	private static ScheduledFuture<?>							future		= null;
 
 	/*

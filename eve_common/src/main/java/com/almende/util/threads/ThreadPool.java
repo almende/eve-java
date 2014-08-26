@@ -6,6 +6,7 @@ package com.almende.util.threads;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,17 +15,33 @@ import java.util.concurrent.TimeUnit;
  * The Class ThreadPool.
  */
 public class ThreadPool {
-	private static int					nofCores	= 8;
-	private static ThreadFactory		factory		= Executors
-															.defaultThreadFactory();
-	private static ThreadPoolExecutor	pool		= new ThreadPoolExecutor(
-															nofCores,
-															nofCores,
-															60,
-															TimeUnit.SECONDS,
-															new LinkedBlockingQueue<Runnable>(),
-															factory,
-															new ThreadPoolExecutor.AbortPolicy());
+	private static int							nofCores		= 8;
+	private static ThreadFactory				factory			= Executors
+																		.defaultThreadFactory();
+	private static ScheduledThreadPoolExecutor	scheduledPool	= null;
+	private static ThreadPoolExecutor			pool			= null;
+
+	static {
+		initPools();
+	}
+
+	private static void initPools() {
+		if (pool != null) {
+			pool.purge();
+			pool.shutdownNow();
+		}
+		if (scheduledPool != null) {
+			scheduledPool.purge();
+			scheduledPool.shutdownNow();
+		}
+		scheduledPool = new ScheduledThreadPoolExecutor(nofCores, factory,
+				new ThreadPoolExecutor.CallerRunsPolicy());
+		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>(), factory,
+				new ThreadPoolExecutor.CallerRunsPolicy());
+
+		pool.allowCoreThreadTimeOut(true);
+	}
 
 	/**
 	 * Sets the nof CPU cores, for efficient resource usage.
@@ -34,12 +51,16 @@ public class ThreadPool {
 	 */
 	public static void setNofCores(int nofCores) {
 		ThreadPool.nofCores = nofCores;
-		pool.purge();
-		pool.shutdownNow();
-		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), factory,
-				new ThreadPoolExecutor.CallerRunsPolicy());
-		pool.allowCoreThreadTimeOut(true);
+		initPools();
+	}
+
+	/**
+	 * Gets the pool.
+	 * 
+	 * @return the pool
+	 */
+	public static ScheduledThreadPoolExecutor getScheduledPool() {
+		return scheduledPool;
 	}
 
 	/**
@@ -68,11 +89,6 @@ public class ThreadPool {
 	 */
 	public static void setFactory(final ThreadFactory factory) {
 		ThreadPool.factory = factory;
-		pool.purge();
-		pool.shutdownNow();
-		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), factory,
-				new ThreadPoolExecutor.CallerRunsPolicy());
-		pool.allowCoreThreadTimeOut(true);
+		initPools();
 	}
 }
