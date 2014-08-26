@@ -23,8 +23,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.PUBLIC)
 public class Cell extends Agent {
-	private ArrayList<String>	neighbors	= null;
-	
+	private ArrayList<String>							neighbors		= null;
+	private static final TypeUtil<ArrayList<String>>	NEIGHBORTYPE	= new TypeUtil<ArrayList<String>>() {};
+	private static final TypeUtil<CycleState>			CYCLESTATETYPE	= new TypeUtil<CycleState>() {};
+	private static final TypeUtil<Boolean>				BOOLEANSTATE	= new TypeUtil<Boolean>() {};
+	private static final TypeUtil<Integer>				INTEGERSTATE	= new TypeUtil<Integer>() {};
+
 	/**
 	 * Instantiates a new cell.
 	 * 
@@ -34,7 +38,7 @@ public class Cell extends Agent {
 	public Cell(final ObjectNode config) {
 		this.setConfig(config);
 	}
-	
+
 	/**
 	 * Creates the.
 	 * 
@@ -63,7 +67,7 @@ public class Cell extends Agent {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * @param agentNo
 	 * @param totalSize
@@ -79,7 +83,7 @@ public class Cell extends Agent {
 			cN = (int) Math.floor(agentNo / N);
 		}
 		neighbors = new ArrayList<String>(8);
-		
+
 		for (int id = 0; id < 8; id++) {
 			final int neighborNo = getNeighborNo(id, cN, cM, N, M);
 			neighbors.add(addPath(odd, even, Goldemo.AGENTPREFIX + neighborNo,
@@ -87,16 +91,16 @@ public class Cell extends Agent {
 		}
 		getState().put("neighbors", neighbors);
 	}
-	
+
 	private String addPath(final String odd, final String even,
 			final String path, final int agentNo) {
 		return (agentNo % 2 == 0 ? even : odd) + path;
 	}
-	
+
 	private int calcBack(final int cN, final int cM, final int M) {
 		return cM + cN * M;
 	}
-	
+
 	private int getNeighborNo(final int id, final int cN, final int cM,
 			final int N, final int M) {
 		switch (id) {
@@ -120,24 +124,22 @@ public class Cell extends Agent {
 		System.err.println("SHould never happen!");
 		return 0;
 	}
-	
+
 	/**
 	 * Stop.
 	 */
 	public void stop() {
 		getState().put("Stopped", true);
 	}
-	
+
 	/**
 	 * Start.
 	 */
 	public void start() {
 		if (neighbors == null) {
-			neighbors = getState().get("neighbors",
-					new TypeUtil<ArrayList<String>>() {
-					});
+			neighbors = getState().get("neighbors", NEIGHBORTYPE);
 		}
-		final CycleState myState = getState().get("val_0", CycleState.class);
+		final CycleState myState = getState().get("val_0", CYCLESTATETYPE);
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("alive", myState.isAlive());
 		params.put("cycle", 0);
@@ -151,7 +153,7 @@ public class Cell extends Agent {
 		}
 		return;
 	}
-	
+
 	/**
 	 * Collect.
 	 * 
@@ -165,9 +167,7 @@ public class Cell extends Agent {
 	public void collect(@Name("alive") final boolean alive,
 			@Name("cycle") final int cycle, @Sender String neighbor) {
 		if (neighbors == null) {
-			neighbors = getState().get("neighbors",
-					new TypeUtil<ArrayList<String>>() {
-					});
+			neighbors = getState().get("neighbors", NEIGHBORTYPE);
 		}
 		final CycleState state = new CycleState(cycle, alive);
 		getState().put(neighbor + "_" + state.getCycle(), state);
@@ -178,13 +178,6 @@ public class Cell extends Agent {
 		}
 	}
 
-	private static final TypeUtil<CycleState>	CYCLESTATETYPE	= new TypeUtil<CycleState>() {
-																};
-	private static final TypeUtil<Boolean>		BOOLEANSTATE	= new TypeUtil<Boolean>() {
-																};
-	private static final TypeUtil<Integer>		INTEGERSTATE	= new TypeUtil<Integer>() {
-																};
-	
 	private void calcCycle() throws URISyntaxException {
 		final Integer currentCycle = getState().get("current_cycle",
 				INTEGERSTATE);
@@ -240,7 +233,7 @@ public class Cell extends Agent {
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets the cycle state.
 	 * 
@@ -250,11 +243,11 @@ public class Cell extends Agent {
 	 */
 	public CycleState getCycleState(@Name("cycle") final int cycle) {
 		if (getState().containsKey("val_" + cycle)) {
-			return getState().get("val_" + cycle, CycleState.class);
+			return getState().get("val_" + cycle, CYCLESTATETYPE);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets the all cycle states.
 	 * 
@@ -264,10 +257,10 @@ public class Cell extends Agent {
 		final ArrayList<CycleState> result = new ArrayList<CycleState>();
 		int count = 0;
 		while (getState().containsKey("val_" + count)) {
-			result.add(getState().get("val_" + count, CycleState.class));
+			result.add(getState().get("val_" + count, CYCLESTATETYPE));
 			count++;
 		}
 		return result;
 	}
-	
+
 }

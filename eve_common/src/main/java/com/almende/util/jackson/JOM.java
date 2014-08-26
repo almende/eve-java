@@ -6,6 +6,7 @@ package com.almende.util.jackson;
 import java.io.IOException;
 import java.util.BitSet;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -90,6 +91,8 @@ public final class JOM {
 				false);
 		mapper.configure(
 				DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, false);
+		mapper.getFactory().configure(
+				JsonFactory.Feature.CANONICALIZE_FIELD_NAMES, false);
 		
 		// Needed for o.a. JsonFileState
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);

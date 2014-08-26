@@ -5,8 +5,8 @@
 package com.almende.eve.transform;
 
 import java.net.URI;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TransformStack.
  */
 public class TransformStack implements Transform {
-	private final List<Transform> stack = new ArrayList<Transform>();
+	private final LinkedList<Transform> stack = new LinkedList<Transform>();
 
 	/**
 	 * Adds the transform at the end of the stack
@@ -42,10 +42,10 @@ public class TransformStack implements Transform {
 	 * @return the top
 	 */
 	public Transform getLast() {
-		if (stack.size() == 0) {
+		if (stack.isEmpty()) {
 			return null;
 		}
-		return stack.get(stack.size() - 1);
+		return stack.getLast();
 	}
 
 	/**
@@ -54,10 +54,10 @@ public class TransformStack implements Transform {
 	 * @return the first
 	 */
 	public Transform getFirst() {
-		if (stack.size() == 0) {
+		if (stack.isEmpty()) {
 			return null;
 		}
-		return stack.get(0);
+		return stack.getFirst();
 	}
 
 	/*
@@ -78,9 +78,9 @@ public class TransformStack implements Transform {
 	 */
 	@Override
 	public Object inbound(Object msg, URI senderUrl) {
-		int i = 0;
-		while (msg != null && i< stack.size()){
-			Transform transform = stack.get(i++);
+		Iterator<Transform> iter = stack.iterator();
+		while (msg != null && iter.hasNext()){
+			Transform transform = iter.next();
 			msg = transform.inbound(msg, senderUrl);
 		}
 		return msg;
@@ -94,9 +94,9 @@ public class TransformStack implements Transform {
 	 */
 	@Override
 	public Object outbound(Object msg, URI recipientUrl) {
-		int i = stack.size()-1;
-		while (msg != null && i>= 0){
-			Transform transform = stack.get(i--);
+		Iterator<Transform> iter = stack.descendingIterator();
+		while (msg != null && iter.hasNext()){
+			Transform transform = iter.next();
 			msg = transform.outbound(msg, recipientUrl);
 		}
 		return msg;

@@ -58,95 +58,8 @@ public class Agent implements Receiver {
 	private TransformStack		transforms	= new TransformStack();
 	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
 	private Handler<Object>		handler		= new SimpleHandler<Object>(this);
-	protected Caller			caller		= new Caller() {
-												public <T> void call(
-														final URI url,
-														final String method,
-														final ObjectNode params,
-														final AsyncCallback<T> callback)
-														throws IOException {
-													final Object message = ((RpcTransform) transforms
-															.getLast())
-															.buildMsg(method,
-																	params,
-																	callback);
-													transport
-															.send(url,
-																	transforms
-																			.outbound(
-																					message,
-																					url)
-																			.toString(),
-																	null);
-												}
+	protected Caller			caller		= new DefaultCaller();
 
-												public <T> void call(
-														final URI url,
-														final Method method,
-														final Object[] params,
-														final AsyncCallback<T> callback)
-														throws IOException {
-													final Object message = ((RpcTransform) transforms
-															.getLast())
-															.buildMsg(method,
-																	params,
-																	callback);
-													transport
-															.send(url,
-																	transforms
-																			.outbound(
-																					message,
-																					url)
-																			.toString(),
-																	null);
-												}
-
-												public <T> void call(
-														final URI url,
-														final String method,
-														final ObjectNode params)
-														throws IOException {
-													final Object message = ((RpcTransform) transforms
-															.getLast())
-															.buildMsg(method,
-																	params,
-																	null);
-													transport
-															.send(url,
-																	transforms
-																			.outbound(
-																					message,
-																					url)
-																			.toString(),
-																	null);
-												}
-
-												public <T> T callSync(
-														final URI url,
-														final String method,
-														final ObjectNode params)
-														throws IOException {
-													final SyncCallback<T> callback = new SyncCallback<T>() {};
-													final Object message = ((RpcTransform) transforms
-															.getLast())
-															.buildMsg(method,
-																	params,
-																	callback);
-													transport
-															.send(url,
-																	transforms
-																			.outbound(
-																					message,
-																					url)
-																			.toString(),
-																	null);
-													try {
-														return callback.get();
-													} catch (final Exception e) {
-														throw new IOException(e);
-													}
-												}
-											};
 	private Handler<Caller>		sender		= new SimpleHandler<Caller>(caller);
 
 	/**
@@ -708,4 +621,46 @@ public class Agent implements Receiver {
 			}
 		}
 	}
+
+	private class DefaultCaller implements Caller {
+		public <T> void call(final URI url, final String method,
+				final ObjectNode params, final AsyncCallback<T> callback)
+				throws IOException {
+			final Object message = ((RpcTransform) transforms.getLast())
+					.buildMsg(method, params, callback);
+			transport.send(url, transforms.outbound(message, url).toString(),
+					null);
+		}
+
+		public <T> void call(final URI url, final Method method,
+				final Object[] params, final AsyncCallback<T> callback)
+				throws IOException {
+			final Object message = ((RpcTransform) transforms.getLast())
+					.buildMsg(method, params, callback);
+			transport.send(url, transforms.outbound(message, url).toString(),
+					null);
+		}
+
+		public <T> void call(final URI url, final String method,
+				final ObjectNode params) throws IOException {
+			final Object message = ((RpcTransform) transforms.getLast())
+					.buildMsg(method, params, null);
+			transport.send(url, transforms.outbound(message, url).toString(),
+					null);
+		}
+
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params) throws IOException {
+			final SyncCallback<T> callback = new SyncCallback<T>() {};
+			final Object message = ((RpcTransform) transforms.getLast())
+					.buildMsg(method, params, callback);
+			transport.send(url, transforms.outbound(message, url).toString(),
+					null);
+			try {
+				return callback.get();
+			} catch (final Exception e) {
+				throw new IOException(e);
+			}
+		}
+	};
 }
