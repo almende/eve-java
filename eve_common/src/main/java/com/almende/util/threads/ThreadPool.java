@@ -14,27 +14,26 @@ import java.util.concurrent.TimeUnit;
  * The Class ThreadPool.
  */
 public class ThreadPool {
-	private static int					nofCores = 8;
-	private static ThreadFactory		factory	= Executors
-														.defaultThreadFactory();
-	private static ThreadPoolExecutor	pool	= new ThreadPoolExecutor(
-														nofCores,
-														nofCores,
-														60,
-														TimeUnit.SECONDS,
-														new LinkedBlockingQueue<Runnable>(),
-														factory,
-														new ThreadPoolExecutor.CallerRunsPolicy());
-	
-	
+	private static int					nofCores	= 8;
+	private static ThreadFactory		factory		= Executors
+															.defaultThreadFactory();
+	private static ThreadPoolExecutor	pool		= new ThreadPoolExecutor(
+															nofCores,
+															nofCores,
+															60,
+															TimeUnit.SECONDS,
+															new LinkedBlockingQueue<Runnable>(),
+															factory,
+															new ThreadPoolExecutor.AbortPolicy());
+
 	/**
 	 * Sets the nof CPU cores, for efficient resource usage.
 	 * 
 	 * @param nofCores
 	 *            the new nof cores
 	 */
-	public static void setNofCores(int nofCores){
-		ThreadPool.nofCores=nofCores;
+	public static void setNofCores(int nofCores) {
+		ThreadPool.nofCores = nofCores;
 		pool.purge();
 		pool.shutdownNow();
 		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
@@ -42,7 +41,7 @@ public class ThreadPool {
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		pool.allowCoreThreadTimeOut(true);
 	}
-	
+
 	/**
 	 * Gets the pool.
 	 * 
@@ -51,7 +50,7 @@ public class ThreadPool {
 	public static ThreadPoolExecutor getPool() {
 		return pool;
 	}
-	
+
 	/**
 	 * Gets the factory.
 	 * 
@@ -60,7 +59,7 @@ public class ThreadPool {
 	public static ThreadFactory getFactory() {
 		return factory;
 	}
-	
+
 	/**
 	 * Sets the factory.
 	 * 
