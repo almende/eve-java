@@ -612,7 +612,7 @@ public class Agent implements Receiver {
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		final Object response = transforms.outbound(
-				transforms.inbound(msg, senderUrl), senderUrl);
+				transforms.inbound(msg, senderUrl).getResult(), senderUrl).getResult();
 		if (response != null) {
 			try {
 				transport.send(senderUrl, response.toString(), tag);

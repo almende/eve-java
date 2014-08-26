@@ -24,7 +24,6 @@ import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -35,9 +34,6 @@ public class RpcTransform implements Transform {
 	private static final Logger						LOG					= Logger.getLogger(RpcTransform.class
 																				.getName());
 	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
-	private static final JavaType					OBJECTNODETYPE		= JOM.getTypeFactory()
-																				.constructType(
-																						ObjectNode.class);
 	static {
 		EVEREQUESTPARAMS.put(Sender.class, null);
 	}
@@ -62,19 +58,13 @@ public class RpcTransform implements Transform {
 	}
 	
 	@Override
-	public Object inbound(Object msg, URI senderUrl) {
+	public Meta inbound(Object msg, URI senderUrl) {
 		final JSONResponse response = invoke(msg,senderUrl);
-		if (response == null){
-			//Couldn't handle this message, allow chaining
-			return msg;
-		} else {
-			//Consumed message entirely
-			return response;
-		}
+		return new Meta(response,response==null,response!=null);
+		
 	}
-	public Object outbound(Object msg, URI recipientUrl){
-		//RPC transform doesn't change existing messages
-		return msg;
+	public Meta outbound(Object msg, URI recipientUrl){
+		return new Meta(msg);
 	}
 	
 	/**
@@ -120,8 +110,7 @@ public class RpcTransform implements Transform {
 					if (message.startsWith("{")
 							|| message.trim().startsWith("{")) {
 						
-						json = JOM.getInstance().readValue(message,
-								OBJECTNODETYPE);
+						json = (ObjectNode)JOM.getInstance().readTree(message);
 					}
 				} else if (msg instanceof ObjectNode) {
 					json = (ObjectNode) msg;

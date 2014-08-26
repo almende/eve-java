@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TransformStack.
  */
 public class TransformStack implements Transform {
-	private final LinkedList<Transform> stack = new LinkedList<Transform>();
+	private final LinkedList<Transform>	stack	= new LinkedList<Transform>();
 
 	/**
 	 * Adds the transform at the end of the stack
@@ -62,7 +62,6 @@ public class TransformStack implements Transform {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
@@ -72,33 +71,34 @@ public class TransformStack implements Transform {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transform.Transform#inbound(java.lang.Object,
 	 * java.net.URI)
 	 */
 	@Override
-	public Object inbound(Object msg, URI senderUrl) {
+	public Meta inbound(final Object msg, URI senderUrl) {
 		Iterator<Transform> iter = stack.iterator();
-		while (msg != null && iter.hasNext()){
+		Meta res = new Meta(msg);
+		while (res.doNext && iter.hasNext()) {
 			Transform transform = iter.next();
-			msg = transform.inbound(msg, senderUrl);
+			res = transform.inbound(res.valid ? res.result : msg, senderUrl);
 		}
-		return msg;
+		return res;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transform.Transform#outbound(java.lang.Object,
 	 * java.net.URI)
 	 */
 	@Override
-	public Object outbound(Object msg, URI recipientUrl) {
+	public Meta outbound(final Object msg, final URI recipientUrl) {
 		Iterator<Transform> iter = stack.descendingIterator();
-		while (msg != null && iter.hasNext()){
+		Meta res = new Meta(msg);
+		while (res.doNext && iter.hasNext()) {
 			Transform transform = iter.next();
-			msg = transform.outbound(msg, recipientUrl);
+			res = transform
+					.outbound(res.valid ? res.result : msg, recipientUrl);
 		}
-		return msg;
+		return res;
 	}
 }
