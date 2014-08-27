@@ -50,8 +50,8 @@ public class Router implements Transport {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
-	 * java.lang.String, java.lang.String)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
 	 */
 	@Override
 	public void send(final URI receiverUri, final String message,
@@ -86,6 +86,24 @@ public class Router implements Transport {
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+	 * java.lang.String)
+	 */
+	@Override
+	public void send(final URI receiverUri, final Object message,
+			final String tag) throws IOException {
+		final Transport transport = transports.get(receiverUri.getScheme()
+				.toLowerCase());
+		if (transport != null) {
+			transport.send(receiverUri, message, tag);
+		} else {
+			throw new IOException("No transport known for scheme:"
+					+ receiverUri.getScheme());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -98,7 +116,8 @@ public class Router implements Transport {
 			final long[] sleep = new long[1];
 			sleep[0] = 1000L;
 			final double rnd = Math.random();
-			final ScheduledThreadPoolExecutor STE = ThreadPool.getScheduledPool();
+			final ScheduledThreadPoolExecutor STE = ThreadPool
+					.getScheduledPool();
 			STE.schedule(new Runnable() {
 				@Override
 				public void run() {

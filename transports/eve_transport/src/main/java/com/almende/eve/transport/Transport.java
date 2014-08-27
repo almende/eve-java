@@ -56,6 +56,23 @@ public interface Transport extends Capability {
 	 */
 	void send(final URI receiverUri, final byte[] message, final String tag)
 			throws IOException;
+
+	/**
+	 * Send bytes to an other agent. String based transports
+	 * may need to encode these bytes to base64. (e.g. through
+	 * org.apache.commons.codec.binary.Base64)
+	 *
+	 * @param receiverUri
+	 *            the receiver uri
+	 * @param message
+	 *            the message
+	 * @param tag
+	 *            the tag
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	void send(final URI receiverUri, final Object message, final String tag) throws IOException;
+
 	
 	/**
 	 * (re)Connect this url (if applicable for this transport type).
@@ -95,4 +112,5 @@ public interface Transport extends Capability {
 	 * @return protocols
 	 */
 	List<String> getProtocols();
+
 }

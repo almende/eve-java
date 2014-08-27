@@ -23,7 +23,7 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 	private static final Logger					LOG			= Logger.getLogger(LocalTransportBuilder.class
 																	.getName());
 	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>();
-	
+
 	@Override
 	public Transport build() {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL
@@ -45,7 +45,7 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Gets the local.
 	 * 
@@ -56,7 +56,7 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 	public LocalService getLocal(final URI address) {
 		return INSTANCES.get(address);
 	}
-	
+
 	/**
 	 * The Class LocalService.
 	 */
@@ -75,14 +75,13 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 				final ObjectNode params) {
 			super(address, handle, new LocalService(), params);
 		}
-		
+
 		private LocalService() {
 			super(null, null, null, null);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 		 */
@@ -90,58 +89,42 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		public LocalService getLocal(final URI address) {
 			return INSTANCES.get(address);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Transport#send(java.net.URI,
 		 * java.lang.String, java.lang.String)
-		 */
-		/**
-		 * Send.
-		 * 
-		 * @param receiverUri
-		 *            the receiver uri
-		 * @param message
-		 *            the message
-		 * @param tag
-		 *            the tag
-		 * @throws IOException
-		 *             Signals that an I/O exception has occurred.
 		 */
 		@Override
 		public void send(final URI receiverUri, final String message,
 				final String tag) throws IOException {
 			sendLocal(receiverUri, message);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
 		 * java.lang.String)
-		 */
-		/**
-		 * Send.
-		 * 
-		 * @param receiverUri
-		 *            the receiver uri
-		 * @param message
-		 *            the message
-		 * @param tag
-		 *            the tag
-		 * @throws IOException
-		 *             Signals that an I/O exception has occurred.
 		 */
 		@Override
 		public void send(final URI receiverUri, final byte[] message,
 				final String tag) throws IOException {
 			sendLocal(receiverUri, message);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
+		 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
+		 * java.lang.String)
+		 */
+		@Override
+		public void send(final URI receiverUri, final Object message,
+				final String tag) throws IOException {
+			sendLocal(receiverUri, message);
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.almende.eve.transport.Transport#connect()
 		 */
 		/**
@@ -151,24 +134,20 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 *             Signals that an I/O exception has occurred.
 		 */
 		@Override
-		public void connect() throws IOException {
-		}
-		
+		public void connect() throws IOException {}
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Transport#disconnect()
 		 */
 		/**
 		 * Disconnect.
 		 */
 		@Override
-		public void disconnect() {
-		}
-		
+		public void disconnect() {}
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Transport#getProtocols()
 		 */
 		/**
@@ -180,10 +159,9 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		public List<String> getProtocols() {
 			return Arrays.asList("local");
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
 		 * transport
@@ -193,6 +171,6 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		public void delete(final Transport instance) {
 			INSTANCES.remove(instance.getAddress());
 		}
-		
+
 	}
 }

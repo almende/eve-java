@@ -60,7 +60,7 @@ public class HttpTransport extends AbstractTransport {
 			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

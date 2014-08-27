@@ -612,10 +612,10 @@ public class Agent implements Receiver {
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		final Object response = transforms.outbound(
-				transforms.inbound(msg, senderUrl).getResult(), senderUrl).getResult();
+				transforms.inbound(msg, senderUrl).getResult(), senderUrl).result;
 		if (response != null) {
 			try {
-				transport.send(senderUrl, response.toString(), tag);
+				transport.send(senderUrl, response, tag);
 			} catch (final IOException e) {
 				LOG.log(Level.WARNING, "Couldn't send message", e);
 			}
@@ -628,7 +628,7 @@ public class Agent implements Receiver {
 				throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).toString(),
+			transport.send(url, transforms.outbound(message, url).result,
 					null);
 		}
 
@@ -637,7 +637,7 @@ public class Agent implements Receiver {
 				throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).toString(),
+			transport.send(url, transforms.outbound(message, url).result,
 					null);
 		}
 
@@ -645,7 +645,7 @@ public class Agent implements Receiver {
 				final ObjectNode params) throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, null);
-			transport.send(url, transforms.outbound(message, url).toString(),
+			transport.send(url, transforms.outbound(message, url).result,
 					null);
 		}
 
@@ -654,7 +654,7 @@ public class Agent implements Receiver {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).toString(),
+			transport.send(url, transforms.outbound(message, url).result,
 					null);
 			try {
 				return callback.get();

@@ -4,6 +4,7 @@
  */
 package com.almende.eve.transport;
 
+import java.io.IOException;
 import java.net.URI;
 
 import com.almende.eve.capabilities.handler.Handler;
@@ -38,6 +39,18 @@ public abstract class AbstractTransport implements Transport {
 		this.service = service;
 		this.handle = handle;
 		myParams = params;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
+	 * java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void send(final URI receiverUri, final Object message,
+			final String tag) throws IOException {
+		send(receiverUri, message.toString(), tag);
 	}
 	
 	/*
