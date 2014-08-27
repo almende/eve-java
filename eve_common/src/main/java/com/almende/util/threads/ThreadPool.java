@@ -4,8 +4,12 @@
  */
 package com.almende.util.threads;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,27 +24,43 @@ public class ThreadPool {
 																		.defaultThreadFactory();
 	private static ScheduledThreadPoolExecutor	scheduledPool	= null;
 	private static ThreadPoolExecutor			pool			= null;
-
+	private static RunQueue						queue			= null;
+	
 	static {
 		initPools();
 	}
 
 	private static void initPools() {
+		List<Runnable> openTasks  = new ArrayList<Runnable>();
+		if (queue != null){
+			 openTasks.addAll(queue.shutdownNow());
+		}
+		
 		if (pool != null) {
 			pool.purge();
-			pool.shutdownNow();
+			openTasks.addAll(pool.shutdownNow());
 		}
 		if (scheduledPool != null) {
 			scheduledPool.purge();
-			scheduledPool.shutdownNow();
+			openTasks.addAll(scheduledPool.shutdownNow());
 		}
 		scheduledPool = new ScheduledThreadPoolExecutor(nofCores, factory,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		pool = new ThreadPoolExecutor(nofCores, nofCores, 60, TimeUnit.SECONDS,
+		pool = new ThreadPoolExecutor(nofCores, nofCores*20, 60, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>(), factory,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-
+		queue = new RunQueue();
+		
 		pool.allowCoreThreadTimeOut(true);
+		
+		for (Runnable task : openTasks){
+			if (task instanceof RunnableScheduledFuture){
+				final RunnableScheduledFuture<?> futureTask = (RunnableScheduledFuture<?>) task;
+				scheduledPool.schedule(futureTask, futureTask.getDelay(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+			} else {
+				queue.execute(task);
+			}
+		}
 	}
 
 	/**
@@ -68,8 +88,8 @@ public class ThreadPool {
 	 * 
 	 * @return the pool
 	 */
-	public static ThreadPoolExecutor getPool() {
-		return pool;
+	public static Executor getPool() {
+		return queue;
 	}
 
 	/**
