@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
@@ -23,7 +22,6 @@ public class ThreadPool {
 	private static ThreadFactory				factory			= Executors
 																		.defaultThreadFactory();
 	private static ScheduledThreadPoolExecutor	scheduledPool	= null;
-	private static ThreadPoolExecutor			pool			= null;
 	private static RunQueue						queue			= null;
 	
 	static {
@@ -35,23 +33,13 @@ public class ThreadPool {
 		if (queue != null){
 			 openTasks.addAll(queue.shutdownNow());
 		}
-		
-		if (pool != null) {
-			pool.purge();
-			openTasks.addAll(pool.shutdownNow());
-		}
 		if (scheduledPool != null) {
 			scheduledPool.purge();
 			openTasks.addAll(scheduledPool.shutdownNow());
 		}
 		scheduledPool = new ScheduledThreadPoolExecutor(nofCores, factory,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		pool = new ThreadPoolExecutor(nofCores, nofCores*20, 60, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), factory,
-				new ThreadPoolExecutor.CallerRunsPolicy());
 		queue = new RunQueue();
-		
-		pool.allowCoreThreadTimeOut(true);
 		
 		for (Runnable task : openTasks){
 			if (task instanceof RunnableScheduledFuture){

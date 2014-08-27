@@ -32,26 +32,26 @@ public class RunQueue extends AbstractExecutorService {
 	private HashSet<Worker>		reserves		= null;
 	private HashSet<Worker>		waiting			= new HashSet<Worker>();
 	private boolean				isShutdown		= false;
-	private Thread scanner = new Thread(new Runnable(){
-		@Override
-		public void run() {
-			for (;;){
-				if (isShutdown){
-					break;
-				}
-				scan();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
-			}
-		}
-		
-	});
+	private Thread				scanner			= new Thread(new Runnable() {
+													@Override
+													public void run() {
+														for (;;) {
+															if (isShutdown) {
+																break;
+															}
+															scan();
+															try {
+																Thread.sleep(100);
+															} catch (InterruptedException e) {}
+														}
+													}
+
+												});
+
 	class Worker extends Thread {
-		private Object		lock		= new Object();
-		private Runnable	task		= null;
-		private boolean		isShutdown	= false;
+		final private Object	lock		= new Object();
+		private Runnable		task		= null;
+		private boolean			isShutdown	= false;
 
 		public void runTask(final Runnable task) {
 			if (isShutdown) {
@@ -59,7 +59,7 @@ public class RunQueue extends AbstractExecutorService {
 			}
 			this.task = task;
 			synchronized (lock) {
-				lock.notifyAll();
+				lock.notify();
 			}
 		}
 
@@ -141,7 +141,7 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	@Override
-	public boolean awaitTermination(long timeout, TimeUnit unit)
+	public boolean awaitTermination(final long timeout, final TimeUnit unit)
 			throws InterruptedException {
 		final long sleepTime = TimeUnit.MILLISECONDS.convert(timeout, unit);
 		synchronized (terminationLock) {
@@ -153,12 +153,12 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	@Override
-	public void execute(Runnable command) {
+	public void execute(final Runnable command) {
 		if (isShutdown()) {
 			LOG.warning("Execute called after shutdown, dropping command");
 			return;
 		}
-		Worker thread = getFreeThread();
+		final Worker thread = getFreeThread();
 		if (thread != null) {
 			thread.runTask(command);
 		} else {
@@ -168,6 +168,9 @@ public class RunQueue extends AbstractExecutorService {
 
 	private Worker getFreeThread() {
 		Worker res = null;
+		if (running.size() >= nofCores) {
+			return null;
+		}
 		synchronized (running) {
 			if (running.size() < nofCores) {
 				synchronized (reserves) {
@@ -189,13 +192,13 @@ public class RunQueue extends AbstractExecutorService {
 		return res;
 	}
 
-	private void threadDone(Worker thread) {
+	private void threadDone(final Worker thread) {
 		if (isShutdown()) {
 			thread.isShutdown = true;
 		}
 		if (!thread.isShutdown) {
 			if (running.contains(thread) && running.size() <= nofCores) {
-				Runnable task = tasks.poll();
+				final Runnable task = tasks.poll();
 				if (task != null) {
 					thread.runTask(task);
 					return;
@@ -208,7 +211,7 @@ public class RunQueue extends AbstractExecutorService {
 		}
 	}
 
-	private void threadWaiting(Worker thread) {
+	private void threadWaiting(final Worker thread) {
 		synchronized (waiting) {
 			waiting.add(thread);
 		}
@@ -217,7 +220,7 @@ public class RunQueue extends AbstractExecutorService {
 		}
 	}
 
-	private void threadReserve(Worker thread) {
+	private void threadReserve(final Worker thread) {
 		synchronized (reserves) {
 			if (!thread.isShutdown
 					&& reserves.size() < nofCores * RESERVEFACTOR) {
@@ -232,7 +235,7 @@ public class RunQueue extends AbstractExecutorService {
 		}
 	}
 
-	private void threadContinue(Worker thread) {
+	private void threadContinue(final Worker thread) {
 		if (!running.contains(thread)) {
 			synchronized (running) {
 				running.add(thread);
@@ -242,28 +245,13 @@ public class RunQueue extends AbstractExecutorService {
 			waiting.remove(thread);
 		}
 	}
+
 	private void scan() {
-		Worker[] wait_arr;
-		synchronized (waiting) {
-			wait_arr = waiting.toArray(new Worker[0]);
-		}
-		for (Worker thread : wait_arr) {
-			switch (thread.getState()) {
-				case RUNNABLE:
-					threadContinue(thread);
-					break;
-				case TERMINATED:
-					threadDone(thread);
-					break;
-				default:
-					break;
-			}
-		}
-		Worker[] runn_arr;
+		final Worker[] runn_arr;
 		synchronized (running) {
 			runn_arr = running.toArray(new Worker[0]);
 		}
-		for (Worker thread : runn_arr) {
+		for (final Worker thread : runn_arr) {
 			switch (thread.getState()) {
 				case TIMED_WAITING:
 					// explicit no break
@@ -278,6 +266,16 @@ public class RunQueue extends AbstractExecutorService {
 				default:
 					break;
 			}
+		}
+		Worker thread = getFreeThread();
+		while (thread != null) {
+			final Runnable task = tasks.poll();
+			if (task != null) {
+				thread.runTask(task);
+			} else {
+				break;
+			}
+			thread = getFreeThread();
 		}
 	}
 }
