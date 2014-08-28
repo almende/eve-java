@@ -169,24 +169,36 @@ public class RunQueue extends AbstractExecutorService {
 	private Worker getFreeThread() {
 		Worker res = null;
 		if (running.size() >= nofCores) {
+			// early out
 			return null;
 		}
-		synchronized (running) {
-			if (running.size() < nofCores) {
-				synchronized (reserves) {
-					if (reserves.size() > 0) {
-						final Iterator<Worker> iter = reserves.iterator();
-						if (iter.hasNext()) {
-							res = iter.next();
-							iter.remove();
-						}
-					}
+		// Try to obtain reserve thread
+		synchronized (reserves) {
+			if (reserves.size() > 0) {
+				final Iterator<Worker> iter = reserves.iterator();
+				if (iter.hasNext()) {
+					res = iter.next();
+					iter.remove();
 				}
+			}
+		}
+		synchronized (running) {
+			// Double check if there is still room for more running threads
+			if (running.size() < nofCores) {
 				if (res == null) {
+					// No reserve found, create new thread
 					res = new Worker();
 					res.start();
 				}
 				running.add(res);
+			} else {
+				// Too bad, revert thread back to reserves
+				if (res != null) {
+					synchronized (reserves) {
+						reserves.add(res);
+						res = null;
+					}
+				}
 			}
 		}
 		return res;
@@ -258,7 +270,7 @@ public class RunQueue extends AbstractExecutorService {
 				case WAITING:
 					// explicit no break
 				case BLOCKED:
-					if (thread.task != null){
+					if (thread.task != null) {
 						threadWaiting(thread);
 					}
 					break;

@@ -165,7 +165,7 @@ public class Goldemo {
 		}
 
 		if (reportOnly) {
-			System.out.println("Cycles:" + (max_full - 1) + "(~"+((max_full-1)/(runTime))+" cycles/second)");
+			System.out.println("Cycles:" + (max_full - 1) + "("+N+"x"+M+": ~"+((max_full-1)/(runTime))+" cycles/second)");
 			System.out.println(((max_full - 1) * M * N * 8) / (runTime)
 					+ " RPCs/second (" + runTime + " sec)");
 		} else {
