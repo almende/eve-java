@@ -8,7 +8,8 @@ state:
   class: com.almende.eve.state.memory.MemoryStateBuilder
 
 gol:
-  runTime: 50
-  columns: 60
-  rows: 60
-
+  runTime: 10
+  columns: 100
+  rows: 100
+  random: true
+  reportOnly: true

@@ -20,28 +20,28 @@ import com.almende.eve.config.YamlReader;
  * The Class Goldemo.
  */
 public class Goldemo {
-	
+
 	/**
 	 * The Constant AGENTPREFIX.
 	 */
 	// final static String BASE = "inproc://";
 	// final static String BASE = "ipc:///tmp/zmq-socket-";
 	// final static String PATH = "zmq:"+BASE;
-	
+
 	public final static String	AGENTPREFIX	= "Agent_";
-	
+
 	/**
 	 * The Constant PATH.
 	 */
 	private static String		PATHodd		= "local:";
 	private static String		PATHeven	= "local:";
-	
+
 	// private static String PATHodd = "http://127.0.0.1:8081/agents/";
 	// private static String PATHeven = "http://127.0.0.1:8081/agents/";
-	
+
 	// final static String PATHodd = PATH;
 	// final static String PATHeven = PATH;
-	
+
 	/**
 	 * The main method.
 	 * 
@@ -63,7 +63,7 @@ public class Goldemo {
 		final Integer runTime = config.get("gol", "runTime");
 		final Integer N = config.get("gol", "columns");
 		final Integer M = config.get("gol", "rows");
-		
+
 		final String oddUrl = config.get("gol", "OddUrl");
 		if (oddUrl != null) {
 			PATHodd = oddUrl;
@@ -72,47 +72,69 @@ public class Goldemo {
 		if (evenUrl != null) {
 			PATHeven = evenUrl;
 		}
-		
+
 		if (runTime == null || N == null || M == null) {
 			System.err.println("Configuration missing in yaml.");
 			return;
-			
+
 		}
-		
+
+		Boolean random = config.get("gol", "random");
+		if (random == null) {
+			random = false;
+		}
+
+		Boolean reportOnly = config.get("gol", "reportOnly");
+		if (reportOnly == null) {
+			reportOnly = false;
+		}
+
 		Boolean annimate = config.get("gol", "annimate");
 		if (annimate == null) {
 			annimate = true;
 		}
-		
-		final BufferedReader br = new BufferedReader(new InputStreamReader(
-				System.in));
-		
-		String input;
-		
-		int cN = 0;
+
 		final ArrayList<Cell> cells = new ArrayList<Cell>(N * M);
-		
-		int no = 0;
-		while ((input = br.readLine()) != null && cN < N) {
-			final String trimmedInput = input.trim();
-			if (trimmedInput.isEmpty()) {
-				break;
+		if (!random) {
+			final BufferedReader br = new BufferedReader(new InputStreamReader(
+					System.in));
+
+			String input;
+
+			int cN = 0;
+			int no = 0;
+			while ((input = br.readLine()) != null && cN < N) {
+				final String trimmedInput = input.trim();
+				if (trimmedInput.isEmpty()) {
+					break;
+				}
+				if (trimmedInput.length() != M) {
+					throw new IllegalArgumentException(
+							"Incorrect input line detected:" + input);
+				}
+				for (int cM = 0; cM < M; cM++) {
+					final AgentConfig agent_config = new AgentConfig(config);
+					agent_config.setId(AGENTPREFIX + no++);
+					final Cell cell = new Cell(agent_config);
+					cell.create(PATHodd, PATHeven,
+							(trimmedInput.charAt(cM) == '+'), M * N);
+					cells.add(cell);
+				}
+				cN++;
 			}
-			if (trimmedInput.length() != M) {
-				throw new IllegalArgumentException(
-						"Incorrect input line detected:" + input);
+		} else {
+			int no = 0;
+			for (int cN = 0; cN < N; cN++) {
+				for (int cM = 0; cM < M; cM++) {
+					final AgentConfig agent_config = new AgentConfig(config);
+					agent_config.setId(AGENTPREFIX + no++);
+					final Cell cell = new Cell(agent_config);
+					cell.create(PATHodd, PATHeven, (Math.random() > 0.5), M * N);
+					cells.add(cell);
+				}
 			}
-			for (int cM = 0; cM < M; cM++) {
-				final AgentConfig agent_config = new AgentConfig(config);
-				agent_config.setId(AGENTPREFIX + no++);
-				final Cell cell = new Cell(agent_config);
-				cell.create(PATHodd, PATHeven,
-						(trimmedInput.charAt(cM) == '+'), M * N);
-				cells.add(cell);
-			}
-			cN++;
 		}
-		
+
 		System.err.println("Waiting before start, 10s");
 		try {
 			Thread.sleep(10000);
@@ -123,7 +145,7 @@ public class Goldemo {
 		for (final Cell cell : cells) {
 			cell.start();
 		}
-		System.err.println("Started!");
+		System.err.println("Started for "+runTime+"s!");
 		try {
 			Thread.sleep(runTime * 1000);
 		} catch (final InterruptedException e) {
@@ -132,6 +154,7 @@ public class Goldemo {
 		for (final Cell cell : cells) {
 			cell.stop();
 		}
+		System.err.println("Stopped!");
 		final HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
 		int max_full = 0;
 		for (final Cell cell : cells) {
@@ -140,47 +163,53 @@ public class Goldemo {
 					: max_full);
 			results.put(cell.getId(), res);
 		}
-		
-		int cycle = 0;
-		for (int j = 0; j < max_full; j++) {
-			if (annimate) {
-				try {
-					Thread.sleep(500);
-				} catch (final InterruptedException e) {
-				}
-				final String ESC = "\033[";
-				System.out.print(ESC + "2J");
-			}
-			System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
+
+		if (reportOnly) {
+			System.out.println("Cycles:" + (max_full - 1) + "(~"+((max_full-1)/(runTime))+" cycles/second)");
 			System.out.println(((max_full - 1) * M * N * 8) / (runTime)
 					+ " RPCs/second (" + runTime + " sec)");
-			System.out.print("/");
-			for (int i = 0; i < M * 2; i++) {
-				System.out.print("-");
-			}
-			System.out.println("-\\");
-			no = 0;
-			for (cN = 0; cN < N; cN++) {
-				System.out.print("| ");
-				for (int cM = 0; cM < M; cM++) {
-					final String id = AGENTPREFIX + no++;
-					final ArrayList<CycleState> states = results.get(id);
-					if (states.size() <= cycle) {
-						break;
-					}
-					System.out.print(states.get(cycle).isAlive() ? "# " : "- ");
+		} else {
+			int cycle = 0;
+			for (int j = 0; j < max_full; j++) {
+				if (annimate) {
+					try {
+						Thread.sleep(500);
+					} catch (final InterruptedException e) {}
+					final String ESC = "\033[";
+					System.out.print(ESC + "2J");
 				}
-				System.out.println("|");
+				System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
+				System.out.println(((max_full - 1) * M * N * 8) / (runTime)
+						+ " RPCs/second (" + runTime + " sec)");
+				System.out.print("/");
+				for (int i = 0; i < M * 2; i++) {
+					System.out.print("-");
+				}
+				System.out.println("-\\");
+				int no = 0;
+				for (int cN = 0; cN < N; cN++) {
+					System.out.print("| ");
+					for (int cM = 0; cM < M; cM++) {
+						final String id = AGENTPREFIX + no++;
+						final ArrayList<CycleState> states = results.get(id);
+						if (states.size() <= cycle) {
+							break;
+						}
+						System.out.print(states.get(cycle).isAlive() ? "# "
+								: "- ");
+					}
+					System.out.println("|");
+				}
+				System.out.print("\\");
+				for (int i = 0; i < M * 2; i++) {
+					System.out.print("-");
+				}
+				System.out.println("-/");
+				cycle++;
 			}
-			System.out.print("\\");
-			for (int i = 0; i < M * 2; i++) {
-				System.out.print("-");
-			}
-			System.out.println("-/");
-			cycle++;
 		}
 		// System.out.println(results);
 		System.exit(0);
 	}
-	
+
 }
