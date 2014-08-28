@@ -258,7 +258,9 @@ public class RunQueue extends AbstractExecutorService {
 				case WAITING:
 					// explicit no break
 				case BLOCKED:
-					threadWaiting(thread);
+					if (thread.task != null){
+						threadWaiting(thread);
+					}
 					break;
 				case TERMINATED:
 					threadDone(thread);
@@ -273,6 +275,7 @@ public class RunQueue extends AbstractExecutorService {
 			if (task != null) {
 				thread.runTask(task);
 			} else {
+				threadReserve(thread);
 				break;
 			}
 			thread = getFreeThread();
