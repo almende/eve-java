@@ -6,7 +6,6 @@ package com.almende.util.threads;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.AbstractExecutorService;
@@ -22,33 +21,32 @@ import java.util.logging.Logger;
  * -Approximately nofCPU threads in Running state.
  */
 public class RunQueue extends AbstractExecutorService {
-	private static final Logger	LOG				= Logger.getLogger(RunQueue.class
-														.getName());
-	private static final double	RESERVEFACTOR	= 1.5;
-	private int					nofCores;
-	private Object				terminationLock	= new Object();
-	private Queue<Runnable>		tasks			= new ConcurrentLinkedQueue<Runnable>();
-	private HashSet<Worker>		running			= null;
-	private HashSet<Worker>		reserves		= null;
-	private HashSet<Worker>		waiting			= new HashSet<Worker>();
-	private boolean				isShutdown		= false;
-	private Thread				scanner			= new Thread(new Runnable() {
-													@Override
-													public void run() {
-														for (;;) {
-															if (isShutdown) {
-																break;
-															}
-															scan();
-															try {
-																Thread.sleep(100);
-															} catch (InterruptedException e) {}
-														}
-													}
+	private static final Logger		LOG				= Logger.getLogger(RunQueue.class
+															.getName());
+	private final Object			terminationLock	= new Object();
+	private final Queue<Runnable>	tasks			= new ConcurrentLinkedQueue<Runnable>();
+	private final HashSet<Worker>	waiting			= new HashSet<Worker>();
+	private final Scanner			scanner			= new Scanner();
+	private int						nofCores;
+	private HashSet<Worker>			running			= null;
+	private boolean					isShutdown		= false;
 
-												});
-
-	class Worker extends Thread {
+	private class Scanner extends Thread {
+		@Override
+		public void run() {
+			for (;;) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {}
+				if (isShutdown) {
+					return;
+				}
+				scan();
+			}
+		}
+	}
+	
+	private class Worker extends Thread {
 		final private Object	lock		= new Object();
 		private Runnable		task		= null;
 		private boolean			isShutdown	= false;
@@ -63,6 +61,7 @@ public class RunQueue extends AbstractExecutorService {
 			}
 		}
 
+		@Override
 		public void run() {
 			for (;;) {
 				synchronized (lock) {
@@ -71,7 +70,7 @@ public class RunQueue extends AbstractExecutorService {
 							lock.wait();
 						} catch (InterruptedException e) {
 							if (isShutdown) {
-								break;
+								return;
 							}
 						}
 					}
@@ -82,11 +81,6 @@ public class RunQueue extends AbstractExecutorService {
 				}
 			}
 		}
-
-		public boolean isShutdown() {
-			return isShutdown;
-		}
-
 	}
 
 	/**
@@ -95,7 +89,6 @@ public class RunQueue extends AbstractExecutorService {
 	public RunQueue() {
 		nofCores = Runtime.getRuntime().availableProcessors();
 		running = new HashSet<Worker>(nofCores);
-		reserves = new HashSet<Worker>((int) (nofCores * RESERVEFACTOR));
 		scanner.start();
 	}
 
@@ -111,19 +104,13 @@ public class RunQueue extends AbstractExecutorService {
 		scanner.interrupt();
 		synchronized (running) {
 			synchronized (waiting) {
-				synchronized (reserves) {
-					for (Worker worker : running) {
-						worker.isShutdown = true;
-						worker.interrupt();
-					}
-					for (Worker worker : waiting) {
-						worker.isShutdown = true;
-						worker.interrupt();
-					}
-					for (Worker worker : reserves) {
-						worker.isShutdown = true;
-						worker.interrupt();
-					}
+				for (Worker worker : running) {
+					worker.isShutdown = true;
+					worker.interrupt();
+				}
+				for (Worker worker : waiting) {
+					worker.isShutdown = true;
+					worker.interrupt();
 				}
 			}
 		}
@@ -167,38 +154,18 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private Worker getFreeThread() {
-		Worker res = null;
 		if (running.size() >= nofCores) {
 			// early out
 			return null;
 		}
-		// Try to obtain reserve thread
-		synchronized (reserves) {
-			if (reserves.size() > 0) {
-				final Iterator<Worker> iter = reserves.iterator();
-				if (iter.hasNext()) {
-					res = iter.next();
-					iter.remove();
-				}
-			}
-		}
+		Worker res = null;
 		synchronized (running) {
-			// Double check if there is still room for more running threads
 			if (running.size() < nofCores) {
 				if (res == null) {
-					// No reserve found, create new thread
 					res = new Worker();
 					res.start();
 				}
 				running.add(res);
-			} else {
-				// Too bad, revert thread back to reserves
-				if (res != null) {
-					synchronized (reserves) {
-						reserves.add(res);
-						res = null;
-					}
-				}
 			}
 		}
 		return res;
@@ -217,7 +184,7 @@ public class RunQueue extends AbstractExecutorService {
 				}
 			}
 		}
-		threadReserve(thread);
+		threadTearDown(thread);
 		synchronized (terminationLock) {
 			terminationLock.notify();
 		}
@@ -232,18 +199,16 @@ public class RunQueue extends AbstractExecutorService {
 		}
 	}
 
-	private void threadReserve(final Worker thread) {
-		synchronized (reserves) {
-			if (!thread.isShutdown
-					&& reserves.size() < nofCores * RESERVEFACTOR) {
-				reserves.add(thread);
-			}
-		}
+	private void threadTearDown(final Worker thread) {
 		synchronized (running) {
 			running.remove(thread);
 		}
 		synchronized (waiting) {
 			waiting.remove(thread);
+		}
+		if (!thread.isShutdown) {
+			thread.isShutdown = true;
+			thread.interrupt();
 		}
 	}
 
@@ -287,7 +252,7 @@ public class RunQueue extends AbstractExecutorService {
 			if (task != null) {
 				thread.runTask(task);
 			} else {
-				threadReserve(thread);
+				threadTearDown(thread);
 				break;
 			}
 			thread = getFreeThread();
