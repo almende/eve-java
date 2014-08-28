@@ -206,6 +206,15 @@ public class Agent implements Receiver {
 	}
 
 	/**
+	 * Gets the rpc.
+	 *
+	 * @return the rpc
+	 */
+	public RpcTransform getRpc(){
+		return (RpcTransform)transforms.getLast();
+	}
+	
+	/**
 	 * Gets the id.
 	 * 
 	 * @return the id
