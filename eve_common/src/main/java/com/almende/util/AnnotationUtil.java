@@ -78,11 +78,6 @@ public final class AnnotationUtil {
 	private static Map<String, AnnotatedClass>	cache					= new ConcurrentHashMap<String, AnnotatedClass>();
 	private static Map<String, AnnotatedClass>	cacheIncludingObject	= new ConcurrentHashMap<String, AnnotatedClass>();
 	
-	/**
-	 * The Constant HASMETHODHANDLES, Does this VM support MethodHandles?.
-	 */
-	public static final boolean					HASMETHODHANDLES = false;
-		
 	private AnnotationUtil() {
 	};
 	
@@ -436,7 +431,7 @@ public final class AnnotationUtil {
 			genericReturnType = method.getGenericReturnType();
 			merge(method);
 			
-			if (HASMETHODHANDLES) {
+			if (Defines.HASMETHODHANDLES) {
 				MethodType newType;
 				if (Modifier.isStatic(method.getModifiers())) {
 					newType = MethodType.genericMethodType(parameters.size(),

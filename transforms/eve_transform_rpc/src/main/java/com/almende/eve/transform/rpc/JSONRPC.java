@@ -35,6 +35,7 @@ import com.almende.eve.transform.rpc.formats.JSONRequest;
 import com.almende.eve.transform.rpc.formats.JSONResponse;
 import com.almende.eve.transform.rpc.formats.RequestParams;
 import com.almende.util.AnnotationUtil;
+import com.almende.util.Defines;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
@@ -47,38 +48,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
-@SuppressWarnings("unused")
 final class JSONRPC {
 	private static final Logger	LOG					= Logger.getLogger(JSONRPC.class
 															.getName());
-	private static boolean		useMethodHandles	= true;
-	
 	
 	static {
-		if (AnnotationUtil.HASMETHODHANDLES && useMethodHandles) {
+		if (Defines.HASMETHODHANDLES) {
 			LOG.log(Level.FINE, "Using MethodHandle i.s.o. plain reflection!");
 		} else {
 			LOG.log(Level.FINE, "Using plain reflection i.s.o. MethodHandle!");
 		}
-	}
-	
-	/**
-	 * Checks if is use method handles.
-	 * 
-	 * @return true, if is use method handles
-	 */
-	public static boolean isUseMethodHandles() {
-		return useMethodHandles;
-	}
-	
-	/**
-	 * Sets the use method handles.
-	 * 
-	 * @param useMethodHandles
-	 *            the new use method handles
-	 */
-	public static void setUseMethodHandles(final boolean useMethodHandles) {
-		JSONRPC.useMethodHandles = useMethodHandles;
 	}
 	
 	/**
@@ -187,7 +166,7 @@ final class JSONRPC {
 			final Method method = annotatedMethod.getActualMethod();
 			
 			Object result;
-			if (useMethodHandles) {
+			if (Defines.HASMETHODHANDLES) {
 				final Object[] params = castParams(realDest,
 						request.getParams(), annotatedMethod.getParams(),
 						requestParams);
