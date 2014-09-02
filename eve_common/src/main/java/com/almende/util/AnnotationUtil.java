@@ -81,18 +81,8 @@ public final class AnnotationUtil {
 	/**
 	 * The Constant HASMETHODHANDLES, Does this VM support MethodHandles?.
 	 */
-	public static final boolean					HASMETHODHANDLES;
-	
-	static {
-		boolean check = true;
-		try {
-			Class.forName("java.lang.invoke.MethodHandle", false, null);
-		} catch (final Exception e) {
-			check = false;
-		}
-		HASMETHODHANDLES = check;
-	}
-	
+	public static final boolean					HASMETHODHANDLES = false;
+		
 	private AnnotationUtil() {
 	};
 	
@@ -436,8 +426,6 @@ public final class AnnotationUtil {
 		 *            the method
 		 * @throws IllegalAccessException
 		 *             the illegal access exception
-		 * @throws WrongMethodTypeException
-		 *             the wrong method type exception
 		 */
 		public AnnotatedMethod(final Method method)
 				throws IllegalAccessException {
@@ -460,10 +448,16 @@ public final class AnnotationUtil {
 				if (method.getReturnType() == Void.class) {
 					newType = newType.changeReturnType(void.class);
 				}
+				try {
 				methodHandle = new ConstantCallSite(MethodHandles.lookup()
 						.unreflect(method).asType(newType)
 						.asSpreader(Object[].class, newType.parameterCount()))
 						.dynamicInvoker();
+				} catch (WrongMethodTypeException e){
+					final IllegalAccessException res = new IllegalAccessException();
+					res.initCause(e);
+					throw res;
+				}
 			}
 		}
 		
@@ -727,7 +721,7 @@ public final class AnnotationUtil {
 			} else {
 				try {
 					listA.add(new AnnotatedMethod(b));
-				} catch (IllegalAccessException | WrongMethodTypeException e) {
+				} catch (IllegalAccessException e) {
 					LOG.log(Level.SEVERE, "Failed to obtain AnnotatedMethod:"
 							+ b.getName(), e);
 				}

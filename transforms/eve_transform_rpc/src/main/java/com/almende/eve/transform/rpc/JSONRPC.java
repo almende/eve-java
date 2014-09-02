@@ -47,10 +47,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
+@SuppressWarnings("unused")
 final class JSONRPC {
 	private static final Logger	LOG					= Logger.getLogger(JSONRPC.class
 															.getName());
-	private static boolean		useMethodHandles	= false;
+	private static boolean		useMethodHandles	= true;
+	
 	
 	static {
 		if (AnnotationUtil.HASMETHODHANDLES && useMethodHandles) {
