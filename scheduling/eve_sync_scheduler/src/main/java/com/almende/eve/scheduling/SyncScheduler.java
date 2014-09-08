@@ -77,6 +77,11 @@ public class SyncScheduler extends SimpleScheduler {
 		});
 		return uuid;
 	}
+	
+	@Override
+	public String schedule(Object msg, int delay) {
+		return schedule(msg,new DateTime(now()).plus(delay));
+	}
 
 	/**
 	 * Instantiates a new persistent scheduler.
