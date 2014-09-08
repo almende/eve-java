@@ -12,7 +12,16 @@ import com.almende.eve.capabilities.Capability;
  * The Interface Scheduler.
  */
 public interface Scheduler extends Capability {
-	
+
+	/**
+	 * Number of (virtual) milliseconds since midnight 1-1-1970 (UTC). For
+	 * real-time this maps to Unixtime, for simulated time this can be offset,
+	 * different tempo, or even discrete timestamps.
+	 *
+	 * @return the long
+	 */
+	long now();
+
 	/**
 	 * Schedule.
 	 * 
@@ -23,7 +32,7 @@ public interface Scheduler extends Capability {
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
 	String schedule(Object msg, final DateTime due);
-	
+
 	/**
 	 * Schedule.
 	 * 
@@ -34,7 +43,7 @@ public interface Scheduler extends Capability {
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
 	String schedule(Object msg, final int delay);
-	
+
 	/**
 	 * Cancel task with given id.
 	 * 
@@ -42,10 +51,10 @@ public interface Scheduler extends Capability {
 	 *            the id
 	 */
 	void cancel(String id);
-	
+
 	/**
 	 * Cancel all scheduled tasks, clear queue.
 	 */
 	void clear();
-	
+
 }

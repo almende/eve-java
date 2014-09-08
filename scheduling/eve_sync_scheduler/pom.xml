@@ -4,35 +4,33 @@
 
 	<parent>
 		<groupId>com.almende.eve</groupId>
-		<artifactId>eve</artifactId>
+		<artifactId>eve-scheduling</artifactId>
 		<version>3.1.0-SNAPSHOT</version>
-		<relativePath>../eve_parent/pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-scheduling</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>eve-scheduling-sync</artifactId>
 
-	<name>EVE Scheduling Parent</name>
+	<name>EVE Scheduling Synchronizing Scheduler</name>
 	<url>http://almende.github.com/eve</url>
-
-	<modules>
-		<module>eve_scheduling</module>
-		<module>eve_persistent_scheduler</module>
-		<module>eve_sync_scheduler</module>
-	</modules>
 
 	<properties>
 	</properties>
 
 	<dependencies>
 		<dependency>
+			<artifactId>eve-scheduling-common</artifactId>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-state-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>eve-transport-common</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>eve-transform-rpc</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>

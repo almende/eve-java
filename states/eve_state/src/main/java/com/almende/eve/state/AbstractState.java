@@ -109,7 +109,7 @@ public abstract class AbstractState<V> implements State {
 			return locPut(key, (JsonNode) value);
 		} else {
 			LOG.severe("Can't handle input that is not Serializable nor JsonNode.");
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Can't handle input that is not Serializable nor JsonNode.");
 		}
 	}
 	

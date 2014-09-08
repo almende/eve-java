@@ -44,6 +44,11 @@
 			<version>${project.parent.version}</version>
 			<artifactId>eve-scheduling-persistent</artifactId>
 		</dependency>
+				<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
+			<artifactId>eve-scheduling-sync</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -158,5 +158,10 @@ public class SimpleScheduler implements Scheduler {
 	public String schedule(Object msg, int delay) {
 		return schedule(msg,DateTime.now().plus(delay));
 	}
+
+	@Override
+	public long now() {
+		return System.currentTimeMillis();
+	}
 	
 }

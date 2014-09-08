@@ -64,6 +64,11 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
+			<artifactId>eve-scheduling-sync</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<version>${project.parent.version}</version>
 			<artifactId>eve-transport-ws</artifactId>
 		</dependency>
 	</dependencies>
