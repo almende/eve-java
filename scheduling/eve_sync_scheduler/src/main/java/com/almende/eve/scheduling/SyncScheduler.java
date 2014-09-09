@@ -6,6 +6,7 @@ package com.almende.eve.scheduling;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -20,7 +21,6 @@ import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
 import com.almende.eve.transport.Caller;
 import com.almende.eve.transport.Receiver;
-import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -77,10 +77,10 @@ public class SyncScheduler extends SimpleScheduler {
 		});
 		return uuid;
 	}
-	
+
 	@Override
 	public String schedule(Object msg, int delay) {
-		return schedule(msg,new DateTime(now()).plus(delay));
+		return schedule(msg, new DateTime(now()).plus(delay));
 	}
 
 	/**
@@ -108,67 +108,112 @@ public class SyncScheduler extends SimpleScheduler {
 		return now();
 	}
 
+	class SyncTupple implements Comparable<SyncTupple> {
+		long	offset;
+		long	roundtrip;
+
+		public SyncTupple(long offset, long roundtrip) {
+			this.offset = offset;
+			this.roundtrip = roundtrip;
+		}
+
+		@Override
+		public int compareTo(SyncTupple o) {
+			return roundtrip == o.roundtrip ? 0 : (roundtrip > o.roundtrip ? 1
+					: -1);
+		}
+	}
+
+	/**
+	 * Sync with peer.
+	 *
+	 * @param peer
+	 *            the peer
+	 * @return the long
+	 */
+	@Access(AccessType.PUBLIC)
+	public SyncTupple syncWithPeer(final URI peer) {
+		if (caller == null) {
+			LOG.warning("Sync requested, but caller is still null, invalid!");
+			return null;
+		}
+		LOG.info("Starting sync with: " + peer + "!");
+		final long start = now();
+		try {
+			final Long result = caller.callSync(peer, "syncScheduler.ping",
+					JOM.createObjectNode());
+			final long now = now();
+			final long roundtrip = now - start;
+			final long offset = (result - (start + (roundtrip / 2)));
+			LOG.info("Sync resulted in offset:" + offset + " ( " + roundtrip
+					+ ":" + start + ":" + result + ")");
+			return new SyncTupple(offset, roundtrip);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "failed to send ping", e);
+		}
+		return null;
+	}
+
 	/**
 	 * Sync.
 	 */
 	@Access(AccessType.PUBLIC)
 	public void sync() {
-		if (caller == null){
-			LOG.warning("Sync requested, but caller is still null, invalid!");
-			return;
-		}
-		LOG.warning("Starting sync! oldOffset:" + offset);
-		final Long[] offsets = new Long[peers.size()];
-		int count = 0;
 		for (final URI peer : peers) {
-			final long start = now();
-			final int myCount = count++;
-			try {
-				caller.call(peer, "syncScheduler.ping", JOM.createObjectNode(),
-						new AsyncCallback<Long>() {
+			LOG.info("Doing sync with " + peer + "!");
 
-							@Override
-							public void onSuccess(Long result) {
-								final long now = now();
-								final long roundtrip = now - start;
-								long res = result - (start + (roundtrip / 2)) ;
-								offsets[myCount] = res;
-								LOG.log(Level.WARNING, "Received syncPing:("+myCount+") "+result+ " in a roundTrip of:"+roundtrip+" ms :"+(start+(roundtrip/2)));
+			final ArrayList<SyncTupple> results = new ArrayList<SyncTupple>(5);
+			final int[] fail = new int[1];
+			fail[0]=0;
+			getClock().requestTrigger(new UUID().toString(), DateTime.now(),
+					new Runnable() {
+						@Override
+						public void run() {
+							final SyncTupple res = syncWithPeer(peer);
+							if (res != null) {
+								results.add(res);
+							} else {
+								fail[0]++;
 							}
-
-							@Override
-							public void onFailure(Exception exception) {
-								LOG.log(Level.WARNING, "peer ping failed:",
-										exception);
+							if (fail[0] < 5 && results.size() < 5) {
+								getClock().requestTrigger(
+										new UUID().toString(),
+										DateTime.now().plus(3000), this);
 							}
-
-						});
-			} catch (IOException e) {
-				LOG.log(Level.WARNING, "failed to send ping", e);
+						}
+					});
+			while (fail[0] < 5 && results.size() < 5) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {}
 			}
-		}
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			LOG.log(Level.WARNING, "interrupted!", e);
-		}
+			long sum = 0;
+			for (int i = 0; i < results.size(); i++) {
+				sum += results.get(i).roundtrip;
+			}
+			long mean = sum / results.size();
 
-		long sum = 0;
-		count = 0;
-		for (final Long offset : offsets) {
-			if (offset != null) {
+			sum = 0;
+			for (int i = 0; i < results.size(); i++) {
+				sum += Math.pow(results.get(i).roundtrip - mean, 2);
+			}
+
+			double stdDev = Math.sqrt(sum / results.size());
+			double limit = stdDev + mean;
+
+			sum = 0;
+			int count = 0;
+			for (SyncTupple tupple : results) {
+				if (tupple.roundtrip > limit) {
+					continue;
+				}
 				count++;
-				sum += offset;
+				sum += tupple.offset;
 			}
-		}
-		if (count > 0){
-		offset += sum / count;
-		} else {
-			LOG.warning("Couldn't sync with any peer? "+peers);
-		}
 
-		LOG.warning("Done sync! new offset:" + offset);
-
+			offset += sum / count;
+			LOG.info("Done sync with " + peer + "! new offset:" + offset);
+		}
 		getClock()
 				.requestTrigger(
 						new UUID().toString(),
