@@ -61,8 +61,10 @@ public class SyncScheduler extends SimpleScheduler {
 	 *            the peer
 	 */
 	public void addPeer(final URI peer) {
-		peers.add(peer);
-		sync();
+		if (!peers.contains(peer)){
+			peers.add(peer);
+			sync();
+		}
 	}
 
 	@Override
