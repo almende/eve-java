@@ -37,6 +37,7 @@ public class SyncScheduler extends SimpleScheduler {
 	private long				syncInterval	= 50000;
 	private Caller				caller			= null;
 	private Set<URI>			peers			= new HashSet<URI>();
+	private Boolean				active			= false;
 
 	@Override
 	public long now() {
@@ -122,6 +123,10 @@ public class SyncScheduler extends SimpleScheduler {
 			return roundtrip == o.roundtrip ? 0 : (roundtrip > o.roundtrip ? 1
 					: -1);
 		}
+		@Override
+		public String toString(){
+			return "{\"offset\":"+offset+",\"roundtrip\":"+roundtrip+"}";
+		}
 	}
 
 	/**
@@ -159,6 +164,12 @@ public class SyncScheduler extends SimpleScheduler {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void sync() {
+		synchronized(active){
+			if (active){
+				return;
+			}
+			active = true;
+		}
 		for (final URI peer : peers) {
 			LOG.info("Doing sync with " + peer + "!");
 
@@ -178,13 +189,14 @@ public class SyncScheduler extends SimpleScheduler {
 							if (fail[0] < 5 && results.size() < 5) {
 								getClock().requestTrigger(
 										new UUID().toString(),
-										DateTime.now().plus(3000), this);
+										DateTime.now().plus((long)(4000 * Math
+												.random())), this);
 							}
 						}
 					});
 			while (fail[0] < 5 && results.size() < 5) {
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(4000);
 				} catch (InterruptedException e) {}
 			}
 			long sum = 0;
@@ -200,19 +212,26 @@ public class SyncScheduler extends SimpleScheduler {
 
 			double stdDev = Math.sqrt(sum / results.size());
 			double limit = stdDev + mean;
-
+			LOG.warning("Mean:"+mean+" stdDev:"+stdDev+" limit:"+limit);
+			
+			
 			sum = 0;
 			int count = 0;
 			for (SyncTupple tupple : results) {
 				if (tupple.roundtrip > limit) {
+					LOG.warning("Skipping tupple:"+tupple);
 					continue;
 				}
+				LOG.warning("Adding tupple:"+tupple);
 				count++;
 				sum += tupple.offset;
 			}
 
 			offset += sum / count;
-			LOG.info("Done sync with " + peer + "! new offset:" + offset);
+			LOG.info("Done sync with " + peer + "! new offset:" + offset + "("+sum/count+")");
+		}
+		synchronized(active){
+			active = false;
 		}
 		getClock()
 				.requestTrigger(
