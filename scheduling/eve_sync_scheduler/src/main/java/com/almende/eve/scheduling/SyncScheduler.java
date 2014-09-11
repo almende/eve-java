@@ -61,10 +61,10 @@ public class SyncScheduler extends SimpleScheduler {
 	 *            the peer
 	 */
 	public void addPeer(final URI peer) {
-		if (!peers.contains(peer)){
+		if (!peers.contains(peer)) {
 			peers.add(peer);
-			sync();
 		}
+		sync();
 	}
 
 	@Override
@@ -125,9 +125,11 @@ public class SyncScheduler extends SimpleScheduler {
 			return roundtrip == o.roundtrip ? 0 : (roundtrip > o.roundtrip ? 1
 					: -1);
 		}
+
 		@Override
-		public String toString(){
-			return "{\"offset\":"+offset+",\"roundtrip\":"+roundtrip+"}";
+		public String toString() {
+			return "{\"offset\":" + offset + ",\"roundtrip\":" + roundtrip
+					+ "}";
 		}
 	}
 
@@ -166,73 +168,80 @@ public class SyncScheduler extends SimpleScheduler {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void sync() {
-		synchronized(active){
-			if (active){
+		synchronized (active) {
+			if (active) {
 				return;
 			}
 			active = true;
 		}
-		for (final URI peer : peers) {
-			LOG.info("Doing sync with " + peer + "!");
+		try {
+			for (final URI peer : peers) {
+				LOG.info("Doing sync with " + peer + "!");
 
-			final ArrayList<SyncTupple> results = new ArrayList<SyncTupple>(5);
-			final int[] fail = new int[1];
-			fail[0]=0;
-			getClock().requestTrigger(new UUID().toString(), DateTime.now(),
-					new Runnable() {
-						@Override
-						public void run() {
-							final SyncTupple res = syncWithPeer(peer);
-							if (res != null) {
-								results.add(res);
-							} else {
-								fail[0]++;
+				final ArrayList<SyncTupple> results = new ArrayList<SyncTupple>(
+						5);
+				final int[] fail = new int[1];
+				fail[0] = 0;
+				getClock().requestTrigger(new UUID().toString(),
+						DateTime.now(), new Runnable() {
+							@Override
+							public void run() {
+								final SyncTupple res = syncWithPeer(peer);
+								if (res != null) {
+									results.add(res);
+								} else {
+									fail[0]++;
+								}
+								if (fail[0] < 5 && results.size() < 5) {
+									getClock().requestTrigger(
+											new UUID().toString(),
+											DateTime.now().plus(
+													(long) (4000 * Math
+															.random())), this);
+								}
 							}
-							if (fail[0] < 5 && results.size() < 5) {
-								getClock().requestTrigger(
-										new UUID().toString(),
-										DateTime.now().plus((long)(4000 * Math
-												.random())), this);
-							}
-						}
-					});
-			while (fail[0] < 5 && results.size() < 5) {
-				try {
-					Thread.sleep(4000);
-				} catch (InterruptedException e) {}
-			}
-			long sum = 0;
-			for (int i = 0; i < results.size(); i++) {
-				sum += results.get(i).roundtrip;
-			}
-			long mean = sum / results.size();
-
-			sum = 0;
-			for (int i = 0; i < results.size(); i++) {
-				sum += Math.pow(results.get(i).roundtrip - mean, 2);
-			}
-
-			double stdDev = Math.sqrt(sum / results.size());
-			double limit = stdDev + mean;
-			LOG.warning("Mean:"+mean+" stdDev:"+stdDev+" limit:"+limit);
-			
-			
-			sum = 0;
-			int count = 0;
-			for (SyncTupple tupple : results) {
-				if (tupple.roundtrip > limit) {
-					LOG.warning("Skipping tupple:"+tupple);
-					continue;
+						});
+				while (fail[0] < 5 && results.size() < 5) {
+					try {
+						Thread.sleep(4000);
+					} catch (InterruptedException e) {}
 				}
-				LOG.warning("Adding tupple:"+tupple);
-				count++;
-				sum += tupple.offset;
-			}
+				long sum = 0;
+				for (int i = 0; i < results.size(); i++) {
+					sum += results.get(i).roundtrip;
+				}
+				long mean = sum / results.size();
 
-			offset += sum / count;
-			LOG.info("Done sync with " + peer + "! new offset:" + offset + "("+sum/count+")");
+				sum = 0;
+				for (int i = 0; i < results.size(); i++) {
+					sum += Math.pow(results.get(i).roundtrip - mean, 2);
+				}
+
+				double stdDev = Math.sqrt(sum / results.size());
+				double limit = stdDev + mean;
+				LOG.warning("Mean:" + mean + " stdDev:" + stdDev + " limit:"
+						+ limit);
+
+				sum = 0;
+				int count = 0;
+				for (SyncTupple tupple : results) {
+					if (tupple.roundtrip > limit) {
+						LOG.warning("Skipping tupple:" + tupple);
+						continue;
+					}
+					LOG.warning("Adding tupple:" + tupple);
+					count++;
+					sum += tupple.offset;
+				}
+
+				offset += sum / count;
+				LOG.info("Done sync with " + peer + "! new offset:" + offset
+						+ "(" + sum / count + ")");
+			}
+		} catch (Exception e) {
+			LOG.log(Level.WARNING, "TimeSync failed", e);
 		}
-		synchronized(active){
+		synchronized (active) {
 			active = false;
 		}
 		getClock()
