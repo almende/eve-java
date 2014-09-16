@@ -25,27 +25,27 @@ public class JSONRPCException extends RuntimeException {
 															.getCanonicalName());
 	private final ObjectNode	error				= JOM.createObjectNode();
 	private boolean				remote				= false;
-	
+
 	/**
 	 * The Constant CODE_S.
 	 */
 	static final String			CODE_S				= "code";
-	
+
 	/**
 	 * The Constant MESSAGE_S.
 	 */
 	static final String			MESSAGE_S			= "message";
-	
+
 	/**
 	 * The Constant DATA_S.
 	 */
 	static final String			DATA_S				= "data";
-	
+
 	/**
 	 * The Enum CODE.
 	 */
 	public static enum CODE {
-		
+
 		/** The unknown error. */
 		UNKNOWN_ERROR,
 		/** The parse error. */
@@ -65,7 +65,7 @@ public class JSONRPCException extends RuntimeException {
 		/** The unauthorized. */
 		UNAUTHORIZED
 	};
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 */
@@ -73,7 +73,7 @@ public class JSONRPCException extends RuntimeException {
 		super();
 		init(CODE.UNKNOWN_ERROR, null, null);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -84,7 +84,7 @@ public class JSONRPCException extends RuntimeException {
 		super();
 		init(code, null, null);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -97,7 +97,7 @@ public class JSONRPCException extends RuntimeException {
 		super(description);
 		init(code, description, null);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -113,7 +113,7 @@ public class JSONRPCException extends RuntimeException {
 		super(description, t);
 		init(code, description, t);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -132,7 +132,7 @@ public class JSONRPCException extends RuntimeException {
 			init(CODE.UNKNOWN_ERROR, null, null);
 		}
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -143,7 +143,7 @@ public class JSONRPCException extends RuntimeException {
 		super(message);
 		init(CODE.UNKNOWN_ERROR, message, null);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -156,7 +156,7 @@ public class JSONRPCException extends RuntimeException {
 		super(message, t);
 		init(CODE.UNKNOWN_ERROR, message, t);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -170,7 +170,7 @@ public class JSONRPCException extends RuntimeException {
 		setCode(code);
 		setMessage(message);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -188,7 +188,7 @@ public class JSONRPCException extends RuntimeException {
 		setMessage(message);
 		setData(data);
 	}
-	
+
 	/**
 	 * Instantiates a new jSONRPC exception.
 	 * 
@@ -202,16 +202,17 @@ public class JSONRPCException extends RuntimeException {
 			cause = JOM.getInstance().convertValue(exception,
 					JSONRPCException.class);
 			cause.setRemote(true);
-			final TypeUtil<List<StackTraceElement>> injector = new TypeUtil<List<StackTraceElement>>() {
-			};
-			final List<StackTraceElement> trace = injector.inject(exception
-					.get("stackTrace"));
-			cause.setStackTrace(trace.toArray(new StackTraceElement[0]));
+			if (exception.has("stackTrace")) {
+				final TypeUtil<List<StackTraceElement>> injector = new TypeUtil<List<StackTraceElement>>() {};
+				final List<StackTraceElement> trace = injector.inject(exception
+						.get("stackTrace"));
+				cause.setStackTrace(trace.toArray(new StackTraceElement[0]));
+			}
 		}
 		init(CODE.REMOTE_EXCEPTION, JSONRPCException.class.getSimpleName()
 				+ " received!", cause);
 	}
-	
+
 	/**
 	 * Inits the.
 	 * 
@@ -271,7 +272,7 @@ public class JSONRPCException extends RuntimeException {
 			LOG.log(Level.SEVERE, "Failed to init JSONRPCException!", e);
 		}
 	}
-	
+
 	/**
 	 * Sets the code.
 	 * 
@@ -281,7 +282,7 @@ public class JSONRPCException extends RuntimeException {
 	public final void setCode(final int code) {
 		error.put(CODE_S, code);
 	}
-	
+
 	/**
 	 * Gets the code.
 	 * 
@@ -290,7 +291,7 @@ public class JSONRPCException extends RuntimeException {
 	public int getCode() {
 		return error.get(CODE_S).asInt();
 	}
-	
+
 	/**
 	 * Sets the message.
 	 * 
@@ -300,17 +301,16 @@ public class JSONRPCException extends RuntimeException {
 	public final void setMessage(final String message) {
 		error.put(MESSAGE_S, message != null ? message : "");
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Throwable#getMessage()
 	 */
 	@Override
 	public String getMessage() {
 		return error.get(MESSAGE_S).asText();
 	}
-	
+
 	/**
 	 * Sets the data.
 	 * 
@@ -322,7 +322,7 @@ public class JSONRPCException extends RuntimeException {
 		error.set(DATA_S,
 				data != null ? mapper.convertValue(data, JsonNode.class) : null);
 	}
-	
+
 	/**
 	 * Gets the data.
 	 * 
@@ -331,7 +331,7 @@ public class JSONRPCException extends RuntimeException {
 	public Object getData() {
 		return error.get(DATA_S);
 	}
-	
+
 	/**
 	 * Checks for data.
 	 * 
@@ -340,7 +340,7 @@ public class JSONRPCException extends RuntimeException {
 	public boolean hasData() {
 		return error.has(DATA_S);
 	}
-	
+
 	/**
 	 * Sets the remote.
 	 * 
@@ -350,7 +350,7 @@ public class JSONRPCException extends RuntimeException {
 	public void setRemote(final boolean remote) {
 		this.remote = remote;
 	}
-	
+
 	/**
 	 * Gets the object node.
 	 * 
@@ -360,10 +360,9 @@ public class JSONRPCException extends RuntimeException {
 	public ObjectNode getObjectNode() {
 		return JOM.getInstance().valueToTree(this);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Throwable#toString()
 	 */
 	@Override
@@ -372,5 +371,5 @@ public class JSONRPCException extends RuntimeException {
 				+ (remote ? "(Remote stackTrace) " : "")
 				+ getLocalizedMessage();
 	}
-	
+
 }
