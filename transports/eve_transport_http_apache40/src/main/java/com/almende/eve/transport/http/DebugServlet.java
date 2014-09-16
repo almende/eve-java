@@ -35,13 +35,12 @@ public class DebugServlet extends HttpServlet {
 	private static final Logger	LOG					= Logger.getLogger(DebugServlet.class
 															.getSimpleName());
 	private URI					myUrl				= null;
-	
+
 	/**
 	 * Instantiates a new eve servlet.
 	 */
-	public DebugServlet() {
-	}
-	
+	public DebugServlet() {}
+
 	/**
 	 * Instantiates a new eve servlet.
 	 * 
@@ -53,10 +52,9 @@ public class DebugServlet extends HttpServlet {
 			myUrl = servletUrl;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
 	 */
 	@Override
@@ -75,12 +73,12 @@ public class DebugServlet extends HttpServlet {
 		}
 		super.init(config);
 	}
-	
+
 	/**
 	 * The Enum Handshake.
 	 */
 	enum Handshake {
-		
+
 		/** The ok. */
 		OK,
 		/** The nak. */
@@ -88,7 +86,7 @@ public class DebugServlet extends HttpServlet {
 		/** The invalid. */
 		INVALID
 	}
-	
+
 	/**
 	 * Handle hand shake.
 	 * 
@@ -103,11 +101,11 @@ public class DebugServlet extends HttpServlet {
 	private boolean handleHandShake(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 		final String time = req.getHeader("X-Eve-requestToken");
-		
+
 		if (time == null) {
 			return false;
 		}
-		
+
 		final String url = req.getRequestURI();
 		final String id = getId(url);
 		final HttpTransport transport = HttpService.get(myUrl, id);
@@ -123,7 +121,7 @@ public class DebugServlet extends HttpServlet {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Do hand shake.
 	 * 
@@ -136,7 +134,7 @@ public class DebugServlet extends HttpServlet {
 		if (tokenTupple == null) {
 			return Handshake.NAK;
 		}
-		
+
 		try {
 			final String senderUrl = req.getHeader("X-Eve-SenderUrl");
 			if (senderUrl != null && !senderUrl.equals("")) {
@@ -163,10 +161,10 @@ public class DebugServlet extends HttpServlet {
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
-		
+
 		return Handshake.INVALID;
 	}
-	
+
 	/**
 	 * Handle session.
 	 * 
@@ -181,27 +179,22 @@ public class DebugServlet extends HttpServlet {
 	private boolean handleSession(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 		try {
-			
+
 			if (req.getSession(false) != null) {
 				return true;
 			}
-			// TODO: make sure connection is secure if configured to enforce
-			// that.
-			final Handshake hs = doHandShake(req);
-			if (hs.equals(Handshake.INVALID)) {
-				return false;
-			}
-			
 			final boolean doAuthentication = HttpService
 					.doAuthentication(myUrl);
-			if (hs.equals(Handshake.NAK) && doAuthentication) {
-				if (!req.isSecure()) {
-					res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							"Request needs to be secured with SSL for session management!");
+			if (doAuthentication) {
+				final Handshake hs = doHandShake(req);
+				if (hs.equals(Handshake.INVALID)) {
 					return false;
 				}
-				if (!req.authenticate(res)) {
-					return false;
+
+				if (hs.equals(Handshake.NAK)) {
+					if (!req.authenticate(res)) {
+						return false;
+					}
 				}
 			}
 			// generate new session:
@@ -214,7 +207,7 @@ public class DebugServlet extends HttpServlet {
 		}
 		return true;
 	}
-	
+
 	private String getId(final String url) {
 		String id = "";
 		if (myUrl != null) {
@@ -225,7 +218,7 @@ public class DebugServlet extends HttpServlet {
 		}
 		return id.indexOf('/') > 0 ? id.substring(0, id.indexOf('/')) : id;
 	}
-	
+
 	private String getResource(final String url) {
 		String id = "";
 		if (myUrl != null) {
@@ -236,10 +229,9 @@ public class DebugServlet extends HttpServlet {
 		}
 		return id.indexOf('/') < 0 ? null : id.substring(id.indexOf('/') + 1);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -248,7 +240,7 @@ public class DebugServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest req,
 			final HttpServletResponse resp) throws IOException,
 			ServletException {
-		
+
 		if (!handleSession(req, resp)) {
 			if (!resp.isCommitted()) {
 				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -256,7 +248,7 @@ public class DebugServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		// retrieve the url and the request body
 		final String body = StringUtil.streamToString(req.getInputStream());
 		final String url = req.getRequestURI();
@@ -267,7 +259,7 @@ public class DebugServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		String sender = req.getHeader("X-Eve-SenderUrl");
 		if (sender == null || sender.equals("")) {
 			sender = "web://" + req.getRemoteUser() + "@" + req.getRemoteAddr();
@@ -297,17 +289,17 @@ public class DebugServlet extends HttpServlet {
 		}
 		resp.flushBuffer();
 	}
-	
+
 	@Override
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
-		
+
 		// If this is a handshake request, handle it.
 		if (handleHandShake(req, resp)) {
 			return;
 		}
-		
+
 		final String url = req.getRequestURI();
 		final String id = getId(url);
 		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
@@ -320,7 +312,7 @@ public class DebugServlet extends HttpServlet {
 			final HttpTransport transport = HttpService.get(myUrl, id);
 			if (transport != null) {
 				// get the resource name from the end of the url
-				
+
 				String resource = getResource(url);
 				if (resource == null || resource.equals("")) {
 					if (!url.endsWith("/") && !resp.isCommitted()) {
@@ -334,7 +326,7 @@ public class DebugServlet extends HttpServlet {
 						.lastIndexOf('.') + 1);
 				// load the resource
 				final String mimetype = StreamingUtil.getMimeType(extension);
-				
+
 				final String filename = RESOURCES + resource;
 				final InputStream is = this.getClass().getResourceAsStream(
 						filename);

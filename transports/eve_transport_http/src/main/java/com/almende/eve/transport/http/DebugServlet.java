@@ -190,18 +190,11 @@ public class DebugServlet extends HttpServlet {
 			final boolean doAuthentication = HttpService
 					.doAuthentication(myUrl);
 			if (doAuthentication) {
-				// TODO: make sure connection is secure if configured to enforce
-				// that.
 				final Handshake hs = doHandShake(req);
 				if (hs.equals(Handshake.INVALID)) {
 					return false;
 				}
 				if (hs.equals(Handshake.NAK)) {
-					if (!req.isSecure()) {
-						res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-								"Request needs to be secured with SSL for session management!");
-						return false;
-					}
 					if (!req.authenticate(res)) {
 						return false;
 					}

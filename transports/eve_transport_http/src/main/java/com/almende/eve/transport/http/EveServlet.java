@@ -29,17 +29,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EveServlet extends HttpServlet {
 	private static final long	serialVersionUID	= -4635490705591217600L;
-	
+
 	private static final Logger	LOG					= Logger.getLogger(EveServlet.class
 															.getSimpleName());
 	private URI					myUrl				= null;
-	
+
 	/**
 	 * Instantiates a new eve servlet.
 	 */
-	public EveServlet() {
-	}
-	
+	public EveServlet() {}
+
 	/**
 	 * Instantiates a new eve servlet.
 	 * 
@@ -51,10 +50,9 @@ public class EveServlet extends HttpServlet {
 			myUrl = servletUrl;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
 	 */
 	@Override
@@ -75,12 +73,12 @@ public class EveServlet extends HttpServlet {
 		}
 		super.init(config);
 	}
-	
+
 	/**
 	 * The Enum Handshake.
 	 */
 	enum Handshake {
-		
+
 		/** The ok. */
 		OK,
 		/** The nak. */
@@ -88,7 +86,7 @@ public class EveServlet extends HttpServlet {
 		/** The invalid. */
 		INVALID
 	}
-	
+
 	/**
 	 * Handle hand shake.
 	 * 
@@ -103,7 +101,7 @@ public class EveServlet extends HttpServlet {
 	private boolean handleHandShake(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 		final String time = req.getHeader("X-Eve-requestToken");
-		
+
 		if (time == null) {
 			return false;
 		}
@@ -122,7 +120,7 @@ public class EveServlet extends HttpServlet {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Do hand shake.
 	 * 
@@ -133,10 +131,10 @@ public class EveServlet extends HttpServlet {
 	private Handshake doHandShake(final HttpServletRequest req) {
 		final String tokenTupple = req.getHeader("X-Eve-Token");
 		if (tokenTupple == null) {
-			//This is a webpage, no HandShake available.
+			// This is a webpage, no HandShake available.
 			return Handshake.NAK;
 		}
-		
+
 		try {
 			final String senderUrl = req.getHeader("X-Eve-SenderUrl");
 			if (senderUrl != null && !senderUrl.equals("")) {
@@ -163,10 +161,10 @@ public class EveServlet extends HttpServlet {
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
-		
+
 		return Handshake.INVALID;
 	}
-	
+
 	/**
 	 * Handle session.
 	 * 
@@ -181,34 +179,26 @@ public class EveServlet extends HttpServlet {
 	private boolean handleSession(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 		try {
-			
+
 			if (req.getSession(false) != null) {
 				return true;
 			}
-			
+
 			final boolean doAuthentication = HttpService
 					.doAuthentication(myUrl);
 			if (doAuthentication) {
-				// TODO: make sure connection is secure if configured to enforce
-				// that.
 				final Handshake hs = doHandShake(req);
 				if (hs.equals(Handshake.INVALID)) {
 					return false;
 				}
-				
+
 				if (hs.equals(Handshake.NAK)) {
-					if (!req.isSecure()) {
-						res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-								"Request needs to be secured with SSL for session management!");
-						return false;
-					}
 					if (!req.authenticate(res)) {
 						return false;
 					}
 				}
 			}
-			
-			
+
 			// generate new session:
 			req.getSession(true);
 		} catch (final Exception e) {
@@ -219,7 +209,7 @@ public class EveServlet extends HttpServlet {
 		}
 		return true;
 	}
-	
+
 	private String getId(final String url) {
 		String id = "";
 		if (myUrl != null) {
@@ -229,10 +219,9 @@ public class EveServlet extends HttpServlet {
 		}
 		return id;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -241,7 +230,7 @@ public class EveServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest req,
 			final HttpServletResponse resp) throws IOException,
 			ServletException {
-		
+
 		if (!handleSession(req, resp)) {
 			if (!resp.isCommitted()) {
 				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -249,7 +238,7 @@ public class EveServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		// retrieve the url and the request body
 		final String body = StringUtil.streamToString(req.getInputStream());
 		final String url = req.getRequestURI();
@@ -260,7 +249,7 @@ public class EveServlet extends HttpServlet {
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		String sender = req.getHeader("X-Eve-SenderUrl");
 		if (sender == null || sender.equals("")) {
 			sender = "web://" + req.getRemoteUser() + "@" + req.getRemoteAddr();
@@ -290,17 +279,17 @@ public class EveServlet extends HttpServlet {
 		}
 		resp.flushBuffer();
 	}
-	
+
 	@Override
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
-		
+
 		// If this is a handshake request, handle it.
 		if (handleHandShake(req, resp)) {
 			return;
 		}
-		
+
 		final String url = req.getRequestURI();
 		final String id = getId(url);
 		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
@@ -310,7 +299,7 @@ public class EveServlet extends HttpServlet {
 			return;
 		}
 		final HttpTransport transport = HttpService.get(myUrl, id);
-		
+
 		resp.setContentType("text/plain");
 		resp.getWriter().println(
 				"You've found the servlet for agent:" + id + " ("
