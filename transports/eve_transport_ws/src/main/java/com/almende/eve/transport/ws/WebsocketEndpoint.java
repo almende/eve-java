@@ -70,6 +70,11 @@ public class WebsocketEndpoint extends Endpoint {
 					@Override
 					public void run() {
 						try {
+							if (!transport.isConnected()){
+								LOG.warning("Strange, received message from unconnected source? Reopening!");
+								transport.registerRemote(id, remote);
+								transport.setConnected(true);
+							}
 							transport.receive(text, id);
 						} catch (final IOException e) {
 							LOG.log(Level.WARNING, "Failed to receive message",

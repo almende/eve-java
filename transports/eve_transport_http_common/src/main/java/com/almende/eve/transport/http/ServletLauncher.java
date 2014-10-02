@@ -44,4 +44,14 @@ public interface ServletLauncher {
 	 *            the config
 	 */
 	void add(ServerEndpointConfig serverConfig, ObjectNode config);
+
+	/**
+	 * Adds the filter.
+	 *
+	 * @param filterpath
+	 *            the filterpath
+	 * @param path
+	 *            the path
+	 */
+	void addFilter(String filterpath, String path);
 }

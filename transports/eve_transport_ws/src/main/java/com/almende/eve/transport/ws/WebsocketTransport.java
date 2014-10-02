@@ -69,14 +69,14 @@ public abstract class WebsocketTransport extends AbstractTransport {
 	 *            the close reason
 	 */
 	public void onClose(final Session session, final CloseReason closeReason) {
-		LOG.warning("Connection closed:" + closeReason.getReasonPhrase() + "("
+		LOG.info("Connection closed:" + closeReason.getReasonPhrase() + "("
 				+ closeReason.getCloseCode().getCode() + ":"
 				+ closeReason.getCloseCode().toString() + ")");
 		setConnected(false);
 	}
 	
 	/**
-	 * On close.
+	 * On open.
 	 * 
 	 * @param session
 	 *            the session

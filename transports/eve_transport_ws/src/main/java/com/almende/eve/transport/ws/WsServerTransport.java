@@ -54,6 +54,7 @@ public class WsServerTransport extends WebsocketTransport {
 	 */
 	@Override
 	public void onClose(final Session session, final CloseReason closeReason) {
+		super.onClose(session, closeReason);
 		if (session.getUserProperties().containsKey("remoteId")) {
 			final String remoteId = (String) session.getUserProperties().get(
 					"remoteId");
