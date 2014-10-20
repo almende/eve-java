@@ -14,6 +14,7 @@ import com.almende.eve.transform.rpc.formats.JSONRPCException;
 import com.almende.eve.transform.rpc.formats.JSONRPCException.CODE;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.SyncCallback;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A factory for creating AgentProxy objects.
@@ -48,7 +49,7 @@ public final class AgentProxyFactory {
 					public Object invoke(final Object proxy,
 							final Method method, final Object[] args) {
 						
-						final SyncCallback<Object> callback = new SyncCallback<Object>() {
+						final SyncCallback<JsonNode> callback = new SyncCallback<JsonNode>() {
 						};
 						try {
 							sender.call(receiverUrl, method, args, callback);
