@@ -7,8 +7,12 @@ package com.almende.eve.agent;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,6 +20,10 @@ import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.capabilities.handler.SimpleHandler;
+import com.almende.eve.instantiation.HibernationHandler;
+import com.almende.eve.instantiation.Initable;
+import com.almende.eve.instantiation.InstantiationService;
+import com.almende.eve.instantiation.InstantiationServiceBuilder;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.State;
@@ -38,6 +46,7 @@ import com.almende.eve.transport.TransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
+import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -47,25 +56,35 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Agent.
  */
 @Access(AccessType.UNAVAILABLE)
-public class Agent implements Receiver {
-	private static final Logger	LOG			= Logger.getLogger(Agent.class
-													.getName());
-	private String				agentId		= null;
-	private AgentConfig			config		= null;
-	private State				state		= null;
-	private Router				transport	= new Router();
-	private Scheduler			scheduler	= null;
-	private TransformStack		transforms	= new TransformStack();
-	private Handler<Receiver>	receiver	= new SimpleHandler<Receiver>(this);
-	private Handler<Object>		handler		= new SimpleHandler<Object>(this);
-	protected Caller			caller		= new DefaultCaller();
+public class Agent implements Receiver,Initable {
+	private static final Logger							LOG				= Logger.getLogger(Agent.class
+																				.getName());
+	private String										agentId			= null;
+	private AgentConfig									config			= null;
+	private InstantiationService						is				= null;
+	private State										state			= null;
+	private Router										transport		= new Router();
+	private Scheduler									scheduler		= null;
+	private TransformStack								transforms		= new TransformStack();
+	private Handler<Receiver>							receiver		= new SimpleHandler<Receiver>(
+																				this);
+	private Handler<Object>								handler			= new SimpleHandler<Object>(
+																				this);
+	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>();
 
-	private Handler<Caller>		sender		= new SimpleHandler<Caller>(caller);
+	protected Caller									caller			= new DefaultCaller();
+	protected DefaultEventCaller						eventCaller		= new DefaultEventCaller();
+
+	private Handler<Caller>								sender			= new SimpleHandler<Caller>(
+																				caller);
 
 	/**
 	 * Instantiates a new agent.
 	 */
-	public Agent() {}
+	public Agent() {
+		registerDefaultEventListeners();
+		eventCaller.on("init");
+	}
 
 	/**
 	 * Instantiates a new agent.
@@ -73,8 +92,16 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the config
 	 */
-	public Agent(final ObjectNode config) {
-		setConfig(config);
+	public Agent(ObjectNode config) {
+		if (config == null){
+			config = JOM.createObjectNode();
+		}
+		AgentConfig conf = new AgentConfig(config);
+		conf.setClassName(this.getClass().getName());
+		registerDefaultEventListeners();
+		setConfig(conf);
+		loadConfig();
+		eventCaller.on("init");
 	}
 
 	/**
@@ -85,25 +112,101 @@ public class Agent implements Receiver {
 	 * @param config
 	 *            the config
 	 */
-	public Agent(final String agentId, final ObjectNode config) {
-		this.config = new AgentConfig(agentId, config);
-		loadConfig(false);
+	public Agent(final String agentId, ObjectNode config) {
+		if (config == null){
+			config = JOM.createObjectNode();
+		}
+		AgentConfig conf = new AgentConfig(config);
+		conf.setId(agentId);
+		conf.setClassName(this.getClass().getName());
+		registerDefaultEventListeners();
+		setConfig(conf);
+		loadConfig();
+		eventCaller.on("init");
 	}
 
 	/**
-	 * Instantiates a new agent.
-	 * 
-	 * @param agentId
-	 *            the agent id
-	 * @param config
-	 *            the config
-	 * @param onBoot
-	 *            the on boot
+	 * On initialisation of the agent (boot, wake, etc.)
 	 */
-	public Agent(final String agentId, final ObjectNode config,
-			final boolean onBoot) {
-		this.config = new AgentConfig(agentId, config);
-		loadConfig(onBoot);
+	public void onInit() {}
+
+	/**
+	 * On boot.
+	 */
+	public void onBoot() {
+		if (transport != null) {
+			try {
+				transport.connect();
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "Couldn't connect transports on boot", e);
+			}
+		}
+	}
+
+	@Override
+	public void init(ObjectNode params, boolean onBoot) {
+		setConfig(params);
+		loadConfig();
+		if (onBoot){
+			eventCaller.on("boot");
+		}
+	};
+	
+	/**
+	 * Adds the event listener.
+	 *
+	 * @param event
+	 *            the event
+	 * @param listener
+	 *            the listener
+	 */
+	public final void addEventListener(final String event,
+			final AgentEventListener listener) {
+		synchronized (eventListeners) {
+			List<AgentEventListener> list = eventListeners.get(event);
+			if (list == null) {
+				list = new ArrayList<AgentEventListener>();
+				eventListeners.put(event, list);
+			}
+			synchronized (list) {
+				list.add(listener);
+			}
+		}
+	}
+
+	private class DefaultEventCaller {
+		/**
+		 * On.
+		 *
+		 * @param event
+		 *            the event
+		 */
+		public final void on(final String event) {
+			List<AgentEventListener> list = eventListeners.get(event);
+			if (list != null) {
+				Executor pool = ThreadPool.getPool();
+				synchronized (list) {
+					for (AgentEventListener listener : list) {
+						pool.execute(listener);
+					}
+				}
+			}
+		}
+	}
+
+	private final void registerDefaultEventListeners() {
+		addEventListener("boot", new AgentEventListener() {
+			@Override
+			public void run() {
+				onBoot();
+			}
+		});
+		addEventListener("init", new AgentEventListener() {
+			@Override
+			public void run() {
+				onInit();
+			}
+		});
 	}
 
 	/**
@@ -189,31 +292,28 @@ public class Agent implements Receiver {
 	 */
 	public void setConfig(final ObjectNode config) {
 		this.config = new AgentConfig(config);
-		loadConfig(false);
 	}
 
 	/**
-	 * Sets the config.
+	 * Set and loads the config.
 	 * 
 	 * @param config
 	 *            the new config
-	 * @param onBoot
-	 *            the on boot flag
 	 */
-	public void setConfig(final ObjectNode config, final boolean onBoot) {
-		this.config = new AgentConfig(config);
-		loadConfig(onBoot);
+	public void loadConfig(final ObjectNode config) {
+		setConfig(config);
+		loadConfig();
 	}
-
+	
 	/**
 	 * Gets the rpc.
 	 *
 	 * @return the rpc
 	 */
-	public RpcTransform getRpc(){
-		return (RpcTransform)transforms.getLast();
+	public RpcTransform getRpc() {
+		return (RpcTransform) transforms.getLast();
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -272,11 +372,21 @@ public class Agent implements Receiver {
 	 * @param onBoot
 	 *            the on boot
 	 */
-	protected void loadConfig(final boolean onBoot) {
+	protected void loadConfig() {
 		agentId = config.getId();
+		ObjectNode iscfg = config.getInstantiationService();
+		if (iscfg != null){
+			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
+			is.register(agentId, config, this.getClass().getName());
+		}
+		if (is != null && config.isCanHibernate()){
+			setHandler(new HibernationHandler<Object>(this, agentId, is));
+			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
+			setSender(new HibernationHandler<Caller>(caller, agentId, is));
+		}
 		loadScheduler(config.getScheduler());
 		loadState(config.getState());
-		loadTransports(config.getTransport(), onBoot);
+		loadTransports(config.getTransport());
 		// All agents have a local transport
 		transport.register(new LocalTransportBuilder()
 				.withConfig(new LocalTransportConfig(agentId))
@@ -408,14 +518,11 @@ public class Agent implements Receiver {
 
 	/**
 	 * Load transport.
-	 * 
+	 *
 	 * @param transportConfig
 	 *            the transport config
-	 * @param onBoot
-	 *            the on boot
 	 */
-	public void loadTransports(final JsonNode transportConfig,
-			final boolean onBoot) {
+	public void loadTransports(final JsonNode transportConfig) {
 		if (transportConfig != null) {
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
@@ -438,15 +545,6 @@ public class Agent implements Receiver {
 				}
 				transport.register(new TransportBuilder()
 						.withConfig(transconfig).withHandle(receiver).build());
-			}
-
-			if (onBoot) {
-				try {
-					transport.connect();
-				} catch (final IOException e) {
-					LOG.log(Level.WARNING,
-							"Couldn't connect transports on boot", e);
-				}
 			}
 			config.set("transport", transportConfig);
 		}
@@ -637,8 +735,7 @@ public class Agent implements Receiver {
 				throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result,
-					null);
+			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> void call(final URI url, final Method method,
@@ -646,16 +743,14 @@ public class Agent implements Receiver {
 				throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result,
-					null);
+			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params) throws IOException {
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, null);
-			transport.send(url, transforms.outbound(message, url).result,
-					null);
+			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> T callSync(final URI url, final String method,
@@ -663,13 +758,12 @@ public class Agent implements Receiver {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
 			final Object message = ((RpcTransform) transforms.getLast())
 					.buildMsg(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result,
-					null);
+			transport.send(url, transforms.outbound(message, url).result, null);
 			try {
 				return callback.get();
 			} catch (final Exception e) {
 				throw new IOException(e);
 			}
 		}
-	};
+	}
 }

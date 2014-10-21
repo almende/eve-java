@@ -13,3 +13,4 @@ target
 /.eveagents_schedulingtest
 TestXMPPAsk.java
 
+.scaleTest

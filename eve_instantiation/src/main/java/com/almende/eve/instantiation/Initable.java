@@ -2,26 +2,25 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.capabilities.wake;
+package com.almende.eve.instantiation;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Interface Wakeable. Objects implementing this interface can be woken by
- * the WakeService.
+ * The Interface Initable. Objects implementing this interface can be instatiated by
+ * the InstantiationService.
  */
-public interface Wakeable {
+public interface Initable {
 	
 	/**
-	 * Wake.
-	 * 
-	 * @param wakeKey
-	 *            the wake key
+	 * Init.
+	 *
 	 * @param params
 	 *            the params
 	 * @param onBoot
 	 *            the onBoot flag, set to true if this wake came from
 	 *            WakeService.boot(). False in all other cases.
 	 */
-	void wake(String wakeKey, ObjectNode params, boolean onBoot);
+	void init(ObjectNode params, boolean onBoot);
+	
 }

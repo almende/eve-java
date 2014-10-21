@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.state.file.FileStateBuilder;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,7 +31,7 @@ public class TestBoot extends TestCase {
 		state.put("id", "testWakeService");
 		params.set("state", state);
 		
-		final WakeService ws = new WakeService(params);
+		final InstantiationService ws = new InstantiationService(params);
 		ws.boot();
 		
 		// Sleep for 10seconds, allowing external XMPP call.

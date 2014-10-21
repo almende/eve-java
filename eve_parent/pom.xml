@@ -61,7 +61,7 @@
 		<module>../transports</module>
 		<module>../transforms</module>
 		<module>../scheduling</module>
-		<module>../eve_wake</module>
+		<module>../eve_instantiation</module>
 		<module>../eve_agents</module>
 		<module>../eve_deployment</module>
 		<module>../tests</module>

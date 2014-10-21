@@ -15,7 +15,6 @@ import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
-import com.almende.eve.capabilities.wake.WakeService;
 import com.almende.eve.config.YamlReader;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,10 +25,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class Boot {
 	private static final Logger	LOG	= Logger.getLogger(Boot.class.getName());
-	
-	private Boot() {
-	}
-	
+
+	private Boot() {}
+
 	/**
 	 * The default agent booter. It takes an EVE yaml file and creates all
 	 * agents mentioned in the "agents" section.
@@ -50,12 +48,11 @@ public final class Boot {
 				Class<?> result = null;
 				try {
 					result = super.findClass(name);
-				} catch (ClassNotFoundException cne) {
-				}
+				} catch (ClassNotFoundException cne) {}
 				if (result == null) {
 					FileInputStream fi = null;
 					try {
-						
+
 						String path = name.replace('.', '/');
 						fi = new FileInputStream(System.getProperty("user.dir")
 								+ "/" + path + ".class");
@@ -74,10 +71,10 @@ public final class Boot {
 				return result;
 			}
 		};
-		
-		loadAgents(args[0], null, cl);
+		//TODO: ALso load from initiationServices, how to prevent duplications with configfile?
+		loadAgents(args[0], cl);
 	}
-	
+
 	/**
 	 * Load agents from config file, agent classes should be in the classpath.
 	 * 
@@ -85,45 +82,29 @@ public final class Boot {
 	 *            the config file name
 	 */
 	public static void loadAgents(final String configFileName) {
-		loadAgents(configFileName, null, null);
+		loadAgents(configFileName, null);
 	}
-	
-	/**
-	 * Load agents from config file, agent classes should be in the classpath.
-	 * This variant can load WakeableAgents.
-	 * 
-	 * @param configFileName
-	 *            the config file name
-	 * @param ws
-	 *            the WakeService
-	 */
-	public static void loadAgents(final String configFileName,
-			final WakeService ws) {
-		loadAgents(configFileName, ws, null);
-	}
-	
+
 	/**
 	 * Load agents.
-	 * 
+	 *
 	 * @param configFileName
 	 *            the config file name
-	 * @param ws
-	 *            The WakeService
 	 * @param cl
 	 *            the custom classloader
 	 */
 	public static void loadAgents(final String configFileName,
-			final WakeService ws, final ClassLoader cl) {
+			final ClassLoader cl) {
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
-			loadAgents(is, ws, cl);
+			loadAgents(is, cl);
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
 					"Couldn't find configfile:" + configFileName, e);
 			return;
 		}
 	}
-	
+
 	/**
 	 * Load agents from config file, agent classes should be in the classpath.
 	 * 
@@ -131,43 +112,27 @@ public final class Boot {
 	 *            An Inputstream to the yaml data
 	 */
 	public static void loadAgents(final InputStream is) {
-		loadAgents(is, null, null);
+		loadAgents(is, null);
 	}
-	
-	/**
-	 * Load agents from config file, agent classes should be in the classpath.
-	 * This variant can load WakeableAgents.
-	 * 
-	 * @param is
-	 *            An Inputstream to the yaml data
-	 * @param ws
-	 *            The WakeService
-	 */
-	public static void loadAgents(final InputStream is, final WakeService ws) {
-		loadAgents(is, ws, null);
-	}
-	
+
 	/**
 	 * Load agents.
-	 * 
+	 *
 	 * @param is
 	 *            An Inputstream to the yaml data
-	 * @param ws
-	 *            The WakeService
 	 * @param cl
 	 *            the custom classloader
 	 */
-	public static void loadAgents(final InputStream is, final WakeService ws,
-			final ClassLoader cl) {
+	public static void loadAgents(final InputStream is, final ClassLoader cl) {
 		final Config config = YamlReader.load(is).expand();
-		
+
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		for (final JsonNode agent : agents) {
 			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
-			final Agent newAgent = new AgentBuilder().withWakeService(ws)
-					.withClassLoader(cl).with(agentConfig).build();
+			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
+					.with(agentConfig).build();
 			LOG.info("Created agent:" + newAgent.getId());
+			//onBoot event!
 		}
 	}
-	
 }

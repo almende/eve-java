@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TestTransports extends TestCase {
 	private static final Logger	LOG	= Logger.getLogger(TestTransports.class
 											.getName());
-	
+
 	/**
 	 * Test Xmpp.
 	 * 
@@ -44,23 +44,19 @@ public class TestTransports extends TestCase {
 		final XmppTransportConfig params = new XmppTransportConfig();
 		params.setAddress("xmpp://alex@openid.almende.org/test");
 		params.setPassword("alex");
-		
-		final Transport transport = 
-				new XmppTransportBuilder()
-				.withConfig(params)
-				.withHandle(new MyReceiver())
-				.build();
+
+		final Transport transport = new XmppTransportBuilder()
+				.withConfig(params).withHandle(new MyReceiver()).build();
 		transport.connect();
-		
+
 		transport.send(URI.create("xmpp:gloria@openid.almende.org"),
 				"Hello World", null);
-		
+
 		try {
 			Thread.sleep(10000);
-		} catch (final InterruptedException e) {
-		}
+		} catch (final InterruptedException e) {}
 	}
-	
+
 	/**
 	 * Test Zmq.
 	 * 
@@ -71,15 +67,15 @@ public class TestTransports extends TestCase {
 	public void testZmq() throws IOException {
 		final ZmqTransportConfig config = new ZmqTransportConfig();
 		config.setAddress("zmq://tcp://127.0.0.1:5678");
-		
+
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
 		transport.connect();
-		
+
 		transport.send(URI.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
 				null);
 	}
-	
+
 	/**
 	 * Test local transport.
 	 * 
@@ -89,13 +85,13 @@ public class TestTransports extends TestCase {
 	@Test
 	public void testLocal() throws IOException {
 		final LocalTransportConfig config = new LocalTransportConfig("testMe");
-		
+
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
-		
+
 		transport.send(URI.create("local:testMe"), "Hello World", null);
 	}
-	
+
 	/**
 	 * Test Websocket transport.
 	 * 
@@ -111,57 +107,54 @@ public class TestTransports extends TestCase {
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8082);
 		serverConfig.set("jetty", jettyParms);
-		
+
 		final Transport server = new TransportBuilder()
 				.withConfig(serverConfig).withHandle(new MyReceiver()).build();
-		
+
 		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
 		clientConfig.setId("testClient");
 		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
-		
+
 		final WsClientTransport client = new WsClientTransportBuilder()
 				.withConfig(clientConfig).withHandle(new MyReceiver()).build();
 		client.connect();
-		
+
 		server.send(URI.create("wsclient:testClient"), "Hi there!", null);
-		
+
 		client.send(URI.create("ws://localhost:8082/ws/testServer"),
 				"Good day to you!", null);
-		
+
 	}
-	
+
 	/**
 	 * The Class myReceiver.
 	 */
 	public class MyReceiver implements Receiver, Handler<Receiver> {
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
 		 * java.net.URI, java.lang.String)
 		 */
 		@Override
 		public void receive(final Object msg, final URI senderUrl,
 				final String tag) {
-			
+
 			LOG.warning("Received msg:'" + msg + "' from: "
 					+ senderUrl.toASCIIString());
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#get()
 		 */
 		@Override
 		public Receiver get() {
 			return this;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.capabilities.handler.Handler#update(com.almende.eve
 		 * .capabilities.handler.Handler)
@@ -170,10 +163,9 @@ public class TestTransports extends TestCase {
 		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#getKey()
 		 */
 		@Override
@@ -181,6 +173,11 @@ public class TestTransports extends TestCase {
 			// Not used, data should be the same.
 			return null;
 		}
-		
+
+		@Override
+		public Receiver getNoWait() {
+			return this;
+		}
+
 	}
 }

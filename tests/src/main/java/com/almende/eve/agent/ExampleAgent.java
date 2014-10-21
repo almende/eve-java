@@ -7,6 +7,7 @@ package com.almende.eve.agent;
 import java.io.IOException;
 import java.net.URI;
 
+import com.almende.eve.instantiation.CanHibernate;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
@@ -17,9 +18,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class ExampleAgent.
  */
 @Access(AccessType.PUBLIC)
-public class ExampleAgent extends WakeableAgent implements
-		ExampleAgentInterface {
-	
+@CanHibernate
+public class ExampleAgent extends Agent implements ExampleAgentInterface {
+
 	/**
 	 * Hello world.
 	 * 
@@ -31,7 +32,7 @@ public class ExampleAgent extends WakeableAgent implements
 	public String helloWorld(@Name("message") final String message) {
 		return "You said:" + message;
 	}
-	
+
 	/**
 	 * Public version of send.
 	 * 
@@ -53,7 +54,7 @@ public class ExampleAgent extends WakeableAgent implements
 			throws IOException {
 		super.call(url, method, params, callback);
 	}
-	
+
 	/**
 	 * Public version of sendSync.
 	 * 

@@ -2,22 +2,25 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.capabilities.wake;
+package com.almende.eve.instantiation;
 
+import com.almende.eve.capabilities.handler.Handler;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class WakeEntry.
  */
-public class WakeEntry {
+public class InstantiationEntry {
 	private String		wakeKey		= null;
 	private String		className	= null;
 	private ObjectNode	params		= null;
+	private Handler<Initable> handler		= null;
 	
 	/**
 	 * Instantiates a new entry.
 	 */
-	public WakeEntry() {
+	public InstantiationEntry() {
 	}
 	
 	/**
@@ -30,7 +33,7 @@ public class WakeEntry {
 	 * @param className
 	 *            the class name
 	 */
-	public WakeEntry(final String wakeKey, final ObjectNode params,
+	public InstantiationEntry(final String wakeKey, final ObjectNode params,
 			final String className) {
 		this.wakeKey = wakeKey;
 		this.className = className;
@@ -92,5 +95,26 @@ public class WakeEntry {
 	 */
 	public void setParams(final ObjectNode params) {
 		this.params = params;
+	}
+
+	/**
+	 * Gets the handler.
+	 *
+	 * @return the handler
+	 */
+	@JsonIgnore
+	public Handler<Initable> getHandler() {
+		return handler;
+	}
+
+	/**
+	 * Sets the handler.
+	 *
+	 * @param handler
+	 *            the new handler
+	 */
+	@JsonIgnore
+	public void setHandler(Handler<Initable> handler) {
+		this.handler = handler;
 	}
 }

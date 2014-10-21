@@ -4,6 +4,7 @@
  */
 package com.almende.eve.capabilities.handler;
 
+
 /**
  * The Interface Handler.
  * 
@@ -11,7 +12,7 @@ package com.almende.eve.capabilities.handler;
  *            the generic type
  */
 public interface Handler<T> {
-	
+
 	/**
 	 * Gets the wrapped handler object, if not found: triggers wake process and
 	 * waits for signal from update().
@@ -19,7 +20,14 @@ public interface Handler<T> {
 	 * @return the t
 	 */
 	T get();
-	
+
+	/**
+	 * Gets the wrapped handler object, returns null if not found.
+	 *
+	 * @return the no wait
+	 */
+	T getNoWait();
+
 	/**
 	 * Update the handler with new data, signals the waiting get() to proceed.
 	 * 
@@ -27,7 +35,7 @@ public interface Handler<T> {
 	 *            the new handler
 	 */
 	void update(Handler<T> newHandler);
-	
+
 	/**
 	 * Gets the key of this handle, when relevant. Returns null if no such key
 	 * is available.
@@ -35,5 +43,5 @@ public interface Handler<T> {
 	 * @return the key
 	 */
 	String getKey();
-	
+
 }

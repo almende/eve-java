@@ -4,7 +4,13 @@
  */
 package com.almende.eve.agent;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.almende.eve.capabilities.Config;
+import com.almende.eve.instantiation.CanHibernate;
+import com.almende.util.AnnotationUtil;
+import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,16 +21,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class AgentConfig.
  */
 public class AgentConfig extends Config {
-	
+	private static final Logger	LOG	= Logger.getLogger(AgentConfig.class
+											.getName());
+
 	/**
-	 * Instantiates a new memory state config.
+	 * Instantiates a new config.
 	 */
 	public AgentConfig() {
 		this(JOM.createObjectNode());
 	}
-	
+
 	/**
-	 * Instantiates a new memory state config.
+	 * Instantiates a new config.
 	 * 
 	 * @param id
 	 *            the id
@@ -33,9 +41,9 @@ public class AgentConfig extends Config {
 		super(JOM.createObjectNode());
 		setId(id);
 	}
-	
+
 	/**
-	 * Instantiates a new memory state config.
+	 * Instantiates a new config.
 	 * 
 	 * @param node
 	 *            the node
@@ -46,9 +54,9 @@ public class AgentConfig extends Config {
 			this.put("id", new UUID().toString());
 		}
 	}
-	
+
 	/**
-	 * Instantiates a new memory state config.
+	 * Instantiates a new config.
 	 * 
 	 * @param id
 	 *            the id
@@ -59,7 +67,7 @@ public class AgentConfig extends Config {
 		super(node);
 		setId(id);
 	}
-	
+
 	/**
 	 * Sets the id.
 	 * 
@@ -69,7 +77,7 @@ public class AgentConfig extends Config {
 	public void setId(final String id) {
 		this.put("id", id);
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -81,7 +89,29 @@ public class AgentConfig extends Config {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Sets the instantiation service.
+	 *
+	 * @param config
+	 *            the new instantiation service
+	 */
+	public void setInstantiationService(final ObjectNode config) {
+		this.set("instantiationService", config);
+	}
+
+	/**
+	 * Gets the instantiation service.
+	 *
+	 * @return the instantiation service
+	 */
+	public ObjectNode getInstantiationService() {
+		if (this.has("instantiationService")) {
+			return (ObjectNode) this.get("instantiationService");
+		}
+		return null;
+	}
+
 	/**
 	 * Sets the transport config.
 	 * 
@@ -92,7 +122,7 @@ public class AgentConfig extends Config {
 	public void setTransport(final JsonNode transport) {
 		this.set("transport", transport);
 	}
-	
+
 	/**
 	 * Gets the transport config.
 	 * 
@@ -104,7 +134,7 @@ public class AgentConfig extends Config {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the state config.
 	 * 
@@ -115,7 +145,7 @@ public class AgentConfig extends Config {
 	public void setState(final ObjectNode state) {
 		this.set("state", state);
 	}
-	
+
 	/**
 	 * Gets the state config.
 	 * 
@@ -127,7 +157,7 @@ public class AgentConfig extends Config {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the scheduler config.
 	 * 
@@ -138,7 +168,7 @@ public class AgentConfig extends Config {
 	public void setScheduler(final ObjectNode scheduler) {
 		this.set("scheduler", scheduler);
 	}
-	
+
 	/**
 	 * Gets the scheduler config.
 	 * 
@@ -152,16 +182,16 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the transform config. The agent will add a rpctransform to the stack.
+	 * Sets the transform config. The agent will add a rpctransform to the
+	 * stack.
 	 * 
 	 * @param transform
 	 *            the new transform config array
-	 *            
 	 */
 	public void setTransforms(final ArrayNode transform) {
 		this.set("transforms", transform);
 	}
-	
+
 	/**
 	 * Gets the transforms.
 	 *
@@ -173,4 +203,36 @@ public class AgentConfig extends Config {
 		}
 		return null;
 	}
+
+	/**
+	 * Checks if this agent can hibernate.
+	 *
+	 * @return true, if this agent can hibernate
+	 */
+	public boolean isCanHibernate() {
+		if (this.has("canHibernate")) {
+			return this.get("canHibernate").asBoolean();
+		}
+		AnnotatedClass ac = null;
+		String className = this.getClassName();
+		if (className != null) {
+			try {
+				ac = AnnotationUtil.get(Class.forName(className));
+			} catch (ClassNotFoundException e) {
+				LOG.log(Level.WARNING, "Couldn't load agent class", e);
+			}
+		}
+		return (ac != null && ac.getAnnotation(CanHibernate.class) != null);
+	}
+
+	/**
+	 * Sets the canHibernate value.
+	 *
+	 * @param canHibernate
+	 *            the new canHibernate value
+	 */
+	public void setCanHibernate(boolean canHibernate) {
+		this.put("canHibernate", canHibernate);
+	}
+
 }

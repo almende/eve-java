@@ -9,9 +9,9 @@
 		<relativePath>../eve_parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-wake</artifactId>
+	<artifactId>eve-instantiation</artifactId>
 
-	<name>EVE Wake/Boot Service</name>
+	<name>EVE Hibernate/Boot Service</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>

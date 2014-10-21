@@ -14,10 +14,9 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.agent.Agent;
+import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.MyAgent;
-import com.almende.eve.capabilities.wake.WakeService;
-import com.almende.eve.capabilities.wake.WakeServiceBuilder;
-import com.almende.eve.capabilities.wake.WakeServiceConfig;
+import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
 import com.almende.util.callback.AsyncCallback;
 
@@ -37,20 +36,19 @@ public class TestWake extends TestCase {
 	@Test
 	public void testWake(){
 		
+		final AgentConfig config = new AgentConfig("testWakeAgent");
+		
 		//First we need to setup the WakeService: (Either keep a global pointer to the wake service, or obtain it again through the same configuration)
-		final WakeServiceConfig config = new WakeServiceConfig();
+		final InstantiationServiceConfig isConfig = new InstantiationServiceConfig();
 		final FileStateConfig stateconfig = new FileStateConfig();
 		stateconfig.setPath(".wakeservices");
 		stateconfig.setId("testWakeService");
-		config.setState(stateconfig);
-				
-		final WakeService ws = 
-			new WakeServiceBuilder()
-			.withConfig(config)
-			.build();
-
+		isConfig.setState(stateconfig);
+		
+		config.setInstantiationService(isConfig);
+		
 		// Now create a WakeAble Agent
-		WeakReference<Agent> test = new WeakReference<Agent>(new MyAgent("testWakeAgent", ws));
+		WeakReference<Agent> test = new WeakReference<Agent>(new MyAgent(config));
 		
 		//after a while the agent is unloaded:
 		System.gc();

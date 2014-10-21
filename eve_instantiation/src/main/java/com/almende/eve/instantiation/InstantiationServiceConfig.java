@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.capabilities.wake;
+package com.almende.eve.instantiation;
 
 import com.almende.eve.capabilities.Config;
 import com.almende.util.jackson.JOM;
@@ -11,12 +11,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class WakeServiceConfig.
  */
-public class WakeServiceConfig extends Config {
+public class InstantiationServiceConfig extends Config {
 	
 	/**
 	 * Instantiates a new memory state config.
 	 */
-	public WakeServiceConfig() {
+	public InstantiationServiceConfig() {
 		this(JOM.createObjectNode());
 	}
 	
@@ -26,10 +26,10 @@ public class WakeServiceConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public WakeServiceConfig(final ObjectNode node) {
+	public InstantiationServiceConfig(final ObjectNode node) {
 		super(node);
 		if (!node.has("class")) {
-			this.put("class", WakeServiceBuilder.class.getName());
+			this.put("class", InstantiationServiceBuilder.class.getName());
 		}
 	}
 	

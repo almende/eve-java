@@ -76,11 +76,17 @@ public class TransformStack implements Transform {
 	 */
 	@Override
 	public Meta inbound(final Object msg, URI senderUrl) {
-		Iterator<Transform> iter = stack.iterator();
+		final Iterator<Transform> iter = stack.iterator();
 		Meta res = new Meta(msg);
 		while (res.doNext && iter.hasNext()) {
-			Transform transform = iter.next();
+			final Transform transform = iter.next();
 			res = transform.inbound(res.valid ? res.result : msg, senderUrl);
+/*			if (result.isValid()){
+				res.result=result.result;
+				res.valid=true;
+			}
+			res.doNext=result.doNext;
+*/
 		}
 		return res;
 	}
@@ -92,12 +98,18 @@ public class TransformStack implements Transform {
 	 */
 	@Override
 	public Meta outbound(final Object msg, final URI recipientUrl) {
-		Iterator<Transform> iter = stack.descendingIterator();
+		final Iterator<Transform> iter = stack.descendingIterator();
 		Meta res = new Meta(msg);
 		while (res.doNext && iter.hasNext()) {
 			Transform transform = iter.next();
 			res = transform
 					.outbound(res.valid ? res.result : msg, recipientUrl);
+/*			if (result.isValid()){
+				res.result=result.result;
+				res.valid=true;
+			}
+			res.doNext=result.doNext;
+*/
 		}
 		return res;
 	}

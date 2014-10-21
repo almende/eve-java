@@ -4,6 +4,8 @@
  */
 package com.almende.eve.capabilities.handler;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Class SimpleHandler.
  * 
@@ -29,7 +31,17 @@ public class SimpleHandler<T> implements Handler<T> {
 	 * @see com.almende.eve.capabilities.handler.Handler#get()
 	 */
 	@Override
+	@JsonIgnore
 	public T get() {
+		return referent;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.almende.eve.capabilities.handler.Handler#getNoWait()
+	 */
+	@Override
+	@JsonIgnore
+	public T getNoWait() {
 		return referent;
 	}
 	

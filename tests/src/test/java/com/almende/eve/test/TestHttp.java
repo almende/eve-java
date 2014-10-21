@@ -102,6 +102,11 @@ public class TestHttp extends TestCase {
 			// Not used, data should be the same.
 			return null;
 		}
+
+		@Override
+		public Receiver getNoWait() {
+			return this;
+		}
 		
 	}
 }

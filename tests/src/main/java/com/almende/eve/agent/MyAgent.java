@@ -6,7 +6,7 @@ package com.almende.eve.agent;
 
 import java.util.logging.Logger;
 
-import com.almende.eve.capabilities.wake.WakeService;
+import com.almende.eve.instantiation.CanHibernate;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class MyAgent.
  */
-public class MyAgent extends WakeableAgent {
+@CanHibernate
+public class MyAgent extends Agent {
 	private static final Logger LOG = Logger.getLogger(MyAgent.class.getName());
 	/**
 	 * Instantiates a new my agent.
@@ -24,14 +25,22 @@ public class MyAgent extends WakeableAgent {
 	
 	/**
 	 * Instantiates a new my agent.
-	 * 
+	 *
 	 * @param id
 	 *            the id
-	 * @param ws
-	 *            the ws
 	 */
-	public MyAgent(final String id, final WakeService ws) {
-		super(new AgentConfig(id), ws);
+	public MyAgent(final String id) {
+		super(new AgentConfig(id));
+	}
+	
+	/**
+	 * Instantiates a new my agent.
+	 *
+	 * @param config
+	 *            the config
+	 */
+	public MyAgent(final ObjectNode config) {
+		super(config);
 	}
 	
 	/*
@@ -41,9 +50,9 @@ public class MyAgent extends WakeableAgent {
 	 * com.fasterxml.jackson.databind.node.ObjectNode, boolean)
 	 */
 	@Override
-	public void wake(final String wakeKey, final ObjectNode params,
+	public void init(final ObjectNode params,
 			final boolean onBoot) {
-		super.wake(wakeKey, params, onBoot);
+		super.init(params, onBoot);
 		LOG.warning("Wake called, so the agent was actually unloaded!");
 	}
 	

@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-wake</artifactId>
+			<artifactId>eve-instantiation</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
