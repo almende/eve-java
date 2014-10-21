@@ -12,14 +12,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeServiceConfig.
  */
 public class InstantiationServiceConfig extends Config {
-	
 	/**
 	 * Instantiates a new memory state config.
 	 */
 	public InstantiationServiceConfig() {
 		this(JOM.createObjectNode());
 	}
-	
+
 	/**
 	 * Instantiates a new memory state config.
 	 * 
@@ -32,7 +31,7 @@ public class InstantiationServiceConfig extends Config {
 			this.put("class", InstantiationServiceBuilder.class.getName());
 		}
 	}
-	
+
 	/**
 	 * Sets the state.
 	 * 
@@ -42,7 +41,7 @@ public class InstantiationServiceConfig extends Config {
 	public void setState(final ObjectNode state) {
 		this.set("state", state);
 	}
-	
+
 	/**
 	 * Gets the state.
 	 * 
@@ -54,5 +53,5 @@ public class InstantiationServiceConfig extends Config {
 		}
 		return null;
 	}
-	
+
 }

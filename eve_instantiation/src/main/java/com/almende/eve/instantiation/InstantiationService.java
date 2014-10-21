@@ -26,6 +26,7 @@ public class InstantiationService implements Capability {
 	private ObjectNode						myParams	= null;
 	private Map<String, InstantiationEntry>	entries		= new HashMap<String, InstantiationEntry>();
 	private State							state		= null;
+	private ClassLoader						cl			= null;
 
 	/**
 	 * Instantiates a new wake service.
@@ -33,13 +34,16 @@ public class InstantiationService implements Capability {
 	public InstantiationService() {};
 
 	/**
-	 * Instantiates a new InstantiationService
-	 * 
+	 * Instantiates a new InstantiationService.
+	 *
 	 * @param params
 	 *            the params, containing at least a "state" field, with a
 	 *            specific State configuration.
+	 * @param cl
+	 *            the cl
 	 */
-	public InstantiationService(final ObjectNode params) {
+	public InstantiationService(final ObjectNode params, final ClassLoader cl) {
+		this.cl = cl;
 		myParams = params;
 		state = new StateBuilder().withConfig(
 				(ObjectNode) myParams.get("state")).build();
@@ -116,7 +120,12 @@ public class InstantiationService implements Capability {
 			}
 			if (instance == null) {
 				try {
-					final Class<?> clazz = Class.forName(className);
+					Class<?> clazz = null;
+					if (cl != null) {
+						clazz = cl.loadClass(className);
+					} else {
+						clazz = Class.forName(className);
+					}
 					instance = (Initable) clazz.newInstance();
 
 				} catch (final Exception e) {

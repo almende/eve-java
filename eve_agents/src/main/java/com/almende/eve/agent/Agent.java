@@ -56,7 +56,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Agent.
  */
 @Access(AccessType.UNAVAILABLE)
-public class Agent implements Receiver,Initable {
+public class Agent implements Receiver, Initable {
 	private static final Logger							LOG				= Logger.getLogger(Agent.class
 																				.getName());
 	private String										agentId			= null;
@@ -93,7 +93,7 @@ public class Agent implements Receiver,Initable {
 	 *            the config
 	 */
 	public Agent(ObjectNode config) {
-		if (config == null){
+		if (config == null) {
 			config = JOM.createObjectNode();
 		}
 		AgentConfig conf = new AgentConfig(config);
@@ -113,7 +113,7 @@ public class Agent implements Receiver,Initable {
 	 *            the config
 	 */
 	public Agent(final String agentId, ObjectNode config) {
-		if (config == null){
+		if (config == null) {
 			config = JOM.createObjectNode();
 		}
 		AgentConfig conf = new AgentConfig(config);
@@ -147,11 +147,11 @@ public class Agent implements Receiver,Initable {
 	public void init(ObjectNode params, boolean onBoot) {
 		setConfig(params);
 		loadConfig();
-		if (onBoot){
+		if (onBoot) {
 			eventCaller.on("boot");
 		}
 	};
-	
+
 	/**
 	 * Adds the event listener.
 	 *
@@ -174,7 +174,7 @@ public class Agent implements Receiver,Initable {
 		}
 	}
 
-	private class DefaultEventCaller {
+	class DefaultEventCaller {
 		/**
 		 * On.
 		 *
@@ -192,6 +192,16 @@ public class Agent implements Receiver,Initable {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Gets the event caller.
+	 *
+	 * @return the event caller
+	 */
+	public DefaultEventCaller getEventCaller() {
+		// TODO Auto-generated method stub
+		return this.eventCaller;
 	}
 
 	private final void registerDefaultEventListeners() {
@@ -304,7 +314,7 @@ public class Agent implements Receiver,Initable {
 		setConfig(config);
 		loadConfig();
 	}
-	
+
 	/**
 	 * Gets the rpc.
 	 *
@@ -375,11 +385,11 @@ public class Agent implements Receiver,Initable {
 	protected void loadConfig() {
 		agentId = config.getId();
 		ObjectNode iscfg = config.getInstantiationService();
-		if (iscfg != null){
+		if (iscfg != null) {
 			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
 			is.register(agentId, config, this.getClass().getName());
 		}
-		if (is != null && config.isCanHibernate()){
+		if (is != null && config.isCanHibernate()) {
 			setHandler(new HibernationHandler<Object>(this, agentId, is));
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
 			setSender(new HibernationHandler<Caller>(caller, agentId, is));

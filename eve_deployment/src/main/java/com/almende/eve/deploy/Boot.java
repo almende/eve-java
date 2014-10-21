@@ -16,6 +16,9 @@ import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
+import com.almende.eve.instantiation.InstantiationService;
+import com.almende.eve.instantiation.InstantiationServiceBuilder;
+import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -71,68 +74,80 @@ public final class Boot {
 				return result;
 			}
 		};
-		//TODO: ALso load from initiationServices, how to prevent duplications with configfile?
-		loadAgents(args[0], cl);
-	}
-
-	/**
-	 * Load agents from config file, agent classes should be in the classpath.
-	 * 
-	 * @param configFileName
-	 *            the config file name
-	 */
-	public static void loadAgents(final String configFileName) {
-		loadAgents(configFileName, null);
-	}
-
-	/**
-	 * Load agents.
-	 *
-	 * @param configFileName
-	 *            the config file name
-	 * @param cl
-	 *            the custom classloader
-	 */
-	public static void loadAgents(final String configFileName,
-			final ClassLoader cl) {
+		String configFileName = args[0];
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
-			loadAgents(is, cl);
+			boot(is,cl);
+			
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
 					"Couldn't find configfile:" + configFileName, e);
 			return;
 		}
-	}
 
+	}
+	
 	/**
-	 * Load agents from config file, agent classes should be in the classpath.
-	 * 
+	 * Boot.
+	 *
 	 * @param is
-	 *            An Inputstream to the yaml data
+	 *            the is
 	 */
-	public static void loadAgents(final InputStream is) {
-		loadAgents(is, null);
+	public static void boot(final InputStream is){
+		boot(is,null);
 	}
+	
+	/**
+	 * Boot.
+	 *
+	 * @param is
+	 *            the is
+	 * @param cl
+	 *            the cl
+	 */
+	public static void boot(final InputStream is, final ClassLoader cl){
+		final Config config = YamlReader.load(is).expand();
 
+		loadInstantiationServices(config, cl);
+		loadAgents(config, cl);		
+	}
+	
+	/**
+	 * Load instantiation services.
+	 *
+	 * @param config
+	 *            the config
+	 * @param cl
+	 *            the cl
+	 */
+	public static void loadInstantiationServices(final Config config, final ClassLoader cl) {
+		if (!config.has("instantiationServices")){
+			return;
+		}
+		final ArrayNode iss = (ArrayNode) config.get("instantiationServices");
+		for (final JsonNode service: iss){
+			final InstantiationServiceConfig isconfig = new InstantiationServiceConfig((ObjectNode)service);
+			final InstantiationService is = new InstantiationServiceBuilder().withClassLoader(cl).withConfig(isconfig).build();
+			is.boot();
+		}
+	}
+	
 	/**
 	 * Load agents.
 	 *
-	 * @param is
-	 *            An Inputstream to the yaml data
+	 * @param config
+	 *            the config
 	 * @param cl
 	 *            the custom classloader
 	 */
-	public static void loadAgents(final InputStream is, final ClassLoader cl) {
-		final Config config = YamlReader.load(is).expand();
+	public static void loadAgents(final Config config, final ClassLoader cl) {
 
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		for (final JsonNode agent : agents) {
 			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
-					.with(agentConfig).build();
+					.with(agentConfig).onBoot().build();
 			LOG.info("Created agent:" + newAgent.getId());
-			//onBoot event!
 		}
 	}
 }

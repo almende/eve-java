@@ -31,7 +31,7 @@ public class TestBoot extends TestCase {
 		state.put("id", "testWakeService");
 		params.set("state", state);
 		
-		final InstantiationService ws = new InstantiationService(params);
+		final InstantiationService ws = new InstantiationService(params,null);
 		ws.boot();
 		
 		// Sleep for 10seconds, allowing external XMPP call.

@@ -35,7 +35,7 @@ public class EveListener implements ServletContextListener {
 				return;
 			}
 
-			Boot.loadAgents(is);
+			Boot.boot(is);
 		}
 		
 	}
