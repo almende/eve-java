@@ -64,6 +64,7 @@ public class TestAgents extends TestCase {
 
 		ExampleAgent agent = new ExampleAgent();
 		agent.loadConfig(config);
+		agent.connect();
 		
 		final ObjectNode callParams = JOM.createObjectNode();
 		callParams.put("message", "Hello world!");
@@ -98,6 +99,7 @@ public class TestAgents extends TestCase {
 		ac.setTransport(transportConfig);
 		final ExampleAgent tester = new ExampleAgent() {};
 		tester.loadConfig(ac);
+		tester.connect();
 
 		LOG.warning("Sync received:'"
 				+ tester.pubSendSync(

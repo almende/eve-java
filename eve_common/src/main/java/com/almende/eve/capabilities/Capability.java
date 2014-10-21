@@ -18,4 +18,9 @@ public interface Capability {
 	 */
 	ObjectNode getParams();
 	
+	/**
+	 * Delete this capability, releasing all resources where applicable.
+	 */
+	void delete();
+	
 }

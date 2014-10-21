@@ -88,11 +88,6 @@ public interface Transport extends Capability {
 	void disconnect();
 	
 	/**
-	 * Delete this transport instance.
-	 */
-	void delete();
-	
-	/**
 	 * Gets the receive handler.
 	 * 
 	 * @return the handler

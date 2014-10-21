@@ -51,6 +51,13 @@ public class InstantiationService implements Capability {
 		load();
 	}
 
+	@Override
+	public void delete(){
+		if (state != null){
+			state.delete();
+		}
+	}
+	
 	/**
 	 * Gets the my params.
 	 * 

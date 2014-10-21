@@ -4,6 +4,8 @@
  */
 package com.almende.eve.test;
 
+import java.util.logging.Logger;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -17,12 +19,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestWake.
  */
 public class TestBoot extends TestCase {
-	
+	private static final Logger	LOG	= Logger.getLogger(TestBoot.class.getName());
+
 	/**
 	 * Test wake.
 	 */
 	@Test
 	public void testBoot() {
+
 		final ObjectNode params = JOM.createObjectNode();
 		final ObjectNode state = JOM.createObjectNode();
 		state.put("class", FileStateBuilder.class.getName());
@@ -30,11 +34,11 @@ public class TestBoot extends TestCase {
 		state.put("path", ".wakeservices");
 		state.put("id", "testWakeService");
 		params.set("state", state);
-		
-		final InstantiationService ws = new InstantiationService(params,null);
+
+		final InstantiationService ws = new InstantiationService(params, null);
 		ws.boot();
-		
-		// Sleep for 10seconds, allowing external XMPP call.
+
+		LOG.warning("Sleep for 20 seconds, allowing external XMPP call.");
 		try {
 			Thread.sleep(20000);
 		} catch (final InterruptedException e) {
@@ -42,5 +46,5 @@ public class TestBoot extends TestCase {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

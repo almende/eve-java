@@ -160,7 +160,13 @@ public class Router implements Transport {
 	 */
 	@Override
 	public void delete() {
-
+		final Set<Transport> result = new HashSet<Transport>(transports.size());
+		for (final Transport transport : transports.values()) {
+			result.add(transport);
+		}
+		for (final Transport transport : result) {
+			transport.delete();
+		}
 	}
 
 	/*

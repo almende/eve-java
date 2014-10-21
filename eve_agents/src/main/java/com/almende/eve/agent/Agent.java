@@ -153,6 +153,26 @@ public class Agent implements Receiver, Initable {
 	};
 
 	/**
+	 * Destroy the agent
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public void destroy() {
+		if (transport != null) {
+			transport.disconnect();
+			transport.delete();
+		}
+		if (transforms != null) {
+			transforms.delete();
+		}
+		if (scheduler != null) {
+			scheduler.delete();
+		}
+		if (state != null) {
+			state.delete();
+		}
+	}
+
+	/**
 	 * Adds the event listener.
 	 *
 	 * @param event

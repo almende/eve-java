@@ -113,4 +113,12 @@ public class TransformStack implements Transform {
 		}
 		return res;
 	}
+	
+	@Override
+	public void delete(){
+		for (Transform transform : stack){
+			transform.delete();
+		}
+		stack.clear();
+	}
 }

@@ -315,5 +315,10 @@ public class RpcTransform implements Transform {
 	public ObjectNode getParams() {
 		return myParams;
 	}
+
+	@Override
+	public void delete() {
+		callbacks.clear();
+	}
 	
 }

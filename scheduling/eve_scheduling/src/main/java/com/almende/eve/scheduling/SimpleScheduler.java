@@ -163,5 +163,11 @@ public class SimpleScheduler implements Scheduler {
 	public long now() {
 		return System.currentTimeMillis();
 	}
+
+	@Override
+	public void delete() {
+		clear();
+		clock.clear();
+	}
 	
 }

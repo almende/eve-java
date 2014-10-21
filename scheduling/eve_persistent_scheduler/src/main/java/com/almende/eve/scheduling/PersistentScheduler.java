@@ -27,7 +27,14 @@ public class PersistentScheduler extends SimpleScheduler {
 	private static final Logger	LOG		= Logger.getLogger(PersistentScheduler.class
 												.getName());
 	private State				state	= null;
-	
+
+	public void delete() {
+		if (state != null) {
+			state.delete();
+		}
+		super.delete();
+	}
+
 	/**
 	 * Instantiates a new persistent scheduler.
 	 * 
@@ -44,7 +51,7 @@ public class PersistentScheduler extends SimpleScheduler {
 		if (getClock() == null) {
 			setClock(new RunnableClock());
 		}
-		
+
 		final ObjectNode stateConfig = config.getState();
 		if (stateConfig == null) {
 			LOG.warning("Parameter 'state' is required, falling back to SimpleScheduler.");
@@ -55,9 +62,9 @@ public class PersistentScheduler extends SimpleScheduler {
 				run(entry);
 			}
 		}
-		
+
 	}
-	
+
 	private void run(final TaskEntry entry) {
 		if (entry != null) {
 			if (getClock() == null) {
@@ -65,7 +72,7 @@ public class PersistentScheduler extends SimpleScheduler {
 			}
 			getClock().requestTrigger(entry.getTaskId(), entry.getDue(),
 					new Runnable() {
-						
+
 						@Override
 						public void run() {
 							if (state != null) {
@@ -77,17 +84,16 @@ public class PersistentScheduler extends SimpleScheduler {
 					});
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.scheduling.SimpleScheduler#schedule(java.lang.Object,
 	 * org.joda.time.DateTime)
 	 */
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
-		
+
 		final TaskEntry entry = new TaskEntry(due, msg);
 		if (state != null) {
 			state.put(entry.getTaskId(), entry);
@@ -95,10 +101,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		run(entry);
 		return entry.getTaskId();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.SimpleScheduler#cancel(java.lang.String)
 	 */
 	@Override
@@ -111,10 +116,9 @@ public class PersistentScheduler extends SimpleScheduler {
 		}
 		getClock().cancel(id);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.SimpleScheduler#clear()
 	 */
 	@Override
@@ -131,7 +135,6 @@ public class PersistentScheduler extends SimpleScheduler {
 
 /**
  * @author Almende
- * 
  */
 class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	private static final Logger	LOG					= Logger.getLogger(TaskEntry.class
@@ -141,13 +144,12 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	private Object				message;
 	private DateTime			due;
 	private boolean				active				= false;
-	
+
 	/**
 	 * Instantiates a new task entry.
 	 */
-	public TaskEntry() {
-	};
-	
+	public TaskEntry() {};
+
 	/**
 	 * Instantiates a new task entry.
 	 * 
@@ -161,10 +163,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		setMessage(message);
 		this.due = due;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -178,20 +179,18 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		final TaskEntry other = (TaskEntry) o;
 		return taskId.equals(other.taskId);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		return taskId.hashCode();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
@@ -204,15 +203,15 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		}
 		return due.compareTo(o.due);
 	}
-	
+
 	public Object getMessage() {
 		return message;
 	}
-	
+
 	public void setMessage(final Object message) {
 		this.message = message;
 	}
-	
+
 	/**
 	 * Gets the task id.
 	 * 
@@ -221,7 +220,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public String getTaskId() {
 		return taskId;
 	}
-	
+
 	/**
 	 * Gets the due as string.
 	 * 
@@ -230,7 +229,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public String getDueAsString() {
 		return due.toString();
 	}
-	
+
 	/**
 	 * Gets the due.
 	 * 
@@ -240,7 +239,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public DateTime getDue() {
 		return due;
 	}
-	
+
 	/**
 	 * Sets the task id.
 	 * 
@@ -250,7 +249,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public void setTaskId(final String taskId) {
 		this.taskId = taskId;
 	}
-	
+
 	/**
 	 * Sets the due as string.
 	 * 
@@ -260,7 +259,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public void setDueAsString(final String due) {
 		this.due = new DateTime(due);
 	}
-	
+
 	/**
 	 * Sets the due.
 	 * 
@@ -270,7 +269,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public void setDue(final DateTime due) {
 		this.due = due;
 	}
-	
+
 	/**
 	 * Sets the active.
 	 * 
@@ -280,7 +279,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public void setActive(final boolean active) {
 		this.active = active;
 	}
-	
+
 	/**
 	 * Checks if is active.
 	 * 
@@ -289,10 +288,9 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
