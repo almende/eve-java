@@ -26,9 +26,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:git@github.com:almende/eve.git</connection>
-		<url>scm:git:git@github.com:almende/eve.git</url>
-		<developerConnection>scm:git:git@github.com:almende/eve.git</developerConnection>
+		<connection>scm:git:git@github.com:almende/eve-java.git</connection>
+		<url>scm:git:git@github.com:almende/eve-java.git</url>
+		<developerConnection>scm:git:git@github.com:almende/eve-java.git</developerConnection>
 	</scm>
 
 	<organization>
