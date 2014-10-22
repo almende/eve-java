@@ -1,3 +1,7 @@
+=======
+eve-java
+=======
+
 ## EVE - JAVA implementation
 
 Eve is a multipurpose, web based agent platform. The project aims to develop 
