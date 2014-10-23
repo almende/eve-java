@@ -42,7 +42,6 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
-import com.almende.eve.transport.TransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
@@ -421,9 +420,9 @@ public class Agent implements Receiver, Initable {
 		loadState(config.getState());
 		loadTransports(config.getTransport());
 		// All agents have a local transport
-		transport.register(new LocalTransportBuilder()
-				.withConfig(new LocalTransportConfig(agentId))
-				.withHandle(receiver).build());
+		addTransport(new LocalTransportBuilder()
+		.withConfig(new LocalTransportConfig(agentId))
+		.withHandle(receiver).build());
 		loadTransforms(config.getTransforms());
 	}
 
@@ -469,6 +468,7 @@ public class Agent implements Receiver, Initable {
 
 				if (stateConfig.getId() == null) {
 					stateConfig.setId("scheduler_" + agentId);
+					schedulerConfig.set("state", stateConfig);
 				}
 			}
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
@@ -538,20 +538,28 @@ public class Agent implements Receiver, Initable {
 	protected void addTransport(final Transport transport) {
 		this.transport.register(transport);
 
-		final JsonNode transportConfig = config.get("transport");
+		JsonNode transportConfig = config.get("transport");
+		if (transportConfig == null){
+			transportConfig = JOM.createArrayNode();
+		}
 		if (transportConfig.isArray()) {
 			((ArrayNode) transportConfig).add(transport.getParams());
 		} else {
 			final ArrayNode transports = JOM.createArrayNode();
 			transports.add(transportConfig);
 			transports.add(transport.getParams());
-			config.set("transport", transports);
+			transportConfig = transports;
 		}
+		config.set("transport", transportConfig);
 	}
 
-	protected void addTransport(final ObjectNode config) {
-		final Transport transport = new TransportBuilder().withConfig(config)
-				.withHandle(receiver).build();
+	protected void addTransport(final ObjectNode transconfig) {
+		// TODO: Somewhat ugly, not every transport requires an id.
+		if (transconfig.get("id") == null) {
+			transconfig.put("id", agentId);
+		}
+		final Transport transport = new TransportBuilder()
+				.withConfig(transconfig).withHandle(receiver).build();
 		addTransport(transport);
 	}
 
@@ -563,29 +571,16 @@ public class Agent implements Receiver, Initable {
 	 */
 	private void loadTransports(final JsonNode transportConfig) {
 		if (transportConfig != null) {
+			//Cleanout old config
+			config.remove("transport");
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
 				while (iter.hasNext()) {
-					final TransportConfig transconfig = new TransportConfig(
-							(ObjectNode) iter.next());
-					// TODO: Somewhat ugly, not every transport requires an id.
-					if (transconfig.get("id") == null) {
-						transconfig.put("id", agentId);
-					}
-					transport.register(new TransportBuilder()
-							.withConfig(transconfig).withHandle(receiver)
-							.build());
+					addTransport((ObjectNode)iter.next());
 				}
 			} else {
-				final TransportConfig transconfig = new TransportConfig(
-						(ObjectNode) transportConfig);
-				if (transconfig.get("id") == null) {
-					transconfig.put("id", agentId);
-				}
-				transport.register(new TransportBuilder()
-						.withConfig(transconfig).withHandle(receiver).build());
+				addTransport((ObjectNode) transportConfig);
 			}
-			config.set("transport", transportConfig);
 		}
 	}
 
