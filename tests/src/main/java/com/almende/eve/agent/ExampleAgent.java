@@ -74,4 +74,10 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 			final ObjectNode params) throws IOException {
 		return super.callSync(url, method, params);
 	}
+	
+	/* Making destroy public */
+	@Override
+	public void destroy(){
+		super.destroy();
+	}
 }

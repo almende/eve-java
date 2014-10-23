@@ -128,12 +128,12 @@ public class Agent implements Receiver, Initable {
 	/**
 	 * On initialisation of the agent (boot, wake, etc.)
 	 */
-	public void onInit() {}
+	protected void onInit() {}
 
 	/**
 	 * On boot.
 	 */
-	public void onBoot() {
+	protected void onBoot() {
 		if (transport != null) {
 			try {
 				transport.connect();
@@ -153,10 +153,20 @@ public class Agent implements Receiver, Initable {
 	};
 
 	/**
+	 * Set and loads the config.
+	 * 
+	 * @param config
+	 *            the new config
+	 */
+	public void loadConfig(final ObjectNode config) {
+		init(config, false);
+	}
+
+	/**
 	 * Destroy the agent
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public void destroy() {
+	protected void destroy() {
 		if (transport != null) {
 			transport.disconnect();
 			transport.delete();
@@ -170,30 +180,8 @@ public class Agent implements Receiver, Initable {
 		if (state != null) {
 			state.delete();
 		}
-		if (is != null){
+		if (is != null) {
 			is.deregister(agentId);
-		}
-	}
-
-	/**
-	 * Adds the event listener.
-	 *
-	 * @param event
-	 *            the event
-	 * @param listener
-	 *            the listener
-	 */
-	public final void addEventListener(final String event,
-			final AgentEventListener listener) {
-		synchronized (eventListeners) {
-			List<AgentEventListener> list = eventListeners.get(event);
-			if (list == null) {
-				list = new ArrayList<AgentEventListener>();
-				eventListeners.put(event, list);
-			}
-			synchronized (list) {
-				list.add(listener);
-			}
 		}
 	}
 
@@ -215,6 +203,44 @@ public class Agent implements Receiver, Initable {
 				}
 			}
 		}
+
+		/**
+		 * Adds the event listener.
+		 *
+		 * @param event
+		 *            the event
+		 * @param listener
+		 *            the listener
+		 */
+		public final void addEventListener(final String event,
+				final AgentEventListener listener) {
+			synchronized (eventListeners) {
+				List<AgentEventListener> list = eventListeners.get(event);
+				if (list == null) {
+					list = new ArrayList<AgentEventListener>();
+					eventListeners.put(event, list);
+				}
+				synchronized (list) {
+					list.add(listener);
+				}
+			}
+		}
+
+	}
+
+	private final void registerDefaultEventListeners() {
+		eventCaller.addEventListener("boot", new AgentEventListener() {
+			@Override
+			public void run() {
+				onBoot();
+			}
+		});
+		eventCaller.addEventListener("init", new AgentEventListener() {
+			@Override
+			public void run() {
+				onInit();
+			}
+		});
 	}
 
 	/**
@@ -222,24 +248,9 @@ public class Agent implements Receiver, Initable {
 	 *
 	 * @return the event caller
 	 */
-	public DefaultEventCaller getEventCaller() {
-		// TODO Auto-generated method stub
+	@JsonIgnore
+	protected DefaultEventCaller getEventCaller() {
 		return this.eventCaller;
-	}
-
-	private final void registerDefaultEventListeners() {
-		addEventListener("boot", new AgentEventListener() {
-			@Override
-			public void run() {
-				onBoot();
-			}
-		});
-		addEventListener("init", new AgentEventListener() {
-			@Override
-			public void run() {
-				onInit();
-			}
-		});
 	}
 
 	/**
@@ -284,7 +295,7 @@ public class Agent implements Receiver, Initable {
 	 * @param sender
 	 *            the new sender
 	 */
-	public void setSender(Handler<Caller> sender) {
+	protected void setSender(Handler<Caller> sender) {
 		this.sender = sender;
 	}
 
@@ -294,7 +305,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the sender
 	 */
 	@JsonIgnore
-	public Handler<Caller> getSender() {
+	protected Handler<Caller> getSender() {
 		return sender;
 	}
 
@@ -323,19 +334,8 @@ public class Agent implements Receiver, Initable {
 	 * @param config
 	 *            the new config
 	 */
-	public void setConfig(final ObjectNode config) {
+	protected void setConfig(final ObjectNode config) {
 		this.config = new AgentConfig(config);
-	}
-
-	/**
-	 * Set and loads the config.
-	 * 
-	 * @param config
-	 *            the new config
-	 */
-	public void loadConfig(final ObjectNode config) {
-		setConfig(config);
-		loadConfig();
 	}
 
 	/**
@@ -343,7 +343,7 @@ public class Agent implements Receiver, Initable {
 	 *
 	 * @return the rpc
 	 */
-	public RpcTransform getRpc() {
+	protected RpcTransform getRpc() {
 		return (RpcTransform) transforms.getLast();
 	}
 
@@ -433,7 +433,7 @@ public class Agent implements Receiver, Initable {
 	 * @param config
 	 *            the config
 	 */
-	public void loadTransforms(final ArrayNode config) {
+	private void loadTransforms(final ArrayNode config) {
 		// TODO: load transforms from config
 
 		// each agent has at least a RPC transform
@@ -447,7 +447,7 @@ public class Agent implements Receiver, Initable {
 	 *            the new scheduler
 	 */
 	@JsonIgnore
-	public void setScheduler(final Scheduler scheduler) {
+	protected void setScheduler(final Scheduler scheduler) {
 		if (this.scheduler != null) {
 			this.scheduler.clear();
 		}
@@ -461,7 +461,7 @@ public class Agent implements Receiver, Initable {
 	 * @param schedulerConfig
 	 *            the scheduler config
 	 */
-	public void loadScheduler(final ObjectNode schedulerConfig) {
+	private void loadScheduler(final ObjectNode schedulerConfig) {
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
@@ -496,7 +496,7 @@ public class Agent implements Receiver, Initable {
 	 *            the new state
 	 */
 	@JsonIgnore
-	public void setState(final State state) {
+	protected void setState(final State state) {
 		this.state = state;
 		config.set("state", state.getParams());
 	}
@@ -507,7 +507,7 @@ public class Agent implements Receiver, Initable {
 	 * @param sc
 	 *            the sc
 	 */
-	public void loadState(final ObjectNode sc) {
+	private void loadState(final ObjectNode sc) {
 		if (sc != null) {
 			final StateConfig stateConfig = new StateConfig(sc);
 			if (agentId != null && stateConfig.getId() == null) {
@@ -525,7 +525,7 @@ public class Agent implements Receiver, Initable {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	@JsonIgnore
-	public State getState() {
+	protected State getState() {
 		return state;
 	}
 
@@ -535,7 +535,7 @@ public class Agent implements Receiver, Initable {
 	 * @param transport
 	 *            the transport
 	 */
-	public void addTransport(final Transport transport) {
+	protected void addTransport(final Transport transport) {
 		this.transport.register(transport);
 
 		final JsonNode transportConfig = config.get("transport");
@@ -549,13 +549,19 @@ public class Agent implements Receiver, Initable {
 		}
 	}
 
+	protected void addTransport(final ObjectNode config) {
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(receiver).build();
+		addTransport(transport);
+	}
+
 	/**
 	 * Load transport.
 	 *
 	 * @param transportConfig
 	 *            the transport config
 	 */
-	public void loadTransports(final JsonNode transportConfig) {
+	private void loadTransports(final JsonNode transportConfig) {
 		if (transportConfig != null) {
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
@@ -606,7 +612,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the t
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public final <T> T createAgentProxy(final URI url,
+	protected final <T> T createAgentProxy(final URI url,
 			final Class<T> agentInterface) {
 		return AgentProxyFactory.genProxy(this, url, agentInterface);
 	}
@@ -623,7 +629,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the string
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public String schedule(final String method, final ObjectNode params,
+	protected String schedule(final String method, final ObjectNode params,
 			final DateTime due) {
 		return getScheduler().schedule(
 				((RpcTransform) transforms.getLast()).buildMsg(method, params),
@@ -642,7 +648,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the string
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public String schedule(final String method, final ObjectNode params,
+	protected String schedule(final String method, final ObjectNode params,
 			final int delay) {
 		return getScheduler().schedule(
 				((RpcTransform) transforms.getLast()).buildMsg(method, params),
@@ -656,7 +662,7 @@ public class Agent implements Receiver, Initable {
 	 *            the task id
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public void cancel(final String taskId) {
+	protected void cancel(final String taskId) {
 		getScheduler().cancel(taskId);
 	}
 
