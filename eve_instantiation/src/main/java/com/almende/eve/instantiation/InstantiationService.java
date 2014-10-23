@@ -94,24 +94,26 @@ public class InstantiationService implements Capability {
 
 	/**
 	 * Init a specific initable.
-	 * 
+	 *
 	 * @param wakeKey
 	 *            the wake key
+	 * @return the initable
 	 */
-	public void init(final String wakeKey) {
-		init(wakeKey, false);
+	public Initable init(final String wakeKey) {
+		return init(wakeKey, false);
 	}
-
+	
 	/**
 	 * Wake.
-	 * 
+	 *
 	 * @param wakeKey
 	 *            the wake key
 	 * @param onBoot
 	 *            the on boot
+	 * @return the initable
 	 */
 	@JsonIgnore
-	public void init(final String wakeKey, final boolean onBoot) {
+	public Initable init(final String wakeKey, final boolean onBoot) {
 		InstantiationEntry entry = entries.get(wakeKey);
 		if (entry == null) {
 			// Retry from file
@@ -149,10 +151,12 @@ public class InstantiationService implements Capability {
 			if (oldHandler != null) {
 				oldHandler.update(newHandler);
 			}
+			return instance;
 		} else {
 			LOG.warning("Sorry, I don't know any entry called:'" + wakeKey
 					+ "'");
 		}
+		return null;
 	}
 
 	/**
