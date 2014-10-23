@@ -191,6 +191,17 @@ public class InstantiationService implements Capability {
 	}
 
 	/**
+	 * Deregister.
+	 *
+	 * @param wakeKey
+	 *            the wake key
+	 */
+	public void deregister(final String wakeKey){
+		entries.remove(wakeKey);
+		store();
+	}
+	
+	/**
 	 * Store.
 	 */
 	private void store() {

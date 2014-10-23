@@ -170,6 +170,9 @@ public class Agent implements Receiver, Initable {
 		if (state != null) {
 			state.delete();
 		}
+		if (is != null){
+			is.deregister(agentId);
+		}
 	}
 
 	/**
