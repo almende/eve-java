@@ -92,9 +92,10 @@ public final class Boot {
 	 *
 	 * @param is
 	 *            the is
+	 * @return the object node
 	 */
-	public static void boot(final InputStream is){
-		boot(is,null);
+	public static ObjectNode boot(final InputStream is){
+		return boot(is,null);
 	}
 
 	/**
@@ -102,9 +103,10 @@ public final class Boot {
 	 *
 	 * @param config
 	 *            the config
+	 * @return the object node
 	 */
-	public static void boot(final ObjectNode config){
-		boot(config,null);
+	public static ObjectNode boot(final ObjectNode config){
+		return boot(config,null);
 	}
 	
 	/**
@@ -114,25 +116,13 @@ public final class Boot {
 	 *            the config
 	 * @param cl
 	 *            the cl
+	 * @return the object node
 	 */
-	public static void boot(final ObjectNode config, final ClassLoader cl){
+	public static ObjectNode boot(final ObjectNode config, final ClassLoader cl){
 		final Config conf = new Config(config);
-		boot(conf,null);
+		return boot(conf,null);
 	}
 
-	/**
-	 * Boot.
-	 *
-	 * @param config
-	 *            the config
-	 * @param cl
-	 *            the cl
-	 */
-	public static void boot(final Config config, final ClassLoader cl){
-		loadInstantiationServices(config, cl);
-		loadAgents(config, cl);		
-	}
-	
 	/**
 	 * Boot.
 	 *
@@ -140,11 +130,28 @@ public final class Boot {
 	 *            the is
 	 * @param cl
 	 *            the cl
+	 * @return the object node
 	 */
-	public static void boot(final InputStream is, final ClassLoader cl){
+	public static ObjectNode boot(final InputStream is, final ClassLoader cl){
 		final Config config = YamlReader.load(is).expand();
-		boot(config,cl);
+		return boot(config,cl);
 	}
+
+	/**
+	 * Boot.
+	 *
+	 * @param config
+	 *            the config
+	 * @param cl
+	 *            the cl
+	 * @return the object node
+	 */
+	public static ObjectNode boot(final Config config, final ClassLoader cl){
+		loadInstantiationServices(config, cl);
+		loadAgents(config, cl);
+		return config;
+	}
+	
 	
 	/**
 	 * Load instantiation services.

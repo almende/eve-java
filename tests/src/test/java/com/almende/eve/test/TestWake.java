@@ -18,7 +18,11 @@ import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.MyAgent;
 import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
+import com.almende.eve.transport.http.DebugServlet;
+import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.callback.AsyncCallback;
+import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class TestWake.
@@ -46,6 +50,16 @@ public class TestWake extends TestCase {
 		isConfig.setState(stateconfig);
 		
 		config.setInstantiationService(isConfig);
+		
+		
+		final HttpTransportConfig transConfig = new HttpTransportConfig();
+		transConfig.setServletUrl("http://localhost:8080/agents/");
+		transConfig.setServletLauncher("JettyLauncher");
+		transConfig.setServletClass(DebugServlet.class.getName());
+		final ObjectNode jettyParms = JOM.createObjectNode();
+		jettyParms.put("port", 8080);
+		transConfig.set("jetty", jettyParms);
+		config.setTransport(transConfig);
 		
 		// Now create a WakeAble Agent
 		WeakReference<Agent> test = new WeakReference<Agent>(new MyAgent(config));

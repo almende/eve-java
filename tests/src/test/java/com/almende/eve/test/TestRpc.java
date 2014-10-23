@@ -18,6 +18,7 @@ import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.transform.rpc.annotation.Namespace;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,13 +58,22 @@ public class TestRpc extends TestCase {
 		
 		final ObjectNode parms = JOM.createObjectNode();
 		parms.put("parm", true);
-		final Object request = transform.buildMsg("testMe", parms, callback);
+		Object request = transform.buildMsg("testMe", parms, callback);
 		
 		// transport
-		final Object response = transform.invoke(request,
+		Object response = transform.invoke(request,
 				URI.create("local://me"));
 		// transport
 		transform.invoke(response, URI.create("local://me"));
+		
+		request = transform.buildMsg("test.testMe", parms, callback);
+		
+		// transport
+		response = transform.invoke(request,
+						URI.create("local://me"));
+		// transport
+		transform.invoke(response, URI.create("local://me"));
+				
 		
 	}
 	
@@ -83,6 +93,35 @@ public class TestRpc extends TestCase {
 		public Boolean testMe(@Name("parm") final Boolean test) {
 			return test;
 		}
+	
+		/**
+		 * The Class MyClass.
+		 */
+		@Access(AccessType.PUBLIC)
+		class MySubClass {
+			
+			/**
+			 * Test me.
+			 * 
+			 * @param test
+			 *            the test
+			 * @return the boolean
+			 */
+			public Boolean testMe(@Name("parm") final Boolean test) {
+				return test;
+			}			
+		}
+		
+		/**
+		 * Gets the sub.
+		 *
+		 * @return the sub
+		 */
+		@Namespace("test")
+		public MySubClass getSub(){
+			return new MySubClass();
+		}
 		
 	}
+	
 }

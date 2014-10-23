@@ -11,12 +11,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * The listener interface for receiving ServletContext events.
  */
 public class EveListener implements ServletContextListener {
 	private static final Logger	LOG	= Logger.getLogger(EveListener.class
 											.getName());
+	protected ObjectNode myConfig = null;
 	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -35,7 +38,7 @@ public class EveListener implements ServletContextListener {
 				return;
 			}
 
-			Boot.boot(is);
+			myConfig = Boot.boot(is);
 		}
 		
 	}
