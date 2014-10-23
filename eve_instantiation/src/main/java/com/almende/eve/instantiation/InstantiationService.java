@@ -6,6 +6,7 @@ package com.almende.eve.instantiation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,19 +15,22 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
 import com.almende.util.TypeUtil;
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class InstantiationService.
  */
 public class InstantiationService implements Capability {
-	private static final Logger				LOG			= Logger.getLogger(InstantiationService.class
-																.getName());
-	private ObjectNode						myParams	= null;
-	private Map<String, InstantiationEntry>	entries		= new HashMap<String, InstantiationEntry>();
-	private State							state		= null;
-	private ClassLoader						cl			= null;
+	private static final Logger							LOG					= Logger.getLogger(InstantiationService.class
+																					.getName());
+	private static final TypeUtil<InstantiationEntry>	INSTANTIATIONENTRY	= new TypeUtil<InstantiationEntry>() {};
+	private ObjectNode									myParams			= null;
+	private Map<String, InstantiationEntry>				entries				= new HashMap<String, InstantiationEntry>();
+	private State										state				= null;
+	private ClassLoader									cl					= null;
 
 	/**
 	 * Instantiates a new wake service.
@@ -52,12 +56,12 @@ public class InstantiationService implements Capability {
 	}
 
 	@Override
-	public void delete(){
-		if (state != null){
+	public void delete() {
+		if (state != null) {
 			state.delete();
 		}
 	}
-	
+
 	/**
 	 * Gets the my params.
 	 * 
@@ -87,11 +91,11 @@ public class InstantiationService implements Capability {
 	@JsonIgnore
 	public void boot() {
 		load();
-		for (final InstantiationEntry entry : entries.values()) {
-			init(entry.getWakeKey(), true);
+		for (final String key : entries.keySet()) {
+			init(key, true);
 		}
 	}
-	
+
 	/**
 	 * Exists.
 	 *
@@ -99,8 +103,8 @@ public class InstantiationService implements Capability {
 	 *            the wake key
 	 * @return true, if successful
 	 */
-	public boolean exists(final String wakeKey){
-		if (!entries.containsKey(wakeKey)){
+	public boolean exists(final String wakeKey) {
+		if (!entries.containsKey(wakeKey)) {
 			load();
 			return entries.containsKey(wakeKey);
 		} else {
@@ -118,7 +122,7 @@ public class InstantiationService implements Capability {
 	public Initable init(final String wakeKey) {
 		return init(wakeKey, false);
 	}
-	
+
 	/**
 	 * Wake.
 	 *
@@ -132,9 +136,8 @@ public class InstantiationService implements Capability {
 	public Initable init(final String wakeKey, final boolean onBoot) {
 		InstantiationEntry entry = entries.get(wakeKey);
 		if (entry == null) {
-			// Retry from file
-			load();
-			entry = entries.get(wakeKey);
+			entry = load(wakeKey);
+			entries.put(wakeKey, entry);
 		}
 		if (entry != null) {
 			final String className = entry.getClassName();
@@ -216,17 +219,55 @@ public class InstantiationService implements Capability {
 	 * @param wakeKey
 	 *            the wake key
 	 */
-	public void deregister(final String wakeKey){
+	public void deregister(final String wakeKey) {
 		entries.remove(wakeKey);
 		store();
 	}
-	
+
+	/**
+	 * Store.
+	 *
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
+	private void store(final String key, final InstantiationEntry val) {
+		final State innerState = new StateBuilder().withConfig(
+				state.getParams().put("id", key)).build();
+		if (innerState != null) {
+			try {
+				innerState.put("entry",
+						JOM.getInstance().writeValueAsString(val));
+			} catch (JsonProcessingException e) {
+				LOG.log(Level.WARNING, "Couldn't store entry:" + key, e);
+			}
+		}
+	}
+
+	/**
+	 * Load.
+	 *
+	 * @param key
+	 *            the key
+	 * @return the instantiation entry
+	 */
+	private InstantiationEntry load(final String key) {
+		final State innerState = new StateBuilder().withConfig(
+				state.getParams().put("id", key)).build();
+		return innerState.get("entry", INSTANTIATIONENTRY);
+	}
+
 	/**
 	 * Store.
 	 */
 	private void store() {
 		if (state != null) {
-			state.put("entries", entries);
+			for (Entry<String, InstantiationEntry> entry : entries.entrySet()) {
+				if (entry.getValue() != null) {
+					store(entry.getKey(), entry.getValue());
+				}
+			}
 		}
 	}
 
@@ -234,10 +275,10 @@ public class InstantiationService implements Capability {
 	 * Load.
 	 */
 	private void load() {
-		if (state != null && state.containsKey("entries")) {
-			entries = state.get("entries",
-					new TypeUtil<HashMap<String, InstantiationEntry>>() {});
-
+		if (state != null) {
+			for (String key : state.keySet()) {
+				entries.put(key, null);
+			}
 		}
 	}
 

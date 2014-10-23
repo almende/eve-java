@@ -49,9 +49,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRPC.
  */
 final class JSONRPC {
-	private static final Logger	LOG					= Logger.getLogger(JSONRPC.class
-															.getName());
-	
+	private static final Logger	LOG	= Logger.getLogger(JSONRPC.class.getName());
+
 	static {
 		if (Defines.HASMETHODHANDLES) {
 			LOG.log(Level.FINE, "Using MethodHandle i.s.o. plain reflection!");
@@ -59,13 +58,12 @@ final class JSONRPC {
 			LOG.log(Level.FINE, "Using plain reflection i.s.o. MethodHandle!");
 		}
 	}
-	
+
 	/**
 	 * Instantiates a new jsonrpc.
 	 */
-	private JSONRPC() {
-	}
-	
+	private JSONRPC() {}
+
 	// TODO: implement JSONRPC 2.0 Batch
 	/**
 	 * Invoke a method on an object.
@@ -84,7 +82,7 @@ final class JSONRPC {
 			final Authorizor auth) throws IOException {
 		return invoke(destination, request, null, auth);
 	}
-	
+
 	/**
 	 * Invoke a method on an object.
 	 * 
@@ -111,10 +109,10 @@ final class JSONRPC {
 		} catch (final JSONRPCException err) {
 			jsonResponse = new JSONResponse(err);
 		}
-		
+
 		return jsonResponse.toString();
 	}
-	
+
 	/**
 	 * Invoke a method on an object.
 	 * 
@@ -130,7 +128,7 @@ final class JSONRPC {
 			final JSONRequest request, final Authorizor auth) {
 		return invoke(destination, request, null, auth);
 	}
-	
+
 	/**
 	 * Invoke a method on an object.
 	 * 
@@ -151,7 +149,7 @@ final class JSONRPC {
 		try {
 			final CallTuple tuple = NamespaceUtil.get(destination,
 					request.getMethod());
-			
+
 			final Object realDest = tuple.getDestination();
 			final AnnotatedMethod annotatedMethod = tuple.getMethod();
 			if (!isAvailable(annotatedMethod, realDest, requestParams, auth)) {
@@ -161,10 +159,10 @@ final class JSONRPC {
 								+ request.getMethod()
 								+ "' not found. The method does not exist or you are not authorized.");
 			}
-			
+
 			final MethodHandle methodHandle = annotatedMethod.getMethodHandle();
 			final Method method = annotatedMethod.getActualMethod();
-			
+
 			Object result;
 			if (Defines.HASMETHODHANDLES) {
 				final Object[] params = castParams(realDest,
@@ -182,8 +180,6 @@ final class JSONRPC {
 			resp.setResult(result);
 		} catch (final JSONRPCException err) {
 			resp.setError(err);
-			// TODO: Can this be reduced to Exception? Which Errors do we want
-			// to catch?
 		} catch (final Throwable err) {
 			final Throwable cause = err.getCause();
 			if (cause instanceof JSONRPCException) {
@@ -193,7 +189,7 @@ final class JSONRPC {
 					LOG.log(Level.WARNING,
 							"Exception raised, returning its cause as JSONRPCException. Request:"
 									+ request, cause);
-					
+
 					final JSONRPCException jsonError = new JSONRPCException(
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(cause), cause);
@@ -203,7 +199,7 @@ final class JSONRPC {
 					LOG.log(Level.WARNING,
 							"Exception raised, returning it as JSONRPCException. Request:"
 									+ request, err);
-					
+
 					final JSONRPCException jsonError = new JSONRPCException(
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(err), err);
@@ -214,7 +210,7 @@ final class JSONRPC {
 		}
 		return resp;
 	}
-	
+
 	/**
 	 * Validate whether the given class contains valid JSON-RPC methods. A class
 	 * if valid when:<br>
@@ -233,7 +229,7 @@ final class JSONRPC {
 			final RequestParams requestParams) {
 		final List<String> errors = new ArrayList<String>();
 		final Set<String> methodNames = new HashSet<String>();
-		
+
 		AnnotatedClass ac = null;
 		try {
 			ac = AnnotationUtil.get(c);
@@ -251,7 +247,7 @@ final class JSONRPC {
 									+ " allowed for JSON-RPC.");
 						}
 						methodNames.add(name);
-						
+
 						// TODO: I removed duplicate @Name check. If you reach
 						// this point the function at least has named
 						// parameters, due to the isAvailable() call. Should we
@@ -266,7 +262,7 @@ final class JSONRPC {
 		}
 		return errors;
 	}
-	
+
 	/**
 	 * _describe.
 	 * 
@@ -281,7 +277,8 @@ final class JSONRPC {
 	 * @return the map
 	 */
 	private static Map<String, Object> _describe(final Object c,
-			final RequestParams requestParams, String namespace, final Authorizor auth) {
+			final RequestParams requestParams, String namespace,
+			final Authorizor auth) {
 		final Map<String, Object> methods = new TreeMap<String, Object>();
 		try {
 			if (c == null) {
@@ -304,14 +301,15 @@ final class JSONRPC {
 							descParams.add(paramData);
 						}
 					}
-					
+
 					final Map<String, Object> result = new HashMap<String, Object>();
 					result.put("type",
 							typeToString(method.getGenericReturnType()));
-					
+
 					final Map<String, Object> desc = new HashMap<String, Object>();
-					if (namespace.equals("*")){
-						namespace = annotatedClass.getAnnotation(Namespace.class).value();
+					if (namespace.equals("*")) {
+						namespace = annotatedClass.getAnnotation(
+								Namespace.class).value();
 					}
 					final String methodName = namespace.equals("") ? method
 							.getName() : namespace + "." + method.getName();
@@ -336,7 +334,7 @@ final class JSONRPC {
 		}
 		return methods;
 	}
-	
+
 	/**
 	 * Describe all JSON-RPC methods of given class.
 	 * 
@@ -351,8 +349,9 @@ final class JSONRPC {
 	public static List<Object> describe(final Object c,
 			final RequestParams requestParams, final Authorizor auth) {
 		try {
-			final Map<String, Object> methods = _describe(c, requestParams, "", auth);
-			
+			final Map<String, Object> methods = _describe(c, requestParams, "",
+					auth);
+
 			// create a sorted array
 			final List<Object> sortedMethods = new ArrayList<Object>();
 			final TreeSet<String> methodNames = new TreeSet<String>(
@@ -367,7 +366,7 @@ final class JSONRPC {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Get type description from a class. Returns for example "String" or
 	 * "List<String>".
@@ -378,7 +377,7 @@ final class JSONRPC {
 	 */
 	private static String typeToString(final Type c) {
 		String s = c.toString();
-		
+
 		// replace full namespaces to short names
 		int point = s.lastIndexOf('.');
 		while (point >= 0) {
@@ -388,17 +387,17 @@ final class JSONRPC {
 			s = s.substring(0, start + 1) + s.substring(point + 1);
 			point = s.lastIndexOf('.');
 		}
-		
+
 		// remove modifiers like "class blabla" or "interface blabla"
 		final int space = s.indexOf(' ');
 		final int angle = s.indexOf('<', point);
 		if (space >= 0 && (angle < 0 || angle > space)) {
 			s = s.substring(space + 1);
 		}
-		
+
 		return s;
 	}
-	
+
 	/**
 	 * Retrieve a description of an error.
 	 * 
@@ -413,7 +412,7 @@ final class JSONRPC {
 		}
 		return cause.toString();
 	}
-	
+
 	/**
 	 * @param params
 	 * @param annotatedParams
@@ -425,7 +424,7 @@ final class JSONRPC {
 			final RequestParams requestParams) {
 		return castParams(null, params, annotatedParams, requestParams);
 	}
-	
+
 	/**
 	 * Cast a JSONArray or JSONObject params to the desired paramTypes.
 	 * 
@@ -441,7 +440,7 @@ final class JSONRPC {
 			final ObjectNode params,
 			final List<AnnotatedParam> annotatedParams,
 			final RequestParams requestParams) {
-		
+
 		switch (annotatedParams.size()) {
 			case 0:
 				if (realDest != null) {
@@ -449,7 +448,7 @@ final class JSONRPC {
 				} else {
 					return new Object[0];
 				}
-				/* -- Unreachable, explicit no break --*/
+				/* -- Unreachable, explicit no break -- */
 			case 1:
 				if (annotatedParams.get(0).getType().equals(ObjectNode.class)
 						&& annotatedParams.get(0).getAnnotations().size() == 0) {
@@ -475,7 +474,7 @@ final class JSONRPC {
 				}
 				for (int i = 0; i < annotatedParams.size(); i++) {
 					final AnnotatedParam p = annotatedParams.get(i);
-					
+
 					final Annotation a = getRequestAnnotation(p, requestParams);
 					if (a != null) {
 						// this is a systems parameter
@@ -515,7 +514,7 @@ final class JSONRPC {
 				return objects;
 		}
 	}
-	
+
 	/**
 	 * Create a JSONRequest from a java method and arguments.
 	 * 
@@ -538,9 +537,9 @@ final class JSONRPC {
 		}
 		final List<AnnotatedParam> annotatedParams = annotatedMethod
 				.getParams();
-		
+
 		final ObjectNode params = JOM.createObjectNode();
-		
+
 		for (int i = 0; i < annotatedParams.size(); i++) {
 			final AnnotatedParam annotatedParam = annotatedParams.get(i);
 			if (i < args.length && args[i] != null) {
@@ -567,7 +566,7 @@ final class JSONRPC {
 		}
 		return new JSONRequest(id, method.getName(), params);
 	}
-	
+
 	/**
 	 * Check whether a method is available for JSON-RPC calls. This is the case
 	 * when it is public, has named parameters, and has a public or private @Access
@@ -586,7 +585,7 @@ final class JSONRPC {
 	private static boolean isAvailable(final AnnotatedMethod method,
 			final Object destination, final RequestParams requestParams,
 			final Authorizor auth) {
-		
+
 		if (method == null) {
 			return false;
 		}
@@ -600,7 +599,7 @@ final class JSONRPC {
 		if (!(Modifier.isPublic(mod) && hasNamedParams(method, requestParams))) {
 			return false;
 		}
-		
+
 		final Access classAccess = AnnotationUtil.get(
 				destination != null ? destination.getClass() : method
 						.getActualMethod().getDeclaringClass()).getAnnotation(
@@ -615,7 +614,7 @@ final class JSONRPC {
 		if (methodAccess.value() == AccessType.UNAVAILABLE) {
 			return false;
 		}
-		
+
 		if (methodAccess.value() == AccessType.PRIVATE) {
 			return auth != null ? auth.onAccess(requestParams.get(Sender.class)
 					.toString(), methodAccess.tag()) : false;
@@ -626,7 +625,7 @@ final class JSONRPC {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Test whether a method has named parameters.
 	 * 
@@ -649,14 +648,14 @@ final class JSONRPC {
 					break;
 				}
 			}
-			
+
 			if (!found) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Test if a parameter is required Reads the parameter annotation @Required.
 	 * Returns True if the annotation is not provided.
@@ -678,7 +677,7 @@ final class JSONRPC {
 		}
 		return required;
 	}
-	
+
 	/**
 	 * Get the name of a parameter Reads the parameter annotation @Name. Returns
 	 * null if the annotation is not provided.
@@ -695,7 +694,7 @@ final class JSONRPC {
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Find a request annotation in the given parameters Returns null if no
 	 * system annotation is not found.
@@ -715,7 +714,7 @@ final class JSONRPC {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Check if given json object contains all fields required for a
 	 * json-rpc request (id, method, params).
@@ -727,7 +726,7 @@ final class JSONRPC {
 	public static boolean isRequest(final ObjectNode json) {
 		return json.has("method");
 	}
-	
+
 	/**
 	 * Check if given json object contains all fields required for a
 	 * json-rpc response (id, result or error).
@@ -739,5 +738,5 @@ final class JSONRPC {
 	public static boolean isResponse(final ObjectNode json) {
 		return (json.has("result") || json.has("error"));
 	}
-	
+
 }

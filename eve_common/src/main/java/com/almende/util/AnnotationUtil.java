@@ -705,7 +705,7 @@ public final class AnnotationUtil {
 		for (final Method b : listB) {
 			AnnotatedMethod methodAnnotations = null;
 			for (final AnnotatedMethod a : listA) {
-				if (equals(a.method, b)) {
+				if (areEqual(a.method, b)) {
 					methodAnnotations = a;
 					break;
 				}
@@ -738,7 +738,7 @@ public final class AnnotationUtil {
 		for (final Field b : listB) {
 			AnnotatedField fieldAnnotations = null;
 			for (final AnnotatedField a : listA) {
-				if (equals(a.field, b)) {
+				if (areEqual(a.field, b)) {
 					fieldAnnotations = a;
 					break;
 				}
@@ -762,7 +762,7 @@ public final class AnnotationUtil {
 	 *            the b
 	 * @return true, if successful
 	 */
-	private static boolean equals(final Method a, final Method b) {
+	private static boolean areEqual(final Method a, final Method b) {
 		// http://stackoverflow.com/q/10062957/1262753
 		if (!a.getName().equals(b.getName())) {
 			return false;
@@ -794,7 +794,7 @@ public final class AnnotationUtil {
 	 *            the b
 	 * @return true, if successful
 	 */
-	private static boolean equals(final Field a, final Field b) {
+	private static boolean areEqual(final Field a, final Field b) {
 		// http://stackoverflow.com/q/10062957/1262753
 		if (!a.getName().equals(b.getName())) {
 			return false;

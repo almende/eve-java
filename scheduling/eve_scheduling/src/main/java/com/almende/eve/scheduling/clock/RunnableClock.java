@@ -65,7 +65,7 @@ public class RunnableClock implements Runnable, Clock {
 			final ClockEntry oldVal = TIMELINE.get(ce);
 			if (oldVal == null || oldVal.getDue().isAfter(due)) {
 				TIMELINE.put(ce, ce);
-				run();
+				POOL.execute(this);
 			}
 		}
 	}
