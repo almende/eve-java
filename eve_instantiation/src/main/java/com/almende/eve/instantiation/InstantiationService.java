@@ -91,6 +91,22 @@ public class InstantiationService implements Capability {
 			init(entry.getWakeKey(), true);
 		}
 	}
+	
+	/**
+	 * Exists.
+	 *
+	 * @param wakeKey
+	 *            the wake key
+	 * @return true, if successful
+	 */
+	public boolean exists(final String wakeKey){
+		if (!entries.containsKey(wakeKey)){
+			load();
+			return entries.containsKey(wakeKey);
+		} else {
+			return true;
+		}
+	}
 
 	/**
 	 * Init a specific initable.
