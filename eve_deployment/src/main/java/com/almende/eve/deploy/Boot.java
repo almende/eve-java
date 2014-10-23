@@ -96,6 +96,42 @@ public final class Boot {
 	public static void boot(final InputStream is){
 		boot(is,null);
 	}
+
+	/**
+	 * Boot.
+	 *
+	 * @param config
+	 *            the config
+	 */
+	public static void boot(final ObjectNode config){
+		boot(config,null);
+	}
+	
+	/**
+	 * Boot.
+	 *
+	 * @param config
+	 *            the config
+	 * @param cl
+	 *            the cl
+	 */
+	public static void boot(final ObjectNode config, final ClassLoader cl){
+		final Config conf = new Config(config);
+		boot(conf,null);
+	}
+
+	/**
+	 * Boot.
+	 *
+	 * @param config
+	 *            the config
+	 * @param cl
+	 *            the cl
+	 */
+	public static void boot(final Config config, final ClassLoader cl){
+		loadInstantiationServices(config, cl);
+		loadAgents(config, cl);		
+	}
 	
 	/**
 	 * Boot.
@@ -107,9 +143,7 @@ public final class Boot {
 	 */
 	public static void boot(final InputStream is, final ClassLoader cl){
 		final Config config = YamlReader.load(is).expand();
-
-		loadInstantiationServices(config, cl);
-		loadAgents(config, cl);		
+		boot(config,cl);
 	}
 	
 	/**
@@ -141,8 +175,12 @@ public final class Boot {
 	 *            the custom classloader
 	 */
 	public static void loadAgents(final Config config, final ClassLoader cl) {
-
+		if (!config.has("agents")){
+			return;
+		}
+		
 		final ArrayNode agents = (ArrayNode) config.get("agents");
+		
 		for (final JsonNode agent : agents) {
 			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
