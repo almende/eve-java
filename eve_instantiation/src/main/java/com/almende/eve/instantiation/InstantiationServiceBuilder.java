@@ -29,9 +29,9 @@ public class InstantiationServiceBuilder extends
 		InstantiationService service = null;
 		if (SERVICES.containsKey(id)) {
 			service = SERVICES.get(id);
+		} else {
+			service = new InstantiationService(config, cl);
 		}
-		service = new InstantiationService(config, cl);
-
 		return service;
 	}
 

@@ -7,6 +7,7 @@ package com.almende.eve.instantiation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,12 +109,7 @@ public class InstantiationService implements Capability {
 	 * @return true, if successful
 	 */
 	public boolean exists(final String wakeKey) {
-		if (!entries.containsKey(wakeKey)) {
-			load();
-			return entries.containsKey(wakeKey);
-		} else {
-			return true;
-		}
+		return entries.containsKey(wakeKey);
 	}
 
 	/**
@@ -274,7 +270,8 @@ public class InstantiationService implements Capability {
 	 * Load.
 	 */
 	private void load() {
-		for (String key : stateService.getStateIds()) {
+		final Set<String> stateIds = stateService.getStateIds();
+		for (String key : stateIds ) {
 			if (key.equals(myId)){
 				continue;
 			}
