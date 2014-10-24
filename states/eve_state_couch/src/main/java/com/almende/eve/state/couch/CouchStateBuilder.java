@@ -4,7 +4,9 @@
  */
 package com.almende.eve.state.couch;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,6 +167,12 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 			}
 			
 			return key;
+		}
+
+		@Override
+		public Set<String> getStateIds() {
+			//TODO: Remove the design doc ids.
+			return new HashSet<String>(db.getAllDocIds());
 		}
 	}
 }

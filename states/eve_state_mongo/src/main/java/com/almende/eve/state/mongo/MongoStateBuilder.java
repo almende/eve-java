@@ -5,7 +5,10 @@
 package com.almende.eve.state.mongo;
 
 import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -171,6 +174,17 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 			} catch (final Exception e) {
 				LOG.log(Level.WARNING, "delete error", e);
 			}
+		}
+
+		@Override
+		public Set<String> getStateIds() {
+			Iterator<MongoState> res = getCollection().find().as(MongoState.class).iterator();
+			Set<String> result = new HashSet<String>();
+			while (res.hasNext()){
+				MongoState state = res.next();
+				result.add(state.getId());
+			}
+			return result;
 		}
 	}
 }

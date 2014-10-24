@@ -5,6 +5,7 @@
 package com.almende.eve.state.memory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -72,5 +73,12 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState>
 	public void delete(final State instance) {
 		STATES.remove(instance.getId());
 	}
+
+	@Override
+	public Set<String> getStateIds() {
+		return STATES.keySet();
+	}
+	
+	
 	
 }

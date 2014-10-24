@@ -7,10 +7,13 @@ package com.almende.eve.state.file;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -283,6 +286,26 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			data.put("class", this.getClass().getName());
 			data.put("path", path);
 			return data.toString();
+		}
+
+		@Override
+		public Set<String> getStateIds() {
+			final File folder = new File(this.path);
+			final File[] files = folder.listFiles();
+			final List<File> totalList = Arrays.asList(files);
+			if (multilevel) {
+				for (final File file : new ArrayList<File>(totalList)) {
+					if (!file.isDirectory()) {
+						continue;
+					}
+					totalList.add(file);
+				}
+			}
+			Set<String> result = new HashSet<String>(totalList.size());
+			for (final File file : totalList){
+				result.add(file.getName());
+			}
+			return result;
 		}
 	}
 	

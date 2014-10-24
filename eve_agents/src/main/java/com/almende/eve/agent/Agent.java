@@ -42,6 +42,7 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
+import com.almende.eve.transport.TransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
@@ -419,10 +420,6 @@ public class Agent implements Receiver, Initable {
 		loadScheduler(config.getScheduler());
 		loadState(config.getState());
 		loadTransports(config.getTransport());
-		// All agents have a local transport
-		addTransport(new LocalTransportBuilder()
-		.withConfig(new LocalTransportConfig(agentId))
-		.withHandle(receiver).build());
 		loadTransforms(config.getTransforms());
 	}
 
@@ -539,7 +536,7 @@ public class Agent implements Receiver, Initable {
 		this.transport.register(transport);
 
 		JsonNode transportConfig = config.get("transport");
-		if (transportConfig == null){
+		if (transportConfig == null) {
 			transportConfig = JOM.createArrayNode();
 		}
 		if (transportConfig.isArray()) {
@@ -555,11 +552,13 @@ public class Agent implements Receiver, Initable {
 
 	protected void addTransport(final ObjectNode transconfig) {
 		// TODO: Somewhat ugly, not every transport requires an id.
-		if (transconfig.get("id") == null) {
-			transconfig.put("id", agentId);
+		TransportConfig transconf = new TransportConfig(transconfig);
+		if (transconf.get("id") == null) {
+			transconf.put("id", agentId);
 		}
 		final Transport transport = new TransportBuilder()
-				.withConfig(transconfig).withHandle(receiver).build();
+				.withConfig(transconf).withHandle(receiver).build();
+
 		addTransport(transport);
 	}
 
@@ -570,18 +569,22 @@ public class Agent implements Receiver, Initable {
 	 *            the transport config
 	 */
 	private void loadTransports(final JsonNode transportConfig) {
+		// Cleanout old config
+		config.remove("transport");
 		if (transportConfig != null) {
-			//Cleanout old config
-			config.remove("transport");
 			if (transportConfig.isArray()) {
 				final Iterator<JsonNode> iter = transportConfig.iterator();
 				while (iter.hasNext()) {
-					addTransport((ObjectNode)iter.next());
+					addTransport((ObjectNode) iter.next());
 				}
 			} else {
 				addTransport((ObjectNode) transportConfig);
 			}
 		}
+		// All agents have a local transport
+		addTransport(new LocalTransportBuilder()
+				.withConfig(new LocalTransportConfig(agentId))
+				.withHandle(receiver).build());
 	}
 
 	/**

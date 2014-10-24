@@ -4,6 +4,8 @@
  */
 package com.almende.eve.state;
 
+import java.util.Set;
+
 
 /**
  * A service for managing State objects.
@@ -18,4 +20,10 @@ public interface StateService {
 	 */
 	void delete(State instance);
 	
+	/**
+	 * Gets the existing stateIds.
+	 *
+	 * @return the stateIds
+	 */
+	Set<String> getStateIds();
 }

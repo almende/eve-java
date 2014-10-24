@@ -14,10 +14,11 @@ import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
+import com.almende.eve.state.StateConfig;
+import com.almende.eve.state.StateService;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -28,8 +29,9 @@ public class InstantiationService implements Capability {
 																					.getName());
 	private static final TypeUtil<InstantiationEntry>	INSTANTIATIONENTRY	= new TypeUtil<InstantiationEntry>() {};
 	private ObjectNode									myParams			= null;
+	private String										myId				= null;
 	private Map<String, InstantiationEntry>				entries				= new HashMap<String, InstantiationEntry>();
-	private State										state				= null;
+	private StateService								stateService		= null;
 	private ClassLoader									cl					= null;
 
 	/**
@@ -49,14 +51,19 @@ public class InstantiationService implements Capability {
 	public InstantiationService(final ObjectNode params, final ClassLoader cl) {
 		this.cl = cl;
 		myParams = params;
-		state = new StateBuilder().withConfig(
+		final State state = new StateBuilder().withConfig(
 				(ObjectNode) myParams.get("state")).build();
-		InstantiationServiceBuilder.getServices().put(state.getId(), this);
+		stateService = state.getService();
+		myId = state.getId();
+		InstantiationServiceBuilder.getServices().put(myId, this);
 		load();
 	}
 
 	@Override
 	public void delete() {
+		// TODO: clear out all state files
+		final State state = new StateBuilder().withConfig(
+				(ObjectNode) myParams.get("state")).build();
 		if (state != null) {
 			state.delete();
 		}
@@ -79,9 +86,6 @@ public class InstantiationService implements Capability {
 	 */
 	public void setMyParams(final ObjectNode myParams) {
 		this.myParams = myParams;
-		state = new StateBuilder().withConfig(
-				(ObjectNode) myParams.get("state")).build();
-		InstantiationServiceBuilder.getServices().put(state.getId(), this);
 		load();
 	}
 
@@ -234,14 +238,10 @@ public class InstantiationService implements Capability {
 	 */
 	private void store(final String key, final InstantiationEntry val) {
 		final State innerState = new StateBuilder().withConfig(
-				state.getParams().put("id", key)).build();
+				new StateConfig((ObjectNode) myParams.get("state")).put("id",
+						key)).build();
 		if (innerState != null) {
-			try {
-				innerState.put("entry",
-						JOM.getInstance().writeValueAsString(val));
-			} catch (JsonProcessingException e) {
-				LOG.log(Level.WARNING, "Couldn't store entry:" + key, e);
-			}
+			innerState.put("entry", JOM.getInstance().valueToTree(val));
 		}
 	}
 
@@ -254,7 +254,8 @@ public class InstantiationService implements Capability {
 	 */
 	private InstantiationEntry load(final String key) {
 		final State innerState = new StateBuilder().withConfig(
-				state.getParams().put("id", key)).build();
+				new StateConfig((ObjectNode) myParams.get("state")).put("id",
+						key)).build();
 		return innerState.get("entry", INSTANTIATIONENTRY);
 	}
 
@@ -262,11 +263,9 @@ public class InstantiationService implements Capability {
 	 * Store.
 	 */
 	private void store() {
-		if (state != null) {
-			for (Entry<String, InstantiationEntry> entry : entries.entrySet()) {
-				if (entry.getValue() != null) {
-					store(entry.getKey(), entry.getValue());
-				}
+		for (Entry<String, InstantiationEntry> entry : entries.entrySet()) {
+			if (entry.getValue() != null) {
+				store(entry.getKey(), entry.getValue());
 			}
 		}
 	}
@@ -275,10 +274,11 @@ public class InstantiationService implements Capability {
 	 * Load.
 	 */
 	private void load() {
-		if (state != null) {
-			for (String key : state.keySet()) {
-				entries.put(key, null);
+		for (String key : stateService.getStateIds()) {
+			if (key.equals(myId)){
+				continue;
 			}
+			entries.put(key, null);
 		}
 	}
 

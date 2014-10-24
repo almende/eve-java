@@ -151,4 +151,11 @@ public interface State extends Capability {
 	 */
 	<T> T get(TypedKey<T> key);
 	
+	/**
+	 * Gets the service.
+	 *
+	 * @return the service
+	 */
+	StateService getService();
+	
 }
