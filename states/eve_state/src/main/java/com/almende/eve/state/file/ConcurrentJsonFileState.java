@@ -4,6 +4,8 @@
  */
 package com.almende.eve.state.file;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.logging.Logger;
 
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.file.FileStateBuilder.FileStateProvider;
+import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.almende.util.jackson.JsonNullAwareDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +34,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,6 +76,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	private InputStream						fis			= null;
 	private OutputStream					fos			= null;
 	private ObjectMapper					om			= null;
+	private ObjectWriter					writer		= null;
 	private static final Map<String, Lock>	LOCKED		= new ConcurrentHashMap<String, Lock>();
 	private Map<String, JsonNode>			properties	= Collections
 																.synchronizedMap(new HashMap<String, JsonNode>());
@@ -98,6 +103,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 		super(agentId, service, params);
 		this.filename = filename;
 		om = JOM.getInstance();
+		writer = om.writerWithType(new TypeUtil<Map<String,JsonNode>>(){}.getJavaType().getRawClass());
 	}
 	
 	/*
@@ -160,8 +166,8 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 				throw new IllegalStateException(
 						"error, couldn't obtain file lock on:" + filename, e);
 			}
-			fis = Channels.newInputStream(channel);
-			fos = Channels.newOutputStream(channel);
+			fis = new BufferedInputStream(Channels.newInputStream(channel));
+			fos = new BufferedOutputStream(Channels.newOutputStream(channel));
 		}
 	}
 	
@@ -216,7 +222,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 		if (channel != null) {
 			channel.position(0);
 		}
-		om.writeValue(fos, properties);
+		writer.writeValue(fos, properties);
 		fos.flush();
 		
 		if (channel != null) {
