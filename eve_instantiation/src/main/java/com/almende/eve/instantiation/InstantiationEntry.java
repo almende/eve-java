@@ -5,6 +5,7 @@
 package com.almende.eve.instantiation;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.state.State;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -16,7 +17,8 @@ public class InstantiationEntry {
 	private String		className	= null;
 	private ObjectNode	params		= null;
 	private Handler<Initable> handler		= null;
-	
+	private State		state		= null;
+
 	/**
 	 * Instantiates a new entry.
 	 */
@@ -116,5 +118,26 @@ public class InstantiationEntry {
 	@JsonIgnore
 	public void setHandler(Handler<Initable> handler) {
 		this.handler = handler;
+	}
+	
+	/**
+	 * Gets the state.
+	 *
+	 * @return the state
+	 */
+	@JsonIgnore
+	public State getState() {
+		return state;
+	}
+	
+	/**
+	 * Sets the state.
+	 *
+	 * @param state
+	 *            the new state
+	 */
+	@JsonIgnore
+	public void setState(State state) {
+		this.state = state;
 	}
 }

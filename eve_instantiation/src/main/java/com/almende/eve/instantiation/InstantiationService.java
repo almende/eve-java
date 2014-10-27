@@ -210,7 +210,7 @@ public class InstantiationService implements Capability {
 		final InstantiationEntry entry = new InstantiationEntry(wakeKey,
 				params, className);
 		entries.put(wakeKey, entry);
-		store();
+		store(wakeKey, entry);
 	}
 
 	/**
@@ -220,8 +220,8 @@ public class InstantiationService implements Capability {
 	 *            the wake key
 	 */
 	public void deregister(final String wakeKey) {
-		entries.remove(wakeKey);
-		store();
+		final InstantiationEntry entry = entries.remove(wakeKey);
+		remove(wakeKey,entry);
 	}
 
 	/**
@@ -233,14 +233,43 @@ public class InstantiationService implements Capability {
 	 *            the val
 	 */
 	private void store(final String key, final InstantiationEntry val) {
-		final State innerState = new StateBuilder().withConfig(
-				new StateConfig((ObjectNode) myParams.get("state")).put("id",
-						key)).build();
+		State innerState = null;
+		if (val != null) {
+			innerState = val.getState();
+		}
+		if (innerState == null) {
+			innerState = new StateBuilder().withConfig(
+					new StateConfig((ObjectNode) myParams.get("state")).put(
+							"id", key)).build();
+		}
 		if (innerState != null) {
 			innerState.put("entry", JOM.getInstance().valueToTree(val));
 		}
 	}
 
+	/**
+	 * Removes the specific state.
+	 *
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
+	private void remove(final String key, final InstantiationEntry val) {
+		State innerState = null;
+		if (val != null) {
+			innerState = val.getState();
+		}
+		if (innerState == null) {
+			innerState = new StateBuilder().withConfig(
+					new StateConfig((ObjectNode) myParams.get("state")).put(
+							"id", key)).build();
+		}
+		if (innerState != null) {
+			innerState.delete();
+		}
+	}
+	
 	/**
 	 * Load.
 	 *
@@ -252,7 +281,10 @@ public class InstantiationService implements Capability {
 		final State innerState = new StateBuilder().withConfig(
 				new StateConfig((ObjectNode) myParams.get("state")).put("id",
 						key)).build();
-		return innerState.get("entry", INSTANTIATIONENTRY);
+		final InstantiationEntry result = innerState.get("entry",
+				INSTANTIATIONENTRY);
+		result.setState(innerState);
+		return result;
 	}
 
 	/**
@@ -271,8 +303,8 @@ public class InstantiationService implements Capability {
 	 */
 	private void load() {
 		final Set<String> stateIds = stateService.getStateIds();
-		for (String key : stateIds ) {
-			if (key.equals(myId)){
+		for (String key : stateIds) {
+			if (key.equals(myId)) {
 				continue;
 			}
 			entries.put(key, null);
