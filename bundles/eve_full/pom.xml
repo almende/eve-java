@@ -107,7 +107,7 @@
 								<configuration>
 									<target name="copy javadoc file to bundle projects">
 										<copy
-											tofile="target/${artifactId}-${project.parent.version}-javadoc.jar"
+											tofile="target/${project.artifactId}-${project.parent.version}-javadoc.jar"
 											file="../../eve_parent/target/eve-${project.parent.version}-javadoc.jar" />
 									</target>
 								</configuration>
