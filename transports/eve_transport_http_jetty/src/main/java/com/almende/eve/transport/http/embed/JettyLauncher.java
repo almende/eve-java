@@ -56,11 +56,24 @@ public class JettyLauncher implements ServletLauncher {
 		wscontainer = WebSocketServerContainerInitializer
 				.configureContext(context);
 
+		if (params != null && params.has("cors")) {
+			String corsClass = "com.thetransactioncompany.cors.CORSFilter";
+			if (params.get("cors").has("class")) {
+				corsClass = params.get("cors").get("class").asText();
+			}
+			String corsPath = "/*";
+			if (params.get("cors").has("path")) {
+				corsPath = params.get("cors").get("path").asText();
+			}
+			addFilter(corsClass, corsPath);
+		}
+
 		try {
 			server.start();
 		} catch (final Exception e) {
 			LOG.log(Level.SEVERE, "Couldn't start embedded Jetty server!", e);
 		}
+
 	}
 
 	/*

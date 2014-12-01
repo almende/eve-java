@@ -44,7 +44,7 @@
 			<version>${project.parent.version}</version>
 			<artifactId>eve-scheduling-persistent</artifactId>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
 			<artifactId>eve-scheduling-sync</artifactId>
@@ -67,6 +67,11 @@
 							</manifestEntries>
 						</transformer>
 					</transformers>
+					<artifactSet>
+						<excludes>
+							<exclude>org.apache.maven:*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
