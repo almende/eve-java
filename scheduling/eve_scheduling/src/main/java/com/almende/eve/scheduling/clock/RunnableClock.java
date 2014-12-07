@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * The Class RunnableClock.
  */
 public class RunnableClock implements Runnable, Clock {
+	private static final Logger									LOG			= Logger.getLogger(RunnableClock.class
+																					.getName());
 	private static final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
 	private static final ScheduledExecutorService				SCHEDULER	= ThreadPool
 																					.getScheduledPool();
@@ -37,10 +40,6 @@ public class RunnableClock implements Runnable, Clock {
 		synchronized (TIMELINE) {
 			while (!TIMELINE.isEmpty()) {
 				final ClockEntry ce = TIMELINE.firstEntry().getValue();
-				if (future != null) {
-					future.cancel(false);
-					future = null;
-				}
 				final DateTime now = DateTime.now();
 				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
@@ -49,14 +48,20 @@ public class RunnableClock implements Runnable, Clock {
 				}
 				final long interval = new Interval(now, ce.getDue())
 						.toDurationMillis();
-				if (interval <= 0){
+				if (interval <= 0) {
 					continue;
 				}
-				while (future == null) {
+				if (future == null || future.getDelay(TimeUnit.MILLISECONDS) != interval) {
+					if (future != null){
+						future.cancel(false);
+					}
 					future = SCHEDULER.schedule(this, interval,
 							TimeUnit.MILLISECONDS);
 				}
 				break;
+			}
+			if (future == null && !TIMELINE.isEmpty()) {
+				LOG.warning("Lost trigger, should never happen!");
 			}
 		}
 	}
@@ -76,6 +81,8 @@ public class RunnableClock implements Runnable, Clock {
 			if (oldVal == null || oldVal.getDue().isAfter(due)) {
 				TIMELINE.put(ce, ce);
 				RUNNER.execute(this);
+			} else {
+				LOG.warning(ce.getTriggerId()+": Skip adding ce, because has old value earlier than current. "+oldVal.getTriggerId());
 			}
 		}
 	}
@@ -116,8 +123,8 @@ class ClockEntry implements Comparable<ClockEntry> {
 	private DateTime	due;
 	private Runnable	callback;
 
-	public ClockEntry(){};
-	
+	public ClockEntry() {};
+
 	/**
 	 * Instantiates a new clock entry.
 	 *
@@ -226,7 +233,12 @@ class ClockEntry implements Comparable<ClockEntry> {
 			}
 		}
 		if (due.equals(o.due)) {
-			return 0;
+			//Become consistent with equals:
+			if (equals(o)){
+				return 0;
+			} else {
+				return -1;
+			}
 		}
 		return due.compareTo(o.due);
 	}
