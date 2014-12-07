@@ -6,6 +6,7 @@ package com.almende.eve.scheduling.clock;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -14,14 +15,17 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import com.almende.util.threads.ThreadPool;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Class RunnableClock.
  */
 public class RunnableClock implements Runnable, Clock {
-
 	private static final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
-	private static final ScheduledExecutorService				POOL		= ThreadPool.getScheduledPool();
+	private static final ScheduledExecutorService				SCHEDULER	= ThreadPool
+																					.getScheduledPool();
+	private static final Executor								RUNNER		= ThreadPool
+																					.getPool();
 	private static ScheduledFuture<?>							future		= null;
 
 	/*
@@ -38,14 +42,20 @@ public class RunnableClock implements Runnable, Clock {
 					future = null;
 				}
 				final DateTime now = DateTime.now();
-				if (ce.getDue().isBefore(now)) {
+				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
-					POOL.execute(ce.getCallback());
+					RUNNER.execute(ce.getCallback());
 					continue;
 				}
 				final long interval = new Interval(now, ce.getDue())
 						.toDurationMillis();
-				future = POOL.schedule(this, interval, TimeUnit.MILLISECONDS);
+				if (interval <= 0){
+					continue;
+				}
+				while (future == null) {
+					future = SCHEDULER.schedule(this, interval,
+							TimeUnit.MILLISECONDS);
+				}
 				break;
 			}
 		}
@@ -65,7 +75,7 @@ public class RunnableClock implements Runnable, Clock {
 			final ClockEntry oldVal = TIMELINE.get(ce);
 			if (oldVal == null || oldVal.getDue().isAfter(due)) {
 				TIMELINE.put(ce, ce);
-				POOL.execute(this);
+				RUNNER.execute(this);
 			}
 		}
 	}
@@ -106,6 +116,8 @@ class ClockEntry implements Comparable<ClockEntry> {
 	private DateTime	due;
 	private Runnable	callback;
 
+	public ClockEntry(){};
+	
 	/**
 	 * Instantiates a new clock entry.
 	 *
@@ -124,20 +136,20 @@ class ClockEntry implements Comparable<ClockEntry> {
 	}
 
 	/**
-	 * @return AgentId
+	 * @return TriggerId
 	 */
-	public String getAgentId() {
+	public String getTriggerId() {
 		return triggerId;
 	}
 
 	/**
-	 * Sets the agent id.
+	 * Sets the trigger id.
 	 *
-	 * @param agentId
-	 *            the new agent id
+	 * @param triggerId
+	 *            the new trigger id
 	 */
-	public void setAgentId(final String agentId) {
-		triggerId = agentId;
+	public void setTriggerId(final String triggerId) {
+		this.triggerId = triggerId;
 	}
 
 	/**
@@ -160,6 +172,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	/**
 	 * @return This tasks callback.
 	 */
+	@JsonIgnore
 	public Runnable getCallback() {
 		return callback;
 	}
