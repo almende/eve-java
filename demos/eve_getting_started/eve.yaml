@@ -1,0 +1,24 @@
+
+#Some empty comment
+
+template:
+   defaultAgent:
+        transport:
+        -  class: com.almende.eve.transport.http.HttpTransportBuilder
+           servletUrl: http://127.0.0.1:8081/agents/
+           servletLauncher: JettyLauncher
+           servletClass: com.almende.eve.transport.http.DebugServlet
+           doShortcut: true
+           doAuthentication: false
+           jetty: 
+              port: 8081
+
+
+agents:
+-   id: helloWorld
+    class: com.almende.demo.MyFirstAgent
+    extends: template/defaultAgent
+-   id: helloWorld2
+    class: com.almende.demo.MySecondAgent
+    extends: template/defaultAgent
+
