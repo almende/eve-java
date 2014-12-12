@@ -16,9 +16,9 @@ template:
 
 agents:
 -   id: helloWorld
-    class: com.almende.demo.MyFirstAgent
+    class: com.almende.eve.demo.MyFirstAgent
     extends: template/defaultAgent
 -   id: helloWorld2
-    class: com.almende.demo.MySecondAgent
+    class: com.almende.eve.demo.MySecondAgent
     extends: template/defaultAgent
 
