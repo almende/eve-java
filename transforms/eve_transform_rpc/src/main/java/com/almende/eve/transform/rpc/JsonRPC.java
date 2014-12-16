@@ -35,21 +35,19 @@ import com.almende.eve.transform.rpc.formats.JSONRequest;
 import com.almende.eve.transform.rpc.formats.JSONResponse;
 import com.almende.eve.transform.rpc.formats.RequestParams;
 import com.almende.util.AnnotationUtil;
-import com.almende.util.Defines;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
+import com.almende.util.Defines;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
-import com.almende.util.uuid.UUID;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class JSONRPC.
  */
-final class JSONRPC {
-	private static final Logger	LOG	= Logger.getLogger(JSONRPC.class.getName());
+final public class JsonRPC {
+	private static final Logger	LOG	= Logger.getLogger(JsonRPC.class.getName());
 
 	static {
 		if (Defines.HASMETHODHANDLES) {
@@ -62,7 +60,7 @@ final class JSONRPC {
 	/**
 	 * Instantiates a new jsonrpc.
 	 */
-	private JSONRPC() {}
+	private JsonRPC() {}
 
 	// TODO: implement JSONRPC 2.0 Batch
 	/**
@@ -515,58 +513,7 @@ final class JSONRPC {
 		}
 	}
 
-	/**
-	 * Create a JSONRequest from a java method and arguments.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param args
-	 *            the args
-	 * @return the jSON request
-	 */
-	public static JSONRequest createRequest(final Method method,
-			final Object[] args) {
-		AnnotatedMethod annotatedMethod = null;
-		try {
-			annotatedMethod = new AnnotationUtil.AnnotatedMethod(method);
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Method can't be used as annotated method",
-					e);
-			throw new IllegalArgumentException("Method '" + method.getName()
-					+ "' can't be used as annotated method.", e);
-		}
-		final List<AnnotatedParam> annotatedParams = annotatedMethod
-				.getParams();
-
-		final ObjectNode params = JOM.createObjectNode();
-
-		for (int i = 0; i < annotatedParams.size(); i++) {
-			final AnnotatedParam annotatedParam = annotatedParams.get(i);
-			if (i < args.length && args[i] != null) {
-				final String name = getName(annotatedParam);
-				if (name != null) {
-					final JsonNode paramValue = JOM.getInstance().valueToTree(
-							args[i]);
-					params.set(name, paramValue);
-				} else {
-					throw new IllegalArgumentException("Parameter " + i
-							+ " in method '" + method.getName()
-							+ "' is missing the @Name annotation.");
-				}
-			} else if (isRequired(annotatedParam)) {
-				throw new IllegalArgumentException("Required parameter " + i
-						+ " in method '" + method.getName() + "' is null.");
-			}
-		}
-		JsonNode id = null;
-		try {
-			id = JOM.getInstance().valueToTree(new UUID().toString());
-		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "Failed to generate UUID for request", e);
-		}
-		return new JSONRequest(id, method.getName(), params);
-	}
-
+	
 	/**
 	 * Check whether a method is available for JSON-RPC calls. This is the case
 	 * when it is public, has named parameters, and has a public or private @Access
@@ -665,7 +612,7 @@ final class JSONRPC {
 	 * @return required
 	 */
 	@SuppressWarnings("deprecation")
-	private static boolean isRequired(final AnnotatedParam param) {
+	public static boolean isRequired(final AnnotatedParam param) {
 		boolean required = true;
 		final com.almende.eve.transform.rpc.annotation.Required requiredAnnotation = param
 				.getAnnotation(com.almende.eve.transform.rpc.annotation.Required.class);
@@ -686,7 +633,7 @@ final class JSONRPC {
 	 *            the param
 	 * @return name
 	 */
-	private static String getName(final AnnotatedParam param) {
+	public static String getName(final AnnotatedParam param) {
 		String name = null;
 		final Name nameAnnotation = param.getAnnotation(Name.class);
 		if (nameAnnotation != null) {

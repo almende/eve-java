@@ -4,7 +4,6 @@
  */
 package com.almende.eve.transform.rpc;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +40,7 @@ public class RpcTransform implements Transform {
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
 	private final ObjectNode						myParams;
-	
+
 	/**
 	 * Instantiates a new rpc transform.
 	 * 
@@ -56,17 +55,22 @@ public class RpcTransform implements Transform {
 		final RpcTransformConfig config = new RpcTransformConfig(params);
 		callbacks.setDefTimeout(config.getCallbackTimeout());
 	}
-	
+
 	@Override
 	public Meta inbound(Object msg, URI senderUrl) {
-		final JSONResponse response = invoke(msg,senderUrl);
-		return new Meta(response,response==null,response!=null);
-		
+		final JSONResponse response = invoke(msg, senderUrl);
+		return new Meta(response, response == null, response != null);
+
 	}
-	public Meta outbound(Object msg, URI recipientUrl){
+
+	public Meta outbound(Object msg, URI recipientUrl) {
+		if (msg instanceof JSONRequest) {
+			final JSONRequest request = (JSONRequest) msg;
+			addCallback(request, request.getCallback());
+		}
 		return new Meta(msg);
 	}
-	
+
 	/**
 	 * Gets the auth.
 	 * 
@@ -75,7 +79,7 @@ public class RpcTransform implements Transform {
 	public Authorizor getAuth() {
 		return auth;
 	}
-	
+
 	/**
 	 * Sets the auth.
 	 * 
@@ -85,7 +89,7 @@ public class RpcTransform implements Transform {
 	public void setAuth(final Authorizor auth) {
 		this.auth = auth;
 	}
-	
+
 	/**
 	 * Convert incoming message object to JSONMessage if possible. Returns null
 	 * if the message can't be interpreted as a JSONMessage.
@@ -109,8 +113,8 @@ public class RpcTransform implements Transform {
 					final String message = (String) msg;
 					if (message.startsWith("{")
 							|| message.trim().startsWith("{")) {
-						
-						json = (ObjectNode)JOM.getInstance().readTree(message);
+
+						json = (ObjectNode) JOM.getInstance().readTree(message);
 					}
 				} else if (msg instanceof ObjectNode) {
 					json = (ObjectNode) msg;
@@ -118,10 +122,10 @@ public class RpcTransform implements Transform {
 					LOG.info("Message unknown type:" + msg.getClass());
 				}
 				if (json != null) {
-					if (JSONRPC.isResponse(json)) {
+					if (JsonRPC.isResponse(json)) {
 						final JSONResponse response = new JSONResponse(json);
 						jsonMsg = response;
-					} else if (JSONRPC.isRequest(json)) {
+					} else if (JsonRPC.isRequest(json)) {
 						final JSONRequest request = new JSONRequest(json);
 						jsonMsg = request;
 					} else {
@@ -137,7 +141,7 @@ public class RpcTransform implements Transform {
 		}
 		return jsonMsg;
 	}
-	
+
 	/**
 	 * Invoke this RPC msg.
 	 * 
@@ -159,7 +163,7 @@ public class RpcTransform implements Transform {
 				final JSONRequest request = (JSONRequest) jsonMsg;
 				final RequestParams params = new RequestParams();
 				params.put(Sender.class, senderUrl.toASCIIString());
-				return JSONRPC.invoke(destination.get(), request, params, auth);
+				return JsonRPC.invoke(destination.get(), request, params, auth);
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
@@ -179,86 +183,30 @@ public class RpcTransform implements Transform {
 			final JSONRPCException jsonError = new JSONRPCException(
 					JSONRPCException.CODE.INTERNAL_ERROR, e.getMessage(), e);
 			LOG.log(Level.WARNING, "Exception in receiving message", jsonError);
-			
+
 			final JSONResponse response = new JSONResponse(jsonError);
 			response.setId(id);
 			return response;
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets the methods.
 	 * 
 	 * @return the methods
 	 */
 	public List<Object> getMethods() {
-		return JSONRPC.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
+		return JsonRPC.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
 	}
 
-	/**
-	 * Builds the msg.
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @return the JSON request
-	 */
-	public <T> JSONRequest buildMsg(final String method,
-			final ObjectNode params) {
-		return new JSONRequest(method, params);
-	}
-	
-	/**
-	 * Builds the msg.
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @param callback
-	 *            the callback
-	 * @return the JSON request
-	 */
-	public <T> JSONRequest buildMsg(final String method,
-			final ObjectNode params, final AsyncCallback<T> callback) {
-		final JSONRequest request = new JSONRequest(method, params);
-		addCallback(request, callback);
-		return request;
-	}
-	
-	/**
-	 * Builds the msg.
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @param callback
-	 *            the callback
-	 * @return the JSON request
-	 */
-	public <T> JSONRequest buildMsg(final Method method, final Object[] params,
-			final AsyncCallback<T> callback) {
-		final JSONRequest request = JSONRPC.createRequest(method, params);
-		addCallback(request, callback);
-		return request;
-	}
-	
 	private <T> void addCallback(final JSONRequest request,
 			final AsyncCallback<T> callback) {
 		if (callback == null) {
 			return;
 		}
 		final TypeUtil<T> type = TypeUtil.resolve(callback);
-		
+
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
@@ -279,24 +227,24 @@ public class RpcTransform implements Transform {
 								"Incorrect return type received for JSON-RPC call:"
 										+ request.getMethod(), cce));
 					}
-					
+
 				} else {
 					callback.onSuccess(null);
 				}
 			}
-			
+
 			@Override
 			public void onFailure(final Exception exception) {
 				callback.onFailure(exception);
 			}
 		};
-		
+
 		if (callbacks != null) {
 			callbacks.push(((JSONMessage) request).getId(), request.toString(),
 					responseCallback);
 		}
 	}
-	
+
 	/**
 	 * Gets the handle.
 	 * 
@@ -305,10 +253,9 @@ public class RpcTransform implements Transform {
 	public Handler<Object> getHandle() {
 		return destination;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
@@ -320,5 +267,5 @@ public class RpcTransform implements Transform {
 	public void delete() {
 		callbacks.clear();
 	}
-	
+
 }

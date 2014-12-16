@@ -5,9 +5,16 @@
 package com.almende.eve.transform.rpc.formats;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.almende.eve.transform.rpc.JsonRPC;
+import com.almende.util.AnnotationUtil;
+import com.almende.util.AnnotationUtil.AnnotatedMethod;
+import com.almende.util.AnnotationUtil.AnnotatedParam;
+import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,20 +28,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRequest.
  */
 public final class JSONRequest extends JSONMessage {
-	private static final Logger	LOG					= Logger.getLogger(JSONRequest.class
-															.getCanonicalName());
-	private static final long	serialVersionUID	= 1970046457233622444L;
-	private ObjectNode			req					= JOM.createObjectNode();
-	
+	private static final Logger			LOG					= Logger.getLogger(JSONRequest.class
+																	.getCanonicalName());
+	private static final long			serialVersionUID	= 1970046457233622444L;
+	private ObjectNode					req					= JOM.createObjectNode();
+	transient private AsyncCallback<?>	callback			= null;
+
 	/**
 	 * Instantiates a new jSON request.
 	 */
 	public JSONRequest() {
-		init(null, null, null);
+		init(null, null, null, null);
 	}
-	
+
 	/**
-	 * Instantiates a new jSON request.
+	 * Instantiates a new JSON request.
 	 * 
 	 * @param json
 	 *            the json
@@ -45,9 +53,9 @@ public final class JSONRequest extends JSONMessage {
 		final ObjectMapper mapper = JOM.getInstance();
 		init(mapper.readTree(json));
 	}
-	
+
 	/**
-	 * Instantiates a new jSON request.
+	 * Instantiates a new JSON request.
 	 * 
 	 * @param request
 	 *            the request
@@ -55,7 +63,104 @@ public final class JSONRequest extends JSONMessage {
 	public JSONRequest(final JsonNode request) {
 		init(request);
 	}
-	
+
+	/**
+	 * Instantiates a new JSON request.
+	 *
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callback
+	 *            the callback
+	 */
+	public JSONRequest(final String method, final ObjectNode params,
+			final AsyncCallback<?> callback) {
+		init(null, method, params, callback);
+	}
+
+	/**
+	 * Instantiates a new JSON request.
+	 *
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 */
+	public JSONRequest(final String method, final ObjectNode params) {
+		init(null, method, params, null);
+	}
+
+	/**
+	 * Instantiates a new jSON request.
+	 *
+	 * @param id
+	 *            the id
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param callback
+	 *            the callback
+	 */
+	public JSONRequest(final JsonNode id, final String method,
+			final ObjectNode params, final AsyncCallback<?> callback) {
+		init(id, method, params, callback);
+	}
+
+	/**
+	 * Create a JSONRequest from a java method and arguments.
+	 *
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @param callback
+	 *            the callback
+	 */
+	public JSONRequest(final Method method, final Object[] args,
+			final AsyncCallback<?> callback) {
+		AnnotatedMethod annotatedMethod = null;
+		try {
+			annotatedMethod = new AnnotationUtil.AnnotatedMethod(method);
+		} catch (final Exception e) {
+			LOG.log(Level.WARNING, "Method can't be used as annotated method",
+					e);
+			throw new IllegalArgumentException("Method '" + method.getName()
+					+ "' can't be used as annotated method.", e);
+		}
+		final List<AnnotatedParam> annotatedParams = annotatedMethod
+				.getParams();
+
+		final ObjectNode params = JOM.createObjectNode();
+
+		for (int i = 0; i < annotatedParams.size(); i++) {
+			final AnnotatedParam annotatedParam = annotatedParams.get(i);
+			if (i < args.length && args[i] != null) {
+				final String name = JsonRPC.getName(annotatedParam);
+				if (name != null) {
+					final JsonNode paramValue = JOM.getInstance().valueToTree(
+							args[i]);
+					params.set(name, paramValue);
+				} else {
+					throw new IllegalArgumentException("Parameter " + i
+							+ " in method '" + method.getName()
+							+ "' is missing the @Name annotation.");
+				}
+			} else if (JsonRPC.isRequired(annotatedParam)) {
+				throw new IllegalArgumentException("Required parameter " + i
+						+ " in method '" + method.getName() + "' is null.");
+			}
+		}
+		JsonNode id = null;
+		try {
+			id = JOM.getInstance().valueToTree(new UUID().toString());
+		} catch (final Exception e) {
+			LOG.log(Level.SEVERE, "Failed to generate UUID for request", e);
+		}
+		init(id, method.getName(), params, callback);
+	}
+
 	/**
 	 * Inits the.
 	 * 
@@ -84,77 +189,11 @@ public final class JSONRequest extends JSONMessage {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'params' is no ObjectNode");
 		}
-		
+
 		init(request.get(ID), request.get(METHOD).asText(),
-				(ObjectNode) request.get(PARAMS));
+				(ObjectNode) request.get(PARAMS), null);
 	}
-	
-	/**
-	 * Instantiates a new jSON request.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 */
-	public JSONRequest(final String method, final ObjectNode params) {
-		init(null, method, params);
-	}
-	
-	/**
-	 * Instantiates a new jSON request.
-	 * 
-	 * @param id
-	 *            the id
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 */
-	public JSONRequest(final JsonNode id, final String method,
-			final ObjectNode params) {
-		init(id, method, params);
-	}
-	
-	/**
-	 * Instantiates a new jSON request.
-	 * 
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @param callbackUrl
-	 *            the callback url
-	 * @param callbackMethod
-	 *            the callback method
-	 */
-	public JSONRequest(final String method, final ObjectNode params,
-			final String callbackUrl, final String callbackMethod) {
-		init(null, method, params);
-		setCallback(callbackUrl, callbackMethod);
-	}
-	
-	/**
-	 * Instantiates a new jSON request.
-	 * 
-	 * @param id
-	 *            the id
-	 * @param method
-	 *            the method
-	 * @param params
-	 *            the params
-	 * @param callbackUrl
-	 *            the callback url
-	 * @param callbackMethod
-	 *            the callback method
-	 */
-	public JSONRequest(final JsonNode id, final String method,
-			final ObjectNode params, final String callbackUrl,
-			final String callbackMethod) {
-		init(id, method, params);
-		setCallback(callbackUrl, callbackMethod);
-	}
-	
+
 	/**
 	 * Inits the.
 	 * 
@@ -166,14 +205,15 @@ public final class JSONRequest extends JSONMessage {
 	 *            the params
 	 */
 	private void init(final JsonNode id, final String method,
-			final ObjectNode params) {
+			final ObjectNode params, final AsyncCallback<?> callback) {
 		this.setRequest(true);
 		setVersion();
 		setId(id);
 		setMethod(method);
 		setParams(params);
+		setCallback(callback);
 	}
-	
+
 	/**
 	 * Sets the id.
 	 * 
@@ -187,17 +227,16 @@ public final class JSONRequest extends JSONMessage {
 			req.set(ID, id);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transform.rpc.jsonrpc.JSONMessage#getId()
 	 */
 	@Override
 	public JsonNode getId() {
 		return req.get(ID);
 	}
-	
+
 	/**
 	 * Sets the method.
 	 * 
@@ -207,7 +246,7 @@ public final class JSONRequest extends JSONMessage {
 	public void setMethod(final String method) {
 		req.put(METHOD, method);
 	}
-	
+
 	/**
 	 * Gets the method.
 	 * 
@@ -219,7 +258,7 @@ public final class JSONRequest extends JSONMessage {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the params.
 	 * 
@@ -233,7 +272,7 @@ public final class JSONRequest extends JSONMessage {
 		}
 		req.set(PARAMS, newParams);
 	}
-	
+
 	/**
 	 * Gets the params.
 	 * 
@@ -242,7 +281,7 @@ public final class JSONRequest extends JSONMessage {
 	public ObjectNode getParams() {
 		return (ObjectNode) req.get(PARAMS);
 	}
-	
+
 	/**
 	 * Put param.
 	 * 
@@ -255,7 +294,7 @@ public final class JSONRequest extends JSONMessage {
 		final ObjectMapper mapper = JOM.getInstance();
 		req.with(PARAMS).set(name, mapper.convertValue(value, JsonNode.class));
 	}
-	
+
 	/**
 	 * Gets the param.
 	 * 
@@ -271,7 +310,7 @@ public final class JSONRequest extends JSONMessage {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Checks for param.
 	 * 
@@ -282,66 +321,33 @@ public final class JSONRequest extends JSONMessage {
 	public Object hasParam(final String name) {
 		return req.get(PARAMS).has(name);
 	}
-	
+
 	/**
 	 * Sets the version.
 	 */
 	private void setVersion() {
 		req.put(JSONRPC, VERSION);
 	}
-	
+
+	/**
+	 * Gets the callback.
+	 *
+	 * @return the callback
+	 */
+	public AsyncCallback<?> getCallback() {
+		return callback;
+	}
+
 	/**
 	 * Sets the callback.
-	 * 
-	 * @param url
-	 *            the url
-	 * @param method
-	 *            the method
+	 *
+	 * @param callback
+	 *            the new callback
 	 */
-	public void setCallback(final String url, final String method) {
-		final ObjectNode callback = JOM.createObjectNode();
-		callback.put(URL, url);
-		callback.put(METHOD, method);
-		req.set(CALLBACK, callback);
+	public void setCallback(AsyncCallback<?> callback) {
+		this.callback = callback;
 	}
-	
-	/**
-	 * Gets the callback url.
-	 * 
-	 * @return the callback url
-	 */
-	public String getCallbackUrl() {
-		final JsonNode callback = req.get(CALLBACK);
-		if (callback != null && callback.isObject() && callback.has(URL)
-				&& callback.get(URL).isTextual()) {
-			return callback.get(URL).asText();
-		}
-		return null;
-	}
-	
-	/**
-	 * Gets the callback method.
-	 * 
-	 * @return the callback method
-	 */
-	public String getCallbackMethod() {
-		final JsonNode callback = req.get(CALLBACK);
-		if (callback != null && callback.isObject() && callback.has(METHOD)
-				&& callback.get(METHOD).isTextual()) {
-			return callback.get(METHOD).asText();
-		}
-		return null;
-	}
-	
-	/**
-	 * Checks for callback.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean hasCallback() {
-		return req.has(CALLBACK);
-	}
-	
+
 	/**
 	 * Gets the object node.
 	 * 
@@ -351,10 +357,9 @@ public final class JSONRequest extends JSONMessage {
 	public ObjectNode getObjectNode() {
 		return req;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -367,7 +372,7 @@ public final class JSONRequest extends JSONMessage {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Write object.
 	 * 
@@ -382,7 +387,7 @@ public final class JSONRequest extends JSONMessage {
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.writeValue(out, req);
 	}
-	
+
 	/**
 	 * Read object.
 	 * 
@@ -399,5 +404,5 @@ public final class JSONRequest extends JSONMessage {
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
 		req = mapper.readValue(in, ObjectNode.class);
 	}
-	
+
 }

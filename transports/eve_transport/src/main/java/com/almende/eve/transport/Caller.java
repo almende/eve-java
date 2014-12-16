@@ -91,5 +91,25 @@ public interface Caller {
 	 */
 	<T> T callSync(final URI url, final String method,
 			final ObjectNode params) throws IOException;
-	
+
+	/**
+	 * Call sync.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param clazz
+	 *            the clazz
+	 * @return the t
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> T callSync(final URI url, final String method,
+			final ObjectNode params,Class<T> clazz) throws IOException;
+
 }

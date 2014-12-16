@@ -35,6 +35,7 @@ import com.almende.eve.transform.rpc.RpcTransformBuilder;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
+import com.almende.eve.transform.rpc.formats.JSONRequest;
 import com.almende.eve.transport.Caller;
 import com.almende.eve.transport.LocalTransportBuilder;
 import com.almende.eve.transport.LocalTransportConfig;
@@ -339,15 +340,6 @@ public class Agent implements Receiver, Initable {
 	}
 
 	/**
-	 * Gets the rpc.
-	 *
-	 * @return the rpc
-	 */
-	protected RpcTransform getRpc() {
-		return (RpcTransform) transforms.getLast();
-	}
-
-	/**
 	 * Gets the id.
 	 * 
 	 * @return the id
@@ -629,9 +621,7 @@ public class Agent implements Receiver, Initable {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final String method, final ObjectNode params,
 			final DateTime due) {
-		return getScheduler().schedule(
-				((RpcTransform) transforms.getLast()).buildMsg(method, params),
-				due);
+		return getScheduler().schedule(new JSONRequest(method, params), due);
 	}
 
 	/**
@@ -648,9 +638,7 @@ public class Agent implements Receiver, Initable {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final String method, final ObjectNode params,
 			final int delay) {
-		return getScheduler().schedule(
-				((RpcTransform) transforms.getLast()).buildMsg(method, params),
-				delay);
+		return getScheduler().schedule(new JSONRequest(method, params), delay);
 	}
 
 	/**
@@ -747,6 +735,28 @@ public class Agent implements Receiver, Initable {
 		return caller.callSync(url, method, params);
 	}
 
+	/**
+	 * Send sync, expecting a response.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param clazz
+	 *            the clazz
+	 * @return response
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, Class<T> clazz) throws IOException {
+		return caller.callSync(url, method, params, clazz);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
@@ -770,31 +780,39 @@ public class Agent implements Receiver, Initable {
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params, final AsyncCallback<T> callback)
 				throws IOException {
-			final Object message = ((RpcTransform) transforms.getLast())
-					.buildMsg(method, params, callback);
+			final Object message = new JSONRequest(method, params, callback);
 			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> void call(final URI url, final Method method,
 				final Object[] params, final AsyncCallback<T> callback)
 				throws IOException {
-			final Object message = ((RpcTransform) transforms.getLast())
-					.buildMsg(method, params, callback);
+			final Object message = new JSONRequest(method, params, callback);
 			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params) throws IOException {
-			final Object message = ((RpcTransform) transforms.getLast())
-					.buildMsg(method, params, null);
+			final Object message = new JSONRequest(method, params, null);
 			transport.send(url, transforms.outbound(message, url).result, null);
 		}
 
 		public <T> T callSync(final URI url, final String method,
 				final ObjectNode params) throws IOException {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
-			final Object message = ((RpcTransform) transforms.getLast())
-					.buildMsg(method, params, callback);
+			final Object message = new JSONRequest(method, params, callback);
+			transport.send(url, transforms.outbound(message, url).result, null);
+			try {
+				return callback.get();
+			} catch (final Exception e) {
+				throw new IOException(e);
+			}
+		}
+
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, Class<T> clazz) throws IOException {
+			final SyncCallback<T> callback = new SyncCallback<T>() {};
+			final Object message = new JSONRequest(method, params, callback);
 			transport.send(url, transforms.outbound(message, url).result, null);
 			try {
 				return callback.get();

@@ -81,12 +81,6 @@ public class TransformStack implements Transform {
 		while (res.doNext && iter.hasNext()) {
 			final Transform transform = iter.next();
 			res = transform.inbound(res.valid ? res.result : msg, senderUrl);
-/*			if (result.isValid()){
-				res.result=result.result;
-				res.valid=true;
-			}
-			res.doNext=result.doNext;
-*/
 		}
 		return res;
 	}
@@ -104,12 +98,6 @@ public class TransformStack implements Transform {
 			Transform transform = iter.next();
 			res = transform
 					.outbound(res.valid ? res.result : msg, recipientUrl);
-/*			if (result.isValid()){
-				res.result=result.result;
-				res.valid=true;
-			}
-			res.doNext=result.doNext;
-*/
 		}
 		return res;
 	}

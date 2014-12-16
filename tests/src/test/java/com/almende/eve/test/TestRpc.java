@@ -19,6 +19,7 @@ import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
 import com.almende.eve.transform.rpc.annotation.Namespace;
+import com.almende.eve.transform.rpc.formats.JSONRequest;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,7 +59,7 @@ public class TestRpc extends TestCase {
 		
 		final ObjectNode parms = JOM.createObjectNode();
 		parms.put("parm", true);
-		Object request = transform.buildMsg("testMe", parms, callback);
+		Object request = new JSONRequest("testMe", parms, callback);
 		
 		// transport
 		Object response = transform.invoke(request,
@@ -66,15 +67,13 @@ public class TestRpc extends TestCase {
 		// transport
 		transform.invoke(response, URI.create("local://me"));
 		
-		request = transform.buildMsg("test.testMe", parms, callback);
+		request = new JSONRequest("test.testMe", parms, callback);
 		
 		// transport
 		response = transform.invoke(request,
 						URI.create("local://me"));
 		// transport
 		transform.invoke(response, URI.create("local://me"));
-				
-		
 	}
 	
 	/**
