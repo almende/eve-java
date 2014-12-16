@@ -12,9 +12,8 @@ import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Name;
 import com.almende.eve.transform.rpc.annotation.Sender;
+import com.almende.eve.transform.rpc.formats.Params;
 import com.almende.util.callback.AsyncCallback;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class MySecondAgent.
@@ -52,8 +51,8 @@ public class MySecondAgent extends Agent {
 
 		// Secondly obtain the echo result synchronous, with a message
 		// parameter.
-		ObjectNode params = JOM.createObjectNode();
-		params.put("message", "Hi there!");
+		Params params = new Params();
+		params.add("message", "Hi there!");
 		result += callSync(
 				URI.create("http://localhost:8081/agents/helloWorld/"), "echo",
 				params);

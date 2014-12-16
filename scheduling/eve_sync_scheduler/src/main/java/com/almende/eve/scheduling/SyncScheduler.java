@@ -19,7 +19,7 @@ import com.almende.eve.scheduling.clock.RunnableClock;
 import com.almende.eve.transform.rpc.annotation.Access;
 import com.almende.eve.transform.rpc.annotation.AccessType;
 import com.almende.eve.transform.rpc.annotation.Namespace;
-import com.almende.eve.transport.Caller;
+import com.almende.eve.transform.rpc.formats.Caller;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;

@@ -18,6 +18,7 @@ import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.almende.eve.state.file.FileStateConfig;
+import com.almende.eve.transform.rpc.formats.Params;
 import com.almende.eve.transport.http.HttpTransportConfig;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
@@ -66,9 +67,8 @@ public class TestAgents extends TestCase {
 		agent.loadConfig(config);
 		agent.connect();
 		
-		final ObjectNode callParams = JOM.createObjectNode();
-		callParams.put("message", "Hello world!");
-
+		final Params callParams = new Params();
+		callParams.add("message", "Hello world!");
 		agent.pubSend(new URI("http://localhost:8080/agents/example"),
 				"helloWorld", callParams, new AsyncCallback<String>() {
 
