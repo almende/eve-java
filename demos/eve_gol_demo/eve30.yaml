@@ -25,7 +25,7 @@ state:
 
 
 gol:
-  runTime: 50
+  runTime: 10
   columns: 30
   rows: 30
 #  OddUrl: http://127.0.0.1:8081/agents/

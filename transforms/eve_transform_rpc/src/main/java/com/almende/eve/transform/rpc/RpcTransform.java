@@ -122,10 +122,10 @@ public class RpcTransform implements Transform {
 					LOG.info("Message unknown type:" + msg.getClass());
 				}
 				if (json != null) {
-					if (JsonRPC.isResponse(json)) {
+					if (JSONRpc.isResponse(json)) {
 						final JSONResponse response = new JSONResponse(json);
 						jsonMsg = response;
-					} else if (JsonRPC.isRequest(json)) {
+					} else if (JSONRpc.isRequest(json)) {
 						final JSONRequest request = new JSONRequest(json);
 						jsonMsg = request;
 					} else {
@@ -163,7 +163,7 @@ public class RpcTransform implements Transform {
 				final JSONRequest request = (JSONRequest) jsonMsg;
 				final RequestParams params = new RequestParams();
 				params.put(Sender.class, senderUrl.toASCIIString());
-				return JsonRPC.invoke(destination.get(), request, params, auth);
+				return JSONRpc.invoke(destination.get(), request, params, auth);
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
@@ -197,7 +197,7 @@ public class RpcTransform implements Transform {
 	 * @return the methods
 	 */
 	public List<Object> getMethods() {
-		return JsonRPC.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
+		return JSONRpc.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
 	}
 
 	private <T> void addCallback(final JSONRequest request,

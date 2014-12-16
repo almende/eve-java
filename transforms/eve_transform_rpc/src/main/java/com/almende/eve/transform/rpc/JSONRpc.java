@@ -46,8 +46,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
-final public class JsonRPC {
-	private static final Logger	LOG	= Logger.getLogger(JsonRPC.class.getName());
+final public class JSONRpc {
+	private static final Logger	LOG	= Logger.getLogger(JSONRpc.class.getName());
 
 	static {
 		if (Defines.HASMETHODHANDLES) {
@@ -60,7 +60,7 @@ final public class JsonRPC {
 	/**
 	 * Instantiates a new jsonrpc.
 	 */
-	private JsonRPC() {}
+	private JSONRpc() {}
 
 	// TODO: implement JSONRPC 2.0 Batch
 	/**
@@ -612,7 +612,7 @@ final public class JsonRPC {
 	 * @return required
 	 */
 	@SuppressWarnings("deprecation")
-	public static boolean isRequired(final AnnotatedParam param) {
+	static boolean isRequired(final AnnotatedParam param) {
 		boolean required = true;
 		final com.almende.eve.transform.rpc.annotation.Required requiredAnnotation = param
 				.getAnnotation(com.almende.eve.transform.rpc.annotation.Required.class);
@@ -633,7 +633,7 @@ final public class JsonRPC {
 	 *            the param
 	 * @return name
 	 */
-	public static String getName(final AnnotatedParam param) {
+	static String getName(final AnnotatedParam param) {
 		String name = null;
 		final Name nameAnnotation = param.getAnnotation(Name.class);
 		if (nameAnnotation != null) {

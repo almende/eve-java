@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.almende.eve.transform.rpc.JsonRPC;
+import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.transform.rpc.annotation.Optional;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
@@ -137,8 +138,10 @@ public final class JSONRequest extends JSONMessage {
 		for (int i = 0; i < annotatedParams.size(); i++) {
 			final AnnotatedParam annotatedParam = annotatedParams.get(i);
 			if (i < args.length && args[i] != null) {
-				final String name = JsonRPC.getName(annotatedParam);
-				if (name != null) {
+				final Name nameAnnotation = annotatedParam
+						.getAnnotation(Name.class);
+				if (nameAnnotation != null && nameAnnotation.value() != null) {
+					final String name = nameAnnotation.value();
 					final JsonNode paramValue = JOM.getInstance().valueToTree(
 							args[i]);
 					params.set(name, paramValue);
@@ -147,7 +150,7 @@ public final class JSONRequest extends JSONMessage {
 							+ " in method '" + method.getName()
 							+ "' is missing the @Name annotation.");
 				}
-			} else if (JsonRPC.isRequired(annotatedParam)) {
+			} else if (isRequired(annotatedParam)) {
 				throw new IllegalArgumentException("Required parameter " + i
 						+ " in method '" + method.getName() + "' is null.");
 			}
@@ -159,6 +162,28 @@ public final class JSONRequest extends JSONMessage {
 			LOG.log(Level.SEVERE, "Failed to generate UUID for request", e);
 		}
 		init(id, method.getName(), params, callback);
+	}
+
+	/**
+	 * Test if a parameter is required Reads the parameter annotation @Required.
+	 * Returns True if the annotation is not provided.
+	 * 
+	 * @param param
+	 *            the param
+	 * @return required
+	 */
+	@SuppressWarnings("deprecation")
+	static boolean isRequired(final AnnotatedParam param) {
+		boolean required = true;
+		final com.almende.eve.transform.rpc.annotation.Required requiredAnnotation = param
+				.getAnnotation(com.almende.eve.transform.rpc.annotation.Required.class);
+		if (requiredAnnotation != null) {
+			required = requiredAnnotation.value();
+		}
+		if (param.getAnnotation(Optional.class) != null) {
+			required = false;
+		}
+		return required;
 	}
 
 	/**
