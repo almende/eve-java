@@ -4,14 +4,14 @@
  */
 package com.almende.eve.transform.rpc;
 
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.transform.TransformConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class RpcTransformConfig.
  */
-public class RpcTransformConfig extends Config {
+public class RpcTransformConfig extends TransformConfig {
 	
 	/**
 	 * Instantiates a new rpc transform config.

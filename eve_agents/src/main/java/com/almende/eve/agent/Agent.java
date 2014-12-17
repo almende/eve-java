@@ -29,6 +29,8 @@ import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.StateConfig;
+import com.almende.eve.transform.TransformBuilder;
+import com.almende.eve.transform.TransformConfig;
 import com.almende.eve.transform.TransformStack;
 import com.almende.eve.transform.rpc.RpcTransform;
 import com.almende.eve.transform.rpc.RpcTransformBuilder;
@@ -422,10 +424,20 @@ public class Agent implements Receiver, Initable {
 	 *            the config
 	 */
 	private void loadTransforms(final ArrayNode config) {
-		// TODO: load transforms from config
-
-		// each agent has at least a RPC transform
-		transforms.add(new RpcTransformBuilder().withHandle(handler).build());
+		boolean found=false;
+		if (config != null){
+			for (JsonNode item : config){
+				TransformConfig conf = new TransformConfig((ObjectNode)item);
+				if (RpcTransformBuilder.class.getName().equals(conf.getClassName())){
+					found = true;
+				}
+				transforms.add(new TransformBuilder().withConfig((ObjectNode)conf).withHandle(handler).build());
+			}
+		} 
+		if (config == null || !found){
+			// each agent has at least a RPC transform
+			transforms.add(new RpcTransformBuilder().withHandle(handler).build());
+		}
 	}
 
 	/**
