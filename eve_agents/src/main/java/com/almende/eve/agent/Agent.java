@@ -24,21 +24,21 @@ import com.almende.eve.instantiation.HibernationHandler;
 import com.almende.eve.instantiation.Initable;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
+import com.almende.eve.protocol.ProtocolBuilder;
+import com.almende.eve.protocol.ProtocolConfig;
+import com.almende.eve.protocol.ProtocolStack;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
+import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.StateConfig;
-import com.almende.eve.transform.TransformBuilder;
-import com.almende.eve.transform.TransformConfig;
-import com.almende.eve.transform.TransformStack;
-import com.almende.eve.transform.rpc.RpcTransform;
-import com.almende.eve.transform.rpc.RpcTransformBuilder;
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Namespace;
-import com.almende.eve.transform.rpc.formats.Caller;
-import com.almende.eve.transform.rpc.formats.JSONRequest;
 import com.almende.eve.transport.LocalTransportBuilder;
 import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.Receiver;
@@ -68,7 +68,7 @@ public class Agent implements Receiver, Initable {
 	private State										state			= null;
 	private Router										transport		= new Router();
 	private Scheduler									scheduler		= null;
-	private TransformStack								transforms		= new TransformStack();
+	private ProtocolStack								protocolStack	= new ProtocolStack();
 	private Handler<Receiver>							receiver		= new SimpleHandler<Receiver>(
 																				this);
 	private Handler<Object>								handler			= new SimpleHandler<Object>(
@@ -174,8 +174,8 @@ public class Agent implements Receiver, Initable {
 			transport.disconnect();
 			transport.delete();
 		}
-		if (transforms != null) {
-			transforms.delete();
+		if (protocolStack != null) {
+			protocolStack.delete();
 		}
 		if (scheduler != null) {
 			scheduler.delete();
@@ -380,7 +380,7 @@ public class Agent implements Receiver, Initable {
 	@Access(AccessType.PUBLIC)
 	@JsonIgnore
 	public List<Object> getMethods() {
-		return ((RpcTransform) transforms.getLast()).getMethods();
+		return ((JSONRpcProtocol) protocolStack.getLast()).getMethods();
 	}
 
 	/**
@@ -414,29 +414,33 @@ public class Agent implements Receiver, Initable {
 		loadScheduler(config.getScheduler());
 		loadState(config.getState());
 		loadTransports(config.getTransport());
-		loadTransforms(config.getTransforms());
+		loadProtocols(config.getProtocols());
 	}
 
 	/**
-	 * Load transforms.
+	 * Load protocol stack.
 	 *
 	 * @param config
 	 *            the config
 	 */
-	private void loadTransforms(final ArrayNode config) {
-		boolean found=false;
-		if (config != null){
-			for (JsonNode item : config){
-				TransformConfig conf = new TransformConfig((ObjectNode)item);
-				if (RpcTransformBuilder.class.getName().equals(conf.getClassName())){
+	private void loadProtocols(final ArrayNode config) {
+		boolean found = false;
+		if (config != null) {
+			for (JsonNode item : config) {
+				ProtocolConfig conf = new ProtocolConfig((ObjectNode) item);
+				if (JSONRpcProtocolBuilder.class.getName().equals(
+						conf.getClassName())) {
 					found = true;
 				}
-				transforms.add(new TransformBuilder().withConfig((ObjectNode)conf).withHandle(handler).build());
+				protocolStack.add(new ProtocolBuilder()
+						.withConfig((ObjectNode) conf).withHandle(handler)
+						.build());
 			}
-		} 
-		if (config == null || !found){
-			// each agent has at least a RPC transform
-			transforms.add(new RpcTransformBuilder().withHandle(handler).build());
+		}
+		if (config == null || !found) {
+			// each agent has at least a JSONRPC protocol handler
+			protocolStack.add(new JSONRpcProtocolBuilder().withHandle(handler)
+					.build());
 		}
 	}
 
@@ -777,8 +781,8 @@ public class Agent implements Receiver, Initable {
 	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		final Object response = transforms.outbound(
-				transforms.inbound(msg, senderUrl).getResult(), senderUrl).result;
+		final Object response = protocolStack.outbound(
+				protocolStack.inbound(msg, senderUrl).getResult(), senderUrl).result;
 		if (response != null) {
 			try {
 				transport.send(senderUrl, response, tag);
@@ -793,27 +797,31 @@ public class Agent implements Receiver, Initable {
 				final ObjectNode params, final AsyncCallback<T> callback)
 				throws IOException {
 			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result, null);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
 		}
 
 		public <T> void call(final URI url, final Method method,
 				final Object[] params, final AsyncCallback<T> callback)
 				throws IOException {
 			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result, null);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
 		}
 
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params) throws IOException {
 			final Object message = new JSONRequest(method, params, null);
-			transport.send(url, transforms.outbound(message, url).result, null);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
 		}
 
 		public <T> T callSync(final URI url, final String method,
 				final ObjectNode params) throws IOException {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
 			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result, null);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
 			try {
 				return callback.get();
 			} catch (final Exception e) {
@@ -825,7 +833,8 @@ public class Agent implements Receiver, Initable {
 				final ObjectNode params, Class<T> clazz) throws IOException {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
 			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, transforms.outbound(message, url).result, null);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
 			try {
 				return callback.get();
 			} catch (final Exception e) {

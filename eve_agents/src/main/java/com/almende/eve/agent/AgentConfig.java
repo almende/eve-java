@@ -182,24 +182,25 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the transform config. The agent will add a rpctransform to the
+	 * Sets the protocols config. The agent will also add a JSONRpcProtocol to
+	 * the
 	 * stack.
-	 * 
-	 * @param transform
-	 *            the new transform config array
+	 *
+	 * @param protocols
+	 *            the new protocols
 	 */
-	public void setTransforms(final ArrayNode transform) {
-		this.set("transforms", transform);
+	public void setProtocols(final ArrayNode protocols) {
+		this.set("protocols", protocols);
 	}
 
 	/**
-	 * Gets the transforms.
+	 * Gets the protocols.
 	 *
-	 * @return the transforms
+	 * @return the protocols
 	 */
-	public ArrayNode getTransforms() {
-		if (this.has("transforms")) {
-			return (ArrayNode) this.get("transforms");
+	public ArrayNode getProtocols() {
+		if (this.has("protocols")) {
+			return (ArrayNode) this.get("protocols");
 		}
 		return null;
 	}

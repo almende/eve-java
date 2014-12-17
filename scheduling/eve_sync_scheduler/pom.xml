@@ -29,7 +29,7 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>eve-transform-rpc</artifactId>
+			<artifactId>eve-protocol-jsonrpc</artifactId>
 			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
 		</dependency>

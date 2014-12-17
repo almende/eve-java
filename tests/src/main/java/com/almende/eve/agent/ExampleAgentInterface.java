@@ -4,7 +4,7 @@
  */
 package com.almende.eve.agent;
 
-import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
 
 /**
  * The Interface ExampleAgentInterface.

@@ -13,13 +13,14 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.capabilities.handler.SimpleHandler;
-import com.almende.eve.transform.rpc.RpcTransform;
-import com.almende.eve.transform.rpc.RpcTransformBuilder;
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Name;
-import com.almende.eve.transform.rpc.annotation.Namespace;
-import com.almende.eve.transform.rpc.formats.JSONRequest;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
+import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,10 +36,9 @@ public class TestRpc extends TestCase {
 	 */
 	@Test
 	public void testRpc() {
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("class", "com.almende.eve.transform.rpc.RpcService");
+		final ObjectNode params = new JSONRpcProtocolConfig();
 		
-		final RpcTransform transform = new RpcTransformBuilder().withConfig(params).withHandle(
+		final JSONRpcProtocol protocol = new JSONRpcProtocolBuilder().withConfig(params).withHandle(
 				new SimpleHandler<Object>(new MyClass())).build();
 		
 		final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
@@ -62,18 +62,18 @@ public class TestRpc extends TestCase {
 		Object request = new JSONRequest("testMe", parms, callback);
 		
 		// transport
-		Object response = transform.invoke(request,
+		Object response = protocol.invoke(request,
 				URI.create("local://me"));
 		// transport
-		transform.invoke(response, URI.create("local://me"));
+		protocol.invoke(response, URI.create("local://me"));
 		
 		request = new JSONRequest("test.testMe", parms, callback);
 		
 		// transport
-		response = transform.invoke(request,
+		response = protocol.invoke(request,
 						URI.create("local://me"));
 		// transport
-		transform.invoke(response, URI.create("local://me"));
+		protocol.invoke(response, URI.create("local://me"));
 	}
 	
 	/**

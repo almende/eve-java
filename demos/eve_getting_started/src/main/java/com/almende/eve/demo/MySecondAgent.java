@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.net.URI;
 
 import com.almende.eve.agent.Agent;
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Name;
-import com.almende.eve.transform.rpc.annotation.Sender;
-import com.almende.eve.transform.rpc.formats.Params;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Sender;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.callback.AsyncCallback;
 
 /**

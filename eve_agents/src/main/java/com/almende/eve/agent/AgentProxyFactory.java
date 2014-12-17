@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 
-import com.almende.eve.transform.rpc.formats.JSONRPCException;
-import com.almende.eve.transform.rpc.formats.JSONRPCException.CODE;
+import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
+import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException.CODE;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.SyncCallback;
 import com.fasterxml.jackson.databind.JsonNode;

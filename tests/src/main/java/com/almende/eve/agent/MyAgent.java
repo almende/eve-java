@@ -7,9 +7,9 @@ package com.almende.eve.agent;
 import java.util.logging.Logger;
 
 import com.almende.eve.instantiation.CanHibernate;
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Namespace;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**

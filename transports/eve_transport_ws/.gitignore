@@ -9,3 +9,4 @@ target
 /pom.xml.versionsBackup
 /.eveagents_resultmonitor
 /.eveagents_schedulerTest
+/target/

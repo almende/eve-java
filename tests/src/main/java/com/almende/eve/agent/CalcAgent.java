@@ -32,9 +32,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.util.StringUtil;
 
 /**

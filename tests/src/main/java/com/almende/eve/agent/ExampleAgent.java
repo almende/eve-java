@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.net.URI;
 
 import com.almende.eve.instantiation.CanHibernate;
-import com.almende.eve.transform.rpc.annotation.Access;
-import com.almende.eve.transform.rpc.annotation.AccessType;
-import com.almende.eve.transform.rpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Access;
+import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
