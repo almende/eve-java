@@ -51,16 +51,9 @@ function Controller($scope, $resource) {
     $scope.response = undefined;
     $scope.rpcStatus = '';
 
-    // event logs
-    $scope.lastTimestamp = 0;
-    $scope.pollingInterval = 10000;  // polling interval in milliseconds
-    $scope.logs = [];
-    $scope.enableEvents = false;
-
     // define a RESTful resource
     var agent = $resource(url + ':resource', {}, {
-        'post': {method: 'POST'},
-        'events': {method: 'GET', params: {resource: 'events'}, isArray: true}
+        'post': {method: 'POST'}
     });
 
     /**
@@ -96,6 +89,7 @@ function Controller($scope, $resource) {
             var method = $scope.methods[i];
             if (method.method == $scope.methodName) {
                 $scope.method = method;
+		$scope.request = JSON.stringify(form2json(), null, 2);
                 break;
             }
         }
@@ -124,15 +118,15 @@ function Controller($scope, $resource) {
         return d.toISOString ? d.toISOString() : d.toString();
     };
 
-    /**
-     * Send an JSON-RPC request.
-     * The request is built up from the current values in the form,
-     * and the field result in the response is filled in in the field #result
-     */
-    $scope.sendForm = function () {
-        try {
+
+    function form2json() {
             var request = {};
             request.id = 1;
+	    if ($scope.method == undefined){
+	            request.method = "getMethods";
+	            request.params = {};
+		    return request;
+            }
             request.method = $scope.method.method;
             request.params = {};
             for (var i = 0; i < $scope.method.params.length; i++) {
@@ -146,7 +140,17 @@ function Controller($scope, $resource) {
                     }
                 }
             }
+	return request;
+    }
 
+    /**
+     * Send an JSON-RPC request.
+     * The request is built up from the current values in the form,
+     * and the field result in the response is filled in in the field #result
+     */
+    $scope.sendForm = function () {
+        try {
+            var request = form2json();
             var start = +new Date();
             $scope.formStatus = 'sending...';
             agent.post({}, request, function (response) {
@@ -219,81 +223,13 @@ function Controller($scope, $resource) {
             $scope.response = ''
         }
     };
-
-    /**
-     * Store the setting enableEvents
-     */
-    $scope.updateEnableEvents = function () {
-        if ($scope.enableEvents == true) {
-            // enableEvents==true is the default setting, do not store it
-            delete localStorage['enableEvents'];
-            $scope.startMonitoringEvents();
-        }
-        else {
-            localStorage['enableEvents'] = false;
-            $scope.stopMonitoringEvents();
-            $scope.clearEvents();
-        }
-    };
-
-    /**
-     * Start monitoring the events of the agent
-     */
-    $scope.startMonitoringEvents = function () {
-        $scope.updateEvents();
-    };
-
-    /**
-     * Stop monitoring the events of the agent
-     */
-    $scope.stopMonitoringEvents = function () {
-        if ($scope.updateEventsTimer) {
-            clearTimeout($scope.updateEventsTimer);
-            delete $scope.updateEventsTimer;
-        }
-    };
-
-    /**
-     * Retrieve the latest event logs, and set a timeout for the next update
-     */
-    $scope.updateEvents = function () {
-        $scope.stopMonitoringEvents();
-
-        agent.events({since: $scope.lastTimestamp}, undefined, function (newLogs) {
-            while (newLogs && newLogs.length) {
-                var newLog = newLogs.shift();
-                $scope.lastTimestamp = newLog.timestamp;
-                $scope.logs.push(newLog);
-            }
-            $scope.lastUpdate = (new Date()).toISOString();
-
-            // set a new timeout
-            $scope.updateEventsTimer = setTimeout($scope.updateEvents, $scope.pollingInterval);
-        }, function (err) {
-            console.log(err);
-
-            // set a new timeout
-            $scope.updateEventsTimer = setTimeout($scope.updateEvents, $scope.pollingInterval);
-        });
-    };
-
-    /**
-     * Clear the list with events
-     */
-    $scope.clearEvents = function () {
-        $scope.logs = [];
-    };
+  
 
     /**
      * Load information and data from the agent via JSON-RPC calls.
      * Retrieve the methods, type, id, description, etc.
      */
     $scope.load = function () {
-        // read settings from local storage
-        if (localStorage['enableEvents'] != undefined) {
-            $scope.enableEvents = localStorage['enableEvents'];
-        }
-        $scope.updateEnableEvents();
 
         // get id
         send ('getId', {}, function (err, result) {
@@ -324,22 +260,16 @@ function Controller($scope, $resource) {
                 $scope.methodName = $scope.methods[0].method;
                 $scope.setMethod();
 
-                // update method select box
+                // update method select box and the json version
                 setTimeout(function () {
                     new Chosen(document.getElementById('methods'));
+		    $scope.request = JSON.stringify(form2json(), null, 2);
                 }, 15);
             }
         });
     };
 
-    // fill in an initial JSON-RPC request
-    var defaultRequest = {
-        "id": 1,
-        "method": "getMethods",
-        "params": {
-        }
-    };
-    $scope.request = JSON.stringify(defaultRequest, null, 2);
+    $scope.request = JSON.stringify(form2json(), null, 2);
 
     $scope.loading = true;
     $scope.load();

@@ -48,20 +48,14 @@
         <tr>
             <th>Mode</th>
             <td colspan="4">
-                <input type="radio" ng-model="mode" value="form" id="mode_form"> Form
-                <input type="radio" ng-model="mode" value="jsonrpc" id="mode_jsonrpc"> JSON-RPC
+                <label><input type="radio" ng-model="mode" value="form" id="mode_form"> Form</label>
+                <label><input type="radio" ng-model="mode" value="jsonrpc" id="mode_jsonrpc" ng-click="setMethod()"> JSON-RPC</label>
             </td>
         </tr>
 
         <tr ng-show="mode=='form'">
             <th>Method</th>
             <td colspan="4">
-                <!-- TODO: cleanup
-                <select ng-model="methodName" ng-change="setMethod()">
-                    <option ng-repeat="method in methods" ng-selected="setParams">{{method.method}}</option>
-                </select>
-                -->
-
                 <select data-placeholder="Select a method"
                         id = "methods"
                         class="chzn-select"
