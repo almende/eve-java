@@ -17,14 +17,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The listener interface for receiving ServletContext events.
  */
 public class EveListener implements ServletContextListener {
-	private static final Logger	LOG	= Logger.getLogger(EveListener.class
-											.getName());
-	protected ObjectNode myConfig = null;
-	
+	private static final Logger	LOG			= Logger.getLogger(EveListener.class
+													.getName());
+	protected ObjectNode		myConfig	= null;
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		final ServletContext sc = sce.getServletContext();
-		
+
 		// Get the eve.yaml file:
 		String path = sc.getInitParameter("eve_config");
 		if (path != null && !path.isEmpty()) {
@@ -40,12 +40,12 @@ public class EveListener implements ServletContextListener {
 
 			myConfig = Boot.boot(is);
 		}
-		
+
 	}
-	
+
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// Doing nothing here.
 	}
-	
+
 }

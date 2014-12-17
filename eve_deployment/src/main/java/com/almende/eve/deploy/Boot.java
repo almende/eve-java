@@ -77,8 +77,8 @@ public final class Boot {
 		String configFileName = args[0];
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
-			boot(is,cl);
-			
+			boot(is, cl);
+
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
 					"Couldn't find configfile:" + configFileName, e);
@@ -86,7 +86,7 @@ public final class Boot {
 		}
 
 	}
-	
+
 	/**
 	 * Boot.
 	 *
@@ -94,8 +94,8 @@ public final class Boot {
 	 *            the is
 	 * @return the object node
 	 */
-	public static ObjectNode boot(final InputStream is){
-		return boot(is,null);
+	public static ObjectNode boot(final InputStream is) {
+		return boot(is, null);
 	}
 
 	/**
@@ -105,10 +105,10 @@ public final class Boot {
 	 *            the config
 	 * @return the object node
 	 */
-	public static ObjectNode boot(final ObjectNode config){
-		return boot(config,null);
+	public static ObjectNode boot(final ObjectNode config) {
+		return boot(config, null);
 	}
-	
+
 	/**
 	 * Boot.
 	 *
@@ -118,9 +118,9 @@ public final class Boot {
 	 *            the cl
 	 * @return the object node
 	 */
-	public static ObjectNode boot(final ObjectNode config, final ClassLoader cl){
+	public static ObjectNode boot(final ObjectNode config, final ClassLoader cl) {
 		final Config conf = new Config(config);
-		return boot(conf,null);
+		return boot(conf, null);
 	}
 
 	/**
@@ -132,9 +132,9 @@ public final class Boot {
 	 *            the cl
 	 * @return the object node
 	 */
-	public static ObjectNode boot(final InputStream is, final ClassLoader cl){
+	public static ObjectNode boot(final InputStream is, final ClassLoader cl) {
 		final Config config = YamlReader.load(is).expand();
-		return boot(config,cl);
+		return boot(config, cl);
 	}
 
 	/**
@@ -146,13 +146,12 @@ public final class Boot {
 	 *            the cl
 	 * @return the object node
 	 */
-	public static ObjectNode boot(final Config config, final ClassLoader cl){
+	public static ObjectNode boot(final Config config, final ClassLoader cl) {
 		loadInstantiationServices(config, cl);
 		loadAgents(config, cl);
 		return config;
 	}
-	
-	
+
 	/**
 	 * Load instantiation services.
 	 *
@@ -161,18 +160,21 @@ public final class Boot {
 	 * @param cl
 	 *            the cl
 	 */
-	public static void loadInstantiationServices(final Config config, final ClassLoader cl) {
-		if (!config.has("instantiationServices")){
+	public static void loadInstantiationServices(final Config config,
+			final ClassLoader cl) {
+		if (!config.has("instantiationServices")) {
 			return;
 		}
 		final ArrayNode iss = (ArrayNode) config.get("instantiationServices");
-		for (final JsonNode service: iss){
-			final InstantiationServiceConfig isconfig = new InstantiationServiceConfig((ObjectNode)service);
-			final InstantiationService is = new InstantiationServiceBuilder().withClassLoader(cl).withConfig(isconfig).build();
+		for (final JsonNode service : iss) {
+			final InstantiationServiceConfig isconfig = new InstantiationServiceConfig(
+					(ObjectNode) service);
+			final InstantiationService is = new InstantiationServiceBuilder()
+					.withClassLoader(cl).withConfig(isconfig).build();
 			is.boot();
 		}
 	}
-	
+
 	/**
 	 * Load agents.
 	 *
@@ -182,12 +184,12 @@ public final class Boot {
 	 *            the custom classloader
 	 */
 	public static void loadAgents(final Config config, final ClassLoader cl) {
-		if (!config.has("agents")){
+		if (!config.has("agents")) {
 			return;
 		}
-		
+
 		final ArrayNode agents = (ArrayNode) config.get("agents");
-		
+
 		for (final JsonNode agent : agents) {
 			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)

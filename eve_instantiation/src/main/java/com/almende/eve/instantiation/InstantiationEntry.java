@@ -13,18 +13,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeEntry.
  */
 public class InstantiationEntry {
-	private String		wakeKey		= null;
-	private String		className	= null;
-	private ObjectNode	params		= null;
-	private Handler<Initable> handler		= null;
-	private State		state		= null;
+	private String				wakeKey		= null;
+	private String				className	= null;
+	private ObjectNode			params		= null;
+	private Handler<Initable>	handler		= null;
+	private State				state		= null;
 
 	/**
 	 * Instantiates a new entry.
 	 */
-	public InstantiationEntry() {
-	}
-	
+	public InstantiationEntry() {}
+
 	/**
 	 * Instantiates a new entry.
 	 * 
@@ -41,7 +40,7 @@ public class InstantiationEntry {
 		this.className = className;
 		setParams(params);
 	}
-	
+
 	/**
 	 * Gets the wake key.
 	 * 
@@ -50,7 +49,7 @@ public class InstantiationEntry {
 	public String getWakeKey() {
 		return wakeKey;
 	}
-	
+
 	/**
 	 * Sets the wake key.
 	 * 
@@ -60,7 +59,7 @@ public class InstantiationEntry {
 	public void setWakeKey(final String wakeKey) {
 		this.wakeKey = wakeKey;
 	}
-	
+
 	/**
 	 * Gets the className.
 	 * 
@@ -69,7 +68,7 @@ public class InstantiationEntry {
 	public String getClassName() {
 		return className;
 	}
-	
+
 	/**
 	 * Sets the className.
 	 * 
@@ -79,7 +78,7 @@ public class InstantiationEntry {
 	public void setClassName(final String className) {
 		this.className = className;
 	}
-	
+
 	/**
 	 * Gets the params.
 	 * 
@@ -88,7 +87,7 @@ public class InstantiationEntry {
 	public ObjectNode getParams() {
 		return params;
 	}
-	
+
 	/**
 	 * Sets the params.
 	 * 
@@ -119,7 +118,7 @@ public class InstantiationEntry {
 	public void setHandler(Handler<Initable> handler) {
 		this.handler = handler;
 	}
-	
+
 	/**
 	 * Gets the state.
 	 *
@@ -129,7 +128,7 @@ public class InstantiationEntry {
 	public State getState() {
 		return state;
 	}
-	
+
 	/**
 	 * Sets the state.
 	 *

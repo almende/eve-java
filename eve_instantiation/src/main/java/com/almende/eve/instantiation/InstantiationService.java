@@ -221,7 +221,7 @@ public class InstantiationService implements Capability {
 	 */
 	public void deregister(final String wakeKey) {
 		final InstantiationEntry entry = entries.remove(wakeKey);
-		remove(wakeKey,entry);
+		remove(wakeKey, entry);
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class InstantiationService implements Capability {
 			innerState.delete();
 		}
 	}
-	
+
 	/**
 	 * Load.
 	 *

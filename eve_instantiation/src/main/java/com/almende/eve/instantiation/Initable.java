@@ -7,11 +7,11 @@ package com.almende.eve.instantiation;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Interface Initable. Objects implementing this interface can be instatiated by
- * the InstantiationService.
+ * The Interface Initable. Objects implementing this interface can be
+ * instatiated by the InstantiationService.
  */
 public interface Initable {
-	
+
 	/**
 	 * Init.
 	 *
@@ -22,5 +22,5 @@ public interface Initable {
 	 *            WakeService.boot(). False in all other cases.
 	 */
 	void init(ObjectNode params, boolean onBoot);
-	
+
 }
