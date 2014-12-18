@@ -235,5 +235,4 @@ public class AgentConfig extends Config {
 	public void setCanHibernate(boolean canHibernate) {
 		this.put("canHibernate", canHibernate);
 	}
-
 }

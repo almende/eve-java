@@ -27,6 +27,8 @@ import com.almende.eve.instantiation.InstantiationServiceBuilder;
 import com.almende.eve.protocol.ProtocolBuilder;
 import com.almende.eve.protocol.ProtocolConfig;
 import com.almende.eve.protocol.ProtocolStack;
+import com.almende.eve.protocol.auth.Authorizor;
+import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
@@ -80,6 +82,7 @@ public class Agent implements Receiver, Initable {
 
 	private Handler<Caller>								sender			= new SimpleHandler<Caller>(
 																				caller);
+	private Authorizor									authorizor		= new DefaultAuthorizor();
 
 	/**
 	 * Instantiates a new agent.
@@ -532,6 +535,14 @@ public class Agent implements Receiver, Initable {
 	@JsonIgnore
 	protected State getState() {
 		return state;
+	}
+
+	protected Authorizor getAuthorizor() {
+		return authorizor;
+	}
+
+	protected void setAuthorizor(Authorizor authorizor) {
+		this.authorizor = authorizor;
 	}
 
 	/**
