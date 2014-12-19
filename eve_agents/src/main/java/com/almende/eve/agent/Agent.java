@@ -173,15 +173,15 @@ public class Agent implements Receiver, Initable {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void destroy() {
+		if (scheduler != null) {
+			scheduler.delete();
+		}
 		if (transport != null) {
 			transport.disconnect();
 			transport.delete();
 		}
 		if (protocolStack != null) {
 			protocolStack.delete();
-		}
-		if (scheduler != null) {
-			scheduler.delete();
 		}
 		if (state != null) {
 			state.delete();
@@ -414,10 +414,10 @@ public class Agent implements Receiver, Initable {
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
 			setSender(new HibernationHandler<Caller>(caller, agentId, is));
 		}
-		loadScheduler(config.getScheduler());
 		loadState(config.getState());
-		loadTransports(config.getTransport());
 		loadProtocols(config.getProtocols());
+		loadTransports(config.getTransport());
+		loadScheduler(config.getScheduler());
 	}
 
 	/**

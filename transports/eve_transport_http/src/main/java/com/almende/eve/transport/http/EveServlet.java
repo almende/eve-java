@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
@@ -100,8 +101,9 @@ public class EveServlet extends HttpServlet {
 	 */
 	private boolean handleHandShake(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
+		
+		
 		final String time = req.getHeader("X-Eve-requestToken");
-
 		if (time == null) {
 			return false;
 		}
@@ -117,6 +119,8 @@ public class EveServlet extends HttpServlet {
 				res.setStatus(HttpServletResponse.SC_OK);
 				res.flushBuffer();
 			}
+		} else {
+			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Can't find the correct transport:'"+myUrl+"' for:'"+id+"'");
 		}
 		return true;
 	}
@@ -145,12 +149,17 @@ public class EveServlet extends HttpServlet {
 						.textValue());
 				final HttpResponse response = ApacheHttpClient.get().execute(
 						httpGet);
-				if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+				if (response != null && response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+					Header replyToken = response.getLastHeader("X-Eve-replyToken");
+					if (replyToken == null){
+						LOG.log(Level.WARNING, "Failed to receive valid handshake, replyToken missing!:"
+								+ response);
+						return Handshake.INVALID;
+					}
 					if (tokenObj
 							.get("token")
 							.textValue()
-							.equals(response.getLastHeader("X-Eve-replyToken")
-									.getValue())) {
+							.equals(replyToken.getValue())) {
 						return Handshake.OK;
 					}
 				} else {
