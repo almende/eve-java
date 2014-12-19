@@ -18,6 +18,7 @@ import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -94,7 +95,7 @@ public class PersistentScheduler extends SimpleScheduler {
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
 
-		final TaskEntry entry = new TaskEntry(due, msg);
+		final TaskEntry entry = new TaskEntry(due, JOM.getInstance().valueToTree(msg));
 		if (state != null) {
 			state.put(entry.getTaskId(), entry);
 		}
@@ -141,7 +142,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 															.getCanonicalName());
 	private static final long	serialVersionUID	= -2402975617148459433L;
 	private String				taskId				= null;
-	private Object				message;
+	private JsonNode			message;
 	private DateTime			due;
 	private boolean				active				= false;
 
@@ -158,7 +159,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	 * @param message
 	 *            the message
 	 */
-	public TaskEntry(final DateTime due, final Object message) {
+	public TaskEntry(final DateTime due, final JsonNode message) {
 		taskId = new UUID().toString();
 		setMessage(message);
 		this.due = due;
@@ -204,11 +205,11 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 		return due.compareTo(o.due);
 	}
 
-	public Object getMessage() {
+	public JsonNode getMessage() {
 		return message;
 	}
 
-	public void setMessage(final Object message) {
+	public void setMessage(final JsonNode message) {
 		this.message = message;
 	}
 

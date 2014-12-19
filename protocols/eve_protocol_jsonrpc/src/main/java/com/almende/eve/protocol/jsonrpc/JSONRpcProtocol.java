@@ -116,7 +116,7 @@ public class JSONRpcProtocol implements Protocol {
 
 						json = (ObjectNode) JOM.getInstance().readTree(message);
 					}
-				} else if (msg instanceof ObjectNode) {
+				} else if (msg instanceof ObjectNode || (msg instanceof JsonNode && ((JsonNode)msg).isObject())) {
 					json = (ObjectNode) msg;
 				} else {
 					LOG.info("Message unknown type:" + msg.getClass());
