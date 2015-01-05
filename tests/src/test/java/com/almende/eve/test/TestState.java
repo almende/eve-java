@@ -19,6 +19,7 @@ import com.almende.eve.state.memory.MemoryStateConfig;
 import com.almende.eve.state.mongo.MongoState;
 import com.almende.eve.state.mongo.MongoStateBuilder;
 import com.almende.eve.state.mongo.MongoStateConfig;
+import com.almende.eve.state.redis.RedisStateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -86,6 +87,25 @@ public class TestState extends TestCase {
 		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		
+	}
+	
+	
+	/**
+	 * Test file state.
+	 */
+	@Test
+	public void testRedisState() {
+		RedisStateConfig params = new RedisStateConfig();
+		params.setDbId(2);
+		params.setId("TestAgent");
+		
+		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+		State myState2 = new StateBuilder().withConfig(params).build();		
+		runTest(myState, myState2);
+		
+		myState = new CapabilityBuilder<State>().withConfig(params).build();
+		myState2 = new StateBuilder().withConfig(params).build();
+		runTest(myState, myState2);
 	}
 	
 	/**

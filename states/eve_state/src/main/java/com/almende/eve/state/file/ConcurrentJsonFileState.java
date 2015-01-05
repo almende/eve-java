@@ -351,14 +351,13 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	 */
 	@Override
 	public JsonNode locPut(final String key, JsonNode value) {
-		JsonNode result = null;
 		try {
 			openFile();
 			read();
 			if (value == null) {
 				value = NullNode.getInstance();
 			}
-			result = properties.put(key, value);
+			properties.put(key, value);
 			write();
 		} catch (final IllegalStateException e) {
 			LOG.log(Level.WARNING,
@@ -367,7 +366,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 			LOG.log(Level.WARNING, "", e);
 		}
 		closeFile();
-		return result;
+		return value;
 	}
 	
 	/*

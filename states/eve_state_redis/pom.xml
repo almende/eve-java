@@ -4,32 +4,30 @@
 
 	<parent>
 		<groupId>com.almende.eve</groupId>
-		<artifactId>eve</artifactId>
+		<artifactId>eve-state</artifactId>
 		<version>3.1.0-SNAPSHOT</version>
-		<relativePath>../eve_parent/pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-state</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>eve-state-redis</artifactId>
 
-	<name>EVE State Parent</name>
+	<name>EVE State RedisDB</name>
 	<url>http://almende.github.com/eve</url>
 
-	<modules>
-		<module>eve_state</module>
-		<module>eve_state_mongo</module>
-		<module>eve_state_couch</module>
-		<module>eve_state_redis</module>
-	</modules>
-
 	<properties>
+		<redis.version>2.2.1</redis.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-common</artifactId>
+			<artifactId>eve-state-common</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${redis.version}</version>
 		</dependency>
 	</dependencies>
 </project>
