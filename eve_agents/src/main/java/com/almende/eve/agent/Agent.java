@@ -33,7 +33,6 @@ import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
-import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.scheduling.Scheduler;
@@ -61,7 +60,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Agent.
  */
 @Access(AccessType.UNAVAILABLE)
-public class Agent implements Receiver, Initable {
+public class Agent implements Receiver, Initable, AgentInterface {
 	private static final Logger							LOG				= Logger.getLogger(Agent.class
 																				.getName());
 	private String										agentId			= null;
@@ -350,6 +349,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the id
 	 */
 	@Access(AccessType.PUBLIC)
+	@Override
 	public String getId() {
 		return agentId;
 	}
@@ -360,6 +360,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the type
 	 */
 	@Access(AccessType.PUBLIC)
+	@Override
 	public String getType() {
 		return this.getClass().getName();
 	}
@@ -370,6 +371,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the urls
 	 */
 	@Access(AccessType.PUBLIC)
+	@Override
 	@JsonIgnore
 	public List<URI> getUrls() {
 		return transport.getAddresses();
@@ -381,6 +383,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the methods
 	 */
 	@Access(AccessType.PUBLIC)
+	@Override
 	@JsonIgnore
 	public List<Object> getMethods() {
 		return ((JSONRpcProtocol) protocolStack.getLast()).getMethods();
@@ -392,6 +395,7 @@ public class Agent implements Receiver, Initable {
 	 * @return the config
 	 */
 	@Access(AccessType.PUBLIC)
+	@Override
 	public AgentConfig getConfig() {
 		return config;
 	}
@@ -491,9 +495,8 @@ public class Agent implements Receiver, Initable {
 	 * 
 	 * @return the scheduler
 	 */
-	@Namespace("scheduler")
 	@JsonIgnore
-	public Scheduler getScheduler() {
+	protected Scheduler getScheduler() {
 		return scheduler;
 	}
 
