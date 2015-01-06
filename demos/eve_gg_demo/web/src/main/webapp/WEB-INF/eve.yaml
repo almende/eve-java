@@ -1,0 +1,13 @@
+
+agents:
+-   id: demo
+    class: com.almende.eve.ggdemo.DemoAgent
+    state:
+         class: com.almende.eve.state.memory.MemoryStateBuilder
+    scheduler:
+         class: com.almende.eve.scheduling.SimpleSchedulerBuilder
+    transport:
+         class: com.almende.eve.transport.http.HttpTransportBuilder
+         servletUrl: http://localhost:8080/ggdemo/agents/
+         doAuthentication: false
+
