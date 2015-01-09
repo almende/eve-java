@@ -5,6 +5,7 @@
 package com.almende.eve.state.redis;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,9 +89,14 @@ public class RedisState extends AbstractState<JsonNode> implements State {
 	@Override
 	public Set<String> keySet() {
 		final Jedis redis = provider.getInstance();
-		Set<String> keys = redis.smembers(KEYS);
+		Set<String> keys = redis.smembers(getId()+"_"+KEYS);
 		provider.returnInstance(redis);
-		return keys;
+		
+		final Set<String> cleanKeys = new HashSet<String>();
+		for (String key : keys){
+			cleanKeys.add(key.replaceFirst(getId()+"_", ""));
+		}
+		return cleanKeys;
 	}
 
 	/*
@@ -100,10 +106,10 @@ public class RedisState extends AbstractState<JsonNode> implements State {
 	@Override
 	public void clear() {
 		final Jedis redis = provider.getInstance();
-		Set<String> keys = redis.smembers(KEYS);
+		Set<String> keys = redis.smembers(getId()+"_"+KEYS);
 		for (String key : keys) {
 			redis.del(key);
-			redis.srem(KEYS, key);
+			redis.srem(getId()+"_"+KEYS, key);
 		}
 		provider.returnInstance(redis);
 	}
@@ -116,7 +122,7 @@ public class RedisState extends AbstractState<JsonNode> implements State {
 	public int size() {
 		Long res = Long.valueOf(0);
 		final Jedis redis = provider.getInstance();
-		res = redis.scard(KEYS);
+		res = redis.scard(getId()+"_"+KEYS);
 		provider.returnInstance(redis);
 		return res.intValue();
 	}
@@ -153,7 +159,7 @@ public class RedisState extends AbstractState<JsonNode> implements State {
 		final Jedis redis = provider.getInstance();
 		final String nkey = makeKey(key);
 		redis.set(nkey, value.toString());
-		redis.sadd(KEYS, nkey);
+		redis.sadd(getId()+"_"+KEYS, nkey);
 		provider.returnInstance(redis);
 		return value;
 	}
@@ -171,7 +177,7 @@ public class RedisState extends AbstractState<JsonNode> implements State {
 			final String nkey = makeKey(key);
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
 				redis.set(nkey, newVal.toString());
-				redis.sadd(KEYS, nkey);
+				redis.sadd(getId()+"_"+KEYS, nkey);
 				result = true;
 			}
 		} catch (Exception e) {
