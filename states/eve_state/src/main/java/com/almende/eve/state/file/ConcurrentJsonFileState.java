@@ -108,6 +108,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 	
 	/*
 	 * (non-Javadoc)
+	 * TODO: Get rid of these, they are a performance hazard!:)
 	 * 
 	 * @see java.lang.Object#finalize()
 	 */

@@ -148,6 +148,12 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.almende.eve.instantiation.Initable#init(com.fasterxml.jackson.databind
+	 * .node.ObjectNode, boolean)
+	 */
 	@Override
 	public void init(ObjectNode params, boolean onBoot) {
 		setConfig(params);
@@ -168,7 +174,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	}
 
 	/**
-	 * Destroy the agent
+	 * Destroy the agent.
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void destroy() {
@@ -190,6 +196,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		}
 	}
 
+	/**
+	 * The Class DefaultEventCaller.
+	 */
 	class DefaultEventCaller {
 		/**
 		 * On.
@@ -259,6 +268,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	}
 
 	/**
+	 * Sets the receiver.
+	 *
 	 * @param receiver
 	 *            the receiver to set
 	 */
@@ -267,6 +278,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	}
 
 	/**
+	 * Gets the receiver.
+	 *
 	 * @return the receiver
 	 */
 	@JsonIgnore
@@ -402,9 +415,6 @@ public class Agent implements Receiver, Initable, AgentInterface {
 
 	/**
 	 * Load config.
-	 *
-	 * @param onBoot
-	 *            the on boot
 	 */
 	protected void loadConfig() {
 		agentId = config.getId();
@@ -540,10 +550,21 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		return state;
 	}
 
+	/**
+	 * Gets the authorizor.
+	 *
+	 * @return the authorizor
+	 */
 	protected Authorizor getAuthorizor() {
 		return authorizor;
 	}
 
+	/**
+	 * Sets the authorizor.
+	 *
+	 * @param authorizor
+	 *            the new authorizor
+	 */
 	protected void setAuthorizor(Authorizor authorizor) {
 		this.authorizor = authorizor;
 	}
@@ -572,6 +593,12 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		config.set("transport", transportConfig);
 	}
 
+	/**
+	 * Adds the transport.
+	 *
+	 * @param transconfig
+	 *            the transconfig
+	 */
 	protected void addTransport(final ObjectNode transconfig) {
 		// TODO: Somewhat ugly, not every transport requires an id.
 		TransportConfig transconf = new TransportConfig(transconfig);

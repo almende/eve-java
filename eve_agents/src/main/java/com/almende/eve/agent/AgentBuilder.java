@@ -17,8 +17,7 @@ public class AgentBuilder {
 	private static final Logger	LOG			= Logger.getLogger(AgentBuilder.class
 													.getName());
 	private AgentConfig			parameters	= null;
-	private ClassLoader			cl			= Thread.currentThread()
-													.getContextClassLoader();
+	private ClassLoader			cl			= getClass().getClassLoader();
 	private boolean				onBoot		= false;
 
 	/**

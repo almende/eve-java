@@ -1,7 +1,8 @@
-
 agents:
 -   id: demo
     class: com.almende.eve.ggdemo.DemoAgent
+
+
     state:
          class: com.almende.eve.state.memory.MemoryStateBuilder
     scheduler:

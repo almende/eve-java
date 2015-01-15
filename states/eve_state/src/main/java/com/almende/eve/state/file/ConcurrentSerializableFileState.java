@@ -92,6 +92,8 @@ public class ConcurrentSerializableFileState extends
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * TODO: Get rid of these, they are a performance hazard!:)
+	 * 
 	 * @see java.lang.Object#finalize()
 	 */
 	@Override
