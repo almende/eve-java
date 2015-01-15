@@ -10,10 +10,11 @@ import java.util.Map;
 import com.almende.eve.scheduling.SimpleSchedulerConfig;
 import com.almende.eve.state.memory.MemoryStateConfig;
 import com.almende.util.TypeUtil;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class AgentHost, this is a backward compatibility class for easier migration of Eve2X implementations to Eve3. 
- *  
+ * The Class AgentHost, this is a backward compatibility class for easier
+ * migration of Eve2X implementations to Eve3.
  */
 @Deprecated
 public class AgentHost {
@@ -79,17 +80,9 @@ public class AgentHost {
 	 */
 	public Agent createAgent(String agentType, String agentId) {
 		final AgentConfig config = new AgentConfig();
-		config.setClassName(agentType);
-		config.setId(agentId);
-		config.setScheduler(new SimpleSchedulerConfig());
-		config.setState(new MemoryStateConfig());
-		
-		final Agent agent = new AgentBuilder().with(config).build();
-		
-		addAgent(agentId, agent);
-		return agent;
+		return createAgent(agentType, agentId, config);
 	}
-	
+
 	/**
 	 * Creates the agent.
 	 *
@@ -103,14 +96,51 @@ public class AgentHost {
 	 */
 	public <T extends Agent> T createAgent(Class<T> agentType, String agentId) {
 		final AgentConfig config = new AgentConfig();
-		config.setClassName(agentType.getName());
-		config.setId(agentId);
-		config.setScheduler(new SimpleSchedulerConfig());
-		config.setState(new MemoryStateConfig());
-		
-		final T agent = new TypeUtil<T>(){}.inject(new AgentBuilder().with(config).build());
-		
+		return createAgent(agentType, agentId, config);
+	}
+
+	/**
+	 * Creates the agent.
+	 *
+	 * @param agentType
+	 *            the agent type
+	 * @param agentId
+	 *            the agent id
+	 * @param config
+	 *            the config
+	 * @return the agent
+	 */
+	public Agent createAgent(String agentType, String agentId,
+			final ObjectNode config) {
+		final AgentConfig conf = new AgentConfig(config);
+		conf.setClassName(agentType);
+		conf.setId(agentId);
+		conf.setScheduler(new SimpleSchedulerConfig());
+		conf.setState(new MemoryStateConfig());
+
+		final Agent agent = new AgentBuilder().with(conf).build();
+
 		addAgent(agentId, agent);
 		return agent;
 	}
+
+	/**
+	 * Creates the agent.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param agentType
+	 *            the agent type
+	 * @param agentId
+	 *            the agent id
+	 * @param config
+	 *            the config
+	 * @return the t
+	 */
+	public <T extends Agent> T createAgent(Class<T> agentType, String agentId,
+			final ObjectNode config) {
+		return new TypeUtil<T>() {}.inject(createAgent(agentType.getName(),
+				agentId, config));
+	}
+
 }
