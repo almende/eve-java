@@ -14,12 +14,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class CapabilityBuilder.
  *
- * @param <T> the generic type
+ * @param <T>
+ *            the generic type
  */
 public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	private static final Logger	LOG		= Logger.getLogger(AbstractCapabilityBuilder.class
 												.getName());
-	
+	private ClassLoader			cl		= getClass().getClassLoader();
+
 	private ObjectNode			params	= null;
 	private Handler<?>			handle	= null;
 
@@ -34,7 +36,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 		this.params = params;
 		return this;
 	}
-	
+
 	/**
 	 * With handle.
 	 * 
@@ -46,7 +48,21 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 		this.handle = handle;
 		return this;
 	}
-	
+
+	/**
+	 * With class loader.
+	 *
+	 * @param cl
+	 *            the cl
+	 * @return the abstract capability builder
+	 */
+	public AbstractCapabilityBuilder<T> withClassLoader(final ClassLoader cl) {
+		if (cl != null) {
+			this.cl = cl;
+		}
+		return this;
+	}
+
 	/**
 	 * Builds or retrieves the Capability.
 	 * 
@@ -57,16 +73,18 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 		final String className = config.getClassName();
 		if (className != null) {
 			try {
-				final Class<?> clazz = Class.forName(className);
-				if (ClassUtil.hasSuperClass(clazz, AbstractCapabilityBuilder.class)) {
+				final Class<?> clazz = Class.forName(className, true, cl);
+				if (ClassUtil.hasSuperClass(clazz,
+						AbstractCapabilityBuilder.class)) {
 					@SuppressWarnings("unchecked")
 					final AbstractCapabilityBuilder<T> instance = (AbstractCapabilityBuilder<T>) clazz
 							.newInstance();
-					return instance.withConfig(params).withHandle(handle)
-							.build();
+					return instance.withClassLoader(cl).withConfig(params)
+							.withHandle(handle).build();
 				} else {
 					LOG.log(Level.WARNING,
-							className+" is not a CapabilityBuilder, nor a Capability itself.");
+							className
+									+ " is not a CapabilityBuilder, nor a Capability itself.");
 				}
 			} catch (final ClassNotFoundException e) {
 				LOG.log(Level.WARNING, "Couldn't find class:" + className, e);
@@ -88,7 +106,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets the params.
 	 *
@@ -97,7 +115,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	protected final ObjectNode getParams() {
 		return params;
 	}
-	
+
 	/**
 	 * Gets the handle.
 	 *
@@ -106,5 +124,5 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	protected final Handler<?> getHandle() {
 		return handle;
 	}
-	
+
 }
