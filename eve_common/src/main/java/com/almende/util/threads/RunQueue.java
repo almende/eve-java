@@ -45,7 +45,7 @@ public class RunQueue extends AbstractExecutorService {
 			}
 		}
 	}
-	
+
 	private class Worker extends Thread {
 		final private Object	lock		= new Object();
 		private Runnable		task		= null;
@@ -246,16 +246,18 @@ public class RunQueue extends AbstractExecutorService {
 					break;
 			}
 		}
-		Worker thread = getFreeThread();
-		while (thread != null) {
-			final Runnable task = tasks.poll();
-			if (task != null) {
-				thread.runTask(task);
-			} else {
-				threadTearDown(thread);
-				break;
+		if (tasks.size() > 0) {
+			Worker thread = getFreeThread();
+			while (thread != null) {
+				final Runnable task = tasks.poll();
+				if (task != null) {
+					thread.runTask(task);
+				} else {
+					threadTearDown(thread);
+					break;
+				}
+				thread = getFreeThread();
 			}
-			thread = getFreeThread();
 		}
 	}
 }
