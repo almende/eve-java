@@ -73,7 +73,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	private ProtocolStack								protocolStack	= new ProtocolStack();
 	private Handler<Receiver>							receiver		= new SimpleHandler<Receiver>(
 																				this);
-	private Handler<Object>								handler			= new SimpleHandler<Object>(
+	private Handler<Initable>								handler			= new SimpleHandler<Initable>(
 																				this);
 	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>();
 
@@ -294,7 +294,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @param handler
 	 *            the new handler
 	 */
-	protected void setHandler(Handler<Object> handler) {
+	protected void setHandler(Handler<Initable> handler) {
 		this.handler = handler;
 	}
 
@@ -304,7 +304,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @return the receiver
 	 */
 	@JsonIgnore
-	protected Handler<Object> getHandler() {
+    public Handler<Initable> getHandler() {
 		return handler;
 	}
 
@@ -425,7 +425,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			is.register(agentId, config, this.getClass().getName());
 		}
 		if (is != null && config.isCanHibernate()) {
-			setHandler(new HibernationHandler<Object>(this, agentId, is));
+			setHandler(new HibernationHandler<Initable>(this, agentId, is));
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
 			setSender(new HibernationHandler<Caller>(caller, agentId, is));
 		}
