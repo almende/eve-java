@@ -57,13 +57,13 @@ public class JSONRpcProtocol implements Protocol {
 	}
 
 	@Override
-	public Meta inbound(Object msg, URI senderUrl) {
+	public Meta inbound(final Object msg, final URI senderUrl) {
 		final JSONResponse response = invoke(msg, senderUrl);
 		return new Meta(response, response == null, response != null);
 
 	}
 
-	public Meta outbound(Object msg, URI recipientUrl) {
+	public Meta outbound(final Object msg, final URI recipientUrl) {
 		if (msg instanceof JSONRequest) {
 			final JSONRequest request = (JSONRequest) msg;
 			addCallback(request, request.getCallback());
