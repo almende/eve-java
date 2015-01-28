@@ -161,10 +161,8 @@ public class RunQueue extends AbstractExecutorService {
 		Worker res = null;
 		synchronized (running) {
 			if (running.size() < nofCores) {
-				if (res == null) {
-					res = new Worker();
-					res.start();
-				}
+				res = new Worker();
+				res.start();
 				running.add(res);
 			}
 		}
