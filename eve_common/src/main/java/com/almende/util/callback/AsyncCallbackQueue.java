@@ -6,11 +6,12 @@ package com.almende.util.callback;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import com.almende.util.threads.ThreadPool;
 
 /**
  * Queue to hold a list with callbacks in progress.
@@ -23,10 +24,7 @@ public class AsyncCallbackQueue<T> {
 	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>();
 	// FIXME: provide some means for the Appengine implementation of
 	// ThreadManager.
-	private static ScheduledThreadPoolExecutor	scheduler	= new ScheduledThreadPoolExecutor(
-																	1,
-																	Executors
-																			.defaultThreadFactory());
+	private static ScheduledThreadPoolExecutor	scheduler	= ThreadPool.getScheduledPool();
 	
 	/** timeout in seconds */
 	private int									defTimeout	= 30;
@@ -108,9 +106,14 @@ public class AsyncCallbackQueue<T> {
 	public synchronized void clear() {
 		queue.clear();
 		scheduler.shutdownNow();
-		scheduler = new ScheduledThreadPoolExecutor(1,
-				Executors.defaultThreadFactory());
-		scheduler.setRemoveOnCancelPolicy(true);
+		scheduler = ThreadPool.getScheduledPool();
+		try {
+			ScheduledThreadPoolExecutor.class.getMethod(
+					"setRemoveOnCancelPolicy", Boolean.class);
+			scheduler.setRemoveOnCancelPolicy(true);
+		} catch (final NoSuchMethodException e) {
+			// Do nothing, Java 6 environment
+		}
 	}
 	
 	/**
