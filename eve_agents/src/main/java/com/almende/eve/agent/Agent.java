@@ -899,7 +899,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			transport.send(url, protocolStack.outbound(message, url).result,
 					null);
 			try {
-				return callback.get();
+				return new TypeUtil<T>(){}.inject(callback.get());
 			} catch (final Exception e) {
 				throw new IOException(e);
 			}
@@ -911,7 +911,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			transport.send(url, protocolStack.outbound(message, url).result,
 					null);
 			try {
-				return callback.get();
+				return type.inject(callback.get());
 			} catch (final Exception e) {
 				throw new IOException(e);
 			}
