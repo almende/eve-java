@@ -4,6 +4,7 @@
  */
 package com.almende.eve.instantiation;
 
+import com.almende.eve.capabilities.handler.Handler;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -23,4 +24,10 @@ public interface Initable {
 	 */
 	void init(ObjectNode params, boolean onBoot);
 
+	/**
+	 * Get Handler to this initable object
+	 * 
+	 * @return The Handle
+	 */
+	Handler<Initable> getHandler();
 }

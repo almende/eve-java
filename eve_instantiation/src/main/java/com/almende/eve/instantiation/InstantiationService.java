@@ -155,20 +155,18 @@ public class InstantiationService implements Capability {
 						clazz = Class.forName(className);
 					}
 					instance = (Initable) clazz.newInstance();
-
+					instance.init(entry.getParams(), onBoot);
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to instantiate entry:'"
 							+ wakeKey + "'", e);
 				}
 			}
-			if (instance != null) {
-				instance.init(entry.getParams(), onBoot);
-			}
-			HibernationHandler<Initable> newHandler = new HibernationHandler<Initable>(
-					instance, wakeKey, this);
-			entry.setHandler(newHandler);
-			if (oldHandler != null) {
-				oldHandler.update(newHandler);
+			if (instance != null){
+			    entry.setHandler(instance.getHandler());
+			    if (oldHandler != null) {
+				oldHandler.update(instance.getHandler());
+			    }
+			    entries.put(wakeKey, entry);
 			}
 			return instance;
 		} else {
@@ -283,7 +281,9 @@ public class InstantiationService implements Capability {
 						key)).build();
 		final InstantiationEntry result = innerState.get("entry",
 				INSTANTIATIONENTRY);
-		result.setState(innerState);
+		if(result!=null) {
+		    result.setState(innerState);
+		}
 		return result;
 	}
 
