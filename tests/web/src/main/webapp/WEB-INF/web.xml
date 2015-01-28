@@ -12,7 +12,7 @@
 	</context-param>
 
 	<listener>
-		<listener-class>com.almende.eve.deploy.EveListenerr</listener-class>
+		<listener-class>com.almende.eve.deploy.EveListener</listener-class>
 	</listener>
 
 	<servlet>
