@@ -47,6 +47,7 @@ import com.almende.eve.transport.Router;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.TransportConfig;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
@@ -810,10 +811,31 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params, Class<T> clazz) throws IOException {
+			final ObjectNode params, final Class<T> clazz) throws IOException {
 		return caller.callSync(url, method, params, clazz);
 	}
 
+	/**
+	 * Call sync.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param type
+	 *            the type
+	 * @return the t
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final TypeUtil<T> type) throws IOException {
+		return caller.callSync(url, method, params, type);
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
@@ -871,7 +893,19 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		}
 
 		public <T> T callSync(final URI url, final String method,
-				final ObjectNode params, Class<T> clazz) throws IOException {
+				final ObjectNode params, final Class<T> clazz) throws IOException {
+			final SyncCallback<T> callback = new SyncCallback<T>() {};
+			final Object message = new JSONRequest(method, params, callback);
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
+			try {
+				return callback.get();
+			} catch (final Exception e) {
+				throw new IOException(e);
+			}
+		}
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, final TypeUtil<T> type) throws IOException {
 			final SyncCallback<T> callback = new SyncCallback<T>() {};
 			final Object message = new JSONRequest(method, params, callback);
 			transport.send(url, protocolStack.outbound(message, url).result,
