@@ -159,7 +159,10 @@ function Controller($scope, $resource) {
                 $scope.formStatus = 'ready in ' + diff + ' ms';
 
                 if (response.error) {
-                    $scope.result = 'Error: ' + JSON.stringify(response.error, null, 2);
+                    var err = response.error;
+                    $scope.result = 'Error: ' + err.code+ ":"+ err.message + "\nBody:" + JSON.stringify(err, null, 2);
+    	            $scope.error = 'Error ' + err.code + ': ' + err.message +
+        	            ((err.data && err.data.description) ? ', ' + err.data.description : '');
                 }
                 else {
                     if (response.result instanceof Object) {
@@ -211,11 +214,16 @@ function Controller($scope, $resource) {
                 $scope.response = JSON.stringify(response, null, 2);
                 $scope.rpcStatus = 'ready in ' + diff + ' ms';
 
+				if (response.error){
+					var err = response.error;
+				    $scope.error = 'Error ' + err.code + ': ' + err.message +
+        	            ((err.data && err.data.description) ? ', ' + err.data.description : '');
+				}
+
                 $scope.resize(document.getElementById('response'));
             }, function (err) {
                 $scope.rpcStatus = 'failed. Error: ' + JSON.stringify(err);
                 $scope.response = '';
-
             });
         }
         catch (err) {
