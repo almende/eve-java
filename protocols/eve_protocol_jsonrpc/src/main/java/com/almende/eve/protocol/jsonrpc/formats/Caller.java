@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Eve's transport service.
  */
 public interface Caller {
-	
+
 	/**
 	 * Send async.
 	 * 
@@ -33,9 +34,8 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final String method,
-			final ObjectNode params, final AsyncCallback<T> callback)
-			throws IOException;
+	<T> void call(final URI url, final String method, final ObjectNode params,
+			final AsyncCallback<T> callback) throws IOException;
 
 	/**
 	 * Send async for usage in proxies.
@@ -53,9 +53,8 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final Method method,
-			final Object[] params, final AsyncCallback<T> callback)
-			throws IOException;
+	<T> void call(final URI url, final Method method, final Object[] params,
+			final AsyncCallback<T> callback) throws IOException;
 
 	/**
 	 * Send async.
@@ -71,9 +70,9 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final String method,
-			final ObjectNode params) throws IOException;
-	
+	<T> void call(final URI url, final String method, final ObjectNode params)
+			throws IOException;
+
 	/**
 	 * Send sync, expecting a response.
 	 * 
@@ -89,8 +88,8 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> T callSync(final URI url, final String method,
-			final ObjectNode params) throws IOException;
+	<T> T callSync(final URI url, final String method, final ObjectNode params)
+			throws IOException;
 
 	/**
 	 * Call sync.
@@ -109,7 +108,27 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> T callSync(final URI url, final String method,
-			final ObjectNode params,Class<T> clazz) throws IOException;
+	<T> T callSync(final URI url, final String method, final ObjectNode params,
+			final Class<T> clazz) throws IOException;
+
+	/**
+	 * Call sync.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param type
+	 *            the type
+	 * @return the t
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> T callSync(final URI url, final String method, final ObjectNode params,
+			final TypeUtil<T> type) throws IOException;
 
 }
