@@ -33,7 +33,7 @@ public class EveServlet extends HttpServlet {
 
 	private static final Logger	LOG					= Logger.getLogger(EveServlet.class
 															.getSimpleName());
-	private URI					myUrl				= null;
+	protected URI				myUrl				= null;
 
 	/**
 	 * Instantiates a new eve servlet.
@@ -99,10 +99,9 @@ public class EveServlet extends HttpServlet {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private boolean handleHandShake(final HttpServletRequest req,
+	protected boolean handleHandShake(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
-		
-		
+
 		final String time = req.getHeader("X-Eve-requestToken");
 		if (time == null) {
 			return false;
@@ -120,7 +119,9 @@ public class EveServlet extends HttpServlet {
 				res.flushBuffer();
 			}
 		} else {
-			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Can't find the correct transport:'"+myUrl+"' for:'"+id+"'");
+			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"Can't find the correct transport:'" + myUrl + "' for:'"
+							+ id + "'");
 		}
 		return true;
 	}
@@ -132,7 +133,7 @@ public class EveServlet extends HttpServlet {
 	 *            the req
 	 * @return the handshake
 	 */
-	private Handshake doHandShake(final HttpServletRequest req) {
+	protected Handshake doHandShake(final HttpServletRequest req) {
 		final String tokenTupple = req.getHeader("X-Eve-Token");
 		if (tokenTupple == null) {
 			// This is a webpage, no HandShake available.
@@ -149,16 +150,17 @@ public class EveServlet extends HttpServlet {
 						.textValue());
 				final HttpResponse response = ApacheHttpClient.get().execute(
 						httpGet);
-				if (response != null && response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
-					Header replyToken = response.getLastHeader("X-Eve-replyToken");
-					if (replyToken == null){
-						LOG.log(Level.WARNING, "Failed to receive valid handshake, replyToken missing!:"
-								+ response);
+				if (response != null
+						&& response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+					Header replyToken = response
+							.getLastHeader("X-Eve-replyToken");
+					if (replyToken == null) {
+						LOG.log(Level.WARNING,
+								"Failed to receive valid handshake, replyToken missing!:"
+										+ response);
 						return Handshake.INVALID;
 					}
-					if (tokenObj
-							.get("token")
-							.textValue()
+					if (tokenObj.get("token").textValue()
 							.equals(replyToken.getValue())) {
 						return Handshake.OK;
 					}
@@ -185,7 +187,7 @@ public class EveServlet extends HttpServlet {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private boolean handleSession(final HttpServletRequest req,
+	protected boolean handleSession(final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 		try {
 
@@ -219,14 +221,15 @@ public class EveServlet extends HttpServlet {
 		return true;
 	}
 
-	private String getId(final String url) {
+	protected String getId(final String url) {
 		String id = "";
 		if (myUrl != null) {
 			id = url.replace(myUrl.getRawPath(), "");
 		} else {
+			// TODO: this doesn't work with resources behind agentId
 			id = url.replaceAll(".*/[^/]+", "");
 		}
-		return id;
+		return id.indexOf('/') > 0 ? id.substring(0, id.indexOf('/')) : id;
 	}
 
 	/*
