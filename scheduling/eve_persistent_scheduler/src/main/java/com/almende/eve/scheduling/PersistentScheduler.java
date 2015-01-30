@@ -30,10 +30,11 @@ public class PersistentScheduler extends SimpleScheduler {
 	private State				state	= null;
 
 	public void delete() {
+		super.delete();
 		if (state != null) {
 			state.delete();
+			state = null;
 		}
-		super.delete();
 	}
 
 	/**
