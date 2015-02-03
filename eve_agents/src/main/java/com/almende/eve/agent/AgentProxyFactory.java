@@ -20,10 +20,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  * A factory for creating AgentProxy objects.
  */
 public final class AgentProxyFactory {
-	
-	private AgentProxyFactory() {
-	}
-	
+
+	private AgentProxyFactory() {}
+
 	/**
 	 * Gen proxy.
 	 * 
@@ -44,20 +43,19 @@ public final class AgentProxyFactory {
 		final T proxy = (T) Proxy.newProxyInstance(
 				proxyInterface.getClassLoader(),
 				new Class[] { proxyInterface }, new InvocationHandler() {
-					
+
 					@Override
 					public Object invoke(final Object proxy,
 							final Method method, final Object[] args) {
-						
-						final SyncCallback<JsonNode> callback = new SyncCallback<JsonNode>() {
-						};
+
+						final SyncCallback<JsonNode> callback = new SyncCallback<JsonNode>() {};
 						try {
 							sender.call(receiverUrl, method, args, callback);
 						} catch (final IOException e) {
 							throw new JSONRPCException(CODE.REMOTE_EXCEPTION, e
 									.getLocalizedMessage(), e);
 						}
-						
+
 						try {
 							return TypeUtil.inject(callback.get(),
 									method.getGenericReturnType());

@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
@@ -147,13 +148,12 @@ public class SyncScheduler extends SimpleScheduler {
 			return null;
 		}
 		LOG.info("Starting sync with: " + peer + "!");
-		final long start = now();
+		final DateTime start = DateTime.now();
 		try {
 			final Long result = caller.callSync(peer, "syncScheduler.ping",
-					JOM.createObjectNode());
-			final long now = now();
-			final long roundtrip = now - start;
-			final long offset = (result - (start + (roundtrip / 2)));
+					JOM.createObjectNode(), Long.class);
+			final long roundtrip = new Duration(start,DateTime.now()).getMillis();
+			final long offset = result - now() + (roundtrip / 2);
 			LOG.info("Sync resulted in offset:" + offset + " ( " + roundtrip
 					+ ":" + start + ":" + result + ")");
 			return new SyncTupple(offset, roundtrip);

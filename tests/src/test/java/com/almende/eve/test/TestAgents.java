@@ -20,6 +20,7 @@ import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.eve.state.file.FileStateConfig;
 import com.almende.eve.transport.http.HttpTransportConfig;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -88,7 +89,7 @@ public class TestAgents extends TestCase {
 		LOG.warning("Sync received:'"
 				+ agent.pubSendSync(new URI(
 						"http://localhost:8080/agents/example"), "helloWorld",
-						callParams) + "'");
+						callParams,new TypeUtil<String>(){}) + "'");
 
 		// Try to get rid of the agent instance from memory
 		agent = null;
@@ -106,7 +107,9 @@ public class TestAgents extends TestCase {
 						new URI("http://localhost:8080/agents/example"),
 						"helloWorld",
 						callParams.deepCopy().put("message",
-								"Hello world after sleep!")) + "'");
+								"Hello world after sleep!"),new TypeUtil<String>(){}) + "'");
+		
+		tester.runComplexTypeTest(new URI("http://localhost:8080/agents/example"));
 	}
 
 }

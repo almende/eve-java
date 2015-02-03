@@ -34,7 +34,7 @@ public final class JSONRequest extends JSONMessage {
 	private static final long			serialVersionUID	= 1970046457233622444L;
 	private ObjectNode					req					= JOM.createObjectNode();
 	transient private AsyncCallback<?>	callback			= null;
-
+	
 	/**
 	 * Instantiates a new jSON request.
 	 */
@@ -75,8 +75,8 @@ public final class JSONRequest extends JSONMessage {
 	 * @param callback
 	 *            the callback
 	 */
-	public JSONRequest(final String method, final ObjectNode params,
-			final AsyncCallback<?> callback) {
+	public <T> JSONRequest(final String method, final ObjectNode params,
+			final AsyncCallback<T> callback) {
 		init(null, method, params, callback);
 	}
 
@@ -104,8 +104,8 @@ public final class JSONRequest extends JSONMessage {
 	 * @param callback
 	 *            the callback
 	 */
-	public JSONRequest(final JsonNode id, final String method,
-			final ObjectNode params, final AsyncCallback<?> callback) {
+	public <T> JSONRequest(final JsonNode id, final String method,
+			final ObjectNode params, final AsyncCallback<T> callback) {
 		init(id, method, params, callback);
 	}
 
@@ -119,8 +119,8 @@ public final class JSONRequest extends JSONMessage {
 	 * @param callback
 	 *            the callback
 	 */
-	public JSONRequest(final Method method, final Object[] args,
-			final AsyncCallback<?> callback) {
+	public <T> JSONRequest(final Method method, final Object[] args,
+			final AsyncCallback<T> callback) {
 		AnnotatedMethod annotatedMethod = null;
 		try {
 			annotatedMethod = new AnnotationUtil.AnnotatedMethod(method);
@@ -229,8 +229,8 @@ public final class JSONRequest extends JSONMessage {
 	 * @param params
 	 *            the params
 	 */
-	private void init(final JsonNode id, final String method,
-			final ObjectNode params, final AsyncCallback<?> callback) {
+	private <T> void init(final JsonNode id, final String method,
+			final ObjectNode params, final AsyncCallback<T> callback) {
 		this.setRequest(true);
 		setVersion();
 		setId(id);
@@ -358,14 +358,14 @@ public final class JSONRequest extends JSONMessage {
 	public AsyncCallback<?> getCallback() {
 		return callback;
 	}
-
+	
 	/**
 	 * Sets the callback.
 	 *
 	 * @param callback
 	 *            the new callback
 	 */
-	public void setCallback(AsyncCallback<?> callback) {
+	public <T> void setCallback(AsyncCallback<T> callback) {
 		this.callback = callback;
 	}
 

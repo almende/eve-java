@@ -22,13 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *            the generic type
  */
 public abstract class TypeUtil<T> {
-	
+
 	/**
 	 * The Constant LOG.
 	 */
 	static final Logger		LOG	= Logger.getLogger(TypeUtil.class.getName());
 	private final JavaType	valueType;
-	
+
 	/**
 	 * Gets an instances of this TypeUtil.
 	 * 
@@ -37,10 +37,9 @@ public abstract class TypeUtil<T> {
 	 * @return the type util
 	 */
 	public static <T> TypeUtil<T> get() {
-		return new TypeUtil<T>() {
-		};
+		return new TypeUtil<T>() {};
 	}
-	
+
 	/**
 	 * Gets an instances of this TypeUtil.
 	 * 
@@ -51,10 +50,9 @@ public abstract class TypeUtil<T> {
 	 * @return the type util
 	 */
 	public static <T> TypeUtil<T> get(final Class<T> type) {
-		return new TypeUtil<T>(type) {
-		};
+		return new TypeUtil<T>(type) {};
 	}
-	
+
 	/**
 	 * Resolve.
 	 * 
@@ -66,8 +64,7 @@ public abstract class TypeUtil<T> {
 	 */
 	public static <T> TypeUtil<T> resolve(final Object target) {
 		if (target == null) {
-			return new TypeUtil<T>(Void.class) {
-			};
+			return new TypeUtil<T>(Void.class) {};
 		}
 		final Type gsc = target.getClass().getGenericSuperclass();
 		ParameterizedType ptype = null;
@@ -91,10 +88,9 @@ public abstract class TypeUtil<T> {
 			LOG.warning("Couldn't find generic type.");
 			return null;
 		}
-		return new TypeUtil<T>(type) {
-		};
+		return new TypeUtil<T>(type) {};
 	}
-	
+
 	/**
 	 * Gets an instances of this TypeUtil.
 	 * 
@@ -105,10 +101,9 @@ public abstract class TypeUtil<T> {
 	 * @return the type util
 	 */
 	public static <T> TypeUtil<T> get(final JavaType type) {
-		return new TypeUtil<T>(type) {
-		};
+		return new TypeUtil<T>(type) {};
 	}
-	
+
 	/**
 	 * Instantiates a new type util.
 	 * 
@@ -118,7 +113,7 @@ public abstract class TypeUtil<T> {
 	public TypeUtil(final JavaType type) {
 		this.valueType = type;
 	}
-	
+
 	/**
 	 * Instantiates a new type util.
 	 * 
@@ -128,10 +123,9 @@ public abstract class TypeUtil<T> {
 	public TypeUtil(final Class<?> type) {
 		this.valueType = JOM.getTypeFactory().constructType(type);
 	}
-	
+
 	/**
 	 * Usage example: <br>
-	 * 
 	 * TypeUtil&lt;TreeSet&lt;TaskEntry>> injector = new
 	 * TypeUtil&lt;TreeSet&lt;TaskEntry>>(){};<br>
 	 * TreeSet&lt;TaskEntry> value = injector.inject(Treeset_with_tasks);<br>
@@ -146,7 +140,7 @@ public abstract class TypeUtil<T> {
 								TypeUtil.class, getClass()))
 								.getActualTypeArguments()[0]);
 	}
-	
+
 	/**
 	 * Gets the type.
 	 * 
@@ -155,7 +149,7 @@ public abstract class TypeUtil<T> {
 	public Type getType() {
 		return this.valueType;
 	}
-	
+
 	/**
 	 * Gets the type.
 	 * 
@@ -164,7 +158,7 @@ public abstract class TypeUtil<T> {
 	public JavaType getJavaType() {
 		return this.valueType;
 	}
-	
+
 	/**
 	 * Inject.
 	 * 
@@ -175,7 +169,7 @@ public abstract class TypeUtil<T> {
 	public T inject(final Object value) {
 		return inject(value, valueType);
 	}
-	
+
 	/**
 	 * Inject.
 	 * 
@@ -190,7 +184,7 @@ public abstract class TypeUtil<T> {
 	public static <T> T inject(final Object value, final Class<T> type) {
 		return inject(value, JOM.getTypeFactory().constructType(type));
 	}
-	
+
 	/**
 	 * Inject.
 	 * 
@@ -205,7 +199,7 @@ public abstract class TypeUtil<T> {
 	public static <T> T inject(final Object value, final Type type) {
 		return inject(value, JOM.getTypeFactory().constructType(type));
 	}
-	
+
 	/**
 	 * Inject.
 	 * 
@@ -227,7 +221,7 @@ public abstract class TypeUtil<T> {
 		}
 		final ObjectMapper mapper = JOM.getInstance();
 		if (value instanceof JsonNode) {
-			if (fullType.getRawClass().equals(JsonNode.class)){
+			if (fullType.getRawClass().equals(JsonNode.class)) {
 				return (T) value;
 			}
 			if (((JsonNode) value).isNull()) {
@@ -244,12 +238,12 @@ public abstract class TypeUtil<T> {
 			}
 		}
 		if (fullType.getRawClass().isAssignableFrom(value.getClass())) {
-			return (T) value;
+			return (T) fullType.getRawClass().cast(value);
 		} else {
 			throw new ClassCastException(value.getClass().getCanonicalName()
 					+ " can't be converted to: "
 					+ fullType.getRawClass().getCanonicalName());
 		}
 	}
-	
+
 }

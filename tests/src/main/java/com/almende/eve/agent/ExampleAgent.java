@@ -6,12 +6,19 @@ package com.almende.eve.agent;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.almende.eve.instantiation.CanHibernate;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
+import com.almende.util.callback.SyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -20,6 +27,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Access(AccessType.PUBLIC)
 @CanHibernate
 public class ExampleAgent extends Agent implements ExampleAgentInterface {
+	private static final Logger	LOG	= Logger.getLogger(ExampleAgent.class
+											.getName());
 
 	/**
 	 * Hello world.
@@ -31,6 +40,18 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	@Override
 	public String helloWorld(@Name("message") final String message) {
 		return "You said:" + message;
+	}
+
+	/**
+	 * Gets the person.
+	 *
+	 * @param test
+	 *            the test
+	 * @return the person
+	 */
+	public List<MessageContainer> getMessage(
+			@Name("message") final MessageContainer test) {
+		return Arrays.asList(test);
 	}
 
 	/**
@@ -57,7 +78,7 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 
 	/**
 	 * Public version of sendSync.
-	 * 
+	 *
 	 * @param <T>
 	 *            the generic type
 	 * @param url
@@ -66,18 +87,82 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	 *            the method
 	 * @param params
 	 *            the params
+	 * @param type
+	 *            the type
 	 * @return the t
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public <T> T pubSendSync(final URI url, final String method,
-			final ObjectNode params) throws IOException {
-		return super.callSync(url, method, params);
+			final ObjectNode params, final TypeUtil<T> type) throws IOException {
+		return super.callSync(url, method, params, type);
 	}
-	
+
 	/* Making destroy public */
+	/*
+	 * (non-Javadoc)
+	 * @see com.almende.eve.agent.Agent#destroy()
+	 */
 	@Override
-	public void destroy(){
+	public void destroy() {
 		super.destroy();
+	}
+
+	/**
+	 * Run complex type test.
+	 *
+	 * @param uri
+	 *            the uri
+	 */
+	public void runComplexTypeTest(URI uri) {
+		final MessageContainer test = new MessageContainer();
+		test.setMessage("Hi there!");
+
+		final Params params = new Params();
+		params.add("message", test);
+		try {
+			call(uri, "getMessage", params,
+					new AsyncCallback<List<MessageContainer>>() {
+
+						@Override
+						public void onSuccess(List<MessageContainer> message) {
+							LOG.info("received message:"
+									+ message.get(0).getMessage());
+						}
+
+						@Override
+						public void onFailure(Exception exception) {
+							LOG.log(Level.WARNING, "Oops:", exception);
+
+						}
+					});
+
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "failed to send message", e);
+		}
+		try {
+			final SyncCallback<List<MessageContainer>> callback = new SyncCallback<List<MessageContainer>>() {};
+			call(uri, "getMessage", params, callback);
+			LOG.info("received message:" + callback.get().get(0).getMessage());
+
+		} catch (Exception e) {
+			LOG.log(Level.WARNING, "failed to send message", e);
+		}
+		try {
+			final List<MessageContainer> message = callSync(uri, "getMessage",
+					params, new TypeUtil<List<MessageContainer>>(){});
+			LOG.info("received message:" + message.get(0).getMessage());
+
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "failed to send message", e);
+		}
+		try {
+			final List<MessageContainer> message = callSync(uri, "getMessage",
+					params);
+			LOG.info("received message:" + message.get(0).getMessage());
+
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "failed to send message", e);
+		}
 	}
 }

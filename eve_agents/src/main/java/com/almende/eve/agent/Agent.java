@@ -73,7 +73,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	private ProtocolStack								protocolStack	= new ProtocolStack();
 	private Handler<Receiver>							receiver		= new SimpleHandler<Receiver>(
 																				this);
-	private Handler<Initable>								handler			= new SimpleHandler<Initable>(
+	private Handler<Initable>							handler			= new SimpleHandler<Initable>(
 																				this);
 	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>();
 
@@ -304,7 +304,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @return the receiver
 	 */
 	@JsonIgnore
-    public Handler<Initable> getHandler() {
+	public Handler<Initable> getHandler() {
 		return handler;
 	}
 
@@ -774,8 +774,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	}
 
 	/**
-	 * Send sync, expecting a response.
-	 * 
+	 * Call sync.
+	 *
 	 * @param <T>
 	 *            the generic type
 	 * @param url
@@ -784,7 +784,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 *            the method
 	 * @param params
 	 *            the params
-	 * @return response
+	 * @return the t
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -792,7 +792,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			final ObjectNode params) throws IOException {
 		return caller.callSync(url, method, params);
 	}
-
+	
 	/**
 	 * Send sync, expecting a response.
 	 *
@@ -836,6 +836,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			final ObjectNode params, final TypeUtil<T> type) throws IOException {
 		return caller.callSync(url, method, params, type);
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
@@ -856,62 +857,71 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	}
 
 	private class DefaultCaller implements Caller {
+		@Override
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params, final AsyncCallback<T> callback)
 				throws IOException {
-			final Object message = new JSONRequest(method, params, callback);
+			final JSONRequest message = new JSONRequest(method, params,
+					callback);
 			transport.send(url, protocolStack.outbound(message, url).result,
 					null);
 		}
 
+		@Override
 		public <T> void call(final URI url, final Method method,
 				final Object[] params, final AsyncCallback<T> callback)
 				throws IOException {
-			final Object message = new JSONRequest(method, params, callback);
+			final JSONRequest message = new JSONRequest(method, params,
+					callback);
 			transport.send(url, protocolStack.outbound(message, url).result,
 					null);
 		}
 
+		@Override
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params) throws IOException {
-			final Object message = new JSONRequest(method, params, null);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
+			call(url, method, params, null);
 		}
 
+		@Override
+		public <T> void call(final URI url, final Method method,
+				final Object[] params) throws IOException {
+			call(url, method, params, null);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
 		public <T> T callSync(final URI url, final String method,
 				final ObjectNode params) throws IOException {
-			final SyncCallback<T> callback = new SyncCallback<T>() {};
-			final Object message = new JSONRequest(method, params, callback);
+			TypeUtil<T> type = null;
+			try {
+				type = (TypeUtil<T>) TypeUtil.resolve(this.getClass().getMethod("callSync",URI.class, String.class, ObjectNode.class).getGenericReturnType());
+			} catch (Exception e) {
+				LOG.log(Level.WARNING,"Couldn't find myself",e);
+			}
+			return callSync(url, method, params, type);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, final Class<T> clazz)
+				throws IOException {
+			return (T) callSync(url, method, params, TypeUtil.resolve(clazz));
+		}
+
+		@Override
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, final TypeUtil<T> type)
+				throws IOException {
+
+			final SyncCallback<T> callback = new SyncCallback<T>(type) {};
+			final JSONRequest message = new JSONRequest(method, params,
+					callback);
 			transport.send(url, protocolStack.outbound(message, url).result,
 					null);
 			try {
 				return callback.get();
-			} catch (final Exception e) {
-				throw new IOException(e);
-			}
-		}
-
-		public <T> T callSync(final URI url, final String method,
-				final ObjectNode params, final Class<T> clazz) throws IOException {
-			final SyncCallback<T> callback = new SyncCallback<T>() {};
-			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
-			try {
-				return new TypeUtil<T>(){}.inject(callback.get());
-			} catch (final Exception e) {
-				throw new IOException(e);
-			}
-		}
-		public <T> T callSync(final URI url, final String method,
-				final ObjectNode params, final TypeUtil<T> type) throws IOException {
-			final SyncCallback<T> callback = new SyncCallback<T>() {};
-			final Object message = new JSONRequest(method, params, callback);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
-			try {
-				return type.inject(callback.get());
 			} catch (final Exception e) {
 				throw new IOException(e);
 			}

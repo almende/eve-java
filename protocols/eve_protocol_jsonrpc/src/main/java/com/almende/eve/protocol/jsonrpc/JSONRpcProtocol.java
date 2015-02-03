@@ -19,7 +19,6 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.eve.protocol.jsonrpc.formats.RequestParams;
-import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.jackson.JOM;
@@ -116,7 +115,9 @@ public class JSONRpcProtocol implements Protocol {
 
 						json = (ObjectNode) JOM.getInstance().readTree(message);
 					}
-				} else if (msg instanceof ObjectNode || (msg instanceof JsonNode && ((JsonNode)msg).isObject())) {
+				} else if (msg instanceof ObjectNode
+						|| (msg instanceof JsonNode && ((JsonNode) msg)
+								.isObject())) {
 					json = (ObjectNode) msg;
 				} else {
 					LOG.info("Message unknown type:" + msg.getClass());
@@ -201,11 +202,10 @@ public class JSONRpcProtocol implements Protocol {
 	}
 
 	private <T> void addCallback(final JSONRequest request,
-			final AsyncCallback<T> callback) {
-		if (callback == null) {
+			final AsyncCallback<T> asyncCallback) {
+		if (asyncCallback == null) {
 			return;
 		}
-		final TypeUtil<T> type = TypeUtil.resolve(callback);
 
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
@@ -215,27 +215,29 @@ public class JSONRpcProtocol implements Protocol {
 			public void onSuccess(final JSONResponse response) {
 				final Exception err = response.getError();
 				if (err != null) {
-					callback.onFailure(err);
+					asyncCallback.onFailure(err);
 				}
-				if (type != null
-						&& !type.getJavaType().getRawClass().equals(Void.class)) {
+				if (asyncCallback.getType() != null
+						&& !asyncCallback.getType().getJavaType().getRawClass()
+								.equals(Void.class)) {
 					try {
-						final T res = type.inject(response.getResult());
-						callback.onSuccess(res);
+						final T res = asyncCallback.getType().inject(
+								response.getResult());
+						asyncCallback.onSuccess(res);
 					} catch (final ClassCastException cce) {
-						callback.onFailure(new JSONRPCException(
+						asyncCallback.onFailure(new JSONRPCException(
 								"Incorrect return type received for JSON-RPC call:"
 										+ request.getMethod(), cce));
 					}
 
 				} else {
-					callback.onSuccess(null);
+					asyncCallback.onSuccess(null);
 				}
 			}
 
 			@Override
 			public void onFailure(final Exception exception) {
-				callback.onFailure(exception);
+				asyncCallback.onFailure(exception);
 			}
 		};
 

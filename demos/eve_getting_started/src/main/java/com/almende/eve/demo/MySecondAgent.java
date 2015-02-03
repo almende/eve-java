@@ -47,7 +47,7 @@ public class MySecondAgent extends Agent {
 		// First obtain the helloWorld result synchronous, without parameters.
 		String result = callSync(
 				URI.create("http://localhost:8081/agents/helloWorld/"),
-				"helloWorld", null);
+				"helloWorld", null, String.class);
 
 		// Secondly obtain the echo result synchronous, with a message
 		// parameter.
@@ -55,7 +55,7 @@ public class MySecondAgent extends Agent {
 		params.add("message", "Hi there!");
 		result += callSync(
 				URI.create("http://localhost:8081/agents/helloWorld/"), "echo",
-				params);
+				params, String.class);
 
 		// Third example: obtain the echo result asynchronously through a
 		// callback.

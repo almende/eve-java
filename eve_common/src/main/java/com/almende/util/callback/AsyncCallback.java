@@ -4,27 +4,56 @@
  */
 package com.almende.util.callback;
 
+import com.almende.util.TypeUtil;
+
 /**
- * The Interface AsyncCallback.
- * 
+ * The Class AsyncCallback.
+ *
  * @param <T>
  *            the generic type
  */
-public interface AsyncCallback<T> {
-	
+public abstract class AsyncCallback<T> {
+	protected TypeUtil<T>	type	= null;
+
+	/**
+	 * Instantiates a new async callback.
+	 *
+	 * @param type
+	 *            the type
+	 */
+	public AsyncCallback(TypeUtil<T> type) {
+		this.type = type;
+	}
+
+	/**
+	 * Instantiates a new async callback.
+	 */
+	public AsyncCallback() {
+		this.type = TypeUtil.resolve(this);
+	}
+
+	/**
+	 * Gets the type.
+	 *
+	 * @return the type
+	 */
+	public TypeUtil<T> getType() {
+		return type;
+	}
+
 	/**
 	 * On success.
 	 * 
 	 * @param result
 	 *            the result
 	 */
-	void onSuccess(T result);
-	
+	public abstract void onSuccess(T result);
+
 	/**
 	 * On failure.
 	 * 
 	 * @param exception
 	 *            the exception
 	 */
-	void onFailure(Exception exception);
+	public abstract void onFailure(Exception exception);
 }

@@ -74,8 +74,8 @@ public interface Caller {
 			throws IOException;
 
 	/**
-	 * Send sync, expecting a response.
-	 * 
+	 * Call.
+	 *
 	 * @param <T>
 	 *            the generic type
 	 * @param url
@@ -84,7 +84,24 @@ public interface Caller {
 	 *            the method
 	 * @param params
 	 *            the params
-	 * @return response
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> void call(final URI url, final Method method, final Object[] params)
+			throws IOException;
+
+	/**
+	 * Call sync.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @return the t
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */

@@ -4,20 +4,39 @@
  */
 package com.almende.util.callback;
 
+import com.almende.util.TypeUtil;
+
 /**
  * The Class SyncCallback.
  * 
  * @param <T>
  *            the generic type
  */
-public abstract class SyncCallback<T> implements AsyncCallback<T> {
+public class SyncCallback<T> extends AsyncCallback<T> {
+
 	private T			response	= null;
 	private Exception	exception	= null;
 	private boolean		done		= false;
-	
+
+	/**
+	 * Instantiates a new sync callback.
+	 *
+	 * @param type
+	 *            the type
+	 */
+	public SyncCallback(TypeUtil<T> type) {
+		super(type);
+	}
+
+	/**
+	 * Instantiates a new sync callback.
+	 */
+	public SyncCallback() {
+		super();
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.agent.callback.AsyncCallback#onSuccess(java.lang.Object)
 	 */
@@ -29,10 +48,9 @@ public abstract class SyncCallback<T> implements AsyncCallback<T> {
 			notifyAll();
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.agent.callback.AsyncCallback#onFailure(java.lang.Exception
 	 * )
@@ -45,7 +63,7 @@ public abstract class SyncCallback<T> implements AsyncCallback<T> {
 			notifyAll();
 		}
 	}
-	
+
 	/**
 	 * Get will wait for the request to finish and then return the
 	 * response. If an exception is returned, the exception will be
@@ -61,10 +79,10 @@ public abstract class SyncCallback<T> implements AsyncCallback<T> {
 				wait();
 			}
 		}
-		
+
 		if (exception != null) {
 			throw exception;
 		}
-		return response;
+		return type.inject(response);
 	}
 };
