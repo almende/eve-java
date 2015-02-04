@@ -6,6 +6,7 @@ package com.almende.eve.agent;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -784,15 +786,39 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 *            the method
 	 * @param params
 	 *            the params
+	 * @param type
+	 *            the type
 	 * @return the t
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params) throws IOException {
-		return caller.callSync(url, method, params);
+			final ObjectNode params, final Type type) throws IOException {
+		return caller.callSync(url, method, params, type);
 	}
-	
+
+	/**
+	 * Call sync.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param type
+	 *            the type
+	 * @return the t
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final JavaType type) throws IOException {
+		return caller.callSync(url, method, params, type);
+	}
+
 	/**
 	 * Send sync, expecting a response.
 	 *
@@ -889,25 +915,27 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			call(url, method, params, null);
 		}
 
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T> T callSync(final URI url, final String method,
-				final ObjectNode params) throws IOException {
-			TypeUtil<T> type = null;
-			try {
-				type = (TypeUtil<T>) TypeUtil.resolve(this.getClass().getMethod("callSync",URI.class, String.class, ObjectNode.class).getGenericReturnType());
-			} catch (Exception e) {
-				LOG.log(Level.WARNING,"Couldn't find myself",e);
-			}
-			return callSync(url, method, params, type);
-		}
-
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T callSync(final URI url, final String method,
 				final ObjectNode params, final Class<T> clazz)
 				throws IOException {
 			return (T) callSync(url, method, params, TypeUtil.resolve(clazz));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, final JavaType type)
+				throws IOException {
+			return (T) callSync(url, method, params, TypeUtil.get(type));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T callSync(final URI url, final String method,
+				final ObjectNode params, final Type type) throws IOException {
+			return (T) callSync(url, method, params, TypeUtil.get(type));
 		}
 
 		@Override

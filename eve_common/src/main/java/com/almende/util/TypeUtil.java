@@ -6,6 +6,7 @@ package com.almende.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.logging.Logger;
 
 import org.jodah.typetools.TypeResolver;
@@ -30,6 +31,43 @@ public abstract class TypeUtil<T> {
 	private final JavaType	valueType;
 
 	/**
+	 * Instantiates a new type util.
+	 * 
+	 * @param type
+	 *            the type
+	 */
+	public TypeUtil(final JavaType type) {
+		this.valueType = type;
+	}
+
+	/**
+	 * Instantiates a new type util.
+	 * 
+	 * @param type
+	 *            the type
+	 */
+	public TypeUtil(final Class<?> type) {
+		this.valueType = JOM.getTypeFactory().constructType(type);
+	}
+
+	/**
+	 * Usage example: <br>
+	 * TypeUtil&lt;TreeSet&lt;TaskEntry>> injector = new
+	 * TypeUtil&lt;TreeSet&lt;TaskEntry>>(){};<br>
+	 * TreeSet&lt;TaskEntry> value = injector.inject(Treeset_with_tasks);<br>
+	 * <br>
+	 * Note the trivial anonymous class declaration, extending abstract class
+	 * TypeUtil...
+	 */
+	public TypeUtil() {
+		this.valueType = JOM.getTypeFactory()
+				.constructType(
+						((ParameterizedType) TypeResolver.resolveGenericType(
+								TypeUtil.class, getClass()))
+								.getActualTypeArguments()[0]);
+	}
+
+	/**
 	 * Gets an instances of this TypeUtil.
 	 * 
 	 * @param <T>
@@ -51,6 +89,43 @@ public abstract class TypeUtil<T> {
 	 */
 	public static <T> TypeUtil<T> get(final Class<T> type) {
 		return new TypeUtil<T>(type) {};
+	}
+
+	/**
+	 * Gets an instances of this TypeUtil.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param type
+	 *            the type
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> get(final JavaType type) {
+		return new TypeUtil<T>(type) {};
+	}
+
+	/**
+	 * Gets an instances of this TypeUtil.
+	 * 
+	 * @param <T>
+	 *            the generic type
+	 * @param type
+	 *            the type
+	 * @return the type util
+	 */
+	public static <T> TypeUtil<T> get(final Type type) {
+		JavaType jtype = null;
+		if (type instanceof TypeVariable) {
+			jtype = JOM.getTypeFactory().constructType(
+					((TypeVariable<?>) type).getBounds()[0]);
+		} else if (type instanceof ParameterizedType) {
+			jtype = JOM.getTypeFactory().constructType(
+					((ParameterizedType) type).getActualTypeArguments()[0]);
+		} else {
+			jtype = JOM.getTypeFactory().constructType(type);
+		}
+
+		return new TypeUtil<T>(jtype) {};
 	}
 
 	/**
@@ -89,56 +164,6 @@ public abstract class TypeUtil<T> {
 			return null;
 		}
 		return new TypeUtil<T>(type) {};
-	}
-
-	/**
-	 * Gets an instances of this TypeUtil.
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param type
-	 *            the type
-	 * @return the type util
-	 */
-	public static <T> TypeUtil<T> get(final JavaType type) {
-		return new TypeUtil<T>(type) {};
-	}
-
-	/**
-	 * Instantiates a new type util.
-	 * 
-	 * @param type
-	 *            the type
-	 */
-	public TypeUtil(final JavaType type) {
-		this.valueType = type;
-	}
-
-	/**
-	 * Instantiates a new type util.
-	 * 
-	 * @param type
-	 *            the type
-	 */
-	public TypeUtil(final Class<?> type) {
-		this.valueType = JOM.getTypeFactory().constructType(type);
-	}
-
-	/**
-	 * Usage example: <br>
-	 * TypeUtil&lt;TreeSet&lt;TaskEntry>> injector = new
-	 * TypeUtil&lt;TreeSet&lt;TaskEntry>>(){};<br>
-	 * TreeSet&lt;TaskEntry> value = injector.inject(Treeset_with_tasks);<br>
-	 * <br>
-	 * Note the trivial anonymous class declaration, extending abstract class
-	 * TypeUtil...
-	 */
-	public TypeUtil() {
-		this.valueType = JOM.getTypeFactory()
-				.constructType(
-						((ParameterizedType) TypeResolver.resolveGenericType(
-								TypeUtil.class, getClass()))
-								.getActualTypeArguments()[0]);
 	}
 
 	/**

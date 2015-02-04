@@ -156,13 +156,5 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "failed to send message", e);
 		}
-		try {
-			final List<MessageContainer> message = callSync(uri, "getMessage",
-					params);
-			LOG.info("received message:" + message.get(0).getMessage());
-
-		} catch (IOException e) {
-			LOG.log(Level.WARNING, "failed to send message", e);
-		}
 	}
 }
