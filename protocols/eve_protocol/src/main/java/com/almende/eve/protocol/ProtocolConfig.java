@@ -44,4 +44,27 @@ public class ProtocolConfig extends Config {
 	public void setAuthorizor(final String authorizor) {
 		this.put("authorizor", authorizor);
 	}
+
+	/**
+	 * Sets the id.
+	 * 
+	 * @param id
+	 *            the new id
+	 */
+	public void setId(final String id) {
+		this.put("id", id);
+	}
+
+	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 */
+	public String getId() {
+		if (this.has("id")) {
+			return this.get("id").asText();
+		}
+		return null;
+	}
+
 }

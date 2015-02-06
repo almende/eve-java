@@ -32,12 +32,14 @@ import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
+import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
+import com.almende.eve.scheduling.SimpleSchedulerConfig;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
 import com.almende.eve.state.StateConfig;
@@ -448,6 +450,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		if (config != null) {
 			for (JsonNode item : config) {
 				ProtocolConfig conf = new ProtocolConfig((ObjectNode) item);
+				if (agentId != null && conf.getId() == null) {
+					conf.setId(agentId);
+				}
 				if (JSONRpcProtocolBuilder.class.getName().equals(
 						conf.getClassName())) {
 					found = true;
@@ -459,7 +464,11 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		}
 		if (config == null || !found) {
 			// each agent has at least a JSONRPC protocol handler
-			protocolStack.add(new JSONRpcProtocolBuilder().withHandle(handler)
+			final JSONRpcProtocolConfig conf = new JSONRpcProtocolConfig();
+			if (agentId != null && conf.getId() == null) {
+				conf.setId(agentId);
+			}
+			protocolStack.add(new JSONRpcProtocolBuilder().withConfig(conf).withHandle(handler)
 					.build());
 		}
 	}
@@ -485,7 +494,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @param schedulerConfig
 	 *            the scheduler config
 	 */
-	private void loadScheduler(final ObjectNode schedulerConfig) {
+	private void loadScheduler(final ObjectNode config) {
+		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(config);
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
@@ -495,6 +505,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 					stateConfig.setId("scheduler_" + agentId);
 					schedulerConfig.set("state", stateConfig);
 				}
+			}
+			if (agentId != null && schedulerConfig.getId() == null) {
+				schedulerConfig.setId(agentId);
 			}
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
 					.withHandle(receiver).build();

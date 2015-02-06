@@ -84,7 +84,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 				} else {
 					LOG.log(Level.WARNING,
 							className
-									+ " is not a CapabilityBuilder, nor a Capability itself.");
+									+ " is not a CapabilityBuilder, which is required.");
 				}
 			} catch (final ClassNotFoundException e) {
 				LOG.log(Level.WARNING, "Couldn't find class:" + className, e);

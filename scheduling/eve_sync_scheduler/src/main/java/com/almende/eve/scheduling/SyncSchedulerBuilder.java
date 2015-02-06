@@ -6,17 +6,21 @@ package com.almende.eve.scheduling;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.TypeUtil;
+import com.almende.util.uuid.UUID;
 
 /**
  * The Class PersistentSchedulerService.
  */
 public class SyncSchedulerBuilder extends
 		AbstractCapabilityBuilder<SyncScheduler> {
+	private static final Logger							LOG			= Logger.getLogger(SyncSchedulerBuilder.class
+																			.getName());
 	private static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
 	private static final Map<String, SyncScheduler>		INSTANCES	= new HashMap<String, SyncScheduler>();
 
@@ -29,19 +33,23 @@ public class SyncSchedulerBuilder extends
 	 */
 	@Override
 	public SyncScheduler build() {
+		final SyncSchedulerConfig config = new SyncSchedulerConfig(getParams());
+		String id = config.getId();
+		if (id == null) {
+			id = new UUID().toString();
+			LOG.warning("Parameter 'id' is required for SyncScheduler. (giving temporary name: "
+					+ id + ")");
+		}
+
 		SyncScheduler result = null;
-		if (getHandle().getKey() != null
-				&& INSTANCES.containsKey(getHandle().getKey())) {
-			result = INSTANCES.get(getHandle().getKey());
+		if (INSTANCES.containsKey(id)) {
+			result = INSTANCES.get(id);
 			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
-			result = new SyncScheduler(getParams(),
-					TYPEUTIL.inject(getHandle()));
+			result = new SyncScheduler(config, TYPEUTIL.inject(getHandle()));
 		}
-		if (getHandle().getKey() != null) {
-			INSTANCES.put(getHandle().getKey(), result);
-		}
+		INSTANCES.put(id, result);
 		return result;
 	}
 

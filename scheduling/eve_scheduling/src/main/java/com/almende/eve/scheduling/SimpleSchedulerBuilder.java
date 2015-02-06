@@ -6,16 +6,20 @@ package com.almende.eve.scheduling;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.TypeUtil;
+import com.almende.util.uuid.UUID;
 
 /**
  * The Class SimpleSchedulerService.
  */
 public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleScheduler> {
+	private static final Logger LOG = Logger
+			.getLogger(SimpleSchedulerBuilder.class.getName());
 	private static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
 																	};
 	private static final Map<String, SimpleScheduler>	INSTANCES	= new HashMap<String, SimpleScheduler>();
@@ -31,17 +35,23 @@ public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleSche
 	 */
 	@Override
 	public SimpleScheduler build(){
+		final SimpleSchedulerConfig config = new SimpleSchedulerConfig(getParams());
+		String id = config.getId();
+		if (id == null) {
+			id = new UUID().toString();
+			LOG.warning("Parameter 'id' is required for SimpleScheduler. (giving temporary name: "
+					+ id + ")");
+		}
+		
 		SimpleScheduler result = null;
-		if (getHandle().getKey() != null && INSTANCES.containsKey(getHandle().getKey())) {
-			result = INSTANCES.get(getHandle().getKey());
+		if (INSTANCES.containsKey(id)) {
+			result = INSTANCES.get(id);
 			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
-			result = new SimpleScheduler(getParams(), TYPEUTIL.inject(getHandle()));
+			result = new SimpleScheduler(config, TYPEUTIL.inject(getHandle()));
 		}
-		if (getHandle().getKey() != null) {
-			INSTANCES.put(getHandle().getKey(), result);
-		}
+		INSTANCES.put(id, result);
 		return result;
 	}
 	

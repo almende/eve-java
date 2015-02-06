@@ -13,21 +13,20 @@ import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.util.TypeUtil;
+import com.almende.util.uuid.UUID;
 
 /**
  * The Class JSONRpcProtocolBuilder.
  */
-public class JSONRpcProtocolBuilder extends AbstractCapabilityBuilder<JSONRpcProtocol> {
-	private static final Logger LOG = Logger
-			.getLogger(JSONRpcProtocolBuilder.class.getName());
-	private static final TypeUtil<Handler<Object>>	TYPEUTIL	= new TypeUtil<Handler<Object>>() {
-																};
+public class JSONRpcProtocolBuilder extends
+		AbstractCapabilityBuilder<JSONRpcProtocol> {
+	private static final Logger							LOG			= Logger.getLogger(JSONRpcProtocolBuilder.class
+																			.getName());
+	private static final TypeUtil<Handler<Object>>		TYPEUTIL	= new TypeUtil<Handler<Object>>() {};
 	private static final Map<String, JSONRpcProtocol>	INSTANCES	= new HashMap<String, JSONRpcProtocol>();
-	
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson.
 	 * databind
@@ -36,29 +35,35 @@ public class JSONRpcProtocolBuilder extends AbstractCapabilityBuilder<JSONRpcPro
 	@Override
 	public JSONRpcProtocol build() {
 		JSONRpcProtocolConfig config = new JSONRpcProtocolConfig(getParams());
-		
+		String id = config.getId();
+		if (id == null) {
+			id = new UUID().toString();
+			LOG.warning("Parameter 'id' is required for JSONRpcProtocol. (giving temporary name: "
+					+ id + ")");
+		}
+
 		JSONRpcProtocol result;
-		if (getHandle() != null && getHandle().getKey() != null
-				&& INSTANCES.containsKey(getHandle().getKey())) {
-			result = INSTANCES.get(getHandle().getKey());
+		if (INSTANCES.containsKey(id)) {
+			result = INSTANCES.get(id);
 			final Handler<Object> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
 			result = new JSONRpcProtocol(config, TYPEUTIL.inject(getHandle()));
 		}
-		if (getHandle() != null && getHandle().getKey() != null) {
-			INSTANCES.put(getHandle().getKey(), result);
-		}
-		
-		//Add authorizor:
+		INSTANCES.put(id, result);
+
+		// Add authorizor:
 		try {
 			@SuppressWarnings("unchecked")
-			final Class<Authorizor> clazz = (Class<Authorizor>) Class.forName(config.getAuthorizor());
+			final Class<Authorizor> clazz = (Class<Authorizor>) Class
+					.forName(config.getAuthorizor());
 			result.setAuth(clazz.newInstance());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			LOG.log(Level.WARNING,"Couldn't instantiate authorizor class:"+config.getAuthorizor(),e);
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException e) {
+			LOG.log(Level.WARNING, "Couldn't instantiate authorizor class:"
+					+ config.getAuthorizor(), e);
 		}
 		return result;
 	}
-	
+
 }

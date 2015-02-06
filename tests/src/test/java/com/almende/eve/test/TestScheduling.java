@@ -40,7 +40,7 @@ public class TestScheduling extends TestCase {
 		state.put("id", "testScheduling");
 
 		params.setState(state);
-		params.setSenderUrl("local:scheduler");
+		params.setId("TestScheduler");
 
 		final Scheduler test = new SchedulerBuilder().withConfig(params)
 				.withHandle(new SimpleHandler<Receiver>(new MyReceiver()))
