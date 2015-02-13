@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.trickle;
+package com.almende.eve.algorithms;
 
 /**
  * The Class Trickle, implementing: https://tools.ietf.org/html/rfc6206

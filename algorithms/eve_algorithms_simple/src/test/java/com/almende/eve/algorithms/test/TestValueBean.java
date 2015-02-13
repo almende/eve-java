@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.daa.test;
+package com.almende.eve.algorithms.test;
 
 import java.util.logging.Logger;
 
@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.almende.daa.ValueBean;
+import com.almende.eve.algorithms.DAAValueBean;
 
 /**
  * The Class TestValueBean.
@@ -27,13 +27,13 @@ public class TestValueBean extends TestCase {
 
 		final int width = 1000;
 		final double value = 125.0;
-		ValueBean bean = new ValueBean(width, 10);
+		DAAValueBean bean = new DAAValueBean(width, 10);
 		bean.generate(value, 10);
 
 		assertTrue(Math.abs(value - bean.computeSum()) < 0.1);
 		assertEquals(new Integer(10), bean.getTtlArray()[15]);
 
-		ValueBean bean2 = new ValueBean(width, 10);
+		DAAValueBean bean2 = new DAAValueBean(width, 10);
 		bean2.generate(value, 10);
 		bean2.minimum(bean);
 

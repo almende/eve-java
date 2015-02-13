@@ -2,24 +2,24 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.daa;
+package com.almende.eve.algorithms;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The API class for the Distributed Aggregation Algorithm.
  */
-public class Api {
+public class DAA {
 	private int			width			= 1000;
 	private int			initialTTL		= 10;
 	private int			evictionFactor	= 10;
-	private ValueBean	localValue		= null;
-	private ValueBean	currentEstimate	= null;
+	private DAAValueBean	localValue		= null;
+	private DAAValueBean	currentEstimate	= null;
 
 	/**
 	 * Instantiates a new api.
 	 */
-	public Api() {}
+	public DAA() {}
 
 	/**
 	 * Configure this library, using a json DOM structure to wrap the
@@ -56,7 +56,7 @@ public class Api {
 	 *            the new new value
 	 */
 	public void setNewValue(Double value) {
-		localValue = new ValueBean(width, evictionFactor);
+		localValue = new DAAValueBean(width, evictionFactor);
 		localValue.generate(value, initialTTL);
 	}
 
@@ -66,7 +66,7 @@ public class Api {
 	 * @param bean
 	 *            the bean
 	 */
-	public void receive(ValueBean bean) {
+	public void receive(DAAValueBean bean) {
 		currentEstimate.minimum(bean).minimum(localValue);
 	}
 
@@ -75,7 +75,7 @@ public class Api {
 	 *
 	 * @return the value
 	 */
-	public ValueBean getCurrentEstimate() {
+	public DAAValueBean getCurrentEstimate() {
 		return currentEstimate;
 	}
 
@@ -84,7 +84,7 @@ public class Api {
 	 *
 	 * @return the local value
 	 */
-	public ValueBean getLocalValue() {
+	public DAAValueBean getLocalValue() {
 		return localValue;
 	}
 
@@ -93,7 +93,7 @@ public class Api {
 	 *
 	 * @return the value bean
 	 */
-	public ValueBean negateValue() {
+	public DAAValueBean negateValue() {
 		return localValue.negate();
 	}
 }

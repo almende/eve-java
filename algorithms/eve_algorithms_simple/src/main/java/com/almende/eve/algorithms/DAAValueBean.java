@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.daa;
+package com.almende.eve.algorithms;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The Class ValueBean.
  */
-public class ValueBean {
-	private static final Logger	LOG				= Logger.getLogger(ValueBean.class
+public class DAAValueBean {
+	private static final Logger	LOG				= Logger.getLogger(DAAValueBean.class
 														.getName());
 	private int					evictionFactor	= 10;
 	private int					width			= 0;
@@ -24,7 +24,7 @@ public class ValueBean {
 	/**
 	 * Instantiates a new value bean.
 	 */
-	public ValueBean() {}
+	public DAAValueBean() {}
 
 	/**
 	 * Instantiates a new value bean.
@@ -34,7 +34,7 @@ public class ValueBean {
 	 * @param evictionFactor
 	 *            the eviction factor
 	 */
-	public ValueBean(final int width, final int evictionFactor) {
+	public DAAValueBean(final int width, final int evictionFactor) {
 		this.width = width;
 		this.evictionFactor = evictionFactor;
 		valueArray = new Double[width];
@@ -153,7 +153,7 @@ public class ValueBean {
 	 *            the initial ttl
 	 * @return the value bean
 	 */
-	public ValueBean generate(final Double value, final int initialTTL) {
+	public DAAValueBean generate(final Double value, final int initialTTL) {
 		Arrays.fill(ttlArray, initialTTL);
 		for (int i = 0; i < width; i++) {
 			Double expRand = -Math.log(Math.random()) / value;
@@ -187,7 +187,7 @@ public class ValueBean {
 	 * @throws IllegalArgumentException
 	 *             the illegal argument exception
 	 */
-	public ValueBean minimum(final ValueBean other)
+	public DAAValueBean minimum(final DAAValueBean other)
 			throws IllegalArgumentException {
 		if (this.width != other.width) {
 			throw new IllegalArgumentException(
@@ -220,7 +220,7 @@ public class ValueBean {
 	 *
 	 * @return the value bean
 	 */
-	public ValueBean negate() {
+	public DAAValueBean negate() {
 		for (int i = 0; i < width; i++) {
 			valueArray[i] = -valueArray[i];
 			ttlArray[i] = evictionFactor * ttlArray[i];
