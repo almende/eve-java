@@ -39,8 +39,16 @@ public class ThreadPool {
 		}
 		scheduledPool = new ScheduledThreadPoolExecutor(nofCores, factory,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		queue = new RunQueue();
 		
+		try {
+			ScheduledThreadPoolExecutor.class.getMethod(
+					"setRemoveOnCancelPolicy", Boolean.class);
+			scheduledPool.setRemoveOnCancelPolicy(true);
+		} catch (final NoSuchMethodException e) {
+			// Do nothing, Java 6 environment
+		}
+
+		queue = new RunQueue();
 		for (Runnable task : openTasks){
 			if (task instanceof RunnableScheduledFuture){
 				final RunnableScheduledFuture<?> futureTask = (RunnableScheduledFuture<?>) task;

@@ -4,6 +4,9 @@
  */
 package com.almende.eve.algorithms.test;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -11,13 +14,13 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.algorithms.DAAValueBean;
+import com.almende.eve.algorithms.test.agents.DAAAgent;
 
 /**
  * The Class TestValueBean.
  */
 public class TestDAA extends TestCase {
-	private static final Logger	LOG	= Logger.getLogger(TestDAA.class
-											.getName());
+	private static final Logger	LOG	= Logger.getLogger(TestDAA.class.getName());
 
 	/**
 	 * Test keys.
@@ -42,15 +45,59 @@ public class TestDAA extends TestCase {
 				+ bean2.computeSum() + " sum:" + sum + " ("
 				+ (sum * 100.0 / bean2.computeSum()) + "%)");
 	}
-	
+
 	/**
 	 * Test agents.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testAgents(){
-		//Setup 5 agents, each with single "1" value in DAA,
-		//use Trickle to share this information
-		//Change the value of a single agent to 3
-		//Run a few seconds, check sum at other agent
+	public void testAgents() throws IOException {
+		final DAAAgent[] agents = new DAAAgent[5];
+		for (int i = 0; i < agents.length; i++) {
+			final DAAAgent agent = new DAAAgent(i + "");
+			agents[i] = agent;
+		}
+		
+		int[][] edges = { { 0, 1 }, { 0, 4 }, { 1, 2 }, { 1, 3 }, { 2, 4 },
+				{ 2, 1 }, { 3, 2 }, { 3, 0 }, { 4, 1 }, { 4, 2 } };
+
+		for (int[] edge : edges) {
+			agents[edge[0]].addNeighbor(URI.create("local:" + edge[1]));
+		}
+		
+		for (final DAAAgent agent : agents){
+			agent.start(1.0);
+		}
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			LOG.log(Level.WARNING, "interrupted", e);
+		}
+		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+
+		agents[3].changeValue(3.0);
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			LOG.log(Level.WARNING, "interrupted", e);
+		}
+		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		
+		agents[2].destroy();
+		
+		LOG.warning("agent config:"+agents[3].getConfig().toString());
+		agents[3].doScheduleTest();
+		agents[4].doScheduleTest();
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			LOG.log(Level.WARNING, "interrupted", e);
+		}
+		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		
 	}
 }

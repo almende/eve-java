@@ -22,14 +22,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * The Class RunnableClock.
  */
 public class RunnableClock implements Runnable, Clock {
-	private static final Logger									LOG			= Logger.getLogger(RunnableClock.class
-																					.getName());
-	private static final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
-	private static final ScheduledExecutorService				SCHEDULER	= ThreadPool
-																					.getScheduledPool();
-	private static final Executor								RUNNER		= ThreadPool
-																					.getPool();
-	private static ScheduledFuture<?>							future		= null;
+	private static final Logger							LOG			= Logger.getLogger(RunnableClock.class
+																			.getName());
+	private final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
+	private static final ScheduledExecutorService		SCHEDULER	= ThreadPool
+																			.getScheduledPool();
+	private static final Executor						RUNNER		= ThreadPool
+																			.getPool();
+	private ScheduledFuture<?>							future		= null;
 
 	/*
 	 * (non-Javadoc)
@@ -51,8 +51,9 @@ public class RunnableClock implements Runnable, Clock {
 				if (interval <= 0) {
 					continue;
 				}
-				if (future == null || future.getDelay(TimeUnit.MILLISECONDS) != interval) {
-					if (future != null){
+				if (future == null
+						|| future.getDelay(TimeUnit.MILLISECONDS) != interval) {
+					if (future != null) {
 						future.cancel(false);
 					}
 					future = SCHEDULER.schedule(this, interval,
@@ -82,7 +83,9 @@ public class RunnableClock implements Runnable, Clock {
 				TIMELINE.put(ce, ce);
 				RUNNER.execute(this);
 			} else {
-				LOG.warning(ce.getTriggerId()+": Skip adding ce, because has old value earlier than current. "+oldVal.getTriggerId());
+				LOG.warning(ce.getTriggerId()
+						+ ": Skip adding ce, because has old value earlier than current. "
+						+ oldVal.getTriggerId());
 			}
 		}
 	}
@@ -233,8 +236,8 @@ class ClockEntry implements Comparable<ClockEntry> {
 			}
 		}
 		if (due.equals(o.due)) {
-			//Become consistent with equals:
-			if (equals(o)){
+			// Become consistent with equals:
+			if (equals(o)) {
 				return 0;
 			} else {
 				return -1;

@@ -20,15 +20,39 @@ public class Trickle {
 	private int		counter				= 0;
 
 	/**
+	 * Instantiates a new trickle.
+	 */
+	public Trickle(){}
+	
+	/**
+	 * Instantiates a new trickle.
+	 *
+	 * @param intervalMin
+	 *            the interval min
+	 * @param intervalFactor
+	 *            the interval factor
+	 * @param redundancyFactor
+	 *            the redundancy factor
+	 */
+	public Trickle(long intervalMin, int intervalFactor, int redundancyFactor){
+		this.intervalMin = intervalMin;
+		this.intervalMax = (2 ^ intervalFactor) * intervalMin;
+		this.redundancyFactor = redundancyFactor;
+	}
+	
+	/**
 	 * Start next interval, generating next random sending opportunity.
 	 *
-	 * @return the duration in ms to the next send, and the duration in ms to the next interval
+	 * @return the duration in ms to the next send, and the duration in ms to
+	 *         the next interval
 	 */
 	public long[] next() {
 		currentInterval = Math.min(intervalMax, currentInterval * 2);
 		counter = 0;
-		final long[] result = { Math.round(currentInterval
-				- (Math.random() * currentInterval / 2)),Math.round(currentInterval)};
+		final long[] result = {
+				Math.round(currentInterval
+						- (Math.random() * currentInterval / 2)),
+				Math.round(currentInterval) };
 		return result;
 	}
 

@@ -19,6 +19,7 @@
 		<module>eve_transport</module>
 		<module>eve_transport_xmpp</module>
 		<module>eve_transport_zmq</module>
+<!-- 		<module>eve_transport_amqp</module> -->
 		<module>eve_transport_http_common</module>
 		<module>eve_transport_http</module>
 		<module>eve_transport_http_apache40</module>

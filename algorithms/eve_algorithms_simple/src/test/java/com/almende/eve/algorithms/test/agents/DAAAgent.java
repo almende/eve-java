@@ -20,109 +20,169 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 
 /**
  * The Class DAAAgent.
  */
 @Access(AccessType.PUBLIC)
 public class DAAAgent extends Agent {
-	private DAA daa = new DAA();
-	private Trickle trickle = new Trickle();
-	private List<URI> neighbors = new ArrayList<URI>();
-	private String intTaskId = null;
-	private String sendTaskId = null;
-	
+	private DAA			daa			= new DAA();
+	private Trickle		trickle		= new Trickle(100, 4, 3);
+	private List<URI>	neighbors	= new ArrayList<URI>();
+	private String		intTaskId	= null;
+	private String		sendTaskId	= null;
+
+	/**
+	 * Instantiates a new DAA agent.
+	 *
+	 * @param string
+	 *            the string
+	 */
+	public DAAAgent(String string) {
+		super(string, null);
+	}
+
+	/**
+	 * Adds the neighbor.
+	 *
+	 * @param address
+	 *            the address
+	 */
+	public void addNeighbor(final URI address) {
+		neighbors.add(address);
+	}
+
 	/**
 	 * Sets the initial DAA value.
 	 *
 	 * @param value
 	 *            the new initial value
 	 */
-	public void start(final double value){
+	public void start(final double value) {
 		final ObjectNode config = JOM.createObjectNode();
 		config.put("width", 1000);
 		config.put("initialTTL", 10);
 		config.put("evictionFactor", 3);
-		
+
 		daa.configure(config);
 		daa.setNewValue(value);
-		
+
 		long[] intervals = trickle.next();
-		sendTaskId = schedule("sendValue",null,DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval",null,DateTime.now().plus(intervals[1]));
+		sendTaskId = schedule("sendValue", null,
+				DateTime.now().plus(intervals[0]));
+		intTaskId = schedule("nextInterval", null,
+				DateTime.now().plus(intervals[1]));
 	}
-	
+
 	/**
 	 * Send value.
-	 *
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
 	 */
-	public void sendValue() throws IOException{
-		if (trickle.check()){
-			for (final URI agent: neighbors){
+	public void sendValue() {
+		if (trickle.check()) {
+			for (final URI agent : neighbors) {
 				Params params = new Params();
 				params.add("value", daa.getCurrentEstimate());
-				call(agent,"daaReceive",params);
+				try {
+					call(agent, "daaReceive", params);
+				} catch (IOException e) {
+					System.out.print("|");
+				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Next interval.
 	 */
-	public void nextInterval(){
+	public void nextInterval() {
+		daa.getCurrentEstimate().decreaseTTL();
 		final long[] intervals = trickle.next();
-		sendTaskId = schedule("sendValue",null,DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval",null,DateTime.now().plus(intervals[1]));		
+		sendTaskId = schedule("sendValue", null,
+				DateTime.now().plus(intervals[0]));
+		intTaskId = schedule("nextInterval", null,
+				DateTime.now().plus(intervals[1]));
 	}
-	
+
 	/**
 	 * Daa receive.
 	 *
 	 * @param value
 	 *            the value
+	 * @throws JsonProcessingException
+	 *             the json processing exception
 	 */
-	public void daaReceive(final @Name("value") DAAValueBean value){
-		if (daa.getCurrentEstimate().computeSum() == value.computeSum()){
-			trickle.incr();
-			//Still receive to update TTLs:
+	public synchronized void daaReceive(final @Name("value") DAAValueBean value)
+			throws JsonProcessingException {
+		if (daa.getCurrentEstimate() == null
+				|| !daa.getCurrentEstimate().computeSum()
+						.equals(value.computeSum())) {
+			System.out.print("!");
 			daa.receive(value);
-		} else {
-			daa.receive(value);
+
 			getScheduler().cancel(sendTaskId);
 			getScheduler().cancel(intTaskId);
 			final long[] intervals = trickle.reset();
-			sendTaskId = schedule("sendValue",null,DateTime.now().plus(intervals[0]));
-			intTaskId = schedule("nextInterval",null,DateTime.now().plus(intervals[1]));	
+			sendTaskId = schedule("sendValue", null,
+					DateTime.now().plus(intervals[0]));
+			intTaskId = schedule("nextInterval", null,
+					DateTime.now().plus(intervals[1]));
+		} else {
+			System.out.print(".");
+			trickle.incr();
 		}
+
 	}
-	
+
 	/**
 	 * Change value.
 	 *
 	 * @param value
 	 *            the value
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
 	 */
-	public void changeValue(@Name("value") Double value) throws IOException{
+	public void changeValue(@Name("value") Double value) {
 		DAAValueBean old = daa.negateValue();
-		//send old value to network to evict it.
-		for (final URI agent: neighbors){
+		// send old value to network to evict it.
+		for (final URI agent : neighbors) {
 			Params params = new Params();
 			params.add("value", old);
-			call(agent,"daaReceive",params);
+			try {
+				call(agent, "daaReceive", params);
+			} catch (IOException e) {
+				System.out.print("|");
+			}
 		}
-		
-		//set new value for next round:
+
+		// set new value for next round:
 		daa.setNewValue(value);
 		getScheduler().cancel(sendTaskId);
 		getScheduler().cancel(intTaskId);
 		final long[] intervals = trickle.reset();
-		sendTaskId = schedule("sendValue",null,DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval",null,DateTime.now().plus(intervals[1]));	
+		sendTaskId = schedule("sendValue", null,
+				DateTime.now().plus(intervals[0]));
+		intTaskId = schedule("nextInterval", null,
+				DateTime.now().plus(intervals[1]));
+	}
+
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	public double getValue() {
+		return daa.getCurrentEstimate().computeSum();
+	}
+
+	public void destroy() {
+		super.destroy();
+	}
+
+	public void test(){
+		System.out.println("test called");
+	}
+	public void doScheduleTest() {
+		schedule("test",null,DateTime.now().plus(1000));
+		
 	}
 }

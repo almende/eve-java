@@ -185,19 +185,24 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	protected void destroy() {
 		if (scheduler != null) {
 			scheduler.delete();
+			scheduler = null;
 		}
 		if (transport != null) {
 			transport.disconnect();
 			transport.delete();
+			transport = null;
 		}
 		if (protocolStack != null) {
 			protocolStack.delete();
+			protocolStack = null;
 		}
 		if (state != null) {
 			state.delete();
+			state = null;
 		}
 		if (is != null) {
 			is.deregister(agentId);
+			is = null;
 		}
 	}
 
@@ -889,7 +894,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		if (response != null) {
 			try {
 				transport.send(senderUrl, response, tag);
-			} catch (final IOException e) {
+			} catch (final Exception e) {
 				LOG.log(Level.WARNING, "Couldn't send message", e);
 			}
 		}

@@ -58,6 +58,10 @@ public class DAA {
 	public void setNewValue(Double value) {
 		localValue = new DAAValueBean(width, evictionFactor);
 		localValue.generate(value, initialTTL);
+		if (currentEstimate == null){
+			currentEstimate = new DAAValueBean(width, evictionFactor);
+		}
+		currentEstimate.minimum(localValue);
 	}
 
 	/**
@@ -94,7 +98,6 @@ public class DAA {
 	 * @return the value bean
 	 */
 	public DAAValueBean negateValue() {
-		//TODO: error: don't just negate localValue, negate those elements in the currentEstimate that localValue provided.
 		return currentEstimate.negate(localValue);
 	}
 }

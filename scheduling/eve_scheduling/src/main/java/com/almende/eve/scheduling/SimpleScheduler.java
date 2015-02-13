@@ -167,7 +167,6 @@ public class SimpleScheduler implements Scheduler {
 	@Override
 	public void delete() {
 		clear();
-		clock.clear();
 	}
 	
 }

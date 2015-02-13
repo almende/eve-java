@@ -29,16 +29,6 @@ public class AsyncCallbackQueue<T> {
 	/** timeout in seconds */
 	private int									defTimeout	= 30;
 	
-	static {
-		try {
-			ScheduledThreadPoolExecutor.class.getMethod(
-					"setRemoveOnCancelPolicy", Boolean.class);
-			scheduler.setRemoveOnCancelPolicy(true);
-		} catch (final NoSuchMethodException e) {
-			// Do nothing, Java 6 environment
-		}
-	}
-	
 	/**
 	 * Append a callback to the queue.
 	 * 
@@ -105,15 +95,6 @@ public class AsyncCallbackQueue<T> {
 	 */
 	public synchronized void clear() {
 		queue.clear();
-		scheduler.shutdownNow();
-		scheduler = ThreadPool.getScheduledPool();
-		try {
-			ScheduledThreadPoolExecutor.class.getMethod(
-					"setRemoveOnCancelPolicy", Boolean.class);
-			scheduler.setRemoveOnCancelPolicy(true);
-		} catch (final NoSuchMethodException e) {
-			// Do nothing, Java 6 environment
-		}
 	}
 	
 	/**

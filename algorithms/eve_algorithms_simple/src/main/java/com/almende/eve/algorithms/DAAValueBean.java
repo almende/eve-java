@@ -172,8 +172,6 @@ public class DAAValueBean {
 					+ computeMean() + " - " + offset + " (" + (1.0 / offset)
 					+ ")");
 		}
-		LOG.warning("Results:" + value + " - " + computeSum() + " - " + offset
-				+ " before:" + (1.0 / mean));
 		return this;
 	}
 
@@ -202,17 +200,27 @@ public class DAAValueBean {
 					valueArray[i] = other.valueArray[i];
 					ttlArray[i] = other.ttlArray[i];
 				}
-			} else if (ttlArray[i] <= 0 || other.valueArray[i] < valueArray[i]) {
+			} else if (valueArray[i] == null || ttlArray[i] <= 0
+					|| other.valueArray[i] < valueArray[i]) {
+				// } else if (valueArray[i] == null || other.valueArray[i] <
+				// valueArray[i]) {
 				valueArray[i] = other.valueArray[i];
 				ttlArray[i] = other.ttlArray[i];
 			}
 			if (valueArray[i] < 0) {
 				ttlArray[i] = ttlArray[i] / 2;
-			} else {
-				ttlArray[i] = ttlArray[i] - 1;
 			}
 		}
 		return this;
+	}
+
+	/**
+	 * Decrease ttl.
+	 */
+	public void decreaseTTL() {
+		for (int i = 0; i < ttlArray.length; i++) {
+			ttlArray[i] = ttlArray[i] - 1;
+		}
 	}
 
 	/**
@@ -228,11 +236,11 @@ public class DAAValueBean {
 					"ValueBeans aren't of the same length:(" + this.width + "/"
 							+ other.width + ")!");
 		}
-		
-		//TODO: Fix this!
 		for (int i = 0; i < width; i++) {
-			valueArray[i] = -valueArray[i];
-			ttlArray[i] = evictionFactor * ttlArray[i];
+			if (valueArray[i] == other.valueArray[i]) {
+				valueArray[i] = -valueArray[i];
+				ttlArray[i] = evictionFactor * ttlArray[i];
+			}
 		}
 		return this;
 	}

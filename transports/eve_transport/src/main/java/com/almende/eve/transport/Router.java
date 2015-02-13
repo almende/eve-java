@@ -167,6 +167,7 @@ public class Router implements Transport {
 		for (final Transport transport : result) {
 			transport.delete();
 		}
+		transports.clear();
 	}
 
 	/*
