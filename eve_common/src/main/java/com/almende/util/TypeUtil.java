@@ -137,11 +137,16 @@ public abstract class TypeUtil<T> {
 	 *            the target
 	 * @return the type util
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> TypeUtil<T> resolve(final Object target) {
 		if (target == null) {
 			return new TypeUtil<T>(Void.class) {};
 		}
-		final Type gsc = target.getClass().getGenericSuperclass();
+		if (target instanceof Class<?>){
+			//Security, but price is unchecked warning....
+			return new TypeUtil<T>((Class<T>) target){};
+		}
+		Type gsc = target.getClass().getGenericSuperclass();
 		ParameterizedType ptype = null;
 		if (gsc instanceof ParameterizedType) {
 			ptype = (ParameterizedType) gsc;
@@ -150,8 +155,11 @@ public abstract class TypeUtil<T> {
 					(Class<?>) gsc, target.getClass());
 		}
 		if (ptype == null) {
-			ptype = (ParameterizedType) target.getClass()
+			gsc = target.getClass()
 					.getGenericInterfaces()[0];
+			if (gsc instanceof ParameterizedType) {
+				ptype = (ParameterizedType) gsc;
+			}
 		}
 		if (ptype == null) {
 			LOG.warning("Couldn't find generic type.");

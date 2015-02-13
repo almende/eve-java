@@ -928,12 +928,11 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			call(url, method, params, null);
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T callSync(final URI url, final String method,
 				final ObjectNode params, final Class<T> clazz)
 				throws IOException {
-			return (T) callSync(url, method, params, TypeUtil.resolve(clazz));
+			return (T) callSync(url, method, params, TypeUtil.get(clazz));
 		}
 
 		@SuppressWarnings("unchecked")
