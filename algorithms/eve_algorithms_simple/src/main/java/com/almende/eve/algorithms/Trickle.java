@@ -22,13 +22,14 @@ public class Trickle {
 	/**
 	 * Start next interval, generating next random sending opportunity.
 	 *
-	 * @return the duration in ms to the next send.
+	 * @return the duration in ms to the next send, and the duration in ms to the next interval
 	 */
-	public long next() {
+	public long[] next() {
 		currentInterval = Math.min(intervalMax, currentInterval * 2);
 		counter = 0;
-		return Math.round(currentInterval
-				- (Math.random() * currentInterval / 2));
+		final long[] result = { Math.round(currentInterval
+				- (Math.random() * currentInterval / 2)),Math.round(currentInterval)};
+		return result;
 	}
 
 	/**
@@ -52,9 +53,9 @@ public class Trickle {
 	 *
 	 * @return the duration in ms to the next send.
 	 */
-	public long reset() {
+	public long[] reset() {
 		if (currentInterval <= intervalMin) {
-			return -1;
+			return new long[2];
 		} else {
 			currentInterval = intervalMin / 2;
 			return next();

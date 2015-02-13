@@ -15,15 +15,15 @@ import com.almende.eve.algorithms.DAAValueBean;
 /**
  * The Class TestValueBean.
  */
-public class TestValueBean extends TestCase {
-	private static final Logger	LOG	= Logger.getLogger(TestValueBean.class
+public class TestDAA extends TestCase {
+	private static final Logger	LOG	= Logger.getLogger(TestDAA.class
 											.getName());
 
 	/**
 	 * Test keys.
 	 */
 	@Test
-	public void testBeans() {
+	public void testValueBean() {
 
 		final int width = 1000;
 		final double value = 125.0;
@@ -41,5 +41,16 @@ public class TestValueBean extends TestCase {
 		LOG.warning("bean1:" + bean.computeSum() + " bean2:"
 				+ bean2.computeSum() + " sum:" + sum + " ("
 				+ (sum * 100.0 / bean2.computeSum()) + "%)");
+	}
+	
+	/**
+	 * Test agents.
+	 */
+	@Test
+	public void testAgents(){
+		//Setup 5 agents, each with single "1" value in DAA,
+		//use Trickle to share this information
+		//Change the value of a single agent to 3
+		//Run a few seconds, check sum at other agent
 	}
 }

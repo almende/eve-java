@@ -218,9 +218,18 @@ public class DAAValueBean {
 	/**
 	 * Negate.
 	 *
+	 * @param other
+	 *            the other
 	 * @return the value bean
 	 */
-	public DAAValueBean negate() {
+	public DAAValueBean negate(DAAValueBean other) {
+		if (this.width != other.width) {
+			throw new IllegalArgumentException(
+					"ValueBeans aren't of the same length:(" + this.width + "/"
+							+ other.width + ")!");
+		}
+		
+		//TODO: Fix this!
 		for (int i = 0; i < width; i++) {
 			valueArray[i] = -valueArray[i];
 			ttlArray[i] = evictionFactor * ttlArray[i];

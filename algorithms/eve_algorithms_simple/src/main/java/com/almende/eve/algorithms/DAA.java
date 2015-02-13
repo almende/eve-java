@@ -89,11 +89,12 @@ public class DAA {
 	}
 
 	/**
-	 * Negate and get the original local value.
+	 * Negate and return the local value.
 	 *
 	 * @return the value bean
 	 */
 	public DAAValueBean negateValue() {
-		return localValue.negate();
+		//TODO: error: don't just negate localValue, negate those elements in the currentEstimate that localValue provided.
+		return currentEstimate.negate(localValue);
 	}
 }
