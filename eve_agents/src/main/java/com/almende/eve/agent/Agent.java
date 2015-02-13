@@ -494,8 +494,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @param schedulerConfig
 	 *            the scheduler config
 	 */
-	private void loadScheduler(final ObjectNode config) {
-		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(config);
+	private void loadScheduler(final ObjectNode params) {
+		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(params);
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
