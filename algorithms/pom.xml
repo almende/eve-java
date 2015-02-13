@@ -17,7 +17,6 @@
 
 	<modules>
 		<module>eve_algorithms_simple</module>
-		<module>eve_algorithms_daa</module>
 		<module>eve_algorithms_dht</module>
 	</modules>
 
