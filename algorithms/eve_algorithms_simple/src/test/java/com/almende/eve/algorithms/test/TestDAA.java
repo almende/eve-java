@@ -72,32 +72,28 @@ public class TestDAA extends TestCase {
 		}
 		
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
 
 		agents[3].changeValue(3.0);
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
 		
 		agents[2].destroy();
-		
-		LOG.warning("agent config:"+agents[3].getConfig().toString());
-		agents[3].doScheduleTest();
-		agents[4].doScheduleTest();
 		try {
-			Thread.sleep(15000);
+			Thread.sleep(8000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at 1:" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
 		
 	}
 }

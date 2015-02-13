@@ -699,7 +699,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final String method, final ObjectNode params,
 			final DateTime due) {
-		return getScheduler().schedule(new JSONRequest(method, params), due);
+		final Scheduler scheduler = this.scheduler;
+		if (scheduler == null) return "";
+		return scheduler.schedule(new JSONRequest(method, params), due);
 	}
 
 	/**
@@ -716,7 +718,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final String method, final ObjectNode params,
 			final int delay) {
-		return getScheduler().schedule(new JSONRequest(method, params), delay);
+		final Scheduler scheduler = this.scheduler;
+		if (scheduler == null) return "";
+		return scheduler.schedule(new JSONRequest(method, params), delay);
 	}
 
 	/**
@@ -727,7 +731,9 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void cancel(final String taskId) {
-		getScheduler().cancel(taskId);
+		final Scheduler scheduler = this.scheduler;
+		if (scheduler == null) return;
+		scheduler.cancel(taskId);
 	}
 
 	/**
@@ -889,6 +895,12 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
+		final ProtocolStack protocolStack = this.protocolStack;
+		final Transport transport = this.transport;
+		if (protocolStack == null || transport == null){
+			//during destroy()
+			return;
+		}
 		final Object response = protocolStack.outbound(
 				protocolStack.inbound(msg, senderUrl).getResult(), senderUrl).result;
 		if (response != null) {

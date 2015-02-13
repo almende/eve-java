@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Access(AccessType.PUBLIC)
 public class DAAAgent extends Agent {
 	private DAA			daa			= new DAA();
-	private Trickle		trickle		= new Trickle(100, 4, 3);
+	private Trickle		trickle		= new Trickle(100, 16, 3);
 	private List<URI>	neighbors	= new ArrayList<URI>();
 	private String		intTaskId	= null;
 	private String		sendTaskId	= null;
@@ -86,9 +86,7 @@ public class DAAAgent extends Agent {
 				params.add("value", daa.getCurrentEstimate());
 				try {
 					call(agent, "daaReceive", params);
-				} catch (IOException e) {
-					System.out.print("|");
-				}
+				} catch (IOException e) {}
 			}
 		}
 	}
@@ -118,7 +116,6 @@ public class DAAAgent extends Agent {
 		if (daa.getCurrentEstimate() == null
 				|| !daa.getCurrentEstimate().computeSum()
 						.equals(value.computeSum())) {
-			System.out.print("!");
 			daa.receive(value);
 
 			getScheduler().cancel(sendTaskId);
@@ -129,8 +126,8 @@ public class DAAAgent extends Agent {
 			intTaskId = schedule("nextInterval", null,
 					DateTime.now().plus(intervals[1]));
 		} else {
-			System.out.print(".");
 			trickle.incr();
+			daa.receive(value);
 		}
 
 	}
@@ -149,9 +146,7 @@ public class DAAAgent extends Agent {
 			params.add("value", old);
 			try {
 				call(agent, "daaReceive", params);
-			} catch (IOException e) {
-				System.out.print("|");
-			}
+			} catch (IOException e) {}
 		}
 
 		// set new value for next round:
@@ -178,11 +173,4 @@ public class DAAAgent extends Agent {
 		super.destroy();
 	}
 
-	public void test(){
-		System.out.println("test called");
-	}
-	public void doScheduleTest() {
-		schedule("test",null,DateTime.now().plus(1000));
-		
-	}
 }

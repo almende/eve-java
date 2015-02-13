@@ -195,15 +195,15 @@ public class DAAValueBean {
 		for (int i = 0; i < width; i++) {
 			if (other.valueArray[i] == valueArray[i]) {
 				ttlArray[i] = Math.max(ttlArray[i], other.ttlArray[i]);
-			} else if (other.valueArray[i] < 0) {
+			}
+			if (other.valueArray[i] < 0) {
 				if (other.valueArray[i] == -valueArray[i]) {
 					valueArray[i] = other.valueArray[i];
 					ttlArray[i] = other.ttlArray[i];
 				}
-			} else if (valueArray[i] == null || ttlArray[i] <= 0
+			} 
+			if (valueArray[i] == null || ttlArray[i] <= 0
 					|| other.valueArray[i] < valueArray[i]) {
-				// } else if (valueArray[i] == null || other.valueArray[i] <
-				// valueArray[i]) {
 				valueArray[i] = other.valueArray[i];
 				ttlArray[i] = other.ttlArray[i];
 			}
