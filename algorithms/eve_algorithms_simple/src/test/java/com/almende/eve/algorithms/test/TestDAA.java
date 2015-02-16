@@ -28,7 +28,7 @@ public class TestDAA extends TestCase {
 	@Test
 	public void testValueBean() {
 
-		final int width = 1000;
+		final int width = 10000;
 		final double value = 125.0;
 		DAAValueBean bean = new DAAValueBean(width, 10);
 		bean.generate(value, 10);
@@ -59,24 +59,25 @@ public class TestDAA extends TestCase {
 			final DAAAgent agent = new DAAAgent(i + "");
 			agents[i] = agent;
 		}
-		
+
 		int[][] edges = { { 0, 1 }, { 0, 4 }, { 1, 2 }, { 1, 3 }, { 2, 4 },
 				{ 2, 1 }, { 3, 2 }, { 3, 0 }, { 4, 1 }, { 4, 2 } };
 
 		for (int[] edge : edges) {
 			agents[edge[0]].addNeighbor(URI.create("local:" + edge[1]));
 		}
-		
-		for (final DAAAgent agent : agents){
+
+		for (final DAAAgent agent : agents) {
 			agent.start(1.0);
 		}
-		
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()
+				+ " -> " + Math.round(agents[1].getValue()));
 
 		agents[3].changeValue(3.0);
 
@@ -85,15 +86,17 @@ public class TestDAA extends TestCase {
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
-		
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()
+				+ " -> " + Math.round(agents[1].getValue()));
+
 		agents[2].destroy();
 		try {
 			Thread.sleep(8000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}
-		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()+ " -> "+ Math.round(agents[1].getValue()));
-		
+		LOG.warning("Current estimate at agent 1 :" + agents[1].getValue()
+				+ " -> " + Math.round(agents[1].getValue()));
+
 	}
 }

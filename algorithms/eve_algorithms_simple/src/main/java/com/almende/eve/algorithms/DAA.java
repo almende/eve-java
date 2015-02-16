@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The API class for the Distributed Aggregation Algorithm.
  */
 public class DAA {
-	private int			width			= 1000;
-	private int			initialTTL		= 10;
-	private int			evictionFactor	= 10;
+	private int				width			= 1000;
+	private int				initialTTL		= 10;
+	private int				evictionFactor	= 10;
 	private DAAValueBean	localValue		= null;
 	private DAAValueBean	currentEstimate	= null;
 
@@ -58,7 +58,7 @@ public class DAA {
 	public void setNewValue(Double value) {
 		localValue = new DAAValueBean(width, evictionFactor);
 		localValue.generate(value, initialTTL);
-		if (currentEstimate == null){
+		if (currentEstimate == null) {
 			currentEstimate = new DAAValueBean(width, evictionFactor);
 		}
 		currentEstimate.minimum(localValue);

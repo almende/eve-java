@@ -201,7 +201,7 @@ public class DAAValueBean {
 					valueArray[i] = other.valueArray[i];
 					ttlArray[i] = other.ttlArray[i];
 				}
-			} 
+			}
 			if (valueArray[i] == null || ttlArray[i] <= 0
 					|| other.valueArray[i] < valueArray[i]) {
 				valueArray[i] = other.valueArray[i];

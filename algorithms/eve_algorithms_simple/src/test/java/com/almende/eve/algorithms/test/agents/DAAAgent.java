@@ -9,15 +9,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
 import com.almende.eve.agent.Agent;
 import com.almende.eve.algorithms.DAA;
 import com.almende.eve.algorithms.DAAValueBean;
-import com.almende.eve.algorithms.Trickle;
+import com.almende.eve.algorithms.TrickleRPC;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,10 +28,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Access(AccessType.PUBLIC)
 public class DAAAgent extends Agent {
 	private DAA			daa			= new DAA();
-	private Trickle		trickle		= new Trickle(100, 16, 3);
+	private TrickleRPC	trickle		= null;
 	private List<URI>	neighbors	= new ArrayList<URI>();
-	private String		intTaskId	= null;
-	private String		sendTaskId	= null;
 
 	/**
 	 * Instantiates a new DAA agent.
@@ -42,6 +39,16 @@ public class DAAAgent extends Agent {
 	 */
 	public DAAAgent(String string) {
 		super(string, null);
+	}
+
+	/**
+	 * Gets the trickle.
+	 *
+	 * @return the trickle
+	 */
+	@Namespace("*")
+	public TrickleRPC getTrickle() {
+		return trickle;
 	}
 
 	/**
@@ -69,38 +76,23 @@ public class DAAAgent extends Agent {
 		daa.configure(config);
 		daa.setNewValue(value);
 
-		long[] intervals = trickle.next();
-		sendTaskId = schedule("sendValue", null,
-				DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval", null,
-				DateTime.now().plus(intervals[1]));
-	}
-
-	/**
-	 * Send value.
-	 */
-	public void sendValue() {
-		if (trickle.check()) {
-			for (final URI agent : neighbors) {
-				Params params = new Params();
-				params.add("value", daa.getCurrentEstimate());
-				try {
-					call(agent, "daaReceive", params);
-				} catch (IOException e) {}
+		trickle = new TrickleRPC(config, getScheduler(), new Runnable() {
+			@Override
+			public void run() {
+				daa.getCurrentEstimate().decreaseTTL();
 			}
-		}
-	}
-
-	/**
-	 * Next interval.
-	 */
-	public void nextInterval() {
-		daa.getCurrentEstimate().decreaseTTL();
-		final long[] intervals = trickle.next();
-		sendTaskId = schedule("sendValue", null,
-				DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval", null,
-				DateTime.now().plus(intervals[1]));
+		}, new Runnable() {
+			@Override
+			public void run() {
+				for (final URI agent : neighbors) {
+					Params params = new Params();
+					params.add("value", daa.getCurrentEstimate());
+					try {
+						call(agent, "daaReceive", params);
+					} catch (IOException e) {}
+				}
+			}
+		});
 	}
 
 	/**
@@ -117,14 +109,7 @@ public class DAAAgent extends Agent {
 				|| !daa.getCurrentEstimate().computeSum()
 						.equals(value.computeSum())) {
 			daa.receive(value);
-
-			getScheduler().cancel(sendTaskId);
-			getScheduler().cancel(intTaskId);
-			final long[] intervals = trickle.reset();
-			sendTaskId = schedule("sendValue", null,
-					DateTime.now().plus(intervals[0]));
-			intTaskId = schedule("nextInterval", null,
-					DateTime.now().plus(intervals[1]));
+			trickle.reset();
 		} else {
 			trickle.incr();
 			daa.receive(value);
@@ -151,13 +136,7 @@ public class DAAAgent extends Agent {
 
 		// set new value for next round:
 		daa.setNewValue(value);
-		getScheduler().cancel(sendTaskId);
-		getScheduler().cancel(intTaskId);
-		final long[] intervals = trickle.reset();
-		sendTaskId = schedule("sendValue", null,
-				DateTime.now().plus(intervals[0]));
-		intTaskId = schedule("nextInterval", null,
-				DateTime.now().plus(intervals[1]));
+		trickle.reset();
 	}
 
 	/**

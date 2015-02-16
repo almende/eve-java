@@ -473,8 +473,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			if (agentId != null && conf.getId() == null) {
 				conf.setId(agentId);
 			}
-			protocolStack.add(new JSONRpcProtocolBuilder().withConfig(conf).withHandle(handler)
-					.build());
+			protocolStack.add(new JSONRpcProtocolBuilder().withConfig(conf)
+					.withHandle(handler).build());
 		}
 	}
 
@@ -500,7 +500,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 *            the scheduler config
 	 */
 	private void loadScheduler(final ObjectNode params) {
-		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(params);
+		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(
+				params);
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
 				final StateConfig stateConfig = new StateConfig(
@@ -700,7 +701,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	protected String schedule(final String method, final ObjectNode params,
 			final DateTime due) {
 		final Scheduler scheduler = this.scheduler;
-		if (scheduler == null) return "";
+		if (scheduler == null)
+			return "";
 		return scheduler.schedule(new JSONRequest(method, params), due);
 	}
 
@@ -719,7 +721,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	protected String schedule(final String method, final ObjectNode params,
 			final int delay) {
 		final Scheduler scheduler = this.scheduler;
-		if (scheduler == null) return "";
+		if (scheduler == null)
+			return "";
 		return scheduler.schedule(new JSONRequest(method, params), delay);
 	}
 
@@ -732,7 +735,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	protected void cancel(final String taskId) {
 		final Scheduler scheduler = this.scheduler;
-		if (scheduler == null) return;
+		if (scheduler == null)
+			return;
 		scheduler.cancel(taskId);
 	}
 
@@ -897,8 +901,8 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
 		final ProtocolStack protocolStack = this.protocolStack;
 		final Transport transport = this.transport;
-		if (protocolStack == null || transport == null){
-			//during destroy()
+		if (protocolStack == null || transport == null) {
+			// during destroy()
 			return;
 		}
 		final Object response = protocolStack.outbound(
