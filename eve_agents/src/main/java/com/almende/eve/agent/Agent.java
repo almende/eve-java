@@ -183,6 +183,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void destroy() {
+		eventCaller.on("destroy");
 		if (scheduler != null) {
 			scheduler.delete();
 			scheduler = null;
@@ -203,6 +204,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		if (is != null) {
 			is.deregister(agentId);
 			is = null;
+		
 		}
 	}
 
