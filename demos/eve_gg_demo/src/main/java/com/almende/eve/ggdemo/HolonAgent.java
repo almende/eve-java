@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.http.annotation.ThreadSafe;
 
-import com.almende.eve.agent.Agent;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
@@ -21,59 +21,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Access(AccessType.PUBLIC)
 @ThreadSafe
-public class HolonAgent extends Agent implements LampAgent {
-	private Set<String>								neighbours	= null;
-	private static final TypeUtil<ArrayList<Sub>>	type		= new TypeUtil<ArrayList<Sub>>() {};
+public class HolonAgent extends AbstractLampAgent {
+	private static final TypeUtil<ArrayList<Sub>>	type	= new TypeUtil<ArrayList<Sub>>() {};
 
-	public void create(@Name("neighbours") ArrayList<String> nbs,
+	public void create(@Name("neighbours") List<String> neighbors,
 			@Name("stepSize") Integer stepSize) throws JSONRPCException,
 			IOException {
-
-		neighbours = new HashSet<String>(nbs);
-		getState().put("neighbours", neighbours);
-
-		if (stepSize > neighbours.size()) {
-			stepSize = neighbours.size();
-		}
-		getState().put("stepSize", stepSize);
+		super.create(neighbors, stepSize);
 
 		String taskId = schedule("checkMerge", null, (int) Math.random() * 1500);
 		System.out.println(getId() + ": schedulertask created:" + taskId
 				+ " --> " + getScheduler());
-	}
-
-	public void lampOn() {
-		getState().put("lamp", true);
-	}
-
-	public void lampOff() {
-		getState().put("lamp", false);
-	}
-
-	public boolean isOn() {
-		Boolean isOn = getState().get("lamp", Boolean.class);
-		if (isOn == null)
-			isOn = false;
-		return isOn;
-	}
-
-	public boolean isOnBlock() throws InterruptedException {
-		Boolean isOn = getState().get("lamp", Boolean.class);
-		while (isOn == null) {
-			Thread.sleep(1000);
-			isOn = getState().get("lamp", Boolean.class);
-		}
-		return isOn;
-	}
-
-	@Access(AccessType.UNAVAILABLE)
-	public Set<String> getNeighbours() {
-		Set<String> result = getState().get("neighbours",
-				new TypeUtil<Set<String>>() {});
-		if (result == null) {
-			result = new HashSet<String>(0);
-		}
-		return result;
 	}
 
 	public void checkMerge() throws JSONRPCException, IOException {
@@ -280,10 +238,6 @@ public class HolonAgent extends Agent implements LampAgent {
 				call(URI.create(neighbour), "handleGoal", params, null);
 			}
 		}
-	}
-
-	public Goal getGoal() {
-		return getState().get("goal", Goal.class);
 	}
 
 	class Sub {

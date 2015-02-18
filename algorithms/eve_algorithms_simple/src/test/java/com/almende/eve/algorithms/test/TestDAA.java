@@ -29,7 +29,7 @@ public class TestDAA extends TestCase {
 	public void testValueBean() {
 
 		final int width = 10000;
-		final double value = 125.0;
+		final double value = 0.345;
 		DAAValueBean bean = new DAAValueBean(width, 10);
 		bean.generate(value, 10);
 
@@ -45,7 +45,31 @@ public class TestDAA extends TestCase {
 				+ bean2.computeSum() + " sum:" + sum + " ("
 				+ (sum * 100.0 / bean2.computeSum()) + "%)");
 	}
+	/**
+	 * Test keys.
+	 */
+	@Test
+	public void test2Bean() {
 
+		final int width = 10000;
+		final double value = 100E43;
+		DAAValueBean bean = new DAAValueBean(width, 10);
+		bean.generate(value, 10);
+
+		assertTrue(Math.abs(value / bean.computeSum()) < 1.1);
+		assertTrue(Math.abs(value / bean.computeSum()) > 0.9);
+		
+		assertEquals(new Integer(10), bean.getTtlArray()[15]);
+
+		DAAValueBean bean2 = new DAAValueBean(width, 10);
+		bean2.generate(value, 10);
+		bean2.minimum(bean);
+
+		double sum = Math.abs(bean2.computeSum() - 2 * bean.computeSum());
+		LOG.warning("bean1:" + bean.computeSum() + " bean2:"
+				+ bean2.computeSum() + " sum:" + sum + " ("
+				+ (sum * 100.0 / bean2.computeSum()) + "%)");
+	}
 	/**
 	 * Test agents.
 	 *
@@ -91,7 +115,7 @@ public class TestDAA extends TestCase {
 
 		agents[2].destroy();
 		try {
-			Thread.sleep(8000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			LOG.log(Level.WARNING, "interrupted", e);
 		}

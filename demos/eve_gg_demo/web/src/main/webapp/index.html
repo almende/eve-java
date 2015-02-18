@@ -45,6 +45,7 @@ div {
 			agentType:<select name="agentType" id="agentType">
 				<option value="com.almende.eve.ggdemo.LinPathAgent">Linear path</option>
 				<option value="com.almende.eve.ggdemo.HolonAgent">Holonic</option>
+				<option value="com.almende.eve.ggdemo.DAALampAgent">DA algorithm</option>
 			</select><br>
 			form:<select name="type" id="type">
 				<option value="fully">fully connected</option>
@@ -123,7 +124,7 @@ div {
 			smoothCurves: false,
 			physics:{barnesHut:{enabled:false}},
 			edges : {
-				color : "#F0F0F0",
+				color : "black",
 				width : 2
 			},
 			groups : {
@@ -136,8 +137,11 @@ div {
 			}
 		}
 		
-		function onSelect() {
-			$("#startLamp").val("lamp"+graph.getSelection());
+		function onSelect(data) {
+			var id = data.nodes[0];
+			if (id !== undefined){
+				$("#startLamp").val("lamp"+id);
+			}
 		}
 		var graph = new vis.Network(container, {
 			nodes : nodes,

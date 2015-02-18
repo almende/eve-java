@@ -5,7 +5,6 @@
 package com.almende.eve.algorithms;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,13 +12,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * The Class ValueBean.
  */
 public class DAAValueBean {
-	private static final Logger	LOG				= Logger.getLogger(DAAValueBean.class
-														.getName());
-	private int					evictionFactor	= 10;
-	private int					width			= 0;
-	private double				offset			= 0.0;
-	private Double[]			valueArray		= null;
-	private Integer[]			ttlArray		= null;
+	private int			evictionFactor	= 10;
+	private int			width			= 0;
+	private double		offset			= 0.0;
+	private Double[]	valueArray		= null;
+	private Integer[]	ttlArray		= null;
 
 	/**
 	 * Instantiates a new value bean.
@@ -133,7 +130,7 @@ public class DAAValueBean {
 	 * @return the double
 	 */
 	public Double computeSum() {
-		return 1.0 / computeMean();
+		return (1.0 / computeMean());
 	}
 
 	private Double computeMean() {
@@ -155,22 +152,20 @@ public class DAAValueBean {
 	 */
 	public DAAValueBean generate(final Double value, final int initialTTL) {
 		Arrays.fill(ttlArray, initialTTL);
-		for (int i = 0; i < width; i++) {
-			Double expRand = -Math.log(Math.random()) / value;
-			valueArray[i] = expRand;
-		}
-
-		// Noise cancelation:
-		final Double mean = computeMean();
-		final Double goal = 1.0 / value;
-		offset = goal / mean;
-		for (int i = 0; i < width; i++) {
-			valueArray[i] = valueArray[i] * offset;
-		}
-		if (Math.abs(value - computeSum()) > 0.001) {
-			LOG.warning("Strange, made a math error?:" + goal + " - "
-					+ computeMean() + " - " + offset + " (" + (1.0 / offset)
-					+ ")");
+		if (value <= 0.0) {
+			Arrays.fill(valueArray, Double.MAX_VALUE);
+		} else {
+			for (int i = 0; i < width; i++) {
+				Double expRand = -Math.log(Math.random()) / value;
+				valueArray[i] = expRand;
+			}
+			// Noise cancelation:
+			final Double mean = computeMean();
+			final Double goal = 1.0 / value;
+			offset = goal / mean;
+			for (int i = 0; i < width; i++) {
+				valueArray[i] = valueArray[i] * offset;
+			}
 		}
 		return this;
 	}

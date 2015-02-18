@@ -69,7 +69,7 @@ public class DAAAgent extends Agent {
 	 */
 	public void start(final double value) {
 		final ObjectNode config = JOM.createObjectNode();
-		config.put("width", 1000);
+		config.put("width", 10000);
 		config.put("initialTTL", 10);
 		config.put("evictionFactor", 3);
 
