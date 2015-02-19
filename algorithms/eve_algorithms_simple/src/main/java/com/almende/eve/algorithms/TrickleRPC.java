@@ -49,17 +49,35 @@ public class TrickleRPC {
 
 		int intervalMin = 100;
 		int intervalFactor = 16;
-		int redundancyFactor = 3;
+		int redundancyFactor = 1;
 
+		if (config.has("intervalMin")) {
+			intervalMin = config.get("intervalMin").asInt();
+		}
+		if (config.has("intervalFactor")) {
+			intervalFactor = config.get("intervalFactor").asInt();
+		}
+		if (config.has("redundancyFactor")) {
+			redundancyFactor = config.get("redundancyFactor").asInt();
+		}
 		trickle = new Trickle(intervalMin, intervalFactor, redundancyFactor);
 		reschedule(trickle.next());
 	}
 
-	private void reschedule(final long[] intervals) {
-		sendTaskId = scheduler.schedule(new JSONRequest("trickle.send", null),
-				DateTime.now().plus(intervals[0]));
-		intTaskId = scheduler.schedule(new JSONRequest("trickle.nextInterval",
-				null), DateTime.now().plus(intervals[1]));
+	private synchronized void reschedule(final long[] intervals) {
+		if (intervals[0] >= 0 && intervals[1] >= 0) {
+			if (sendTaskId != null) {
+				scheduler.cancel(sendTaskId);
+			}
+			if (intTaskId != null) {
+				scheduler.cancel(intTaskId);
+			}
+			sendTaskId = scheduler.schedule(new JSONRequest("trickle.send",
+					null), DateTime.now().plus(intervals[0]));
+			intTaskId = scheduler.schedule(new JSONRequest(
+					"trickle.nextInterval", null),
+					DateTime.now().plus(intervals[1]));
+		}
 	}
 
 	/**
@@ -85,8 +103,6 @@ public class TrickleRPC {
 	 * Reset.
 	 */
 	public void reset() {
-		scheduler.cancel(sendTaskId);
-		scheduler.cancel(intTaskId);
 		reschedule(trickle.reset());
 	}
 
