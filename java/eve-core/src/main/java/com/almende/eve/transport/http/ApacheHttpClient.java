@@ -139,7 +139,7 @@ public final class ApacheHttpClient {
 			List<Cookie> result = new ArrayList<Cookie>(myState.size());
 			for (String entryKey : myState.keySet()) {
 				if (!entryKey.equals(State.KEY_AGENT_TYPE)) {
-					result.add(myState.get(entryKey, Cookie.class));
+					result.add(myState.get(entryKey, BasicClientCookie.class));
 				}
 			}
 			return result;
@@ -151,7 +151,7 @@ public final class ApacheHttpClient {
 			
 			for (String entryKey : myState.keySet()) {
 				if (!entryKey.equals(State.KEY_AGENT_TYPE)) {
-					Cookie cookie = myState.get(entryKey, Cookie.class);
+					BasicClientCookie cookie = myState.get(entryKey, BasicClientCookie.class);
 					if (cookie.isExpired(date)) {
 						myState.remove(entryKey);
 						result = true;

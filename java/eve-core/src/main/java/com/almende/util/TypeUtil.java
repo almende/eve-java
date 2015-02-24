@@ -68,7 +68,10 @@ public abstract class TypeUtil<T> {
 			try {
 				return mapper.convertValue(value, fullType);
 			} catch (Exception e) {
-				throw new ClassCastException("Failed to convert value:" + value + " -----> " + fullType);
+			    ClassCastException cce = new ClassCastException("Failed to convert value:" + value
+			                                                    + " -----> " + fullType);
+			    cce.initCause(e);
+			    throw cce;
 			}
 		}
 		if (fullType.getRawClass().isAssignableFrom(value.getClass())){
