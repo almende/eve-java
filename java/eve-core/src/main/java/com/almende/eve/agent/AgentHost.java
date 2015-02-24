@@ -91,7 +91,39 @@ public final class AgentHost implements AgentHostInterface {
 			HOST.addAgents(config);
 		}
 	}
-	
+
+class worker extends Thread {
+public Iterator<String> iter;
+AgentSignal<?> event;
+public worker( Iterator<String> i,AgentSignal<?> e ){ iter=i; event=e;}
+public void run() {
+while (iter.hasNext()) {
+try {
+Agent agent = getAgent(iter.next());
+if (agent != null)agent.signalAgent(event);
+} catch (Exception e) {
+LOG.log(Level.WARNING, "Couldn't signal agent.", e);
+}
+}
+}
+}
+
+@Override
+public void signalAgents(AgentSignal<?> event) {
+if (stateFactory == null)return;
+worker w = new worker( stateFactory.getAllAgentIds(),event );
+if (w.iter == null) return;
+try{
+w.start();
+if(w.isAlive()) {
+w.join(5000); //wait
+System.out.println("(tymon) EXIT signalAgents now "+ this.getClass() );
+}
+}catch(InterruptedException ie){}
+}
+
+
+/*	
 	@Override
 	public void signalAgents(AgentSignal<?> event) {
 		if (stateFactory != null) {
@@ -110,6 +142,7 @@ public final class AgentHost implements AgentHostInterface {
 			}
 		}
 	}
+*/
 	
 	@Override
 	public Agent getAgent(String agentId) throws JSONRPCException,
