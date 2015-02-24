@@ -24,6 +24,7 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
@@ -80,7 +81,7 @@ public final class ApacheHttpClient {
 		
 		// Set cookie policy and persistent cookieStore
 		try {
-			httpClient.setCookieStore(new MyCookieStore());
+			httpClient.setCookieStore(new BasicCookieStore());
 		} catch (Exception e) {
 			LOG.log(Level.WARNING,
 					"Failed to initialize persistent cookieStore!", e);
