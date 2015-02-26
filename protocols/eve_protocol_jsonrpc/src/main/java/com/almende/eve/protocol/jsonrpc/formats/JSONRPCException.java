@@ -4,6 +4,7 @@
  */
 package com.almende.eve.protocol.jsonrpc.formats;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -372,4 +373,41 @@ public class JSONRPCException extends RuntimeException {
 				+ getLocalizedMessage();
 	}
 
+	/* Following methods are adopted from apache.commons.lang3 */
+	/**
+	 * Gets the throwable list.
+	 *
+	 * @return the throwable list
+	 */
+	public List<Throwable> getThrowableList() {
+		Throwable throwable = this;
+		final List<Throwable> list = new ArrayList<Throwable>();
+		while (throwable != null && list.contains(throwable) == false) {
+			list.add(throwable);
+			throwable = getCause();
+		}
+		return list;
+	}
+
+	/**
+	 * Gets the root cause.
+	 *
+	 * @return the root cause
+	 */
+	public Throwable getRootCause() {
+		final List<Throwable> list = getThrowableList();
+		return list.size() < 2 ? null : (Throwable) list.get(list.size() - 1);
+	}
+
+	/**
+	 * Throw the root cause is available.
+	 *
+	 * @throws Throwable
+	 *             the throwable
+	 */
+	public void throwRootCause() throws Throwable {
+		if (getRootCause() != null) {
+			throw getRootCause();
+		}
+	}
 }
