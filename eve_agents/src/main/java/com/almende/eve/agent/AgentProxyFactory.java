@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.almende.eve.agent.annotation.ProxyAsync;
+import com.almende.eve.protocol.jsonrpc.annotation.NoReply;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException.CODE;
 import com.almende.util.AnnotationUtil;
@@ -66,14 +66,14 @@ public final class AgentProxyFactory {
 								List<AnnotatedMethod> list = clazz
 										.getMethods(method.getName());
 								for (AnnotatedMethod m : list) {
-									if (m.getAnnotation(ProxyAsync.class) != null) {
+									if (m.getAnnotation(NoReply.class) != null) {
 										doSync = false;
 									}
 								}
 								if (doSync
 										&& method.getReturnType().equals(
 												void.class)
-										&& clazz.getAnnotation(ProxyAsync.class) != null) {
+										&& clazz.getAnnotation(NoReply.class) != null) {
 									doSync = false;
 								}
 							}

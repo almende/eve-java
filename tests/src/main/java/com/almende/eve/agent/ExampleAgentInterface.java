@@ -4,13 +4,13 @@
  */
 package com.almende.eve.agent;
 
-import com.almende.eve.agent.annotation.ProxyAsync;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.NoReply;
 
 /**
  * The Interface ExampleAgentInterface.
  */
-@ProxyAsync
+@NoReply
 public interface ExampleAgentInterface {
 
 	/**
@@ -32,6 +32,6 @@ public interface ExampleAgentInterface {
 	 *
 	 * @return the string
 	 */
-	@ProxyAsync
+	@NoReply
 	String doMore();
 }
