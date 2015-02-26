@@ -184,10 +184,11 @@ public class JSONRpcProtocol implements Protocol {
 			final JSONRPCException jsonError = new JSONRPCException(
 					JSONRPCException.CODE.INTERNAL_ERROR, e.getMessage(), e);
 			LOG.log(Level.WARNING, "Exception in receiving message", jsonError);
-
-			final JSONResponse response = new JSONResponse(jsonError);
-			response.setId(id);
-			return response;
+			if (id != null){
+				final JSONResponse response = new JSONResponse(jsonError);
+				response.setId(id);
+				return response;
+			}
 		}
 		return null;
 	}
@@ -203,7 +204,7 @@ public class JSONRpcProtocol implements Protocol {
 
 	private <T> void addCallback(final JSONRequest request,
 			final AsyncCallback<T> asyncCallback) {
-		if (asyncCallback == null) {
+		if (asyncCallback == null || request.getId() == null || request.getId().isNull()) {
 			return;
 		}
 

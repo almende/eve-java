@@ -36,7 +36,8 @@ public class TestRpc extends TestCase {
 	 */
 	@Test
 	public void testRpc() {
-		final ObjectNode params = new JSONRpcProtocolConfig();
+		final JSONRpcProtocolConfig params = new JSONRpcProtocolConfig();
+		params.setId("me");
 		
 		final JSONRpcProtocol protocol = new JSONRpcProtocolBuilder().withConfig(params).withHandle(
 				new SimpleHandler<Object>(new MyClass())).build();
@@ -74,6 +75,10 @@ public class TestRpc extends TestCase {
 						URI.create("local://me"));
 		// transport
 		protocol.invoke(response, URI.create("local://me"));
+		
+		request = new JSONRequest("test.testMe", parms);
+		response = protocol.invoke(request,  URI.create("local://me"));
+		assertNull(response);
 	}
 	
 	/**

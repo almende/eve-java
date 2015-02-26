@@ -34,7 +34,7 @@ public final class JSONRequest extends JSONMessage {
 	private static final long			serialVersionUID	= 1970046457233622444L;
 	private ObjectNode					req					= JOM.createObjectNode();
 	transient private AsyncCallback<?>	callback			= null;
-	
+
 	/**
 	 * Instantiates a new jSON request.
 	 */
@@ -77,6 +77,9 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	public <T> JSONRequest(final String method, final ObjectNode params,
 			final AsyncCallback<T> callback) {
+		if (callback != null) {
+
+		}
 		init(null, method, params, callback);
 	}
 
@@ -233,7 +236,11 @@ public final class JSONRequest extends JSONMessage {
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		this.setRequest(true);
 		setVersion();
-		setId(id);
+		if (callback != null && (id == null || id.isNull())){
+			setId(JOM.getInstance().valueToTree(new UUID().toString()));
+		} else {
+			setId(id);
+		}
 		setMethod(method);
 		setParams(params);
 		setCallback(callback);
@@ -246,11 +253,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the new id
 	 */
 	public void setId(final JsonNode id) {
-		if (id == null || id.isNull()) {
-			req.put(ID, new UUID().toString());
-		} else {
-			req.set(ID, id);
-		}
+		req.set(ID, id);
 	}
 
 	@Override
@@ -358,7 +361,7 @@ public final class JSONRequest extends JSONMessage {
 	public AsyncCallback<?> getCallback() {
 		return callback;
 	}
-	
+
 	/**
 	 * Sets the callback.
 	 *

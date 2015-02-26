@@ -206,7 +206,11 @@ final public class JSONRpc {
 				}
 			}
 		}
-		return resp;
+		if (resp.getId() == null || resp.getId().isNull()) {
+			return null;
+		} else {
+			return resp;
+		}
 	}
 
 	/**
@@ -513,7 +517,6 @@ final public class JSONRpc {
 		}
 	}
 
-	
 	/**
 	 * Check whether a method is available for JSON-RPC calls. This is the case
 	 * when it is public, has named parameters, and has a public or private @Access
