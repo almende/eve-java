@@ -36,7 +36,7 @@ public class Cell extends Agent {
 	 *            the config
 	 */
 	public Cell(final ObjectNode config) {
-		this.setConfig(config);
+		super(config);
 	}
 
 	/**
