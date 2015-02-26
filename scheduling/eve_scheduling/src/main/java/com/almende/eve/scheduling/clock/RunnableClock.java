@@ -229,6 +229,7 @@ class ClockEntry implements Comparable<ClockEntry> {
 	@Override
 	public int compareTo(final ClockEntry o) {
 		if (due == null || o.due == null) {
+			// Become consistent with equals:
 			if (equals(o)) {
 				return 0;
 			} else {
