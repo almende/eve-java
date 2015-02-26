@@ -167,4 +167,15 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		}
 
 	}
+
+	@Override
+	public void doSomething() {
+		LOG.info("Doing something!");
+	}
+	
+	@Override
+	public String doMore() {
+		LOG.info("Doing more!");
+		return "Some string!";
+	}
 }

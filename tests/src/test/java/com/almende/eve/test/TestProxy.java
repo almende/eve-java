@@ -49,5 +49,10 @@ public class TestProxy extends TestCase {
 				URI.create("http://localhost:8081/agents/example"),
 				ExampleAgentInterface.class);
 		LOG.warning("Proxy got reply:" + proxy.helloWorld("Hi there"));
+		
+		assertEquals(proxy.helloWorld("Hi there"),"You said:Hi there");
+		proxy.doSomething();
+		
+		assertNull(proxy.doMore());
 	}
 }
