@@ -50,7 +50,11 @@ public abstract class AbstractTransport implements Transport {
 	@Override
 	public void send(final URI receiverUri, final Object message,
 			final String tag) throws IOException {
-		send(receiverUri, message.toString(), tag);
+		if (message == null){
+			send(receiverUri, "", tag);
+		} else {
+			send(receiverUri, message.toString(), tag);
+		}
 	}
 	
 	/*

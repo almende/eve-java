@@ -204,7 +204,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		if (is != null) {
 			is.deregister(agentId);
 			is = null;
-		
+
 		}
 	}
 
@@ -901,13 +901,13 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		if (protocolStack == null){
-			//E.g. during destroy()!
+		if (protocolStack == null) {
+			// E.g. during destroy()!
 			return;
 		}
 		final Object response = protocolStack.outbound(
 				protocolStack.inbound(msg, senderUrl).getResult(), senderUrl).result;
-		if (response != null && transport != null) {
+		if ((tag != null || response != null) && transport != null) {
 			try {
 				transport.send(senderUrl, response, tag);
 			} catch (final Exception e) {
