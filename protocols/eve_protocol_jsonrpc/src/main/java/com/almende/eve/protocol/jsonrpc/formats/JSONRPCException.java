@@ -373,12 +373,13 @@ public class JSONRPCException extends RuntimeException {
 				+ getLocalizedMessage();
 	}
 
-	/* Following methods are adopted from apache.commons.lang3 */
+//	 Following methods are adopted from apache.commons.lang3 
 	/**
 	 * Gets the throwable list.
 	 *
 	 * @return the throwable list
 	 */
+	@JsonIgnore
 	public List<Throwable> getThrowableList() {
 		Throwable throwable = this;
 		final List<Throwable> list = new ArrayList<Throwable>();
@@ -394,6 +395,7 @@ public class JSONRPCException extends RuntimeException {
 	 *
 	 * @return the root cause
 	 */
+	@JsonIgnore
 	public Throwable getRootCause() {
 		final List<Throwable> list = getThrowableList();
 		return list.size() < 2 ? null : (Throwable) list.get(list.size() - 1);
@@ -405,6 +407,7 @@ public class JSONRPCException extends RuntimeException {
 	 * @throws Throwable
 	 *             the throwable
 	 */
+	@JsonIgnore
 	public void throwRootCause() throws Throwable {
 		if (getRootCause() != null) {
 			throw getRootCause();

@@ -81,4 +81,15 @@ public class MyAgent extends Agent {
 	public MySubAgent getMySubAgent() {
 		return new MySubAgent();
 	}
+	
+	/**
+	 * Throw exception.
+	 *
+	 * @throws IllegalStateException
+	 *             the illegal state exception
+	 */
+	@Access(AccessType.PUBLIC)
+	public void throwException() throws IllegalStateException {
+		throw new IllegalStateException("Hi there!");
+	}
 }
