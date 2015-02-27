@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,12 +44,7 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public JSONResponse(final String json) throws IOException {
 		final ObjectMapper mapper = JOM.getInstance();
-		try {
-			init(mapper.readValue(json, ObjectNode.class));
-		} catch (final JsonParseException e) {
-			LOG.warning("Failed to parse JSON: '" + json + "'");
-			throw e;
-		}
+		init(mapper.valueToTree(json));
 	}
 
 	/**
@@ -109,31 +104,36 @@ public final class JSONResponse extends JSONMessage {
 	/**
 	 * Inits the.
 	 * 
-	 * @param response
+	 * @param jsonNode
 	 *            the response
 	 */
-	private void init(final ObjectNode response) {
-		if (response == null || response.isNull()) {
+	private void init(final JsonNode jsonNode) {
+		if (jsonNode == null || jsonNode.isNull()) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Response is null");
 		}
-		if (response.has(JSONRPC) && response.get(JSONRPC).isTextual()
-				&& !response.get(JSONRPC).asText().equals(VERSION)) {
+		if (jsonNode.has(JSONRPC) && jsonNode.get(JSONRPC).isTextual()
+				&& !jsonNode.get(JSONRPC).asText().equals(VERSION)) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Value of member 'jsonrpc' must be '2.0'");
 		}
-		final boolean hasError = response.has(ERROR)
-				&& !response.get(ERROR).isNull();
-		if (hasError && !(response.get(ERROR).isObject())) {
+		final boolean hasError = jsonNode.has(ERROR)
+				&& !jsonNode.get(ERROR).isNull();
+		if (hasError && !(jsonNode.get(ERROR).isObject())) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'error' is no ObjectNode");
 		}
 
-		final JsonNode id = response.get(ID);
-		final Object result = response.get(RESULT);
+		final JsonNode id = jsonNode.get(ID);
+		final Object result = jsonNode.get(RESULT);
 		JSONRPCException error = null;
 		if (hasError) {
-			error = new JSONRPCException((ObjectNode) response.get(ERROR));
+			try {
+				error = new JSONRPCException(jsonNode.get(ERROR));
+			} catch (JsonProcessingException e) {
+				throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
+						"Member 'error' is no a real JSONRPCException.");
+			}
 		}
 
 		init(id, result, error);
@@ -209,7 +209,7 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public void setError(final JSONRPCException error) {
 		if (error != null) {
-			resp.set(ERROR, error.getObjectNode());
+			resp.set(ERROR, error.getJsonNode());
 			setResult(null);
 		} else {
 			if (resp.has(ERROR)) {
@@ -225,11 +225,14 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public JSONRPCException getError() {
 		if (resp.has(ERROR)) {
-			final ObjectNode error = (ObjectNode) resp.get(ERROR);
-			return new JSONRPCException(error);
-		} else {
-			return null;
+			final JsonNode error = resp.get(ERROR);
+			try {
+				return new JSONRPCException(error);
+			} catch (JsonProcessingException e) {
+				LOG.log(Level.WARNING, "Couldn't parse error", e);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -237,15 +240,6 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	private void setVersion() {
 		resp.put(JSONRPC, VERSION);
-	}
-
-	/**
-	 * Gets the object node.
-	 * 
-	 * @return the object node
-	 */
-	public ObjectNode getObjectNode() {
-		return resp;
 	}
 
 	/*

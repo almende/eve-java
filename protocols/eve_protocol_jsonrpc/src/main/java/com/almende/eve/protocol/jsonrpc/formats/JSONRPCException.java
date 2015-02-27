@@ -6,41 +6,23 @@ package com.almende.eve.protocol.jsonrpc.formats;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class JSONRPCException.
  */
 public class JSONRPCException extends RuntimeException {
 	private static final long	serialVersionUID	= -4258336566828038603L;
-	private static final Logger	LOG					= Logger.getLogger(JSONRPCException.class
-															.getCanonicalName());
-	private final ObjectNode	error				= JOM.createObjectNode();
+
 	private boolean				remote				= false;
-
-	/**
-	 * The Constant CODE_S.
-	 */
-	static final String			CODE_S				= "code";
-
-	/**
-	 * The Constant MESSAGE_S.
-	 */
-	static final String			MESSAGE_S			= "message";
-
-	/**
-	 * The Constant DATA_S.
-	 */
-	static final String			DATA_S				= "data";
+	private int					code				= -1;
+	private String				message				= null;
+	private JsonNode			data				= null;
 
 	/**
 	 * The Enum CODE.
@@ -192,15 +174,18 @@ public class JSONRPCException extends RuntimeException {
 
 	/**
 	 * Instantiates a new jSONRPC exception.
-	 * 
+	 *
 	 * @param exception
 	 *            the exception
+	 * @throws JsonProcessingException
+	 *             the json processing exception
 	 */
-	public JSONRPCException(final ObjectNode exception) {
+	public JSONRPCException(final JsonNode exception)
+			throws JsonProcessingException {
 		super();
 		JSONRPCException cause = null;
 		if (exception != null && !exception.isNull()) {
-			cause = JOM.getInstance().convertValue(exception,
+			cause = JOM.getInstance().treeToValue(exception,
 					JSONRPCException.class);
 			cause.setRemote(true);
 			if (exception.has("stackTrace")) {
@@ -267,11 +252,6 @@ public class JSONRPCException extends RuntimeException {
 		if (t != null && getCause() == null) {
 			initCause(t);
 		}
-		try {
-			setData(JOM.getInstance().writeValueAsString(t));
-		} catch (final JsonProcessingException e) {
-			LOG.log(Level.SEVERE, "Failed to init JSONRPCException!", e);
-		}
 	}
 
 	/**
@@ -281,7 +261,7 @@ public class JSONRPCException extends RuntimeException {
 	 *            the new code
 	 */
 	public final void setCode(final int code) {
-		error.put(CODE_S, code);
+		this.code = code;
 	}
 
 	/**
@@ -290,7 +270,7 @@ public class JSONRPCException extends RuntimeException {
 	 * @return the code
 	 */
 	public int getCode() {
-		return error.get(CODE_S).asInt();
+		return this.code;
 	}
 
 	/**
@@ -300,7 +280,7 @@ public class JSONRPCException extends RuntimeException {
 	 *            the new message
 	 */
 	public final void setMessage(final String message) {
-		error.put(MESSAGE_S, message != null ? message : "");
+		this.message = message;
 	}
 
 	/*
@@ -309,7 +289,10 @@ public class JSONRPCException extends RuntimeException {
 	 */
 	@Override
 	public String getMessage() {
-		return error.get(MESSAGE_S).asText();
+		if (this.message == null) {
+			return super.getMessage();
+		}
+		return this.message;
 	}
 
 	/**
@@ -319,9 +302,11 @@ public class JSONRPCException extends RuntimeException {
 	 *            the new data
 	 */
 	public final void setData(final Object data) {
-		final ObjectMapper mapper = JOM.getInstance();
-		error.set(DATA_S,
-				data != null ? mapper.convertValue(data, JsonNode.class) : null);
+		if (data != null) {
+			this.data = JOM.getInstance().valueToTree(data);
+		} else {
+			this.data = null;
+		}
 	}
 
 	/**
@@ -330,7 +315,13 @@ public class JSONRPCException extends RuntimeException {
 	 * @return the data
 	 */
 	public Object getData() {
-		return error.get(DATA_S);
+		if (this.data != null) {
+			return this.data;
+		}
+		if (this.getCause() != null) {
+			return this.getCause();
+		}
+		return null;
 	}
 
 	/**
@@ -339,7 +330,7 @@ public class JSONRPCException extends RuntimeException {
 	 * @return true, if successful
 	 */
 	public boolean hasData() {
-		return error.has(DATA_S);
+		return this.data != null;
 	}
 
 	/**
@@ -358,7 +349,7 @@ public class JSONRPCException extends RuntimeException {
 	 * @return the object node
 	 */
 	@JsonIgnore
-	public ObjectNode getObjectNode() {
+	public JsonNode getJsonNode() {
 		return JOM.getInstance().valueToTree(this);
 	}
 
@@ -373,7 +364,7 @@ public class JSONRPCException extends RuntimeException {
 				+ getLocalizedMessage();
 	}
 
-//	 Following methods are adopted from apache.commons.lang3 
+	// Following methods are adopted from apache.commons.lang3
 	/**
 	 * Gets the throwable list.
 	 *
@@ -385,7 +376,7 @@ public class JSONRPCException extends RuntimeException {
 		final List<Throwable> list = new ArrayList<Throwable>();
 		while (throwable != null && list.contains(throwable) == false) {
 			list.add(throwable);
-			throwable = getCause();
+			throwable = throwable.getCause();
 		}
 		return list;
 	}

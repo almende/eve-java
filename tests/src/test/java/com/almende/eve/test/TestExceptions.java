@@ -23,47 +23,54 @@ import com.almende.util.jackson.JOM;
  * The Class TestWake.
  */
 public class TestExceptions extends TestCase {
-	private static final Logger LOG = Logger.getLogger(TestExceptions.class
-			.getName());
-	
+	private static final Logger	LOG	= Logger.getLogger(TestExceptions.class
+											.getName());
+
 	/**
 	 * Test boot: requires a testWakeService state, with a list of agents.
 	 */
 	@Test
 	public void testException() {
-		
+
 		new MyAgent("Other");
-		
-		
-		new Agent(){
+
+		new Agent() {
 			@Override
-			public void onBoot(){
+			public void onBoot() {
 				LOG.warning("Starting run");
 				try {
-					call(URI.create("local:Other"),"throwException",null, new AsyncCallback<Void>(){
+					call(URI.create("local:Other"), "throwException", null,
+							new AsyncCallback<Void>() {
 
-						@Override
-						public void onSuccess(Void result) {
-							fail();
-						}
-
-						@Override
-						public void onFailure(Exception exception) {
-							if (exception instanceof JSONRPCException){
-								JSONRPCException e = (JSONRPCException) exception;
-								try {
-									e.throwRootCause();
-								} catch (IllegalStateException e1){
-									LOG.log(Level.WARNING,"Good, got the illegalStateException:",e1);									
-								} catch (Throwable e1) {
-									LOG.log(Level.WARNING,"Didn't get the expected rootCause:",e1);
+								@Override
+								public void onSuccess(Void result) {
+									fail();
 								}
-							} else {
-								LOG.log(Level.WARNING,"Didn't get a JSONRPCException?",exception);
-							}
-						}});
+
+								@Override
+								public void onFailure(Exception exception) {
+									if (exception instanceof JSONRPCException) {
+										JSONRPCException e = (JSONRPCException) exception;
+										try {
+											e.throwRootCause();
+										} catch (IllegalStateException e1) {
+											LOG.log(Level.WARNING,
+													"Good, got the illegalStateException:",
+													e1);
+										} catch (Throwable e1) {
+											LOG.log(Level.WARNING,
+													"Didn't get the expected rootCause:",
+													e1);
+										}
+									} else {
+										LOG.log(Level.WARNING,
+												"Didn't get a JSONRPCException?",
+												exception);
+									}
+								}
+							});
 				} catch (IOException e) {
-					LOG.log(Level.WARNING,"Didn't want an IOException",e);
+					LOG.log(Level.WARNING, "Didn't want an IOException", e);
 				}
 				LOG.warning("Done");
 			}
@@ -71,7 +78,7 @@ public class TestExceptions extends TestCase {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			LOG.log(Level.WARNING,"Interrupted?",e);
+			LOG.log(Level.WARNING, "Interrupted?", e);
 		}
 
 	}

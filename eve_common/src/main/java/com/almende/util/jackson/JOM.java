@@ -35,13 +35,12 @@ public final class JOM {
 	static {
 		MAPPER = createInstance();
 	}
-	
+
 	/**
 	 * Instantiates a new jom.
 	 */
-	protected JOM() {
-	}
-	
+	protected JOM() {}
+
 	/**
 	 * Gets the single instance of JOM.
 	 * 
@@ -50,7 +49,7 @@ public final class JOM {
 	public static ObjectMapper getInstance() {
 		return MAPPER;
 	}
-	
+
 	/**
 	 * Creates the object node.
 	 * 
@@ -59,7 +58,7 @@ public final class JOM {
 	public static ObjectNode createObjectNode() {
 		return MAPPER.createObjectNode();
 	}
-	
+
 	/**
 	 * Creates the array node.
 	 * 
@@ -68,7 +67,7 @@ public final class JOM {
 	public static ArrayNode createArrayNode() {
 		return MAPPER.createArrayNode();
 	}
-	
+
 	/**
 	 * Creates the null node.
 	 * 
@@ -77,7 +76,7 @@ public final class JOM {
 	public static NullNode createNullNode() {
 		return NullNode.getInstance();
 	}
-	
+
 	/**
 	 * Creates the instance.
 	 * 
@@ -85,7 +84,7 @@ public final class JOM {
 	 */
 	private static synchronized ObjectMapper createInstance() {
 		final ObjectMapper mapper = new ObjectMapper();
-		
+
 		// set configuration
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 				false);
@@ -93,23 +92,35 @@ public final class JOM {
 				DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, false);
 		mapper.getFactory().configure(
 				JsonFactory.Feature.CANONICALIZE_FIELD_NAMES, false);
-		
+
 		// Needed for o.a. JsonFileState
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
-		
+
 		mapper.registerModule(new JodaModule());
-		
+
+		SimpleModule throwableModule = new SimpleModule("ThrowableModule",
+				new Version(1, 0, 0, null, null, null)) {
+			private static final long	serialVersionUID	= -7028757133086455336L;
+
+			@Override
+			public void setupModule(SetupContext context) {
+				context.setMixInAnnotations(Throwable.class,
+						ThrowableMixin.class);
+			}
+		};
+		mapper.registerModule(throwableModule);
+
 		SimpleModule bitSetModule = new SimpleModule("BitSetModule",
 				new Version(1, 0, 0, null, null, null));
 		bitSetModule.addSerializer(new JOM().new CustomBitSetSerializer());
 		bitSetModule.addDeserializer(BitSet.class,
 				new JOM().new CustomBitSetDeserializer());
 		mapper.registerModule(bitSetModule);
-		
+
 		return mapper;
 	}
-	
+
 	/**
 	 * Gets the type factory.
 	 * 
@@ -118,7 +129,7 @@ public final class JOM {
 	public static TypeFactory getTypeFactory() {
 		return MAPPER.getTypeFactory();
 	}
-	
+
 	/**
 	 * Gets the void.
 	 * 
@@ -130,7 +141,7 @@ public final class JOM {
 	public static JavaType getVoid() {
 		return MAPPER.getTypeFactory().uncheckedSimpleType(Void.class);
 	}
-	
+
 	/**
 	 * Gets the simple type.
 	 * 
@@ -144,7 +155,7 @@ public final class JOM {
 	public static JavaType getSimpleType(final Class<?> c) {
 		return MAPPER.getTypeFactory().uncheckedSimpleType(c);
 	}
-	
+
 	/**
 	 * The Class CustomBitSetSerializer.
 	 */
@@ -173,7 +184,7 @@ public final class JOM {
 	 * The Class CustomBitSetDeserializer.
 	 */
 	public class CustomBitSetDeserializer extends StdDeserializer<BitSet> {
-		private static final long serialVersionUID = 8734051359812526123L;
+		private static final long	serialVersionUID	= 8734051359812526123L;
 
 		/**
 		 * Instantiates a new custom bit set deserializer.
@@ -186,7 +197,7 @@ public final class JOM {
 		public BitSet deserialize(JsonParser jpar, DeserializationContext ctx)
 				throws IOException, JsonProcessingException {
 			final JsonNode node = jpar.readValueAsTree();
-			if (!node.isObject()){
+			if (!node.isObject()) {
 				throw ctx.mappingException(BitSet.class);
 			}
 			final ObjectNode obj = (ObjectNode) node;
@@ -200,7 +211,7 @@ public final class JOM {
 	}
 
 	// From: http://stackoverflow.com/a/9855338
-	final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	final private static char[]	hexArray	= "0123456789ABCDEF".toCharArray();
 
 	private static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
