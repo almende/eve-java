@@ -2,7 +2,7 @@
  * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
  * License: The Apache Software License, Version 2.0
  */
-package com.almende.eve.transport.xmpp;
+package com.almende.eve.transport.amqp;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,14 +15,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class XmppTransportConfig.
  */
-public class XmppTransportConfig extends TransportConfig {
-	private static final Logger	LOG	= Logger.getLogger(XmppTransportConfig.class
+public class AmqpTransportConfig extends TransportConfig {
+	private static final Logger	LOG	= Logger.getLogger(AmqpTransportConfig.class
 											.getName());
 	
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
-	public XmppTransportConfig() {
+	public AmqpTransportConfig() {
 		this(JOM.createObjectNode());
 	}
 	
@@ -32,10 +32,10 @@ public class XmppTransportConfig extends TransportConfig {
 	 * @param node
 	 *            the node
 	 */
-	public XmppTransportConfig(final ObjectNode node) {
+	public AmqpTransportConfig(final ObjectNode node) {
 		super(node);
 		if (!this.has("class")) {
-			setClassName(XmppTransportBuilder.class.getName());
+			setClassName(AmqpTransportBuilder.class.getName());
 		}
 	}
 	

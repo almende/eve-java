@@ -71,7 +71,10 @@ public class DAA {
 	 *            the bean
 	 */
 	public void receive(DAAValueBean bean) {
-		currentEstimate.minimum(bean).minimum(localValue);
+		if (currentEstimate != null) {
+			currentEstimate.minimum(bean);
+			currentEstimate.minimum(localValue);
+		}
 	}
 
 	/**

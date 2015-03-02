@@ -69,9 +69,13 @@ public class DAAAgent extends Agent {
 	 */
 	public void start(final double value) {
 		final ObjectNode config = JOM.createObjectNode();
-		config.put("width", 10000);
+		config.put("width", 1000);
 		config.put("initialTTL", 10);
-		config.put("evictionFactor", 3);
+		config.put("evictionFactor", 20);
+
+		config.put("intervalFactor", 1);
+		config.put("intervalMin", 100);
+		config.put("redundancyFactor", 3);
 
 		daa.configure(config);
 		daa.setNewValue(value);
@@ -84,15 +88,55 @@ public class DAAAgent extends Agent {
 		}, new Runnable() {
 			@Override
 			public void run() {
+				final Params params = new Params();
+				params.add("value", daa.getCurrentEstimate());
 				for (final URI agent : neighbors) {
-					Params params = new Params();
-					params.add("value", daa.getCurrentEstimate());
 					try {
 						call(agent, "daaReceive", params);
 					} catch (IOException e) {}
 				}
 			}
 		});
+
+		//schedule("scheduleSend", null, 100);
+//		 scheduleTTL();
+	}
+
+	/**
+	 * Decrease ttl.
+	 */
+	public void decreaseTTL() {
+		daa.getCurrentEstimate().decreaseTTL();
+	}
+
+	/**
+	 * Decrease ttl.
+	 */
+	public void scheduleTTL() {
+		decreaseTTL();
+		schedule("scheduleTTL", null, 1000);
+	}
+
+	/**
+	 * Decrease ttl.
+	 */
+	public void send() {
+		daa.getCurrentEstimate().decreaseTTL();
+		final Params params = new Params();
+		params.add("value", daa.getCurrentEstimate());
+		for (final URI agent : neighbors) {
+			try {
+				call(agent, "daaReceive", params);
+			} catch (IOException e) {}
+		}
+	}
+
+	/**
+	 * Decrease ttl.
+	 */
+	public void scheduleSend() {
+		send();
+		schedule("scheduleSend", null, 100);
 	}
 
 	/**
@@ -105,14 +149,18 @@ public class DAAAgent extends Agent {
 	 */
 	public synchronized void daaReceive(final @Name("value") DAAValueBean value)
 			throws JsonProcessingException {
-		if (daa.getCurrentEstimate() == null
-				|| !daa.getCurrentEstimate().computeSum()
-						.equals(value.computeSum())) {
-			daa.receive(value);
-			trickle.reset();
-		} else {
-			trickle.incr();
-			daa.receive(value);
+
+		Double oldval = 0.0;
+		if (daa.getCurrentEstimate() != null) {
+			oldval = daa.getCurrentEstimate().computeSum();
+		}
+		daa.receive(value);
+		if (trickle != null) {
+			if (!oldval.equals(daa.getCurrentEstimate().computeSum())) {
+				trickle.reset();
+			} else {
+				trickle.incr();
+			}
 		}
 
 	}
@@ -133,10 +181,12 @@ public class DAAAgent extends Agent {
 				call(agent, "daaReceive", params);
 			} catch (IOException e) {}
 		}
-
+		daa.receive(old);
 		// set new value for next round:
 		daa.setNewValue(value);
-		trickle.reset();
+		if (trickle != null) {
+			trickle.reset();
+		}
 	}
 
 	/**
@@ -146,6 +196,15 @@ public class DAAAgent extends Agent {
 	 */
 	public double getValue() {
 		return daa.getCurrentEstimate().computeSum();
+	}
+
+	/**
+	 * Gets the ttl average.
+	 *
+	 * @return the value
+	 */
+	public int getTTLAvg() {
+		return daa.getCurrentEstimate().avgTTL();
 	}
 
 	public void destroy() {
