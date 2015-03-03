@@ -3,6 +3,8 @@
 
 template:
    defaultAgent:
+        scheduler:
+           class: com.almende.eve.scheduling.SimpleSchedulerBuilder
         transport:
         -  class: com.almende.eve.transport.http.HttpTransportBuilder
            servletUrl: http://127.0.0.1:8081/agents/
@@ -21,4 +23,6 @@ agents:
 -   id: helloWorld2
     class: com.almende.eve.demo.MySecondAgent
     extends: template/defaultAgent
-
+-   id: tips
+    class: com.almende.eve.demo.TipsNTricksAgent
+    extends: template/defaultAgent
