@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import com.almende.eve.algorithms.DAA;
 import com.almende.eve.algorithms.DAAValueBean;
 import com.almende.eve.algorithms.TrickleRPC;
@@ -29,9 +31,7 @@ public class DAALampAgent extends AbstractLampAgent {
 
 	private TrickleRPC			trickle		= null;
 	private double				requiredOn	= 0.0;
-
-	private int					count		= 0;
-	private static final int	DELAY		= 5;
+	private DateTime			nextCheck	= DateTime.now();
 
 	/*
 	 * (non-Javadoc)
@@ -54,9 +54,8 @@ public class DAALampAgent extends AbstractLampAgent {
 
 		requiredOn = Math
 				.round((goal.getGoalPct() * lampCnt.computeSum()) / 100);
-		count = DELAY+1;
-		checkLamps();
 		
+		checkLamps();
 		for (String neighbour : neighbours) {
 			ObjectNode params = JOM.createObjectNode();
 			params.set("goal", JOM.getInstance().valueToTree(goal));
@@ -78,17 +77,15 @@ public class DAALampAgent extends AbstractLampAgent {
 	}
 
 	private synchronized void checkLamps() {
-		if (count++ <= DELAY) {
-			return;
-		}
+		if (nextCheck.isAfterNow()) return;
+		nextCheck = DateTime.now().plus(Math.round(Math.random()*10000));
 		System.out.println(getId() + ": Checking lamps:" + lampCnt.computeSum()
-				+ "/" + onCnt.computeSum());
+				+ "/" + onCnt.computeSum()+ "  req:"+requiredOn);
 		if (requiredOn > Math.round(onCnt.computeSum())) {
 			if (!super.isOn()) {
 				lampOn();
 				setOnValue(1.0);
 				trickle.reset();
-				count = 0;
 				System.out.print("!");
 			}
 		} else if (requiredOn < Math.round(onCnt.computeSum())) {
@@ -96,7 +93,6 @@ public class DAALampAgent extends AbstractLampAgent {
 				lampOff();
 				setOnValue(0.0);
 				trickle.reset();
-				count = 0;
 				System.out.print(".");
 			}
 		}
@@ -107,9 +103,13 @@ public class DAALampAgent extends AbstractLampAgent {
 			throws JSONRPCException, IOException {
 		super.create(neighbours, stepSize);
 		final ObjectNode config = JOM.createObjectNode();
-		config.put("width", 10000);
-		config.put("initialTTL", 100);
-		config.put("evictionFactor", 10);
+		config.put("width", 1000);
+		config.put("initialTTL", 10);
+		config.put("evictionFactor", 20);
+
+		config.put("intervalFactor", 1);
+		config.put("intervalMin", 500);
+		config.put("redundancyFactor", 3);
 
 		lampCnt.configure(config);
 		lampCnt.setNewValue(1.0);
@@ -121,10 +121,9 @@ public class DAALampAgent extends AbstractLampAgent {
 		trickle = new TrickleRPC(config, getScheduler(), new Runnable() {
 			@Override
 			public void run() {
-				
 				checkLamps();
-//				 lampCnt.getCurrentEstimate().decreaseTTL();
-//				 onCnt.getCurrentEstimate().decreaseTTL();
+				lampCnt.getCurrentEstimate().decreaseTTL();
+				onCnt.getCurrentEstimate().decreaseTTL();
 			}
 		}, new Runnable() {
 			@Override
@@ -171,19 +170,23 @@ public class DAALampAgent extends AbstractLampAgent {
 		if (nofOn == null) {
 			nofOn = onCnt.getCurrentEstimate();
 		}
-		if (lampCnt.getCurrentEstimate() == null
-				|| !lampCnt.getCurrentEstimate().computeSum()
-						.equals(nofLamps.computeSum())
-				|| onCnt.getCurrentEstimate() == null
-				|| !onCnt.getCurrentEstimate().computeSum()
-						.equals(nofOn.computeSum())) {
-			lampCnt.receive(nofLamps);
-			onCnt.receive(nofOn);
-			trickle.reset();
-		} else {
-			lampCnt.receive(nofLamps);
-			onCnt.receive(nofOn);
-			trickle.incr();
+		double oldNofLamps = 0.0;
+		if (lampCnt.getCurrentEstimate() != null) {
+			oldNofLamps = lampCnt.getCurrentEstimate().computeSum();
+		}
+		double oldNofOn = 0.0;
+		if (onCnt.getCurrentEstimate() != null) {
+			oldNofOn = onCnt.getCurrentEstimate().computeSum();
+		}
+		lampCnt.receive(nofLamps);
+		onCnt.receive(nofOn);
+		if (trickle != null) {
+			if (oldNofLamps != lampCnt.getCurrentEstimate().computeSum()
+					|| oldNofOn != onCnt.getCurrentEstimate().computeSum()) {
+				trickle.reset();
+			} else {
+				trickle.incr();
+			}
 		}
 	}
 }

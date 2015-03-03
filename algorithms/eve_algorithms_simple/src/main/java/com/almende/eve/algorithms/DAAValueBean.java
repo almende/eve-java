@@ -16,7 +16,7 @@ public class DAAValueBean {
 	private int			width			= 0;
 	private double		offset			= 0.0;
 	private double[]	valueArray		= null;
-	private int[]	ttlArray		= null;
+	private int[]		ttlArray		= null;
 
 	/**
 	 * Instantiates a new value bean.
@@ -182,59 +182,37 @@ public class DAAValueBean {
 	 */
 	public DAAValueBean minimum(final DAAValueBean other)
 			throws IllegalArgumentException {
-		StringBuilder log = new StringBuilder();
 		if (this.width != other.width) {
 			throw new IllegalArgumentException(
 					"ValueBeans aren't of the same length:(" + this.width + "/"
 							+ other.width + ")!");
 		}
-		log.append("a:"+this.avgTTL());
 		for (int i = 0; i < width; i++) {
 			if (other.ttlArray[i] <= 1) {
-				log.append("_");
 				continue;
 			}
-			if (valueArray[i] < 0 && ttlArray[i] > 1){
-				log.append("=");
+			if (valueArray[i] < 0 && ttlArray[i] > 1) {
 				continue;
 			}
 			if (other.valueArray[i] < 0) {
 				if ((other.valueArray[i] * -1) == valueArray[i]) {
-					log.append("-");
 					valueArray[i] = other.valueArray[i];
 					ttlArray[i] = (other.ttlArray[i] / 2) - 1;
 				}
 			} else {
 				if (other.valueArray[i] == valueArray[i]) {
-					if (ttlArray[i] == (other.ttlArray[i] - 1)) {
-//						log.append("'");
-					} else if (ttlArray[i] < (other.ttlArray[i]-1)) {
-						if (other.ttlArray[i] == 11) {
-							log.append(":");
-						} else {
-							log.append("|");
-						}
-						ttlArray[i] = other.ttlArray[i]-1;
-					} else {
-//						log.append(";");
-					}
-
-//					ttlArray[i] = Math.max(ttlArray[i], other.ttlArray[i] - 1);
+					ttlArray[i] = Math.max(ttlArray[i], other.ttlArray[i]);
 				}
 				if (other.valueArray[i] < valueArray[i]) {
-					log.append(".");
 					valueArray[i] = other.valueArray[i];
 					ttlArray[i] = other.ttlArray[i] - 1;
 				}
 			}
 			if (ttlArray[i] <= 0 && other.ttlArray[i] > 1) {
-				log.append(",");
 				valueArray[i] = other.valueArray[i];
 				ttlArray[i] = other.ttlArray[i] - 1;
 			}
 		}
-		log.append("b:"+this.avgTTL());
-//		System.out.println(log.toString());
 		return this;
 	}
 
@@ -261,7 +239,7 @@ public class DAAValueBean {
 		for (int i = 0; i < ttlArray.length; i++) {
 			res += ttlArray[i];
 		}
-		return res/ttlArray.length;
+		return res / ttlArray.length;
 	}
 
 	/**
