@@ -6,17 +6,19 @@ package com.almende.eve.algorithms;
 
 import java.util.Arrays;
 
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Class ValueBean.
  */
 public class DAAValueBean {
-	private int			evictionFactor	= 10;
-	private int			width			= 0;
-	private double		offset			= 0.0;
-	private double[]	valueArray		= null;
-	private int[]		ttlArray		= null;
+	protected int		evictionFactor	= 10;
+	protected int		width			= 0;
+	protected double	offset			= 0.0;
+	protected double[]	valueArray		= null;
+	protected long[]	ttlArray		= null;
 
 	/**
 	 * Instantiates a new value bean.
@@ -35,7 +37,7 @@ public class DAAValueBean {
 		this.width = width;
 		this.evictionFactor = evictionFactor;
 		valueArray = new double[width];
-		ttlArray = new int[width];
+		ttlArray = new long[width];
 	}
 
 	/**
@@ -100,7 +102,7 @@ public class DAAValueBean {
 	 *
 	 * @return the ttl array
 	 */
-	public int[] getTtlArray() {
+	public long[] getTtlArray() {
 		return ttlArray;
 	}
 
@@ -110,7 +112,7 @@ public class DAAValueBean {
 	 * @param ttlArray
 	 *            the new ttl array
 	 */
-	public void setTtlArray(final int[] ttlArray) {
+	public void setTtlArray(final long[] ttlArray) {
 		this.ttlArray = ttlArray;
 	}
 
@@ -133,9 +135,9 @@ public class DAAValueBean {
 		return (1.0 / computeMean());
 	}
 
-	private Double computeMean() {
-		Double result = 0.0;
-		for (Double i : valueArray) {
+	private double computeMean() {
+		double result = 0.0;
+		for (double i : valueArray) {
 			result += Math.abs(i);
 		}
 		return result / width;
@@ -146,12 +148,9 @@ public class DAAValueBean {
 	 *
 	 * @param value
 	 *            the value
-	 * @param initialTTL
-	 *            the initial ttl
 	 * @return the value bean
 	 */
-	public DAAValueBean generate(final Double value, final int initialTTL) {
-		Arrays.fill(ttlArray, initialTTL + 1);
+	public DAAValueBean generate(final double value) {
 		if (value <= 0.0) {
 			Arrays.fill(valueArray, Double.MAX_VALUE);
 		} else {
@@ -167,6 +166,18 @@ public class DAAValueBean {
 				valueArray[i] = valueArray[i] * offset;
 			}
 		}
+		return this;
+	}
+
+	/**
+	 * Sets the ttl.
+	 *
+	 * @param initialTTL
+	 *            the initial ttl
+	 * @return the DAA value bean
+	 */
+	public DAAValueBean setTTL(final long initialTTL) {
+		Arrays.fill(ttlArray, initialTTL);
 		return this;
 	}
 
@@ -188,45 +199,22 @@ public class DAAValueBean {
 							+ other.width + ")!");
 		}
 		for (int i = 0; i < width; i++) {
-			if (other.ttlArray[i] <= 1) {
-				continue;
-			}
-			if (valueArray[i] < 0 && ttlArray[i] > 1) {
-				continue;
-			}
-			if (other.valueArray[i] < 0) {
-				if ((other.valueArray[i] * -1) == valueArray[i]) {
-					valueArray[i] = other.valueArray[i];
-					ttlArray[i] = (other.ttlArray[i] / 2) - 1;
-				}
+			if (other.valueArray[i] == valueArray[i]) {
+				ttlArray[i] = Math.max(ttlArray[i], other.ttlArray[i]);
 			} else {
-				if (other.valueArray[i] == valueArray[i]) {
-					ttlArray[i] = Math.max(ttlArray[i], other.ttlArray[i]);
-				}
+				ttlArray[i] = Math.min(ttlArray[i], other.ttlArray[i]);
 				if (other.valueArray[i] < valueArray[i]) {
 					valueArray[i] = other.valueArray[i];
-					ttlArray[i] = other.ttlArray[i] - 1;
+					ttlArray[i] = other.ttlArray[i];
 				}
 			}
-			if (ttlArray[i] <= 0 && other.ttlArray[i] > 1) {
+			final long now = DateTime.now().getMillis();
+			if (ttlArray[i] < now && other.ttlArray[i] > now) {
 				valueArray[i] = other.valueArray[i];
-				ttlArray[i] = other.ttlArray[i] - 1;
+				ttlArray[i] = other.ttlArray[i];
 			}
 		}
 		return this;
-	}
-
-	/**
-	 * Decrease ttl.
-	 */
-	public void decreaseTTL() {
-		for (int i = 0; i < ttlArray.length; i++) {
-			if (valueArray[i] < 0) {
-				ttlArray[i] = (ttlArray[i] / 2) - 1;
-			} else {
-				ttlArray[i] = ttlArray[i] - 1;
-			}
-		}
 	}
 
 	/**
@@ -234,33 +222,11 @@ public class DAAValueBean {
 	 *
 	 * @return the int
 	 */
-	public int avgTTL() {
-		int res = 0;
+	public long avgTTL() {
+		long res = 0;
 		for (int i = 0; i < ttlArray.length; i++) {
 			res += ttlArray[i];
 		}
 		return res / ttlArray.length;
-	}
-
-	/**
-	 * Negate.
-	 *
-	 * @param other
-	 *            the other
-	 * @return the value bean
-	 */
-	public DAAValueBean negate(DAAValueBean other) {
-		if (this.width != other.width) {
-			throw new IllegalArgumentException(
-					"ValueBeans aren't of the same length:(" + this.width + "/"
-							+ other.width + ")!");
-		}
-		for (int i = 0; i < width; i++) {
-			if (valueArray[i] == other.valueArray[i]) {
-				valueArray[i] = -valueArray[i];
-				ttlArray[i] = evictionFactor * ttlArray[i];
-			}
-		}
-		return this;
 	}
 }

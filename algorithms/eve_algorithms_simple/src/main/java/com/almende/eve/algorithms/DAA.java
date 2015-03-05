@@ -4,17 +4,21 @@
  */
 package com.almende.eve.algorithms;
 
+import java.util.Arrays;
+
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The API class for the Distributed Aggregation Algorithm.
  */
 public class DAA {
-	private int				width			= 1000;
-	private int				initialTTL		= 10;
-	private int				evictionFactor	= 10;
-	private DAAValueBean	localValue		= null;
-	private DAAValueBean	currentEstimate	= null;
+	protected int			width			= 1000;
+	protected int			initialTTL		= 10;
+	protected int			evictionFactor	= 10;
+	protected DAAValueBean	localValue		= null;
+	protected DAAValueBean	currentEstimate	= null;
 
 	/**
 	 * Instantiates a new api.
@@ -55,11 +59,12 @@ public class DAA {
 	 * @param value
 	 *            the new new value
 	 */
-	public void setNewValue(Double value) {
+	public void setNewValue(final double value) {
 		localValue = new DAAValueBean(width, evictionFactor);
-		localValue.generate(value, initialTTL);
+		localValue.generate(value).setTTL(DateTime.now().plus(100).getMillis());
 		if (currentEstimate == null) {
 			currentEstimate = new DAAValueBean(width, evictionFactor);
+			Arrays.fill(currentEstimate.valueArray, Double.MAX_VALUE);
 		}
 		currentEstimate.minimum(localValue);
 	}
@@ -93,14 +98,5 @@ public class DAA {
 	 */
 	public DAAValueBean getLocalValue() {
 		return localValue;
-	}
-
-	/**
-	 * Negate and return the local value.
-	 *
-	 * @return the value bean
-	 */
-	public DAAValueBean negateValue() {
-		return currentEstimate.negate(localValue);
 	}
 }

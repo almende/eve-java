@@ -28,6 +28,7 @@ public class TrickleRPC {
 	private Runnable	onInterval	= null;
 	private Runnable	onSend		= null;
 	private Executor	executer	= ThreadPool.getPool();
+	private long[]      next        = new long[]{0,0};
 
 	/**
 	 * Instantiates a new trickle rpc.
@@ -66,6 +67,7 @@ public class TrickleRPC {
 
 	private synchronized void reschedule(final long[] intervals) {
 		if (intervals[0] >= 0 && intervals[1] >= 0) {
+			final DateTime now = DateTime.now();
 			if (sendTaskId != null) {
 				scheduler.cancel(sendTaskId);
 			}
@@ -73,10 +75,10 @@ public class TrickleRPC {
 				scheduler.cancel(intTaskId);
 			}
 			sendTaskId = scheduler.schedule(new JSONRequest("trickle.send",
-					null), DateTime.now().plus(intervals[0]));
+					null), now.plus(intervals[0]));
 			intTaskId = scheduler.schedule(new JSONRequest(
 					"trickle.nextInterval", null),
-					DateTime.now().plus(intervals[1]));
+					now.plus(intervals[1]));
 		}
 	}
 
@@ -95,8 +97,9 @@ public class TrickleRPC {
 	 */
 	@Access(AccessType.SELF)
 	public void nextInterval() {
+		next = trickle.next();
 		executer.execute(onInterval);
-		reschedule(trickle.next());
+		reschedule(next);
 	}
 
 	/**
@@ -112,5 +115,13 @@ public class TrickleRPC {
 	public void incr() {
 		trickle.incr();
 	}
-
+	
+	/**
+	 * Gets the delay.
+	 *
+	 * @return the delay
+	 */
+	public long getDelay(){
+		return next[1];
+	}
 }

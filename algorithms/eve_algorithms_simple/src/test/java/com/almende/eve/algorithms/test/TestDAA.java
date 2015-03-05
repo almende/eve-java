@@ -31,13 +31,13 @@ public class TestDAA extends TestCase {
 		final int width = 10000;
 		final double value = 0.345;
 		DAAValueBean bean = new DAAValueBean(width, 10);
-		bean.generate(value, 10);
+		bean.generate(value).setTTL(10);
 
 		assertTrue(Math.abs(value - bean.computeSum()) < 0.1);
 //		assertEquals(10, bean.getTtlArray()[15]);
 
 		DAAValueBean bean2 = new DAAValueBean(width, 10);
-		bean2.generate(value, 10);
+		bean2.generate(value).setTTL(10);
 		bean2.minimum(bean);
 
 		double sum = Math.abs(bean2.computeSum() - 2 * bean.computeSum());
@@ -55,7 +55,7 @@ public class TestDAA extends TestCase {
 		final int width = 10000;
 		final double value = 100E43;
 		DAAValueBean bean = new DAAValueBean(width, 10);
-		bean.generate(value, 10);
+		bean.generate(value).setTTL(10);
 
 		assertTrue(Math.abs(value / bean.computeSum()) < 1.1);
 		assertTrue(Math.abs(value / bean.computeSum()) > 0.9);
@@ -63,7 +63,7 @@ public class TestDAA extends TestCase {
 //		assertEquals(new Integer(10), bean.getTtlArray()[15]);
 
 		DAAValueBean bean2 = new DAAValueBean(width, 10);
-		bean2.generate(value, 10);
+		bean2.generate(value).setTTL(10);
 		bean2.minimum(bean);
 
 		double sum = Math.abs(bean2.computeSum() - 2 * bean.computeSum());

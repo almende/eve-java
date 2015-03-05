@@ -26,12 +26,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class DAALampAgent.
  */
 public class DAALampAgent extends AbstractLampAgent {
-	private DAA					lampCnt		= new DAA();
-	private DAA					onCnt		= new DAA();
+	private DAA			lampCnt	= new DAA();
+	private DAA			onCnt	= new DAA();
 
-	private TrickleRPC			trickle		= null;
-	private double				requiredOn	= 0.0;
-	private DateTime			nextCheck	= DateTime.now();
+	private TrickleRPC	trickle	= null;
+	private double		percent	= 0.0;
 
 	/*
 	 * (non-Javadoc)
@@ -52,10 +51,7 @@ public class DAALampAgent extends AbstractLampAgent {
 		}
 		getState().put("goal", goal);
 
-		requiredOn = Math
-				.round((goal.getGoalPct() * lampCnt.computeSum()) / 100);
-		
-		checkLamps();
+		percent = goal.getGoalPct();
 		for (String neighbour : neighbours) {
 			ObjectNode params = JOM.createObjectNode();
 			params.set("goal", JOM.getInstance().valueToTree(goal));
@@ -64,31 +60,26 @@ public class DAALampAgent extends AbstractLampAgent {
 	}
 
 	private void setOnValue(double value) {
-		DAAValueBean old = onCnt.negateValue();
-		// send old value to network to evict it.
-		for (final String neighbour : getNeighbours()) {
-			Params params = new Params();
-			params.add("nofOn", old);
-			try {
-				call(URI.create(neighbour), "daaReceive", params);
-			} catch (IOException e) {}
-		}
 		onCnt.setNewValue(value);
 	}
 
-	private synchronized void checkLamps() {
-		if (nextCheck.isAfterNow()) return;
-		nextCheck = DateTime.now().plus(Math.round(Math.random()*10000));
-		System.out.println(getId() + ": Checking lamps:" + lampCnt.computeSum()
-				+ "/" + onCnt.computeSum()+ "  req:"+requiredOn);
-		if (requiredOn > Math.round(onCnt.computeSum())) {
+	public void scheduleLamps(){
+		checkLamps();
+		schedule("scheduleLamps", null, 1000+Math.round(Math.random()*5000));
+	}
+	
+	private void checkLamps() {
+		long requiredOn = Math.round((percent * lampCnt.computeSum()) / 100);
+		long diff = requiredOn - Math.round(onCnt.computeSum());
+		System.out.println(getId()+": diff:"+diff+"/"+requiredOn+" on total:"+Math.round(lampCnt.computeSum()));
+		if (diff > 0) {
 			if (!super.isOn()) {
 				lampOn();
 				setOnValue(1.0);
 				trickle.reset();
 				System.out.print("!");
 			}
-		} else if (requiredOn < Math.round(onCnt.computeSum())) {
+		} else if (diff < 0) {
 			if (super.isOn()) {
 				lampOff();
 				setOnValue(0.0);
@@ -107,9 +98,9 @@ public class DAALampAgent extends AbstractLampAgent {
 		config.put("initialTTL", 10);
 		config.put("evictionFactor", 20);
 
-		config.put("intervalFactor", 1);
-		config.put("intervalMin", 500);
-		config.put("redundancyFactor", 3);
+		config.put("intervalFactor", 5);
+		config.put("intervalMin", 200);
+		config.put("redundancyFactor", 999);
 
 		lampCnt.configure(config);
 		lampCnt.setNewValue(1.0);
@@ -121,9 +112,12 @@ public class DAALampAgent extends AbstractLampAgent {
 		trickle = new TrickleRPC(config, getScheduler(), new Runnable() {
 			@Override
 			public void run() {
-				checkLamps();
-				lampCnt.getCurrentEstimate().decreaseTTL();
-				onCnt.getCurrentEstimate().decreaseTTL();
+				//checkLamps();
+				final long delay = (long) (trickle.getDelay() * 3.2);
+				lampCnt.getLocalValue().setTTL(
+						DateTime.now().plus(delay).getMillis());
+				onCnt.getLocalValue().setTTL(
+						DateTime.now().plus(delay).getMillis());
 			}
 		}, new Runnable() {
 			@Override
@@ -138,6 +132,7 @@ public class DAALampAgent extends AbstractLampAgent {
 				}
 			}
 		});
+		scheduleLamps();
 	}
 
 	/**
@@ -160,8 +155,7 @@ public class DAALampAgent extends AbstractLampAgent {
 	 * @throws JsonProcessingException
 	 *             the json processing exception
 	 */
-	public synchronized void daaReceive(
-			@Name("nofLamps") @Optional DAAValueBean nofLamps,
+	public void daaReceive(@Name("nofLamps") @Optional DAAValueBean nofLamps,
 			@Name("nofOn") @Optional DAAValueBean nofOn)
 			throws JsonProcessingException {
 		if (nofLamps == null) {

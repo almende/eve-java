@@ -9,6 +9,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import com.almende.eve.agent.Agent;
 import com.almende.eve.algorithms.DAA;
 import com.almende.eve.algorithms.DAAValueBean;
@@ -73,9 +75,9 @@ public class DAAAgent extends Agent {
 		config.put("initialTTL", 10);
 		config.put("evictionFactor", 20);
 
-		config.put("intervalFactor", 1);
-		config.put("intervalMin", 100);
-		config.put("redundancyFactor", 3);
+		config.put("intervalFactor", 5);
+		config.put("intervalMin", 200);
+		config.put("redundancyFactor", 9999);
 
 		daa.configure(config);
 		daa.setNewValue(value);
@@ -83,7 +85,9 @@ public class DAAAgent extends Agent {
 		trickle = new TrickleRPC(config, getScheduler(), new Runnable() {
 			@Override
 			public void run() {
-				daa.getCurrentEstimate().decreaseTTL();
+				daa.getLocalValue().setTTL(
+						DateTime.now().plus((long) (trickle.getDelay() * 3.2))
+								.getMillis());
 			}
 		}, new Runnable() {
 			@Override
@@ -98,45 +102,6 @@ public class DAAAgent extends Agent {
 			}
 		});
 
-		//schedule("scheduleSend", null, 100);
-//		 scheduleTTL();
-	}
-
-	/**
-	 * Decrease ttl.
-	 */
-	public void decreaseTTL() {
-		daa.getCurrentEstimate().decreaseTTL();
-	}
-
-	/**
-	 * Decrease ttl.
-	 */
-	public void scheduleTTL() {
-		decreaseTTL();
-		schedule("scheduleTTL", null, 1000);
-	}
-
-	/**
-	 * Decrease ttl.
-	 */
-	public void send() {
-		daa.getCurrentEstimate().decreaseTTL();
-		final Params params = new Params();
-		params.add("value", daa.getCurrentEstimate());
-		for (final URI agent : neighbors) {
-			try {
-				call(agent, "daaReceive", params);
-			} catch (IOException e) {}
-		}
-	}
-
-	/**
-	 * Decrease ttl.
-	 */
-	public void scheduleSend() {
-		send();
-		schedule("scheduleSend", null, 100);
 	}
 
 	/**
@@ -149,7 +114,6 @@ public class DAAAgent extends Agent {
 	 */
 	public synchronized void daaReceive(final @Name("value") DAAValueBean value)
 			throws JsonProcessingException {
-
 		Double oldval = 0.0;
 		if (daa.getCurrentEstimate() != null) {
 			oldval = daa.getCurrentEstimate().computeSum();
@@ -172,16 +136,6 @@ public class DAAAgent extends Agent {
 	 *            the value
 	 */
 	public void changeValue(@Name("value") Double value) {
-		DAAValueBean old = daa.negateValue();
-		// send old value to network to evict it.
-		for (final URI agent : neighbors) {
-			Params params = new Params();
-			params.add("value", old);
-			try {
-				call(agent, "daaReceive", params);
-			} catch (IOException e) {}
-		}
-		daa.receive(old);
 		// set new value for next round:
 		daa.setNewValue(value);
 		if (trickle != null) {
@@ -203,7 +157,7 @@ public class DAAAgent extends Agent {
 	 *
 	 * @return the value
 	 */
-	public int getTTLAvg() {
+	public long getTTLAvg() {
 		return daa.getCurrentEstimate().avgTTL();
 	}
 
