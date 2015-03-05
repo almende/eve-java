@@ -79,10 +79,18 @@ public class RunQueue extends AbstractExecutorService {
 							}
 						}
 					}
-					threadContinue(this);
+					if (!running.contains(this)){
+						threadContinue(this);
+					}
 					task.run();
 					task = null;
-					threadDone(this);
+					
+					if (running.size() <= nofCores){
+						task = tasks.poll();
+					}
+					if (task == null){
+						threadDone(this);
+					}
 				}
 			}
 		}
@@ -178,7 +186,7 @@ public class RunQueue extends AbstractExecutorService {
 		}
 		return res;
 	}
-
+	
 	private void threadDone(final Worker thread) {
 		if (isShutdown()) {
 			thread.isShutdown = true;
