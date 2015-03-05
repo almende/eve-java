@@ -86,6 +86,7 @@ public class RunQueue extends AbstractExecutorService {
 					task = null;
 					
 					if (running.size() <= nofCores){
+						//Shortcut: Check if there are more tasks available.
 						task = tasks.poll();
 					}
 					if (task == null){

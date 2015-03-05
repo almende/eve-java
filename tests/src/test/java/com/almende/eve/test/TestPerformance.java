@@ -48,7 +48,7 @@ public class TestPerformance extends TestCase {
 		x.put("Some key", "Some value");
 		
 		final int NOFTESTERS = 2;
-		final int NOFRUNS	= 10000;
+		final int NOFRUNS	= 100;
 		
 		for (int i = 0; i < NOFRUNS; i++) {
 			test = new Vector<Tester>();

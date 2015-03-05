@@ -7,7 +7,6 @@ package com.almende.eve.test;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -24,8 +23,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestAgents.
  */
 public class TestDelete extends TestCase {
-	private static final Logger	LOG	= Logger.getLogger(TestDelete.class
-											.getName());
 
 	/**
 	 * Test agents.
@@ -73,9 +70,9 @@ public class TestDelete extends TestCase {
 
 		assertNull(test.get());
 
-		LOG.warning("Sleeping for profiler connection.");
-		try {
-			Thread.sleep(20000);
-		} catch (final InterruptedException e) {}
+//		LOG.warning("Sleeping for profiler connection.");
+//		try {
+//			Thread.sleep(20000);
+//		} catch (final InterruptedException e) {}
 	}
 }

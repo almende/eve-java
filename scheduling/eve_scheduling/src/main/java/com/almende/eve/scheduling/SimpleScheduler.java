@@ -169,6 +169,8 @@ public class SimpleScheduler implements Scheduler {
 	@Override
 	public void delete() {
 		clear();
+		SimpleSchedulerConfig config = new SimpleSchedulerConfig(getParams());
+		SimpleSchedulerBuilder.delete(config.getId());
 	}
 
 }

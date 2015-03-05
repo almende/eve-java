@@ -35,6 +35,8 @@ public class PersistentScheduler extends SimpleScheduler {
 			state.delete();
 			state = null;
 		}
+		PersistentSchedulerConfig config = new PersistentSchedulerConfig(getParams());
+		SimpleSchedulerBuilder.delete(config.getId());
 	}
 
 	/**

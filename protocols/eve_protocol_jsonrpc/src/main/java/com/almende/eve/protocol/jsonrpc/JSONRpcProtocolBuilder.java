@@ -66,4 +66,13 @@ public class JSONRpcProtocolBuilder extends
 		return result;
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param id
+	 *            the id
+	 */
+	public static void delete(final String id){
+		INSTANCES.remove(id);
+	}
 }

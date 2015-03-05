@@ -4,26 +4,20 @@
  */
 package com.almende.eve.scheduling;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
-import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
 
 /**
  * The Class PersistentSchedulerService.
  */
 public class PersistentSchedulerBuilder extends
-		AbstractCapabilityBuilder<PersistentScheduler> {
-	private static final Logger								LOG			= Logger.getLogger(PersistentSchedulerBuilder.class
-																				.getName());
-	private static final TypeUtil<Handler<Receiver>>		TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
-	private static final Map<String, PersistentScheduler>	INSTANCES	= new HashMap<String, PersistentScheduler>();
-
+		SimpleSchedulerBuilder {
+	private static final Logger LOG = Logger
+			.getLogger(PersistentSchedulerBuilder.class.getName());
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -43,7 +37,7 @@ public class PersistentSchedulerBuilder extends
 		}
 		PersistentScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
-			result = INSTANCES.get(id);
+			result = (PersistentScheduler) INSTANCES.get(id);
 			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {

@@ -40,7 +40,7 @@ public class TestDebug extends TestCase {
 		final HttpTransportConfig transportConfig = new HttpTransportConfig();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 		transportConfig
-				.setServletClass("com.almende.eve.transport.http.debug.DebugServlet");
+				.setServletClass("com.almende.eve.transport.http.DebugServlet");
 		transportConfig.setDoAuthentication(false);
 		
 		transportConfig.setServletLauncher("JettyLauncher");
@@ -60,9 +60,7 @@ public class TestDebug extends TestCase {
 		final CalcAgent agent2 = new CalcAgent();
 		agent2.loadConfig(config2);
 		
-		synchronized (this) {
-			this.wait();
-		}
+		Thread.sleep(10000);
 	}
 	
 }

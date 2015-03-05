@@ -4,25 +4,19 @@
  */
 package com.almende.eve.scheduling;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
-import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
 
 /**
  * The Class PersistentSchedulerService.
  */
 public class SyncSchedulerBuilder extends
-		AbstractCapabilityBuilder<SyncScheduler> {
+		SimpleSchedulerBuilder {
 	private static final Logger							LOG			= Logger.getLogger(SyncSchedulerBuilder.class
 																			.getName());
-	private static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
-	private static final Map<String, SyncScheduler>		INSTANCES	= new HashMap<String, SyncScheduler>();
 
 	/*
 	 * (non-Javadoc)
@@ -43,7 +37,7 @@ public class SyncSchedulerBuilder extends
 
 		SyncScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
-			result = INSTANCES.get(id);
+			result = (SyncScheduler) INSTANCES.get(id);
 			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {

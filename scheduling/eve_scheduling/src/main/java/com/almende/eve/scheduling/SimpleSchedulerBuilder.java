@@ -20,9 +20,9 @@ import com.almende.util.uuid.UUID;
 public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleScheduler> {
 	private static final Logger LOG = Logger
 			.getLogger(SimpleSchedulerBuilder.class.getName());
-	private static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
+	protected static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
 																	};
-	private static final Map<String, SimpleScheduler>	INSTANCES	= new HashMap<String, SimpleScheduler>();
+	protected static final Map<String, SimpleScheduler>	INSTANCES	= new HashMap<String, SimpleScheduler>();
 	
 	
 	/*
@@ -55,4 +55,13 @@ public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleSche
 		return result;
 	}
 	
+	/**
+	 * Delete.
+	 *
+	 * @param id
+	 *            the id
+	 */
+	public static void delete(final String id){
+		INSTANCES.remove(id);
+	}
 }
