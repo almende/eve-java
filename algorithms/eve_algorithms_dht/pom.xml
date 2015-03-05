@@ -45,7 +45,6 @@
 		<maven-resources-plugin.version>2.6</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
 		<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-		<eve.version>3.1.0-SNAPSHOT</eve.version>
 		<junit.version>4.11</junit.version>
 		<java.version>1.7</java.version>
 		<jackson.version>2.4.1</jackson.version>
@@ -66,12 +65,12 @@
 		<dependency>
 			<groupId>com.almende.eve</groupId>
 			<artifactId>eve-agents</artifactId>
-			<version>${eve.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.almende.eve</groupId>
 			<artifactId>eve-transport-http-jetty</artifactId>
-			<version>${eve.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 	
