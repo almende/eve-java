@@ -14,10 +14,6 @@
 	<name>EVE Bundle Full - Embedded Jetty Server</name>
 	<url>http://almende.github.com/eve</url>
 
-	<properties>
-		<maven.shade.version>2.2</maven.shade.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -109,7 +105,7 @@
 						<executions>
 							<execution>
 								<id>copy-javadoc-files</id>
-								<phase>verify</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
@@ -119,6 +115,29 @@
 											tofile="target/${project.artifactId}-${project.parent.version}-javadoc.jar"
 											file="../../eve_parent/target/eve-${project.parent.version}-javadoc.jar" />
 									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>${build-helper.version}</version>
+						<executions>
+							<execution>
+								<id>attach-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>attach-artifact</goal>
+								</goals>
+								<configuration>
+									<artifacts>
+										<artifact>
+											<file>${project.build.directory}/${project.build.finalName}-javadoc.jar</file>
+											<type>jar</type>
+											<classifier>javadoc</classifier>
+										</artifact>
+									</artifacts>
 								</configuration>
 							</execution>
 						</executions>

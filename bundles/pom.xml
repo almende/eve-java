@@ -15,10 +15,16 @@
 	<name>EVE Bundle Parent</name>
 	<url>http://almende.github.com/eve</url>
 
+	<properties>
+		<maven.shade.version>2.2</maven.shade.version>
+		<build-helper.version>1.9.1</build-helper.version>
+	</properties>
+
 	<modules>
 		<module>eve_full</module>
 		<module>eve_full_embed</module>
 		<module>eve_android</module>
 		<module>eve_android_ws</module>
 	</modules>
+
 </project>

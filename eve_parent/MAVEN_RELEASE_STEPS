@@ -18,22 +18,23 @@ Requirements:
 3: git commit -a
 4: git push --all
 
-5: git tag <ver>  //(version with prefix 'v', e.g. v1.1.0)
-6: git push --tags
-7: mvn clean deploy -Prelease
+5: git branch -b <ver>_release
+6: git push --set-upstream origin <ver>_release
+7: git checkout master
+8: mvn clean deploy -Prelease
 
-8: mvn versions:set -DnewVersion=<ver+1>-SNAPSHOT
-9: git commit -a
-10: git push --all
+9: mvn versions:set -DnewVersion=<ver+1>-SNAPSHOT
+10: git commit -a
+11: git push --all
 
-11: Login to: https://oss.sonatype.org  (Really login, not just opening the page! )
-12: Goto: "Staging repositories"        (if you can't find it, you didn't login:) )
-13: select comalmende repos
-14: click on "close"
+12: Login to: https://oss.sonatype.org  (Really login, not just opening the page! )
+13: Goto: "Staging repositories"        (if you can't find it, you didn't login:) )
+14: select comalmende repos
+15: click on "close"
 
 <Fix any errors that might popup>
 
 <download and test>
 
-15: click on "release"
-16: Tell the world!
+16: click on "release"
+17: Tell the world!
