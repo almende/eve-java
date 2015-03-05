@@ -21,7 +21,7 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState>
 	private static final Logger						LOG		= Logger.getLogger(MemoryStateBuilder.class
 																	.getName());
 	// MemoryStates are currently a Singleton implementation:
-	private static final Map<String, MemoryState>	STATES	= new ConcurrentHashMap<String, MemoryState>();
+	private static final Map<String, MemoryState>	STATES	= new ConcurrentHashMap<String, MemoryState>(10);
 	
 	/*
 	 * (non-Javadoc)

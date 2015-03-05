@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class MemoryState extends AbstractState<Serializable> implements State {
 	private static final Logger				LOG			= Logger.getLogger(MemoryState.class
 																.getName());
-	private final Map<String, Serializable>	properties	= new ConcurrentHashMap<String, Serializable>();
+	private final Map<String, Serializable>	properties	= new ConcurrentHashMap<String, Serializable>(10);
 	
 	/**
 	 * Instantiates a new memory state.

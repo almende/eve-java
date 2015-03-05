@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> {
 	private static final Logger					LOG			= Logger.getLogger(LocalTransportBuilder.class
 																	.getName());
-	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>();
+	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>(10);
 
 	@Override
 	public Transport build() {

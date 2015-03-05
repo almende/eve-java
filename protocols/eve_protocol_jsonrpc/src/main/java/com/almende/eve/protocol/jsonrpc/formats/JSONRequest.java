@@ -236,7 +236,7 @@ public final class JSONRequest extends JSONMessage {
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		this.setRequest(true);
 		setVersion();
-		if (callback != null && (id == null || id.isNull())){
+		if (callback != null && (id == null || id.isNull())) {
 			setId(JOM.getInstance().valueToTree(new UUID().toString()));
 		} else {
 			setId(id);

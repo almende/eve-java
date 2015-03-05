@@ -28,7 +28,7 @@ public final class TokenStore {
 	private static final Logger	LOG		= Logger.getLogger(TokenStore.class
 												.getCanonicalName());
 	private static final int	SIZE	= 5;
-	private Map<String, String>	tokens	= new ConcurrentHashMap<String, String>();
+	private Map<String, String>	tokens	= new ConcurrentHashMap<String, String>(5);
 	private DateTime			last	= DateTime.now();
 	
 	/**

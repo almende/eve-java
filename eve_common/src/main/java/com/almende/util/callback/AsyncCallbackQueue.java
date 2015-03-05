@@ -21,7 +21,7 @@ import com.almende.util.threads.ThreadPool;
  *            the generic type
  */
 public class AsyncCallbackQueue<T> {
-	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>();
+	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>(5);
 	// FIXME: provide some means for the Appengine implementation of
 	// ThreadManager.
 	private static ScheduledThreadPoolExecutor	scheduler	= ThreadPool.getScheduledPool();

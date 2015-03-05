@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class Router implements Transport {
 	private static final Logger				LOG			= Logger.getLogger(Router.class
 																.getName());
-	private final Map<String, Transport>	transports	= new HashMap<String, Transport>();
+	private final Map<String, Transport>	transports	= new HashMap<String, Transport>(2);
 
 	/**
 	 * Register new transport. If a given protocol is already known, this will

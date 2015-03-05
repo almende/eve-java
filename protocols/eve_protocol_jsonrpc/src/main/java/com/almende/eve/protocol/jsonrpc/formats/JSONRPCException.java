@@ -373,7 +373,7 @@ public class JSONRPCException extends RuntimeException {
 	@JsonIgnore
 	public List<Throwable> getThrowableList() {
 		Throwable throwable = this;
-		final List<Throwable> list = new ArrayList<Throwable>();
+		final List<Throwable> list = new ArrayList<Throwable>(3);
 		while (throwable != null && list.contains(throwable) == false) {
 			list.add(throwable);
 			throwable = throwable.getCause();

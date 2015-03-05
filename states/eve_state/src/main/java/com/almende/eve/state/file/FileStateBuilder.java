@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 	private static final Logger						LOG			= Logger.getLogger(FileStateBuilder.class
 																		.getSimpleName());
-	private static Map<String, FileStateProvider>	instances	= new ConcurrentHashMap<String, FileStateProvider>();
+	private static Map<String, FileStateProvider>	instances	= new ConcurrentHashMap<String, FileStateProvider>(10);
 	
 	@Override
 	public State build() {
@@ -74,7 +74,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		private String						path		= null;
 		private Boolean						json		= true;
 		private Boolean						multilevel	= false;
-		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>();
+		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>(10);
 		
 		/**
 		 * Instantiates a new file state provider.

@@ -28,7 +28,7 @@ public class SimpleScheduler implements Scheduler {
 	private Handler<Receiver>	handle			= null;
 	private Clock				clock			= null;
 	private ObjectNode			myParams		= null;
-	
+
 	/**
 	 * Instantiates a new abstract scheduler.
 	 * 
@@ -58,10 +58,9 @@ public class SimpleScheduler implements Scheduler {
 		this.handle = handle;
 		myParams = params;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.Scheduler#schedule(java.lang.Object,
 	 * org.joda.time.DateTime)
 	 */
@@ -72,19 +71,18 @@ public class SimpleScheduler implements Scheduler {
 		}
 		final String uuid = new UUID().toString();
 		clock.requestTrigger(uuid, due, new Runnable() {
-			
+
 			@Override
 			public void run() {
 				handle.get().receive(msg, schedulerUrl, null);
 			}
-			
+
 		});
 		return uuid;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.Scheduler#cancel(java.lang.String)
 	 */
 	@Override
@@ -95,10 +93,9 @@ public class SimpleScheduler implements Scheduler {
 		}
 		clock.cancel(id);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.scheduling.Scheduler#clear()
 	 */
 	@Override
@@ -109,7 +106,7 @@ public class SimpleScheduler implements Scheduler {
 		}
 		clock.clear();
 	}
-	
+
 	/**
 	 * Gets the scheduler url.
 	 * 
@@ -118,7 +115,7 @@ public class SimpleScheduler implements Scheduler {
 	public URI getSchedulerUrl() {
 		return schedulerUrl;
 	}
-	
+
 	/**
 	 * Gets the handle.
 	 * 
@@ -127,7 +124,7 @@ public class SimpleScheduler implements Scheduler {
 	public Handler<Receiver> getHandle() {
 		return handle;
 	}
-	
+
 	/**
 	 * Gets the clock.
 	 * 
@@ -136,9 +133,10 @@ public class SimpleScheduler implements Scheduler {
 	public Clock getClock() {
 		return clock;
 	}
-	
+
 	/**
-	 * @param clock the clock to set
+	 * @param clock
+	 *            the clock to set
 	 */
 	protected void setClock(Clock clock) {
 		this.clock = clock;
@@ -146,7 +144,6 @@ public class SimpleScheduler implements Scheduler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
@@ -156,7 +153,12 @@ public class SimpleScheduler implements Scheduler {
 
 	@Override
 	public String schedule(Object msg, int delay) {
-		return schedule(msg,DateTime.now().plus(delay));
+		return schedule(msg, DateTime.now().plus(delay));
+	}
+
+	@Override
+	public String schedule(Object msg, long delay) {
+		return schedule(msg, DateTime.now().plus(delay));
 	}
 
 	@Override
@@ -168,5 +170,5 @@ public class SimpleScheduler implements Scheduler {
 	public void delete() {
 		clear();
 	}
-	
+
 }

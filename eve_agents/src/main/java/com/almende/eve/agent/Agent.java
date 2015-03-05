@@ -79,7 +79,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 																				this);
 	private Handler<Initable>							handler			= new SimpleHandler<Initable>(
 																				this);
-	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>();
+	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>(3);
 
 	protected Caller									caller			= new DefaultCaller();
 	protected DefaultEventCaller						eventCaller		= new DefaultEventCaller();
@@ -243,7 +243,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			synchronized (eventListeners) {
 				List<AgentEventListener> list = eventListeners.get(event);
 				if (list == null) {
-					list = new ArrayList<AgentEventListener>();
+					list = new ArrayList<AgentEventListener>(1);
 					eventListeners.put(event, list);
 				}
 				synchronized (list) {
@@ -722,6 +722,26 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final String method, final ObjectNode params,
 			final int delay) {
+		final Scheduler scheduler = this.scheduler;
+		if (scheduler == null)
+			return "";
+		return scheduler.schedule(new JSONRequest(method, params), delay);
+	}
+
+	/**
+	 * Schedule an RPC call at a specified due time.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param delay
+	 *            the delay
+	 * @return the string
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String schedule(final String method, final ObjectNode params,
+			final long delay) {
 		final Scheduler scheduler = this.scheduler;
 		if (scheduler == null)
 			return "";

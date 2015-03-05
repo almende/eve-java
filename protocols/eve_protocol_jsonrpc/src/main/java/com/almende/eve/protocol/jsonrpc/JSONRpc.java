@@ -229,8 +229,8 @@ final public class JSONRpc {
 	 */
 	public static List<String> validate(final Class<?> c,
 			final RequestParams requestParams) {
-		final List<String> errors = new ArrayList<String>();
-		final Set<String> methodNames = new HashSet<String>();
+		final List<String> errors = new ArrayList<String>(0);
+		final Set<String> methodNames = new HashSet<String>(10);
 
 		AnnotatedClass ac = null;
 		try {
@@ -291,11 +291,11 @@ final public class JSONRpc {
 			for (final AnnotatedMethod method : annotatedClass.getMethods()) {
 				if (isAvailable(method, null, requestParams, auth)) {
 					// format as JSON
-					final List<Object> descParams = new ArrayList<Object>();
+					final List<Object> descParams = new ArrayList<Object>(4);
 					for (final AnnotatedParam param : method.getParams()) {
 						if (getRequestAnnotation(param, requestParams) == null) {
 							final String name = getName(param);
-							final Map<String, Object> paramData = new HashMap<String, Object>();
+							final Map<String, Object> paramData = new HashMap<String, Object>(3);
 							paramData.put("name", name);
 							paramData.put("type",
 									typeToString(param.getGenericType()));
@@ -304,11 +304,11 @@ final public class JSONRpc {
 						}
 					}
 
-					final Map<String, Object> result = new HashMap<String, Object>();
+					final Map<String, Object> result = new HashMap<String, Object>(1);
 					result.put("type",
 							typeToString(method.getGenericReturnType()));
 
-					final Map<String, Object> desc = new HashMap<String, Object>();
+					final Map<String, Object> desc = new HashMap<String, Object>(3);
 					if (namespace.equals("*")) {
 						namespace = annotatedClass.getAnnotation(
 								Namespace.class).value();
@@ -355,9 +355,9 @@ final public class JSONRpc {
 					auth);
 
 			// create a sorted array
-			final List<Object> sortedMethods = new ArrayList<Object>();
 			final TreeSet<String> methodNames = new TreeSet<String>(
 					methods.keySet());
+			final List<Object> sortedMethods = new ArrayList<Object>(methodNames.size());
 			for (final String methodName : methodNames) {
 				sortedMethods.add(methods.get(methodName));
 			}
