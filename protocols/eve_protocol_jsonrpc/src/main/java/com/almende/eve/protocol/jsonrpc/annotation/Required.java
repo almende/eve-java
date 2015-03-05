@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation for parameter requirement.
+ * 
+ * @deprecated Please use @Optional instead! Will be removed in 3.2.x.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
