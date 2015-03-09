@@ -4,6 +4,7 @@
  */
 package com.almende.eve.test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -11,8 +12,6 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * The Class TestThreads.

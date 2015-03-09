@@ -21,9 +21,8 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.callback.AsyncCallback;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class TestRpc.
@@ -58,8 +57,8 @@ public class TestRpc extends TestCase {
 			
 		};
 		
-		final ObjectNode parms = JOM.createObjectNode();
-		parms.put("parm", true);
+		final Params parms = new Params();
+		parms.add("parm", true);
 		Object request = new JSONRequest("testMe", parms, callback);
 		
 		// transport
