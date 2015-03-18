@@ -124,10 +124,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	@Override
 	public void connect() throws IOException {
 		if (isConnected()) {
-			// this is a reconnect.
-			disconnect();
+			return;
 		}
-		LOG.warning("Reconnect called:" + toString());
+		LOG.warning("Connect called:" + toString());
 		// configure and connect
 		final ConnectionConfiguration connConfig = new ConnectionConfiguration(
 				host, port, serviceName);

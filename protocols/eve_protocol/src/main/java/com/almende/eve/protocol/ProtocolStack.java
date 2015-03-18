@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ProtocolStack implements Protocol {
 	private final LinkedList<Protocol>	stack	= new LinkedList<Protocol>();
-
+	
 	/**
 	 * Adds the protocol at the end of the stack
 	 *

@@ -38,7 +38,7 @@ public class WsClientTransport extends WebsocketTransport {
 	private ClientManager		client		= null;
 	private Session				session		= null;
 	private Boolean				shouldClose	= false;
-	
+
 	/**
 	 * Instantiates a new websocket transport.
 	 * 
@@ -69,7 +69,7 @@ public class WsClientTransport extends WebsocketTransport {
 		}
 		myId = config.getId();
 	}
-	
+
 	/**
 	 * Sets the remote.
 	 * 
@@ -80,10 +80,9 @@ public class WsClientTransport extends WebsocketTransport {
 	protected void registerRemote(final String key, final Async remote) {
 		this.remote = remote;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.transport.ws.WebsocketTransport#receive(java.lang.String,
 	 * java.net.URI)
@@ -92,7 +91,7 @@ public class WsClientTransport extends WebsocketTransport {
 	public void receive(final String body, final String id) throws IOException {
 		super.getHandle().get().receive(body, serverUrl, null);
 	}
-	
+
 	/**
 	 * Send.
 	 * 
@@ -104,7 +103,7 @@ public class WsClientTransport extends WebsocketTransport {
 	public void send(final byte[] message) throws IOException {
 		send(serverUrl, message, null);
 	}
-	
+
 	/**
 	 * Send.
 	 * 
@@ -116,10 +115,9 @@ public class WsClientTransport extends WebsocketTransport {
 	public void send(final String message) throws IOException {
 		send(serverUrl, message, null);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
 	 * java.lang.String, java.lang.String)
 	 */
@@ -151,10 +149,9 @@ public class WsClientTransport extends WebsocketTransport {
 			throw new IOException("Not connected?");
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
 	 * java.lang.String)
 	 */
@@ -184,7 +181,7 @@ public class WsClientTransport extends WebsocketTransport {
 			throw new IOException("Not connected?");
 		}
 	}
-	
+
 	@Override
 	public void onClose(final Session session, final CloseReason closeReason) {
 		if (!shouldClose) {
@@ -198,14 +195,16 @@ public class WsClientTransport extends WebsocketTransport {
 			super.onClose(session, closeReason);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.ws.WebsocketTransport#connect()
 	 */
 	@Override
 	public void connect() throws IOException {
+		if (session != null) {
+			return;
+		}
 		if (client == null) {
 			client = ClientManager.createClient();
 			client.setDefaultMaxSessionIdleTimeout(-1);
@@ -214,40 +213,35 @@ public class WsClientTransport extends WebsocketTransport {
 			final ClientEndpointConfig cec = ClientEndpointConfig.Builder
 					.create().build();
 			cec.getUserProperties().put("address", getAddress());
-			
-			if (session != null) {
-				disconnect();
-			}
 			session = client.connectToServer(WebsocketEndpoint.class, cec,
 					new URI(serverUrl + "?id=" + myId));
-			
+
 		} catch (final DeploymentException e) {
 			LOG.log(Level.WARNING, "Can't connect to server", e);
 		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Can't parse server address", e);
 		}
-		
+
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.ws.WebsocketTransport#disconnect()
 	 */
 	@Override
 	public void disconnect() {
 		try {
 			shouldClose = true;
-			
+
 			session.close();
-			
+
 			shouldClose = false;
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Failed to normally close session", e);
 		}
 		session = null;
 	}
-	
+
 	/**
 	 * Update config.
 	 *
@@ -273,15 +267,14 @@ public class WsClientTransport extends WebsocketTransport {
 		myId = config.getId();
 		connect();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
 		return Arrays.asList("wss", "ws");
 	}
-	
+
 }

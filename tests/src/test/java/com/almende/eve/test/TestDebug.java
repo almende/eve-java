@@ -52,13 +52,13 @@ public class TestDebug extends TestCase {
 		config.setTransport(transportConfig);
 		
 		final ExampleAgent agent = new ExampleAgent();
-		agent.loadConfig(config);
+		agent.setConfig(config);
 		
 		final AgentConfig config2 = new AgentConfig("calc");
 		config2.setTransport(transportConfig);
 		
 		final CalcAgent agent2 = new CalcAgent();
-		agent2.loadConfig(config2);
+		agent2.setConfig(config2);
 		
 		Thread.sleep(10000);
 	}

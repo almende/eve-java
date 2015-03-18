@@ -18,7 +18,6 @@ public class AgentBuilder {
 													.getName());
 	private AgentConfig			parameters	= null;
 	private ClassLoader			cl			= getClass().getClassLoader();
-	private boolean				onBoot		= false;
 
 	/**
 	 * With config
@@ -47,16 +46,6 @@ public class AgentBuilder {
 	}
 
 	/**
-	 * On boot.
-	 *
-	 * @return the agent builder
-	 */
-	public AgentBuilder onBoot() {
-		this.onBoot = true;
-		return this;
-	}
-
-	/**
 	 * Builds the.
 	 * 
 	 * @return the agent
@@ -76,10 +65,6 @@ public class AgentBuilder {
 			if (ClassUtil.hasSuperClass(clazz, Agent.class)) {
 				final Agent agent = (Agent) clazz.newInstance();
 				agent.setConfig(parameters);
-				agent.loadConfig();
-				if (onBoot) {
-					agent.getEventCaller().on("boot");
-				}
 				return agent;
 			} else {
 				LOG.warning("The requested class doesn't extend Agent, which is required for the AgentBuilder");

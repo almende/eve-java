@@ -65,8 +65,7 @@ public class TestAgents extends TestCase {
 		config.setInstantiationService(isconfig);
 
 		ExampleAgent agent = new ExampleAgent();
-		agent.loadConfig(config);
-		agent.connect();
+		agent.setConfig(config);
 		
 		final Params callParams = new Params();
 		callParams.add("message", "Hello world!");
@@ -99,9 +98,8 @@ public class TestAgents extends TestCase {
 		final AgentConfig ac = new AgentConfig("tester");
 		ac.setTransport(transportConfig);
 		final ExampleAgent tester = new ExampleAgent() {};
-		tester.loadConfig(ac);
-		tester.connect();
-
+		tester.setConfig(ac);
+		
 		LOG.warning("Sync received:'"
 				+ tester.pubSendSync(
 						new URI("http://localhost:8080/agents/example"),

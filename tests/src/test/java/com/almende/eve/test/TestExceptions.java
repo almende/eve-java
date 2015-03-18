@@ -36,7 +36,7 @@ public class TestExceptions extends TestCase {
 
 		new Agent() {
 			@Override
-			public void onBoot() {
+			public void onReady() {
 				LOG.warning("Starting run");
 				try {
 					call(URI.create("local:Other"), "throwException", null,
@@ -74,7 +74,7 @@ public class TestExceptions extends TestCase {
 				}
 				LOG.warning("Done");
 			}
-		}.init(JOM.createObjectNode(), true);
+		}.setConfig(JOM.createObjectNode());
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {

@@ -8,12 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,8 +17,8 @@ import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.capabilities.handler.SimpleHandler;
+import com.almende.eve.instantiation.Configurable;
 import com.almende.eve.instantiation.HibernationHandler;
-import com.almende.eve.instantiation.Initable;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
 import com.almende.eve.protocol.ProtocolBuilder;
@@ -54,7 +50,6 @@ import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
-import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -65,36 +60,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Agent.
  */
 @Access(AccessType.UNAVAILABLE)
-public class Agent implements Receiver, Initable, AgentInterface {
-	private static final Logger							LOG				= Logger.getLogger(Agent.class
-																				.getName());
-	private String										agentId			= null;
-	private AgentConfig									config			= null;
-	private InstantiationService						is				= null;
-	private State										state			= null;
-	private Router										transport		= new Router();
-	private Scheduler									scheduler		= null;
-	private ProtocolStack								protocolStack	= new ProtocolStack();
-	private Handler<Receiver>							receiver		= new SimpleHandler<Receiver>(
-																				this);
-	private Handler<Initable>							handler			= new SimpleHandler<Initable>(
-																				this);
-	private final Map<String, List<AgentEventListener>>	eventListeners	= new HashMap<String, List<AgentEventListener>>(3);
+public class Agent implements Receiver, Configurable, AgentInterface {
+	private static final Logger		LOG				= Logger.getLogger(Agent.class
+															.getName());
+	private String					agentId			= null;
+	private AgentConfig				config			= null;
+	private InstantiationService	is				= null;
+	private State					state			= null;
+	private Router					transport		= new Router();
+	private Scheduler				scheduler		= null;
+	private ProtocolStack			protocolStack	= new ProtocolStack();
+	private Handler<Receiver>		receiver		= new SimpleHandler<Receiver>(
+															this);
+	private Handler<Configurable>	handler			= new SimpleHandler<Configurable>(
+															this);
 
-	protected Caller									caller			= new DefaultCaller();
-	protected DefaultEventCaller						eventCaller		= new DefaultEventCaller();
+	protected Caller				caller			= new DefaultCaller();
 
-	private Handler<Caller>								sender			= new SimpleHandler<Caller>(
-																				caller);
-	private Authorizor									authorizor		= new DefaultAuthorizor();
+	private Handler<Caller>			sender			= new SimpleHandler<Caller>(
+															caller);
+	private Authorizor				authorizor		= new DefaultAuthorizor();
 
 	/**
 	 * Instantiates a new agent.
 	 */
-	public Agent() {
-		registerDefaultEventListeners();
-		eventCaller.on("init");
-	}
+	public Agent() {}
 
 	/**
 	 * Instantiates a new agent.
@@ -108,10 +98,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		}
 		AgentConfig conf = new AgentConfig(config);
 		conf.setClassName(this.getClass().getName());
-		registerDefaultEventListeners();
 		setConfig(conf);
-		loadConfig();
-		eventCaller.on("init");
 	}
 
 	/**
@@ -129,61 +116,40 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		AgentConfig conf = new AgentConfig(config);
 		conf.setId(agentId);
 		conf.setClassName(this.getClass().getName());
-		registerDefaultEventListeners();
 		setConfig(conf);
-		loadConfig();
-		eventCaller.on("init");
 	}
 
 	/**
-	 * On initialisation of the agent (boot, wake, etc.)
+	 * On ready, is being run after the configuration has been loaded.
 	 */
-	protected void onInit() {}
+	protected void onReady() {}
 
+	/**
+	 * On destroy, is being run before the destroy() method is started.
+	 * 
+	 */
+	protected void onDestroy() {}
+
+	/**
+	 * On init.
+	 * @deprecated This old event handler is no longer in use, use onReady instead.
+	 */
+	@Deprecated
+	protected void onInit(){}
+	
 	/**
 	 * On boot.
+	 * @deprecated This old event handler is no longer in use, use onReady instead.
 	 */
-	protected void onBoot() {
-		if (transport != null) {
-			try {
-				transport.connect();
-			} catch (IOException e) {
-				LOG.log(Level.WARNING, "Couldn't connect transports on boot", e);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.almende.eve.instantiation.Initable#init(com.fasterxml.jackson.databind
-	 * .node.ObjectNode, boolean)
-	 */
-	@Override
-	public void init(ObjectNode params, boolean onBoot) {
-		setConfig(params);
-		loadConfig();
-		if (onBoot) {
-			eventCaller.on("boot");
-		}
-	};
-
-	/**
-	 * Set and loads the config.
-	 * 
-	 * @param config
-	 *            the new config
-	 */
-	public void loadConfig(final ObjectNode config) {
-		init(config, false);
-	}
-
+	@Deprecated
+	protected void onBoot(){}
+	
 	/**
 	 * Destroy the agent.
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void destroy() {
-		eventCaller.on("destroy");
+		onDestroy();
 		if (scheduler != null) {
 			scheduler.delete();
 			scheduler = null;
@@ -204,79 +170,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 		if (is != null) {
 			is.deregister(agentId);
 			is = null;
-
 		}
-	}
-
-	/**
-	 * The Class DefaultEventCaller.
-	 */
-	class DefaultEventCaller {
-		/**
-		 * On.
-		 *
-		 * @param event
-		 *            the event
-		 */
-		public final void on(final String event) {
-			List<AgentEventListener> list = eventListeners.get(event);
-			if (list != null) {
-				Executor pool = ThreadPool.getPool();
-				synchronized (list) {
-					for (AgentEventListener listener : list) {
-						pool.execute(listener);
-					}
-				}
-			}
-		}
-
-		/**
-		 * Adds the event listener.
-		 *
-		 * @param event
-		 *            the event
-		 * @param listener
-		 *            the listener
-		 */
-		public final void addEventListener(final String event,
-				final AgentEventListener listener) {
-			synchronized (eventListeners) {
-				List<AgentEventListener> list = eventListeners.get(event);
-				if (list == null) {
-					list = new ArrayList<AgentEventListener>(1);
-					eventListeners.put(event, list);
-				}
-				synchronized (list) {
-					list.add(listener);
-				}
-			}
-		}
-
-	}
-
-	private final void registerDefaultEventListeners() {
-		eventCaller.addEventListener("boot", new AgentEventListener() {
-			@Override
-			public void run() {
-				onBoot();
-			}
-		});
-		eventCaller.addEventListener("init", new AgentEventListener() {
-			@Override
-			public void run() {
-				onInit();
-			}
-		});
-	}
-
-	/**
-	 * Gets the event caller.
-	 *
-	 * @return the event caller
-	 */
-	@JsonIgnore
-	protected DefaultEventCaller getEventCaller() {
-		return this.eventCaller;
 	}
 
 	/**
@@ -305,7 +199,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @param handler
 	 *            the new handler
 	 */
-	protected void setHandler(Handler<Initable> handler) {
+	protected void setHandler(Handler<Configurable> handler) {
 		this.handler = handler;
 	}
 
@@ -315,7 +209,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @return the receiver
 	 */
 	@JsonIgnore
-	public Handler<Initable> getHandler() {
+	public Handler<Configurable> getHandler() {
 		return handler;
 	}
 
@@ -364,8 +258,16 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	 * @param config
 	 *            the new config
 	 */
-	protected void setConfig(final ObjectNode config) {
+	public void setConfig(final ObjectNode config) {
 		this.config = new AgentConfig(config);
+		loadConfig();
+		onReady();
+		try {
+			// Asynchronous connect of agent's transports.
+			connect();
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "Couldn't connect transports", e);
+		}
 	}
 
 	/**
@@ -428,7 +330,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 	/**
 	 * Load config.
 	 */
-	protected void loadConfig() {
+	private void loadConfig() {
 		agentId = config.getId();
 		ObjectNode iscfg = config.getInstantiationService();
 		if (iscfg != null) {
@@ -436,7 +338,7 @@ public class Agent implements Receiver, Initable, AgentInterface {
 			is.register(agentId, config, this.getClass().getName());
 		}
 		if (is != null && config.isCanHibernate()) {
-			setHandler(new HibernationHandler<Initable>(this, agentId, is));
+			setHandler(new HibernationHandler<Configurable>(this, agentId, is));
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
 			setSender(new HibernationHandler<Caller>(caller, agentId, is));
 		}

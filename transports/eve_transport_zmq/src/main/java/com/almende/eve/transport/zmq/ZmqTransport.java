@@ -142,7 +142,7 @@ public class ZmqTransport extends AbstractTransport {
 	@Override
 	public void connect() throws IOException {
 		if (listeningThread != null) {
-			disconnect();
+			return;
 		}
 		listen();
 	}

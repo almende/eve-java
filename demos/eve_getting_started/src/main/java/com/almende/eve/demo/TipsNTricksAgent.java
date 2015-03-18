@@ -27,7 +27,8 @@ public class TipsNTricksAgent extends Agent {
 	/* (non-Javadoc)
 	 * @see com.almende.eve.agent.Agent#onInit()
 	 */
-	public void onInit(){
+	@Override
+	public void onReady(){
 				
 		/* Example scheduling: */
 		

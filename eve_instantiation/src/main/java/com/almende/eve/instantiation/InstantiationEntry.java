@@ -16,7 +16,7 @@ public class InstantiationEntry {
 	private String				wakeKey		= null;
 	private String				className	= null;
 	private ObjectNode			params		= null;
-	private Handler<Initable>	handler		= null;
+	private Handler<Configurable>	handler		= null;
 	private State				state		= null;
 
 	/**
@@ -104,7 +104,7 @@ public class InstantiationEntry {
 	 * @return the handler
 	 */
 	@JsonIgnore
-	public Handler<Initable> getHandler() {
+	public Handler<Configurable> getHandler() {
 		return handler;
 	}
 
@@ -115,7 +115,7 @@ public class InstantiationEntry {
 	 *            the new handler
 	 */
 	@JsonIgnore
-	public void setHandler(Handler<Initable> handler) {
+	public void setHandler(Handler<Configurable> handler) {
 		this.handler = handler;
 	}
 

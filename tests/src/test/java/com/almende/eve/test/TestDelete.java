@@ -50,9 +50,8 @@ public class TestDelete extends TestCase {
 		config.setTransport(transportConfig);
 
 		ExampleAgent agent = new ExampleAgent();
-		agent.loadConfig(config);
-		agent.connect();
-
+		agent.setConfig(config);
+		
 		transportConfig = null;
 		config = null;
 

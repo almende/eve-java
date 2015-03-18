@@ -119,7 +119,7 @@ public class InstantiationService implements Capability {
 	 *            the wake key
 	 * @return the initable
 	 */
-	public Initable init(final String wakeKey) {
+	public Configurable init(final String wakeKey) {
 		return init(wakeKey, false);
 	}
 
@@ -133,7 +133,7 @@ public class InstantiationService implements Capability {
 	 * @return the initable
 	 */
 	@JsonIgnore
-	public Initable init(final String wakeKey, final boolean onBoot) {
+	public Configurable init(final String wakeKey, final boolean onBoot) {
 		InstantiationEntry entry = entries.get(wakeKey);
 		if (entry == null) {
 			entry = load(wakeKey);
@@ -141,8 +141,8 @@ public class InstantiationService implements Capability {
 		}
 		if (entry != null) {
 			final String className = entry.getClassName();
-			Initable instance = null;
-			Handler<Initable> oldHandler = entry.getHandler();
+			Configurable instance = null;
+			Handler<Configurable> oldHandler = entry.getHandler();
 			if (oldHandler != null) {
 				instance = oldHandler.getNoWait();
 			}
@@ -154,8 +154,8 @@ public class InstantiationService implements Capability {
 					} else {
 						clazz = Class.forName(className);
 					}
-					instance = (Initable) clazz.newInstance();
-					instance.init(entry.getParams(), onBoot);
+					instance = (Configurable) clazz.newInstance();
+					instance.setConfig(entry.getParams());
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to instantiate entry:'"
 							+ wakeKey + "'", e);

@@ -49,7 +49,7 @@ public class TestAgent extends TestCase {
 		config.setTransport(transportConfig);
 		
 		DHTAgent agent = new DHTAgent();
-		agent.loadConfig(config);
+		agent.setConfig(config);
 		
 		Thread.sleep(1000000);
 	}

@@ -43,7 +43,7 @@ public class TestProxy extends TestCase {
 		config.setTransport(transportConfig);
 		
 		final ExampleAgent agent = new ExampleAgent();
-		agent.loadConfig(config);
+		agent.setConfig(config);
 		
 		final ExampleAgentInterface proxy = AgentProxyFactory.genProxy(agent,
 				URI.create("http://localhost:8081/agents/example"),
