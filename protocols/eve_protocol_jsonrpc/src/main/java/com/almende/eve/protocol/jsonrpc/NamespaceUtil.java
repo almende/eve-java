@@ -104,7 +104,7 @@ final class NamespaceUtil {
 
 	/**
 	 * _get.
-	 * 
+	 *
 	 * @param destination
 	 *            the destination
 	 * @param path
@@ -116,10 +116,12 @@ final class NamespaceUtil {
 	 *             the invocation target exception
 	 * @throws NoSuchMethodException
 	 *             the no such method exception
+	 * @throws UnsupportedOperationException
+	 *             the unsupported operation exception
 	 */
 	private CallTuple _get(final Object destination, final String path)
 			throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
+			NoSuchMethodException, UnsupportedOperationException {
 		final CallTuple result = new CallTuple();
 		String reducedPath = "";
 		String reducedMethod = path;
@@ -163,6 +165,16 @@ final class NamespaceUtil {
 		final List<AnnotatedMethod> methods = newClazz
 				.getMethods(reducedMethod);
 		if (!methods.isEmpty()) {
+			// TODO: If we ever want to support method overloading, this needs
+			// to be fixed to return multiple methods.
+			if (methods.size() > 1) {
+				throw new UnsupportedOperationException(
+						"Method '"
+								+ reducedMethod
+								+ "' in class '"
+								+ newClazz.getActualClass().getName()
+								+ "' is overloaded, which is not supported by this JSON-RPC implementation.");
+			}
 			result.setMethod(methods.get(0));
 		}
 		return result;

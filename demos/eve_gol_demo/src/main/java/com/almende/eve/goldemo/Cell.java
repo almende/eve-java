@@ -165,12 +165,12 @@ public class Cell extends Agent {
 	 *            the neighbor
 	 */
 	public void collect(@Name("alive") final boolean alive,
-			@Name("cycle") final int cycle, @Sender String neighbor) {
+			@Name("cycle") final int cycle, @Sender URI neighbor) {
 		if (neighbors == null) {
 			neighbors = getState().get("neighbors", NEIGHBORTYPE);
 		}
 		final CycleState state = new CycleState(cycle, alive);
-		getState().put(neighbor + "_" + state.getCycle(), state);
+		getState().put(neighbor.toASCIIString() + "_" + state.getCycle(), state);
 		try {
 			calcCycle();
 		} catch (final URISyntaxException e) {

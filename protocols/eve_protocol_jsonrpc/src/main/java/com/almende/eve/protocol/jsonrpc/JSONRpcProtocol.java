@@ -163,11 +163,12 @@ public class JSONRpcProtocol implements Protocol {
 			if (jsonMsg.isRequest()) {
 				final JSONRequest request = (JSONRequest) jsonMsg;
 				final RequestParams params = new RequestParams();
-				params.put(Sender.class, senderUrl.toASCIIString());
+				params.put(Sender.class, senderUrl);
 				return JSONRpc.invoke(destination.get(), request, params, auth);
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
+				LOG.log(Level.WARNING, "received response"+id+", callback:"+callback);
 				if (callback != null) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
 					final JSONRPCException error = response.getError();

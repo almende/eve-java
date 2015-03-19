@@ -23,69 +23,98 @@ import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.callback.AsyncCallback;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * The Class TestRpc.
  */
 public class TestRpc extends TestCase {
 	private static final Logger	LOG	= Logger.getLogger(TestRpc.class.getName());
-	
+
 	/**
 	 * Test me.
+	 *
+	 * @throws JsonProcessingException
+	 *             the json processing exception
 	 */
 	@Test
-	public void testRpc() {
+	public void testRpc() throws JsonProcessingException {
 		final JSONRpcProtocolConfig params = new JSONRpcProtocolConfig();
 		params.setId("me");
-		
-		final JSONRpcProtocol protocol = new JSONRpcProtocolBuilder().withConfig(params).withHandle(
-				new SimpleHandler<Object>(new MyClass())).build();
-		
+
+		final JSONRpcProtocol protocol = new JSONRpcProtocolBuilder()
+				.withConfig(params)
+				.withHandle(new SimpleHandler<Object>(new MyClass())).build();
+
 		final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
-			
+
 			@Override
 			public void onSuccess(final Boolean result) {
 				LOG.warning("Success!");
 				assertTrue(result);
 			}
-			
+
 			@Override
 			public void onFailure(final Exception exception) {
-				LOG.log(Level.WARNING, "Fail:", exception);
-				fail();
+				LOG.log(Level.WARNING, "Expected exception:", exception);
 			}
-			
+
 		};
-		
+
 		final Params parms = new Params();
 		parms.add("parm", true);
 		Object request = new JSONRequest("testMe", parms, callback);
-		
+
+		// prepare message for transport
+		Object message = protocol.outbound(request, URI.create("local://me"))
+				.getResult();
 		// transport
-		Object response = protocol.invoke(request,
-				URI.create("local://me"));
-		// transport
-		protocol.invoke(response, URI.create("local://me"));
-		
-		request = new JSONRequest("test.testMe", parms, callback);
-		
-		// transport
-		response = protocol.invoke(request,
-						URI.create("local://me"));
-		// transport
-		protocol.invoke(response, URI.create("local://me"));
-		
+		Object response = protocol
+				.outbound(
+						protocol.inbound(message, URI.create("local://me"))
+								.getResult(), URI.create("local://me"))
+				.getResult();
+		// transport back
+		protocol.inbound(response, URI.create("local://me"));
+
 		request = new JSONRequest("test.testMe", parms);
-		response = protocol.invoke(request,  URI.create("local://me"));
+
+		// prepare message for transport
+		message = protocol.outbound(request, URI.create("local://me"))
+				.getResult();
+		// transport
+		response = protocol
+				.outbound(
+						protocol.inbound(message, URI.create("local://me"))
+								.getResult(), URI.create("local://me"))
+				.getResult();
 		assertNull(response);
+
+		request = new JSONRequest("failMe", parms, callback);
+
+		// prepare message for transport
+		message = protocol.outbound(request, URI.create("local://me"))
+				.getResult();
+		// transport
+		response = protocol
+				.outbound(
+						protocol.inbound(message, URI.create("local://me"))
+								.getResult(), URI.create("local://me"))
+				.getResult();
+		protocol.inbound(response, URI.create("local://me"));
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {}
+
 	}
-	
+
 	/**
 	 * The Class MyClass.
 	 */
 	@Access(AccessType.PUBLIC)
 	public class MyClass {
-		
+
 		/**
 		 * Test me.
 		 * 
@@ -96,13 +125,33 @@ public class TestRpc extends TestCase {
 		public Boolean testMe(@Name("parm") final Boolean test) {
 			return test;
 		}
-	
+
+		/**
+		 * Fail me.
+		 *
+		 * @return the boolean
+		 */
+		public Boolean failMe() {
+			return true;
+		}
+
+		/**
+		 * Fail me.
+		 *
+		 * @param test
+		 *            the test
+		 * @return the boolean
+		 */
+		public Boolean failMe(@Name("parm") final Boolean test) {
+			return test;
+		}
+
 		/**
 		 * The Class MyClass.
 		 */
 		@Access(AccessType.PUBLIC)
 		class MySubClass {
-			
+
 			/**
 			 * Test me.
 			 * 
@@ -112,19 +161,19 @@ public class TestRpc extends TestCase {
 			 */
 			public Boolean testMe(@Name("parm") final Boolean test) {
 				return test;
-			}			
+			}
 		}
-		
+
 		/**
 		 * Gets the sub.
 		 *
 		 * @return the sub
 		 */
 		@Namespace("test")
-		public MySubClass getSub(){
+		public MySubClass getSub() {
 			return new MySubClass();
 		}
-		
+
 	}
-	
+
 }

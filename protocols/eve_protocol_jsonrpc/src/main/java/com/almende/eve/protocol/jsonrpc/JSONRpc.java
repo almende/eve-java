@@ -13,10 +13,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -211,58 +209,6 @@ final public class JSONRpc {
 		} else {
 			return resp;
 		}
-	}
-
-	/**
-	 * Validate whether the given class contains valid JSON-RPC methods. A class
-	 * if valid when:<br>
-	 * - There are no public methods with equal names<br>
-	 * - The parameters of all public methods have the @Name annotation<br>
-	 * If the class is not valid, an Exception is thrown
-	 * 
-	 * @param c
-	 *            The class to be verified
-	 * @param requestParams
-	 *            optional request parameters
-	 * @return errors A list with validation errors. When no problems are found,
-	 *         an empty list is returned
-	 */
-	public static List<String> validate(final Class<?> c,
-			final RequestParams requestParams) {
-		final List<String> errors = new ArrayList<String>(0);
-		final Set<String> methodNames = new HashSet<String>(10);
-
-		AnnotatedClass ac = null;
-		try {
-			ac = AnnotationUtil.get(c);
-			if (ac != null) {
-				for (final AnnotatedMethod method : ac.getMethods()) {
-					final boolean available = isAvailable(method, null,
-							requestParams, null);
-					if (available) {
-						// The method name may only occur once
-						final String name = method.getName();
-						if (methodNames.contains(name)) {
-							errors.add("Public method '"
-									+ name
-									+ "' is defined more than once, which is not"
-									+ " allowed for JSON-RPC.");
-						}
-						methodNames.add(name);
-
-						// TODO: I removed duplicate @Name check. If you reach
-						// this point the function at least has named
-						// parameters, due to the isAvailable() call. Should we
-						// add a duplicates check to isAvailable()?
-					}
-				}
-			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Problems wrapping class for annotation", e);
-			errors.add("Class can't be wrapped for annotation, exception raised:"
-					+ e.getLocalizedMessage());
-		}
-		return errors;
 	}
 
 	/**

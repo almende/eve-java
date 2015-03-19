@@ -77,9 +77,6 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	public <T> JSONRequest(final String method, final ObjectNode params,
 			final AsyncCallback<T> callback) {
-		if (callback != null) {
-
-		}
 		init(null, method, params, callback);
 	}
 
