@@ -47,7 +47,7 @@ public class RunQueue extends AbstractExecutorService {
 			}
 		}
 	}
-
+	
 	private class Worker extends Thread {
 		final private Object	lock		= new Object();
 		private Runnable		task		= null;
@@ -56,6 +56,9 @@ public class RunQueue extends AbstractExecutorService {
 		public boolean runTask(final Runnable task) {
 			if (isShutdown) {
 				return false;
+			}
+			if (task == null) {
+				return true;
 			}
 			synchronized (lock) {
 				if (this.task != null) {
@@ -67,17 +70,17 @@ public class RunQueue extends AbstractExecutorService {
 			return true;
 		}
 
+
 		@Override
 		public void run() {
-			for (;;) {
+			while (!isShutdown) {
 				synchronized (lock) {
 					while (task == null) {
 						try {
 							lock.wait();
-						} catch (InterruptedException e) {
-							if (isShutdown) {
-								return;
-							}
+						} catch (InterruptedException e) {}
+						if (isShutdown) {
+							return;
 						}
 					}
 					if (!running.contains(this)) {
@@ -85,7 +88,7 @@ public class RunQueue extends AbstractExecutorService {
 					}
 					task.run();
 					task = null;
-
+					
 					if (running.size() <= nofCores) {
 						// Shortcut: Check if there are more tasks available.
 						task = tasks.poll();
@@ -94,6 +97,9 @@ public class RunQueue extends AbstractExecutorService {
 						threadDone(this);
 					}
 				}
+			}
+			if (task != null){
+				tasks.add(task);
 			}
 		}
 	}
@@ -128,6 +134,10 @@ public class RunQueue extends AbstractExecutorService {
 					worker.isShutdown = true;
 					worker.interrupt();
 				}
+				for (Worker worker : reserve) {
+					worker.isShutdown = true;
+					worker.interrupt();
+				}
 				for (Worker worker : waiting) {
 					worker.isShutdown = true;
 					worker.interrupt();
@@ -144,7 +154,7 @@ public class RunQueue extends AbstractExecutorService {
 
 	@Override
 	public boolean isTerminated() {
-		return isShutdown && (running.size() == 0 && waiting.size() == 0);
+		return isShutdown && (running.size() == 0 && waiting.size() == 0 && reserve.size() == 0);
 	}
 
 	@Override
@@ -156,7 +166,7 @@ public class RunQueue extends AbstractExecutorService {
 				terminationLock.wait(sleepTime);
 			}
 		}
-		return (running.size() == 0 && waiting.size() == 0);
+		return (running.size() == 0 && waiting.size() == 0 && reserve.size() == 0);
 	}
 
 	@Override
@@ -165,8 +175,14 @@ public class RunQueue extends AbstractExecutorService {
 			LOG.warning("Execute called after shutdown, dropping command");
 			return;
 		}
-		final Worker thread = getFreeThread();
-		if (thread == null || !thread.runTask(command)) {
+		Worker thread = getFreeThread();
+		while (thread != null) {
+			if (thread.runTask(command)) {
+				break;
+			}
+			thread = getFreeThread();
+		}
+		if (thread == null) {
 			tasks.add(command);
 		}
 	}
@@ -236,15 +252,19 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private void threadTearDown(final Worker thread) {
+		
+		if (!thread.isShutdown) {
+			thread.isShutdown = true;
+			thread.interrupt();
+		}
+		synchronized (reserve) {
+			reserve.remove(thread);
+		}
 		synchronized (running) {
 			running.remove(thread);
 		}
 		synchronized (waiting) {
 			waiting.remove(thread);
-		}
-		if (!thread.isShutdown) {
-			thread.isShutdown = true;
-			thread.interrupt();
 		}
 	}
 
@@ -282,11 +302,12 @@ public class RunQueue extends AbstractExecutorService {
 					break;
 			}
 		}
-		if (tasks.size() > 0) {
+		while (tasks.size() > 0) {
 			Worker thread = getFreeThread();
-			while (tasks.size() > 0 && thread != null) {
+			if (thread != null) {
 				threadDone(thread);
-				thread = getFreeThread();
+			} else {
+				break;
 			}
 		}
 	}

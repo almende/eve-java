@@ -6,7 +6,6 @@ package com.almende.eve.test;
 
 import java.util.logging.Logger;
 
-
 import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
@@ -74,9 +73,17 @@ public class TestThreads extends TestCase {
 			ThreadPool.getPool().execute(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {}
+					if (Math.random() > 0.5) {
+						int count = 0;
+						while (count < 10000) {
+							count++;
+							String.valueOf(count);
+						}
+					} else {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {}
+					}
 					flags[j] = true;
 				}
 			});
@@ -93,6 +100,10 @@ public class TestThreads extends TestCase {
 				}
 			}
 		}
-		LOG.warning(count + " jobs took: "+ (new Duration(start,DateTime.now()).getMillis())+ " ms");
+		LOG.warning(count + " jobs took: "
+				+ (new Duration(start, DateTime.now()).getMillis()) + " ms");
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {}
 	}
 }

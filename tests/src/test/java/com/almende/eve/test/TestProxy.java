@@ -54,5 +54,11 @@ public class TestProxy extends TestCase {
 		proxy.doSomething();
 		
 		assertNull(proxy.doMore());
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e){
+			
+		}
 	}
 }
