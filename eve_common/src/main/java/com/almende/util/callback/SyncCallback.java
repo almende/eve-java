@@ -43,8 +43,8 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	@Override
 	public void onSuccess(final T response) {
 		this.response = response;
-		done = true;
 		synchronized (this) {
+			done = true;
 			notifyAll();
 		}
 	}
@@ -58,8 +58,8 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	@Override
 	public void onFailure(final Exception exception) {
 		this.exception = exception;
-		done = true;
 		synchronized (this) {
+			done = true;
 			notifyAll();
 		}
 	}
@@ -74,8 +74,8 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	 *             the exception
 	 */
 	public T get() throws Exception {
-		while (!done) {
-			synchronized (this) {
+		synchronized (this) {
+			while (!done) {
 				wait();
 			}
 		}
