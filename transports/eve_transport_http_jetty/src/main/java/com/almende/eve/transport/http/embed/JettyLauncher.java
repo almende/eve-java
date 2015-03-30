@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
@@ -41,8 +42,10 @@ public class JettyLauncher implements ServletLauncher {
 	 * 
 	 * @param params
 	 *            the params
+	 * @throws ServletException
+	 *	      the ServletException
 	 */
-	public void initServer(final ObjectNode params) {
+	public void initServer(final ObjectNode params) throws ServletException {
 		int port = 8080;
 		if (params != null && params.has("port")) {
 			port = params.get("port").asInt();
@@ -84,7 +87,7 @@ public class JettyLauncher implements ServletLauncher {
 	 */
 	@Override
 	public void add(final Servlet servlet, final URI servletPath,
-			final ObjectNode config) {
+			final ObjectNode config) throws ServletException {
 		// TODO: config hierarchy...
 		if (server == null) {
 			if (config != null) {
@@ -124,7 +127,7 @@ public class JettyLauncher implements ServletLauncher {
 	 */
 	@Override
 	public void add(final ServerEndpointConfig serverConfig,
-			final ObjectNode config) {
+			final ObjectNode config) throws ServletException {
 		// TODO: config hierarchy...
 		if (server == null) {
 			if (config != null) {

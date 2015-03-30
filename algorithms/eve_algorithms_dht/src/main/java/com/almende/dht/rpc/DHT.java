@@ -6,6 +6,7 @@ package com.almende.dht.rpc;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +40,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * The Class DHT Adapter.

@@ -40,9 +40,7 @@ public class DebugServlet extends EveServlet {
 	 *            the servlet url
 	 */
 	public DebugServlet(final URI servletUrl) {
-		if (servletUrl != null) {
-			myUrl = servletUrl;
-		}
+		super(servletUrl);
 	}
 	
 	private String getResource(final String url) {

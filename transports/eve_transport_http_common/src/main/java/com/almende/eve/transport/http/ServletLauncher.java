@@ -7,6 +7,7 @@ package com.almende.eve.transport.http;
 import java.net.URI;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 import javax.websocket.server.ServerEndpointConfig;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,9 +31,11 @@ public interface ServletLauncher {
 	 *            the servlet path
 	 * @param config
 	 *            the config
+	 * @throws ServletException
+	 *             the servlet exception
 	 */
 	void add(final Servlet servlet, final URI servletPath,
-			final ObjectNode config);
+			final ObjectNode config) throws ServletException;
 	
 	/**
 	 * Adds a Websocket Server configuration, and potentially starting the
@@ -42,8 +45,10 @@ public interface ServletLauncher {
 	 *            the server config
 	 * @param config
 	 *            the config
+	 * @throws ServletException
+	 *             the servlet exception
 	 */
-	void add(ServerEndpointConfig serverConfig, ObjectNode config);
+	void add(ServerEndpointConfig serverConfig, ObjectNode config) throws ServletException;
 
 	/**
 	 * Adds the filter.
