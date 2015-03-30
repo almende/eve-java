@@ -37,6 +37,7 @@ public class RunQueue extends AbstractExecutorService {
 		public void run() {
 			for (;;) {
 				try {
+					// TODO: make this dynamic?
 					Thread.sleep(100);
 				} catch (InterruptedException e) {}
 				if (isShutdown) {
@@ -79,17 +80,17 @@ public class RunQueue extends AbstractExecutorService {
 							}
 						}
 					}
-					if (!running.contains(this)){
+					if (!running.contains(this)) {
 						threadContinue(this);
 					}
 					task.run();
 					task = null;
-					
-					if (running.size() <= nofCores){
-						//Shortcut: Check if there are more tasks available.
+
+					if (running.size() <= nofCores) {
+						// Shortcut: Check if there are more tasks available.
 						task = tasks.poll();
 					}
-					if (task == null){
+					if (task == null) {
 						threadDone(this);
 					}
 				}
@@ -102,6 +103,11 @@ public class RunQueue extends AbstractExecutorService {
 	 */
 	public RunQueue() {
 		nofCores = Runtime.getRuntime().availableProcessors();
+		if (nofCores < 4) {
+			// Keep a minimum number of assumed cores, to prevent thread
+			// starvation.
+			nofCores = 4;
+		}
 		running = new HashSet<Worker>(nofCores);
 		scanner.start();
 	}
@@ -187,7 +193,7 @@ public class RunQueue extends AbstractExecutorService {
 		}
 		return res;
 	}
-	
+
 	private void threadDone(final Worker thread) {
 		if (isShutdown()) {
 			thread.isShutdown = true;

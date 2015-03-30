@@ -6,8 +6,11 @@ package com.almende.eve.test;
 
 import java.util.logging.Logger;
 
+
 import junit.framework.TestCase;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Test;
 
 import com.almende.util.threads.ThreadPool;
@@ -54,5 +57,42 @@ public class TestThreads extends TestCase {
 		}
 		LOG.warning(count + " jobs didn't finish in time (" + duration
 				+ " ms for " + nofjobs + " jobs)");
+	}
+
+	/**
+	 * Test scheduling.
+	 */
+	@Test
+	public void testSleepingThreads() {
+		int nofjobs = 2000;
+		DateTime start = DateTime.now();
+		final boolean[] flags = new boolean[nofjobs];
+
+		for (int i = 0; i < nofjobs; i++) {
+			final int j = i;
+			flags[j] = false;
+			ThreadPool.getPool().execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+					flags[j] = true;
+				}
+			});
+		}
+		int count = 0;
+		while (count < nofjobs) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {}
+			count = 0;
+			for (int i = 0; i < nofjobs; i++) {
+				if (flags[i]) {
+					count++;
+				}
+			}
+		}
+		LOG.warning(count + " jobs took: "+ (new Duration(start,DateTime.now()).getMillis())+ " ms");
 	}
 }

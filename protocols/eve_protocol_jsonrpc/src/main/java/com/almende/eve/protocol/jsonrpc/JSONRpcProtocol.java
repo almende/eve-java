@@ -33,7 +33,7 @@ public class JSONRpcProtocol implements Protocol {
 																				.getName());
 	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
 	static {
-		EVEREQUESTPARAMS.put(Sender.class, null);
+		EVEREQUESTPARAMS.put(Sender.class, URI.create("local:null"));
 	}
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
@@ -168,7 +168,8 @@ public class JSONRpcProtocol implements Protocol {
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
-				LOG.log(Level.WARNING, "received response"+id+", callback:"+callback);
+				LOG.log(Level.WARNING, "received response" + id + ", callback:"
+						+ callback);
 				if (callback != null) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
 					final JSONRPCException error = response.getError();
@@ -185,7 +186,7 @@ public class JSONRpcProtocol implements Protocol {
 			final JSONRPCException jsonError = new JSONRPCException(
 					JSONRPCException.CODE.INTERNAL_ERROR, e.getMessage(), e);
 			LOG.log(Level.WARNING, "Exception in receiving message", jsonError);
-			if (id != null){
+			if (id != null) {
 				final JSONResponse response = new JSONResponse(jsonError);
 				response.setId(id);
 				return response;
@@ -205,7 +206,8 @@ public class JSONRpcProtocol implements Protocol {
 
 	private <T> void addCallback(final JSONRequest request,
 			final AsyncCallback<T> asyncCallback) {
-		if (asyncCallback == null || request.getId() == null || request.getId().isNull()) {
+		if (asyncCallback == null || request.getId() == null
+				|| request.getId().isNull()) {
 			return;
 		}
 
