@@ -18,7 +18,7 @@ Requirements:
 3: git commit -a
 4: git push --all
 
-5: git branch -b <ver>_release
+5: git branch -b <ver>_release   //(version with X at end, e.g. v1.1.X_release)
 6: git push --set-upstream origin <ver>_release
 7: git checkout master
 

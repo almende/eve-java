@@ -47,7 +47,7 @@ public class RunQueue extends AbstractExecutorService {
 			}
 		}
 	}
-	
+
 	private class Worker extends Thread {
 		final private Object	lock		= new Object();
 		private Runnable		task		= null;
@@ -70,7 +70,6 @@ public class RunQueue extends AbstractExecutorService {
 			return true;
 		}
 
-
 		@Override
 		public void run() {
 			while (!isShutdown) {
@@ -88,7 +87,7 @@ public class RunQueue extends AbstractExecutorService {
 					}
 					task.run();
 					task = null;
-					
+
 					if (running.size() <= nofCores) {
 						// Shortcut: Check if there are more tasks available.
 						task = tasks.poll();
@@ -98,7 +97,7 @@ public class RunQueue extends AbstractExecutorService {
 					}
 				}
 			}
-			if (task != null){
+			if (task != null) {
 				tasks.add(task);
 			}
 		}
@@ -154,7 +153,9 @@ public class RunQueue extends AbstractExecutorService {
 
 	@Override
 	public boolean isTerminated() {
-		return isShutdown && (running.size() == 0 && waiting.size() == 0 && reserve.size() == 0);
+		return isShutdown
+				&& (running.size() == 0 && waiting.size() == 0 && reserve
+						.size() == 0);
 	}
 
 	@Override
@@ -252,7 +253,6 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private void threadTearDown(final Worker thread) {
-		
 		if (!thread.isShutdown) {
 			thread.isShutdown = true;
 			thread.interrupt();
