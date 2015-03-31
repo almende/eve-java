@@ -168,8 +168,6 @@ public class JSONRpcProtocol implements Protocol {
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
-				LOG.log(Level.WARNING, "received response" + id + ", callback:"
-						+ callback);
 				if (callback != null) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
 					final JSONRPCException error = response.getError();
