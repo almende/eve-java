@@ -31,14 +31,15 @@ public class RunQueue extends AbstractExecutorService {
 	private int						nofCores;
 	private HashSet<Worker>			running			= null;
 	private boolean					isShutdown		= false;
+	private int						interval		= 100;
+	private final int				maxinterval		= 500;
 
 	private class Scanner extends Thread {
 		@Override
 		public void run() {
 			for (;;) {
 				try {
-					// TODO: make this dynamic?
-					Thread.sleep(100);
+					Thread.sleep(interval);
 				} catch (InterruptedException e) {}
 				if (isShutdown) {
 					return;
@@ -284,6 +285,7 @@ public class RunQueue extends AbstractExecutorService {
 		synchronized (running) {
 			runn_arr = running.toArray(new Worker[0]);
 		}
+		int count = 0;
 		for (final Worker thread : runn_arr) {
 			switch (thread.getState()) {
 				case TIMED_WAITING:
@@ -293,6 +295,7 @@ public class RunQueue extends AbstractExecutorService {
 				case BLOCKED:
 					if (thread.task != null) {
 						threadWaiting(thread);
+						count++;
 					}
 					break;
 				case TERMINATED:
@@ -300,6 +303,13 @@ public class RunQueue extends AbstractExecutorService {
 					break;
 				default:
 					break;
+			}
+		}
+		if (count == 0) {
+			interval = Math.min(interval * 2, maxinterval);
+		} else {
+			while (count-- > 0) {
+				interval = interval > 1 ? interval / 2 : 1;
 			}
 		}
 		while (tasks.size() > 0) {
