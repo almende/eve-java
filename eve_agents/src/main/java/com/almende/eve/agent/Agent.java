@@ -909,5 +909,10 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				throw new IOException(e);
 			}
 		}
+
+		@Override
+		public List<URI> getSenderUrls() {
+			return getUrls();
+		}
 	}
 }

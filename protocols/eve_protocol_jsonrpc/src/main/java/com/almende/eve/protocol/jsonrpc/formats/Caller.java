@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.List;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
@@ -15,11 +16,19 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Interface Receiver, implementations will be able to receive messages from
- * Eve's transport service.
+ * The Interface Caller, can be used to provide capabilities the possibility to
+ * send messages on behalf of the entity implementing this interface.
  */
 public interface Caller {
 
+
+	/**
+	 * Gets the sender addresses known to this caller. 
+	 * 
+	 * @return the urls
+	 */
+	List<URI> getSenderUrls() ;
+	
 	/**
 	 * Send async.
 	 * 
