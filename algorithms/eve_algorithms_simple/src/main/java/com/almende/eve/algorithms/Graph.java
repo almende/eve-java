@@ -50,7 +50,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * returns URI.<br>
  * graph.randomWalk({"tag":-tag-,"steps":-steps-,"origin":-URI-,"runId":-id-})
  * //perform the randomwalk, report to origin<br>
- * graph.reportRandomWalk({""runId":-id-}) //Report resulting node (through the @Sender)<br>
+ * graph.reportRandomWalk({""runId":-id-}) //Report resulting node (through the
+ * @Sender)<br>
  */
 @Namespace("graph")
 public class Graph {
@@ -200,10 +201,11 @@ public class Graph {
 	// ScaleFreeNetwork
 
 	/**
-	 * Adds the node to a tagged Scale-Free-Network overlay.
+	 * Adds this node to a tagged Scale-Free-Network overlay, starting from
+	 * remote.
 	 *
-	 * @param node
-	 *            the new nodes address
+	 * @param start
+	 *            the start
 	 * @param tag
 	 *            the tag
 	 * @param m
@@ -214,23 +216,25 @@ public class Graph {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.PUBLIC)
-	public void addNode2SFN(final @Name("node") URI node,
+	public void addNode2SFN(final @Name("start") URI start,
 			final @Name("tag") String tag, final @Name("nofEdges") int m,
 			final @Optional @Name("initialWalk") Integer l) throws IOException {
 		final Set<URI> others = new HashSet<URI>(m);
-		URI remote = doRandomWalk(tag, l != null ? l : 7);
+		Params params = new Params();
+		params.add("tag", tag);
+		params.add("steps", 7);
+		URI remote = caller.callSync(start, "graph.doRandomWalk", params,
+				URI.class);
 		others.add(remote);
 		while (others.size() < m) {
-			final Params params = new Params();
+			params = new Params();
 			params.add("tag", tag);
 			remote = caller.callSync(remote, "graph.doRandomWalk", params,
 					URI.class);
 			others.add(remote);
 		}
-		final Params params = new Params();
-		params.add("nodes", others.toArray(new URI[0]));
-		params.add("tag", tag);
-		caller.call(node, "graph.addEdges", params);
+		params = new Params();
+		addEdges(new ArrayList<URI>(others), tag);
 	}
 
 	// Random walk

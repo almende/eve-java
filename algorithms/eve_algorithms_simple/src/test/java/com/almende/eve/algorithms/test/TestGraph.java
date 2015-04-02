@@ -99,7 +99,7 @@ public class TestGraph extends TestCase {
 		for (int i=max; i< nofNodes; i++ ){
 			NodeAgent agent = new NodeAgent("" + i, config);
 			agents.add(agent);
-			start.getGraph().addNode2SFN(agent.getUrls().get(0), "SFN", nofEdges, startSteps);
+			agent.getGraph().addNode2SFN(start.getUrls().get(0), "SFN", nofEdges, startSteps);
 		}
 		
 		LOG.warning(writeVisGraph(agents));
