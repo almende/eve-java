@@ -34,9 +34,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * The Class Graph, contains storage, logic and communication for maintaining a
  * graph, potentially existing of tagged subgraphs, with edges that can carry a
  * Comparable Weight.
- * 
  * Among management tooling, the class also contains a Scale-Free-Network
- * generator algorithm and some graph search tools.
+ * generator algorithm and some graph search tools. <br>
+ * API:<br>
+ * <br>
+ * graph.addEdge({"edge":{"node":-URI-,"tag":-tag-,"weight":-object-}}); //Add
+ * single Edge <br>
+ * graph.addEdges({"nodes":[-URI-],"tag":-tag-}); //Add double directional
+ * tagged Edges<br>
+ * graph.addNode2SFN({"node":-URI-,"tag":-tag-,
+ * "nofEdges":-m-,"initialWalk":-l-}) //add a node to a tagged
+ * scale-free-network overlay. <br>
+ * <br>
+ * graph.doRandomWalk({"tag":-tag-,"steps":-steps-}) //initiate random walk,
+ * returns URI.<br>
+ * graph.randomWalk({"tag":-tag-,"steps":-steps-,"origin":-URI-,"runId":-id-})
+ * //perform the randomwalk, report to origin<br>
+ * graph.reportRandomWalk({""runId":-id-}) //Report resulting node (through the @Sender)<br>
  */
 @Namespace("graph")
 public class Graph {
@@ -81,53 +95,12 @@ public class Graph {
 	/**
 	 * Adds a new edge.
 	 *
-	 * @param node
-	 *            the node
+	 * @param edge
+	 *            the edge
 	 */
 	@Access(AccessType.PUBLIC)
-	public void addEdge(@Name("node") URI node) {
-		addFullEdge(node, null, null);
-	}
-
-	/**
-	 * Adds a single direction tagged edge to the other node.
-	 *
-	 * @param node
-	 *            the node
-	 * @param tag
-	 *            the tag
-	 */
-	@Access(AccessType.PUBLIC)
-	public void addTaggedEdge(@Name("node") URI node, @Name("tag") String tag) {
-		addFullEdge(node, tag, null);
-	}
-
-	/**
-	 * Adds a new edge.
-	 *
-	 * @param node
-	 *            the node
-	 * @param weight
-	 *            the weight
-	 */
-	public void addWeightedEdge(URI node, Comparable<Object> weight) {
-		addFullEdge(node, null, weight);
-	}
-
-	/**
-	 * Adds a new edge.
-	 *
-	 * @param address
-	 *            the address
-	 * @param tag
-	 *            the tag
-	 * @param weight
-	 *            the weight
-	 */
-	public synchronized void addFullEdge(final URI address, final Object tag,
-			final Comparable<Object> weight) {
+	public void addEdge(final @Name("edge") Edge edge) {
 		edges = Arrays.copyOf(edges, edges.length + 1);
-		final Edge edge = new Edge(address, tag, weight);
 		edges[edges.length - 1] = edge;
 		if (set != null) {
 			set.add(edge);
@@ -191,7 +164,8 @@ public class Graph {
 	 * @return the random edge
 	 */
 	@JsonIgnore
-	public Edge getRandomEdge(final String tag) {
+	@Access(AccessType.PUBLIC)
+	public Edge getRandomEdge(final @Name("tag") String tag) {
 		final Edge[] taggedEdges = getByTag(tag);
 		if (taggedEdges.length > 0) {
 			return taggedEdges[(int) Math.floor(Math.random()
@@ -215,14 +189,14 @@ public class Graph {
 	public void addEdges(@Name("nodes") List<URI> nodes, @Name("tag") String tag)
 			throws IOException {
 		for (URI node : nodes) {
-			addTaggedEdge(node, tag);
+			addEdge(new Edge(node, tag, null));
 			final Params params = new Params();
-			params.add("node", caller.getSenderUrls().get(0));
-			params.add("tag", tag);
-			caller.call(node, "graph.addTaggedEdge", params);
+			params.add("edge", new Edge(caller.getSenderUrls().get(0), tag,
+					null));
+			caller.call(node, "graph.addEdge", params);
 		}
 	}
-	
+
 	// ScaleFreeNetwork
 
 	/**
@@ -240,7 +214,7 @@ public class Graph {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.PUBLIC)
-	public void addNode2SFN(final @Name("address") URI node,
+	public void addNode2SFN(final @Name("node") URI node,
 			final @Name("tag") String tag, final @Name("nofEdges") int m,
 			final @Optional @Name("initialWalk") Integer l) throws IOException {
 		final Set<URI> others = new HashSet<URI>(m);
@@ -262,7 +236,7 @@ public class Graph {
 	// Random walk
 
 	/**
-	 * Do random walk.
+	 * Initiate a random walk and report the resulting address.
 	 *
 	 * @param steps
 	 *            the steps
@@ -279,9 +253,9 @@ public class Graph {
 			steps = Math.random() > probSFN ? 2 : 1;
 		}
 		SyncCallback<URI> callback = new SyncCallback<URI>();
-		String id = new UUID().toString();
-		callbacks.put(id, callback);
-		randomWalk(steps, caller.getSenderUrls().get(0), id, tag);
+		String runId = new UUID().toString();
+		callbacks.put(runId, callback);
+		randomWalk(tag, steps, caller.getSenderUrls().get(0), runId);
 		try {
 			return callback.get();
 		} catch (Exception e) {
@@ -292,49 +266,49 @@ public class Graph {
 	}
 
 	/**
-	 * Random walk.
+	 * Random walk: take the next step, if steps==0, send message to origin.
 	 *
+	 * @param tag
+	 *            the tag
 	 * @param steps
 	 *            the steps
 	 * @param origin
 	 *            the origin
-	 * @param id
-	 *            the id
-	 * @param tag
-	 *            the tag
+	 * @param runId
+	 *            the run id
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.PUBLIC)
-	public void randomWalk(@Name("steps") int steps,
-			@Name("origin") URI origin, @Name("id") String id,
-			@Name("tag") String tag) throws IOException {
+	public void randomWalk(@Name("tag") String tag, @Name("steps") int steps,
+			@Name("origin") URI origin, @Name("runId") String runId)
+			throws IOException {
 		URI next = getRandomEdge(tag).getAddress();
 		if (steps > 0) {
 			Params params = new Params();
 			params.add("steps", steps - 1);
 			params.add("origin", origin);
-			params.add("id", id);
+			params.add("runId", runId);
 			params.add("tag", tag);
 			caller.call(next, "graph.randomWalk", params);
 		} else {
 			Params params = new Params();
-			params.add("id", id);
+			params.add("runId", runId);
 			caller.call(origin, "graph.reportRandomWalk", params);
 		}
 	}
 
 	/**
-	 * Report random walk.
+	 * Random Walk: reporting method.
 	 *
 	 * @param other
 	 *            the other
-	 * @param id
-	 *            the id
+	 * @param runId
+	 *            the run id
 	 */
 	@Access(AccessType.PUBLIC)
-	public void reportRandomWalk(@Sender URI other, @Name("id") String id) {
-		AsyncCallback<URI> callback = callbacks.get(id);
+	public void reportRandomWalk(@Sender URI other, @Name("runId") String runId) {
+		AsyncCallback<URI> callback = callbacks.get(runId);
 		callback.onSuccess(other);
 	}
 }

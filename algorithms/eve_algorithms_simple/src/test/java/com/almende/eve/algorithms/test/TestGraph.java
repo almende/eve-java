@@ -65,7 +65,7 @@ public class TestGraph extends TestCase {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testGraph() throws IOException {
+	public void testSFNGraph() throws IOException {
 		int nofEdges = 3;
 		int startDegree = 2;
 		int startSteps = 7;
@@ -91,7 +91,7 @@ public class TestGraph extends TestCase {
 				NodeAgent other = agents.get((i + j + 1) % max);
 				if (other.equals(agent))
 					continue;
-				agent.getGraph().addTaggedEdge(other.getUrls().get(0), "SFN");
+				agent.getGraph().addEdge(new Edge(other.getUrls().get(0), "SFN",null));
 			}
 		}
 		
