@@ -31,7 +31,12 @@ import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * The Class NetworkRPC.
+ * The Class Graph, contains storage, logic and communication for maintaining a
+ * graph, potentially existing of tagged subgraphs, with edges that can carry a
+ * Comparable Weight.
+ * 
+ * Among management tooling, the class also contains a Scale-Free-Network
+ * generator algorithm and some graph search tools.
  */
 @Namespace("graph")
 public class Graph {
@@ -217,17 +222,16 @@ public class Graph {
 			caller.call(node, "graph.addTaggedEdge", params);
 		}
 	}
-
-	// Gossip (how to show "state change", or shouldn't gossip be in this part,
-	// just using the edge lists for neighbors?)
-
+	
 	// ScaleFreeNetwork
 
 	/**
-	 * Adds the node2 sfn.
+	 * Adds the node to a tagged Scale-Free-Network overlay.
 	 *
 	 * @param node
 	 *            the new nodes address
+	 * @param tag
+	 *            the tag
 	 * @param m
 	 *            the number of new edges to attach
 	 * @param l
@@ -237,9 +241,8 @@ public class Graph {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void addNode2SFN(final @Name("address") URI node,
-			final @Name("nofEdges") int m,
+			final @Name("tag") String tag, final @Name("nofEdges") int m,
 			final @Optional @Name("initialWalk") Integer l) throws IOException {
-		final String tag = "SFN";
 		final Set<URI> others = new HashSet<URI>(m);
 		URI remote = doRandomWalk(tag, l != null ? l : 7);
 		others.add(remote);
