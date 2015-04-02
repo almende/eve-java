@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Namespace("trickle")
 public class TrickleRPC {
+	private String		namespace	= "trickle.";
 	private Trickle		trickle		= null;
 	private String		intTaskId	= null;
 	private String		sendTaskId	= null;
@@ -61,6 +62,9 @@ public class TrickleRPC {
 		if (config.has("redundancyFactor")) {
 			redundancyFactor = config.get("redundancyFactor").asInt();
 		}
+		if (config.has("namespace")){
+			namespace = config.get("namespace").asText()+namespace;
+		}
 		trickle = new Trickle(intervalMin, intervalFactor, redundancyFactor);
 		reschedule(trickle.next());
 	}
@@ -74,10 +78,10 @@ public class TrickleRPC {
 			if (intTaskId != null) {
 				scheduler.cancel(intTaskId);
 			}
-			sendTaskId = scheduler.schedule(new JSONRequest("trickle.send",
+			sendTaskId = scheduler.schedule(new JSONRequest(namespace+"send",
 					null), now.plus(intervals[0]));
 			intTaskId = scheduler.schedule(new JSONRequest(
-					"trickle.nextInterval", null),
+					namespace+"nextInterval", null),
 					now.plus(intervals[1]));
 		}
 	}
