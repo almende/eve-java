@@ -55,6 +55,10 @@ public class RunQueue extends AbstractExecutorService {
 		private boolean			isShutdown	= false;
 
 		public boolean runTask(final Runnable task) {
+			if (this.task != null) {
+				//Early out
+				return false;
+			}
 			if (isShutdown) {
 				return false;
 			}
