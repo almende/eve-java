@@ -63,6 +63,16 @@ public class TestEventBus extends TestCase {
 		
 		LOG.warning("Network generation in:"
 				+ (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
+
+		
+		LOG.warning("Pausing for a minute!");
+		try {
+			Thread.sleep(60000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		LOG.warning("Going forward again!");
 		
 		start.sendEvent("report_*");
 
@@ -78,6 +88,16 @@ public class TestEventBus extends TestCase {
 		LOG.warning("All agents ("+nofAgents+") reporting on event in:"
 				+ (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
 
+		LOG.warning("Pausing for a minute!");
+		try {
+			Thread.sleep(60000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		LOG.warning("Going forward again!");
+
+		
 		int agentId = (int)Math.floor(Math.random()*nofAgents);
 		
 		start.sendEvent("report_"+agentId);

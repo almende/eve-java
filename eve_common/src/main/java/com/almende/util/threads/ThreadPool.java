@@ -48,6 +48,12 @@ public class ThreadPool {
 			// Do nothing, Java 6 environment
 		}
 
+		scheduledPool.scheduleAtFixedRate(new Runnable(){
+			@Override
+			public void run() {
+				scheduledPool.purge();
+			}}, 1000, 1000, TimeUnit.MILLISECONDS);
+		
 		queue = new RunQueue();
 		for (Runnable task : openTasks){
 			if (task instanceof RunnableScheduledFuture){

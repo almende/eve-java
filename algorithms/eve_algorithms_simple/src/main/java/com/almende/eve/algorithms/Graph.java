@@ -312,7 +312,7 @@ public class Graph {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void reportRandomWalk(@Sender URI other, @Name("runId") String runId) {
-		AsyncCallback<URI> callback = callbacks.get(runId);
+		AsyncCallback<URI> callback = callbacks.remove(runId);
 		callback.onSuccess(other);
 	}
 }

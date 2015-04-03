@@ -7,7 +7,6 @@ package com.almende.util.callback;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -24,7 +23,6 @@ public class AsyncCallbackQueue<T> {
 	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>(5);
 	// FIXME: provide some means for the Appengine implementation of
 	// ThreadManager.
-	private static ScheduledThreadPoolExecutor	scheduler	= ThreadPool.getScheduledPool();
 	
 	/** timeout in seconds */
 	private int									defTimeout	= 30;
@@ -56,7 +54,7 @@ public class AsyncCallbackQueue<T> {
 		final AsyncCallbackQueue<T> me = this;
 		final CallbackHandler handler = new CallbackHandler();
 		handler.callback = callback;
-		handler.timeout = scheduler.schedule(new Runnable() {
+		handler.timeout = ThreadPool.getScheduledPool().schedule(new Runnable() {
 			@Override
 			public void run() {
 				final AsyncCallback<T> callback = me.pull(id);
