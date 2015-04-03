@@ -6,6 +6,7 @@ package com.almende.eve.protocol.jsonrpc.formats;
 
 import java.io.Serializable;
 
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -55,5 +56,21 @@ public abstract class JSONMessage implements Serializable {
 	 */
 	protected void setRequest(boolean request) {
 		this.request = request;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if (o == this){
+			return true;
+		}
+		if (!(o instanceof JSONMessage)){
+			return false;
+		}
+		return JOM.getInstance().valueToTree(this).equals(JOM.getInstance().valueToTree(o));
+	}
+	
+	@Override
+	public int hashCode(){
+		return JOM.getInstance().valueToTree(this).hashCode();
 	}
 }

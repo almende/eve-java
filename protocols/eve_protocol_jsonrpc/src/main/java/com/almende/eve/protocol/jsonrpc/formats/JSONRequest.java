@@ -355,6 +355,7 @@ public final class JSONRequest extends JSONMessage {
 	 *
 	 * @return the callback
 	 */
+	@JsonIgnore
 	public AsyncCallback<?> getCallback() {
 		return callback;
 	}
@@ -365,6 +366,7 @@ public final class JSONRequest extends JSONMessage {
 	 * @param callback
 	 *            the new callback
 	 */
+	@JsonIgnore
 	public <T> void setCallback(AsyncCallback<T> callback) {
 		this.callback = callback;
 	}
