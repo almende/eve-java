@@ -56,7 +56,7 @@ public class RunQueue extends AbstractExecutorService {
 
 		public boolean runTask(final Runnable task) {
 			if (this.task != null) {
-				//Early out
+				// Early out
 				return false;
 			}
 			if (isShutdown) {
@@ -229,16 +229,18 @@ public class RunQueue extends AbstractExecutorService {
 					} else {
 						return;
 					}
-				} else {
-					synchronized (running) {
-						synchronized (reserve) {
-							if (reserve.size() < nofCores) {
-								running.remove(thread);
-								reserve.add(thread);
-								return;
-							}
-						}
-					}
+				}
+			}
+			synchronized (running) {
+				running.remove(thread);
+			}
+			synchronized (waiting) {
+				waiting.remove(thread);
+			}
+			synchronized (reserve) {
+				if (reserve.size() < nofCores * 5) {
+					reserve.add(thread);
+					return;
 				}
 			}
 		}
