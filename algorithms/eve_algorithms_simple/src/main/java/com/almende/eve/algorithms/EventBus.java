@@ -5,7 +5,6 @@
 package com.almende.eve.algorithms;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -19,6 +18,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
+import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.util.jackson.JOM;
@@ -34,7 +34,8 @@ public class EventBus {
 	private Scheduler			scheduler	= null;
 	private TrickleRPC			trickle		= null;
 	private Caller				caller		= null;
-	private URI[]				neighbors	= null;
+	private Graph				neighbors	= null;
+	private String				tag			= null;
 	private Set<Event>			events		= new HashSet<Event>();
 
 	/**
@@ -46,11 +47,15 @@ public class EventBus {
 	 *            the caller
 	 * @param neighbors
 	 *            the neighbors
+	 * @param tag
+	 *            the tag
 	 */
-	public EventBus(Scheduler scheduler, Caller caller, URI[] neighbors) {
+	public EventBus(Scheduler scheduler, Caller caller, Graph neighbors,
+			String tag) {
 		this.scheduler = scheduler;
 		this.caller = caller;
 		this.neighbors = neighbors;
+		this.tag = tag;
 		scheduleExpiry();
 		scheduleTrigger();
 		setupGossip();
@@ -62,12 +67,13 @@ public class EventBus {
 	 * @param message
 	 *            the message
 	 */
-	public void sendEvent(Object message) {
+	public void sendEvent(JSONRequest message) {
 		final Event event = new Event(DateTime.now().plus(60000).getMillis(),
 				message, caller.getSenderUrls().get(0));
 		synchronized (events) {
 			events.add(event);
 		}
+		trickle.reset();
 	}
 
 	/**
@@ -76,7 +82,8 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleExpiry() {
 		doExpiry();
-		scheduler.schedule("event.scheduleExpiry", DateTime.now().plus(60000));
+		scheduler.schedule(new JSONRequest("event.scheduleExpiry", null),
+				DateTime.now().plus(60000));
 	}
 
 	/**
@@ -104,7 +111,8 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleTrigger() {
 		doTriggers();
-		scheduler.schedule("event.doTriggers", DateTime.now().plus(5000));
+		scheduler.schedule(new JSONRequest("event.doTriggers", null), DateTime
+				.now().plus(5000));
 	}
 
 	/**
@@ -124,8 +132,8 @@ public class EventBus {
 	private void trigger(final Event event) {
 		synchronized (event) {
 			if (!event.isTriggered()) {
-				scheduler.schedule(event.getMessage(), 0);
 				event.setTriggered(true);
+				scheduler.schedule(event.getMessage(), 0);
 			}
 		}
 	}
@@ -143,11 +151,13 @@ public class EventBus {
 		}, new Runnable() {
 			@Override
 			public void run() {
-				for (URI neighbor : neighbors) {
+				final Edge[] neighborArray = neighbors.getByTag(tag);
+				for (Edge neighbor : neighborArray) {
 					final Params params = new Params();
 					params.add("events", events);
 					try {
-						caller.call(neighbor, "receiveEvents", params);
+						caller.call(neighbor.getAddress(),
+								"event.receiveEvents", params);
 					} catch (IOException e) {
 						LOG.log(Level.WARNING, "EventBus got IO error", e);
 					}
@@ -165,12 +175,16 @@ public class EventBus {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void receiveEvents(final @Name("events") Set<Event> events) {
-		if (this.events.equals(events)) {
-			trickle.incr();
-		} else {
-			events.addAll(events);
-			trickle.reset();
-			for (Event event : events) {
+		synchronized (this.events) {
+			if (this.events.equals(events)) {
+				trickle.incr();
+			} else {
+				this.events.addAll(events);
+				trickle.reset();
+			}
+		}
+		synchronized (this.events) {
+			for (Event event : this.events) {
 				if (!event.isTriggered()) {
 					trigger(event);
 				}
@@ -183,7 +197,7 @@ public class EventBus {
 	 *
 	 * @return the trickle
 	 */
-	@Namespace("trickle")
+	@Namespace("*")
 	public TrickleRPC getTrickle() {
 		return trickle;
 	}

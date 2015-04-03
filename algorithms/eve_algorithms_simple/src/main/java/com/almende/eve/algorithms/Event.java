@@ -6,6 +6,7 @@ package com.almende.eve.algorithms;
 
 import java.net.URI;
 
+import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -13,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class Event {
 	private long				expiryTime	= -1;
-	private Object				message		= null;
+	private JSONRequest			message		= null;
 	private URI					sender		= null;
 	transient private boolean	triggered	= false;
 
@@ -32,7 +33,8 @@ public class Event {
 	 * @param sender
 	 *            the sender
 	 */
-	public Event(final long expiryTime, final Object message, final URI sender) {
+	public Event(final long expiryTime, final JSONRequest message,
+			final URI sender) {
 		this.expiryTime = expiryTime;
 		this.message = message;
 		this.sender = sender;
@@ -62,7 +64,7 @@ public class Event {
 	 *
 	 * @return the message
 	 */
-	public Object getMessage() {
+	public JSONRequest getMessage() {
 		return message;
 	}
 
@@ -72,7 +74,7 @@ public class Event {
 	 * @param message
 	 *            the new message
 	 */
-	public void setMessage(Object message) {
+	public void setMessage(JSONRequest message) {
 		this.message = message;
 	}
 
