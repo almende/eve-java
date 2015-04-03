@@ -14,6 +14,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
+import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,7 +58,17 @@ public class EventAgent extends NodeAgent {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void receiveEvent(@Name("message") String message) {
-		LOG.warning(getId() + ": Received event:" + message);
+		if (message.startsWith("report_")) {
+			final String target = message.replace("report_", "");
+			if (target.equals("*") || target.equals(getId())) {
+				try {
+					caller.call(URI.create("local:0"), "reportEventReceived",
+							null);
+				} catch (IOException e) {
+					LOG.log(Level.WARNING, "Couldn't send report?", e);
+				}
+			}
+		}
 	}
 
 	/**
@@ -67,18 +78,48 @@ public class EventAgent extends NodeAgent {
 	 *            the message
 	 */
 	public void sendEvent(String message) {
+		getState().clear();
+		
 		final Params params = new Params();
 		params.add("message", message);
 		events.sendEvent(new JSONRequest("receiveEvent", params));
 	}
-	
+
 	/**
 	 * Gets the event bus.
 	 *
 	 * @return the event bus
 	 */
 	@Namespace("event")
-	public EventBus getEventBus(){
+	public EventBus getEventBus() {
 		return events;
+	}
+
+	/**
+	 * Report event received.
+	 *
+	 * @param sender
+	 *            the sender
+	 */
+	@Access(AccessType.PUBLIC)
+	public void reportEventReceived(@Sender URI sender) {
+		getState().put(sender.toASCIIString().replace("local:", ""), true);
+	}
+
+	/**
+	 * Count received.
+	 *
+	 * @param max
+	 *            the max
+	 * @return the int
+	 */
+	public int countReceived(int max) {
+		int count = 0;
+		for (int i = 0; i < max; i++) {
+			if (getState().containsKey("" + i)) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

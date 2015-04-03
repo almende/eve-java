@@ -150,8 +150,8 @@ final class NamespaceUtil {
 		Object newDestination = destination;
 		for (final AnnotatedMethod method : methodPath) {
 			if (method != null) {
-				newDestination = method.getActualMethod().invoke(newDestination,
-						(Object[]) null);
+				newDestination = method.getActualMethod().invoke(
+						newDestination, (Object[]) null);
 			}
 		}
 		if (newDestination == null) {
