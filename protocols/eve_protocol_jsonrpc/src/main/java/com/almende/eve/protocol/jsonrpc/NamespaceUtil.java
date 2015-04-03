@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * The Class NamespaceUtil.
  */
 final class NamespaceUtil {
-
 	private static final Map<String, AnnotatedMethod[]>	CACHE		= new HashMap<String, AnnotatedMethod[]>();
 	private static final NamespaceUtil					INSTANCE	= new NamespaceUtil();
 	private static final Pattern						PATTERN		= Pattern
@@ -151,7 +150,7 @@ final class NamespaceUtil {
 		Object newDestination = destination;
 		for (final AnnotatedMethod method : methodPath) {
 			if (method != null) {
-				newDestination = method.getActualMethod().invoke(destination,
+				newDestination = method.getActualMethod().invoke(newDestination,
 						(Object[]) null);
 			}
 		}
