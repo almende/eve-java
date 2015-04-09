@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * The Class JSONMessage.
  */
 public abstract class JSONMessage implements Serializable {
+	
 	private static final long		serialVersionUID	= -3324436908445901707L;
 	protected static final String	JSONRPC				= "jsonrpc";
 	protected static final String	ID					= "id";
@@ -57,20 +58,21 @@ public abstract class JSONMessage implements Serializable {
 	protected void setRequest(boolean request) {
 		this.request = request;
 	}
-	
+
 	@Override
-	public boolean equals(Object o){
-		if (o == this){
+	public boolean equals(Object o) {
+		if (o == this) {
 			return true;
 		}
-		if (!(o instanceof JSONMessage)){
+		if (!(o instanceof JSONMessage)) {
 			return false;
 		}
-		return JOM.getInstance().valueToTree(this).equals(JOM.getInstance().valueToTree(o));
+		return JOM.getInstance().valueToTree(this)
+				.equals(JOM.getInstance().valueToTree(o));
 	}
-	
+
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return JOM.getInstance().valueToTree(this).hashCode();
 	}
 }

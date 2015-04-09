@@ -1,0 +1,10 @@
+agents:
+-  id: example
+   class: com.almende.eve.agent.ExampleAgent
+   state:
+     class: com.almende.eve.state.memory.MemoryStateBuilder
+     id: example
+   scheduler:
+     class: com.almende.eve.scheduling.SimpleSchedulerBuilder
+
+

@@ -22,5 +22,5 @@ public interface Capability {
 	 * Delete this capability, releasing all resources where applicable.
 	 */
 	void delete();
-	
+
 }

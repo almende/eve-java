@@ -47,7 +47,7 @@ public class TestDelete extends TestCase {
 		transportConfig.set("jetty", jettyParms);
 
 		AgentConfig config = new AgentConfig("example");
-		config.setTransport(transportConfig);
+		config.addTransport(transportConfig);
 
 		ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);

@@ -29,14 +29,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Namespace("event")
 public class EventBus {
-	private static final Logger	LOG			= Logger.getLogger(EventBus.class
-													.getName());
-	private Scheduler			scheduler	= null;
-	private TrickleRPC			trickle		= null;
-	private Caller				caller		= null;
-	private Graph				neighbors	= null;
-	private String				tag			= null;
-	private Set<Event>			events		= new HashSet<Event>();
+	private static final Logger			LOG				= Logger.getLogger(EventBus.class
+																.getName());
+	private Scheduler					scheduler		= null;
+	private TrickleRPC					trickle			= null;
+	private Caller						caller			= null;
+	private Graph						neighbors		= null;
+	private String						tag				= null;
+	private Set<Event>					events			= new HashSet<Event>(2);
+
+	private static final JSONRequest	EXPIRYREQUEST	= new JSONRequest(
+																"event.scheduleExpiry",
+																null);
+	private static final JSONRequest	TRIGGERREQUEST	= new JSONRequest(
+																"event.scheduleTrigger",
+																null);
 
 	/**
 	 * Instantiates a new event bus.
@@ -82,8 +89,7 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleExpiry() {
 		doExpiry();
-		scheduler.schedule(new JSONRequest("event.scheduleExpiry", null),
-				DateTime.now().plus(60000));
+		scheduler.schedule(EXPIRYREQUEST, DateTime.now().plus(60000));
 	}
 
 	/**
@@ -111,8 +117,7 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleTrigger() {
 		doTriggers();
-		scheduler.schedule(new JSONRequest("event.doTriggers", null), DateTime
-				.now().plus(5000));
+		scheduler.schedule(TRIGGERREQUEST, DateTime.now().plus(5000));
 	}
 
 	/**
@@ -142,7 +147,7 @@ public class EventBus {
 		final ObjectNode config = JOM.createObjectNode();
 		config.put("intervalFactor", 16);
 		config.put("intervalMin", 100);
-		config.put("redundancyFactor", 4);
+		config.put("redundancyFactor", 2);
 		config.put("namespace", "event.");
 
 		trickle = new TrickleRPC(config, scheduler, new Runnable() {

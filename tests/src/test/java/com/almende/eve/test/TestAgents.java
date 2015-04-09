@@ -61,7 +61,7 @@ public class TestAgents extends TestCase {
 		transportConfig.set("jetty", jettyParms);
 
 		final AgentConfig config = new AgentConfig("example");
-		config.setTransport(transportConfig);
+		config.addTransport(transportConfig);
 		config.setInstantiationService(isconfig);
 
 		ExampleAgent agent = new ExampleAgent();
@@ -96,7 +96,7 @@ public class TestAgents extends TestCase {
 		System.gc();
 
 		final AgentConfig ac = new AgentConfig("tester");
-		ac.setTransport(transportConfig);
+		ac.addTransport(transportConfig);
 		final ExampleAgent tester = new ExampleAgent() {};
 		tester.setConfig(ac);
 		

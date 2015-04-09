@@ -24,8 +24,6 @@ import com.almende.eve.instantiation.InstantiationServiceBuilder;
 import com.almende.eve.protocol.ProtocolBuilder;
 import com.almende.eve.protocol.ProtocolConfig;
 import com.almende.eve.protocol.ProtocolStack;
-import com.almende.eve.protocol.auth.Authorizor;
-import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
@@ -79,7 +77,6 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 	private Handler<Caller>			sender			= new SimpleHandler<Caller>(
 															caller);
-	private Authorizor				authorizor		= new DefaultAuthorizor();
 
 	/**
 	 * Instantiates a new agent.
@@ -126,24 +123,27 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 	/**
 	 * On destroy, is being run before the destroy() method is started.
-	 * 
 	 */
 	protected void onDestroy() {}
 
 	/**
 	 * On init.
-	 * @deprecated This old event handler is no longer in use, use onReady instead.
+	 * 
+	 * @deprecated This old event handler is no longer in use, use onReady
+	 *             instead.
 	 */
 	@Deprecated
-	protected void onInit(){}
-	
+	protected void onInit() {}
+
 	/**
 	 * On boot.
-	 * @deprecated This old event handler is no longer in use, use onReady instead.
+	 * 
+	 * @deprecated This old event handler is no longer in use, use onReady
+	 *             instead.
 	 */
 	@Deprecated
-	protected void onBoot(){}
-	
+	protected void onBoot() {}
+
 	/**
 	 * Destroy the agent.
 	 */
@@ -259,7 +259,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the new config
 	 */
 	public void setConfig(final ObjectNode config) {
-		this.config = new AgentConfig(config);
+		this.config = (AgentConfig) new AgentConfig(config).compress();
 		loadConfig();
 		onReady();
 		try {
@@ -324,7 +324,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	@Access(AccessType.PUBLIC)
 	@Override
 	public AgentConfig getConfig() {
-		return config;
+		return new AgentConfig(config.expand());
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		}
 		loadState(config.getState());
 		loadProtocols(config.getProtocols());
-		loadTransports(config.getTransport());
+		loadTransports(config.getTransports());
 		loadScheduler(config.getScheduler());
 	}
 
@@ -413,7 +413,6 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 				if (stateConfig.getId() == null) {
 					stateConfig.setId("scheduler_" + agentId);
-					schedulerConfig.set("state", stateConfig);
 				}
 			}
 			if (agentId != null && schedulerConfig.getId() == null) {
@@ -421,8 +420,6 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			}
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
 					.withHandle(receiver).build();
-
-			config.set("scheduler", schedulerConfig);
 		}
 	}
 
@@ -461,7 +458,6 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				stateConfig.setId(agentId);
 			}
 			state = new StateBuilder().withConfig(stateConfig).build();
-			config.set("state", stateConfig);
 		}
 	}
 
@@ -477,48 +473,16 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	}
 
 	/**
-	 * Gets the authorizor.
-	 *
-	 * @return the authorizor
-	 */
-	protected Authorizor getAuthorizor() {
-		return authorizor;
-	}
-
-	/**
-	 * Sets the authorizor.
-	 *
-	 * @param authorizor
-	 *            the new authorizor
-	 */
-	protected void setAuthorizor(Authorizor authorizor) {
-		this.authorizor = authorizor;
-	}
-
-	/**
 	 * Adds the transport.
-	 * 
+	 *
 	 * @param transport
 	 *            the transport
 	 */
-	protected void addTransport(final Transport transport) {
+	public void addTransport(final Transport transport){
 		this.transport.register(transport);
-
-		JsonNode transportConfig = config.get("transport");
-		if (transportConfig == null) {
-			transportConfig = JOM.createArrayNode();
-		}
-		if (transportConfig.isArray()) {
-			((ArrayNode) transportConfig).add(transport.getParams());
-		} else {
-			final ArrayNode transports = JOM.createArrayNode();
-			transports.add(transportConfig);
-			transports.add(transport.getParams());
-			transportConfig = transports;
-		}
-		config.set("transport", transportConfig);
+		this.config.addTransport(transport.getParams());
 	}
-
+	
 	/**
 	 * Adds the transport.
 	 *
@@ -534,7 +498,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		final Transport transport = new TransportBuilder()
 				.withConfig(transconf).withHandle(receiver).build();
 
-		addTransport(transport);
+		this.transport.register(transport);
 	}
 
 	/**
@@ -543,21 +507,15 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 * @param transportConfig
 	 *            the transport config
 	 */
-	private void loadTransports(final JsonNode transportConfig) {
-		// Cleanout old config
-		config.remove("transport");
+	private void loadTransports(final ArrayNode transportConfig) {
 		if (transportConfig != null) {
-			if (transportConfig.isArray()) {
-				final Iterator<JsonNode> iter = transportConfig.iterator();
-				while (iter.hasNext()) {
-					addTransport((ObjectNode) iter.next());
-				}
-			} else {
-				addTransport((ObjectNode) transportConfig);
+			final Iterator<JsonNode> iter = transportConfig.iterator();
+			while (iter.hasNext()) {
+				addTransport((ObjectNode) iter.next());
 			}
 		}
 		// All agents have a local transport
-		addTransport(new LocalTransportBuilder()
+		this.transport.register(new LocalTransportBuilder()
 				.withConfig(new LocalTransportConfig(agentId))
 				.withHandle(receiver).build());
 	}

@@ -109,6 +109,16 @@ public abstract class AbstractTransport implements Transport {
 		return service;
 	}
 	
+	/**
+	 * Sets the service.
+	 *
+	 * @param service
+	 *            the new service
+	 */
+	public void setService(TransportService service) {
+		this.service = service;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

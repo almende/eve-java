@@ -40,7 +40,7 @@ public class TestProxy extends TestCase {
 		transportConfig.set("jetty", jettyParms);
 		
 		final AgentConfig config = new AgentConfig("example");
-		config.setTransport(transportConfig);
+		config.addTransport(transportConfig);
 		
 		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);

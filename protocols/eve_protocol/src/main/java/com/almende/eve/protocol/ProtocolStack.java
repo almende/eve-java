@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ProtocolStack implements Protocol {
 	private final LinkedList<Protocol>	stack	= new LinkedList<Protocol>();
-	
+
 	/**
 	 * Adds the protocol at the end of the stack
 	 *
@@ -86,15 +86,14 @@ public class ProtocolStack implements Protocol {
 		Meta res = new Meta(msg);
 		while (res.doNext && iter.hasNext()) {
 			Protocol protocol = iter.next();
-			res = protocol
-					.outbound(res.valid ? res.result : msg, recipientUrl);
+			res = protocol.outbound(res.valid ? res.result : msg, recipientUrl);
 		}
 		return res;
 	}
-	
+
 	@Override
-	public void delete(){
-		for (Protocol protocol : stack){
+	public void delete() {
+		for (Protocol protocol : stack) {
 			protocol.delete();
 		}
 		stack.clear();

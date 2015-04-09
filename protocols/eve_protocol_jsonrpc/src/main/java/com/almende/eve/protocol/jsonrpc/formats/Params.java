@@ -4,34 +4,40 @@
  */
 package com.almende.eve.protocol.jsonrpc.formats;
 
+import java.util.LinkedHashMap;
+
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Params.
  */
 public class Params extends ObjectNode {
-	
+
 	/**
 	 * Instantiates a new config.
 	 */
 	public Params() {
-		super(JOM.getInstance().getNodeFactory());
+		super(JOM.getInstance().getNodeFactory(),
+				new LinkedHashMap<String, JsonNode>(2));
 	}
-	
+
 	/**
 	 * Instantiates a new params.
 	 *
 	 * @param node
 	 *            the node
 	 */
-	public Params(final ObjectNode node){
-		super(JOM.getInstance().getNodeFactory());
-		if (node != null){
+	public Params(final ObjectNode node) {
+		super(JOM.getInstance().getNodeFactory(),
+				new LinkedHashMap<String, JsonNode>(node != null ? node.size()
+						: 2));
+		if (node != null) {
 			this.setAll(node);
 		}
 	}
-	
+
 	/**
 	 * Adds a parameter
 	 *
@@ -40,10 +46,14 @@ public class Params extends ObjectNode {
 	 * @param value
 	 *            the value
 	 */
-	public void add(final String name, final Object value){
-		super.set(name, JOM.getInstance().valueToTree(value));
+	public void add(final String name, final Object value) {
+		if (value instanceof JsonNode){
+			super.set(name, (JsonNode) value);
+		} else {
+			super.set(name, JOM.getInstance().valueToTree(value));
+		}
 	}
-	
+
 	/**
 	 * Extend these params with the other tree, overwriting existing
 	 * fields, adding new ones.

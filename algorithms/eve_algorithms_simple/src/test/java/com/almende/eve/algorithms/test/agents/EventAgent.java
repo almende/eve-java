@@ -59,7 +59,7 @@ public class EventAgent extends NodeAgent {
 	@Access(AccessType.PUBLIC)
 	public void receiveEvent(@Name("message") String message) {
 		if (message.startsWith("report_")) {
-			final String target = message.replace("report_", "");
+			final String target = message.substring(7);
 			if (target.equals("*") || target.equals(getId())) {
 				try {
 					caller.call(URI.create("local:0"), "reportEventReceived",

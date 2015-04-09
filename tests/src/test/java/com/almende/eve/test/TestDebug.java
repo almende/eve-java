@@ -49,13 +49,13 @@ public class TestDebug extends TestCase {
 		transportConfig.set("jetty", jettyParms);
 		
 		final AgentConfig config = new AgentConfig("example");
-		config.setTransport(transportConfig);
+		config.addTransport(transportConfig);
 		
 		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
 		
 		final AgentConfig config2 = new AgentConfig("calc");
-		config2.setTransport(transportConfig);
+		config2.addTransport(transportConfig);
 		
 		final CalcAgent agent2 = new CalcAgent();
 		agent2.setConfig(config2);

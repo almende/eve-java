@@ -32,11 +32,11 @@ public class TestEventBus extends TestCase {
 	 */
 	@Test
 	public void testEvents() {
-		final int nofAgents = 10000; 
-		
-		LOG.warning("Starting with:"+nofAgents+" agents");
+		final int nofAgents = 10000;
+
+		LOG.warning("Starting with:" + nofAgents + " agents");
 		DateTime timestamp = DateTime.now();
-		
+
 		final AgentConfig config = new AgentConfig();
 		config.setClassName(EventAgent.class.getName());
 		config.setState(new MemoryStateConfig());
@@ -60,59 +60,67 @@ public class TestEventBus extends TestCase {
 		for (int i = 10; i < nofAgents; i++) {
 			agents.add(new EventAgent("" + i, config, start.getUrls().get(0)));
 		}
-		
+
 		LOG.warning("Network generation in:"
 				+ (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
 
-		
-		LOG.warning("Pausing for a minute!");
+		/*
+		 * LOG.warning("Pausing for a minute!");
+		 * try {
+		 * Thread.sleep(60000);
+		 * } catch (InterruptedException e) {
+		 * // TODO Auto-generated catch block
+		 * e.printStackTrace();
+		 * }
+		 * LOG.warning("Going forward again!");
+		 * start.sendEvent("report_*");
+		 * timestamp = DateTime.now();
+		 * while (start.countReceived(nofAgents) < nofAgents) {
+		 * try {
+		 * Thread.sleep(10);
+		 * } catch (InterruptedException e) {
+		 * // TODO Auto-generated catch block
+		 * e.printStackTrace();
+		 * }
+		 * }
+		 * LOG.warning("All agents ("+nofAgents+") reporting on event in:"
+		 * + (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
+		 */
+		LOG.warning("Pausing for half a minute!");
 		try {
-			Thread.sleep(60000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
-		LOG.warning("Going forward again!");
-		
-		start.sendEvent("report_*");
-
-		timestamp = DateTime.now();
-		while (start.countReceived(nofAgents) < nofAgents) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
-		LOG.warning("All agents ("+nofAgents+") reporting on event in:"
-				+ (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
-
-		LOG.warning("Pausing for a minute!");
-		try {
-			Thread.sleep(60000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
 		LOG.warning("Going forward again!");
 
-		
-		int agentId = (int)Math.floor(Math.random()*nofAgents);
-		
-		start.sendEvent("report_"+agentId);
-		
-		timestamp = DateTime.now();
-		while (start.countReceived(nofAgents) < 1) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		LOG.warning("Single agent (#"+agentId+") reporting on event in:"
-				+ (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
+		int i = 10;
+		long[] results = new long[i];
+		for (int j = 0; j < i; j++) {
+			int agentId = (int) Math.floor(Math.random() * nofAgents);
+			start.sendEvent("report_" + agentId);
 
+			timestamp = DateTime.now();
+			while (start.countReceived(nofAgents) < 1) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			long duration =(new Duration(timestamp, DateTime.now()).getMillis()); 
+			LOG.warning("Single agent (#" + agentId
+					+ ") reporting on event in:"
+					+ duration
+					+ " ms");
+			results[j]=duration;
+		}
+		long res =0;
+		for (long j: results){
+			res += j;
+		}
+		LOG.warning("average time:"+res/i+ " ms");
 	}
 }

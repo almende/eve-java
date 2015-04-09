@@ -69,7 +69,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the t
 	 */
 	public T build() {
-		final Config config = new Config(params);
+		final Config config = new Config(params).compress();
 		final String className = config.getClassName();
 		if (className != null) {
 			try {
@@ -79,7 +79,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 					@SuppressWarnings("unchecked")
 					final AbstractCapabilityBuilder<T> instance = (AbstractCapabilityBuilder<T>) clazz
 							.newInstance();
-					return instance.withClassLoader(cl).withConfig(params)
+					return instance.withClassLoader(cl).withConfig(config)
 							.withHandle(handle).build();
 				} else {
 					LOG.log(Level.WARNING,

@@ -73,7 +73,8 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 */
 		public LocalService(final URI address, final Handler<Receiver> handle,
 				final ObjectNode params) {
-			super(address, handle, new LocalService(), params);
+			super(address, handle, null, params);
+			setService(this);
 		}
 
 		private LocalService() {

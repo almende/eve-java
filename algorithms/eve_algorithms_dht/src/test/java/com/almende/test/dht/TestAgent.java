@@ -46,7 +46,7 @@ public class TestAgent extends TestCase {
 		transportConfig.set("jetty", jettyParms);
 		
 		final AgentConfig config = new AgentConfig("example");
-		config.setTransport(transportConfig);
+		config.addTransport(transportConfig);
 		
 		DHTAgent agent = new DHTAgent();
 		agent.setConfig(config);

@@ -59,7 +59,7 @@ public class TestWake extends TestCase {
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transConfig.set("jetty", jettyParms);
-		config.setTransport(transConfig);
+		config.addTransport(transConfig);
 		
 		// Now create a WakeAble Agent
 		WeakReference<Agent> test = new WeakReference<Agent>(new MyAgent(config));

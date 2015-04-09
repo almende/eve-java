@@ -5,6 +5,7 @@ package com.almende.util.jackson;
 
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.LinkedHashMap;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -85,6 +87,15 @@ public final class JOM {
 	private static synchronized ObjectMapper createInstance() {
 		final ObjectMapper mapper = new ObjectMapper();
 
+		mapper.setNodeFactory(new JsonNodeFactory(){
+			private static final long	serialVersionUID	= -1340917885113347742L;
+
+			@Override
+			public ObjectNode objectNode(){
+				return new ObjectNode(this,new LinkedHashMap<String,JsonNode>(2));
+			}
+		});
+		
 		// set configuration
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 				false);
@@ -117,7 +128,7 @@ public final class JOM {
 		bitSetModule.addDeserializer(BitSet.class,
 				new JOM().new CustomBitSetDeserializer());
 		mapper.registerModule(bitSetModule);
-
+		
 		return mapper;
 	}
 

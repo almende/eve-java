@@ -38,7 +38,7 @@ public class JSONRpcProtocol implements Protocol {
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
-	private final ObjectNode						myParams;
+	private ObjectNode								myParams;
 
 	/**
 	 * Instantiates a new JSON rpc protocol.

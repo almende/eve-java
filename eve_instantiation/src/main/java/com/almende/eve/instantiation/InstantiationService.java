@@ -161,12 +161,12 @@ public class InstantiationService implements Capability {
 							+ wakeKey + "'", e);
 				}
 			}
-			if (instance != null){
-			    entry.setHandler(instance.getHandler());
-			    if (oldHandler != null) {
-				oldHandler.update(instance.getHandler());
-			    }
-			    entries.put(wakeKey, entry);
+			if (instance != null) {
+				entry.setHandler(instance.getHandler());
+				if (oldHandler != null) {
+					oldHandler.update(instance.getHandler());
+				}
+				entries.put(wakeKey, entry);
 			}
 			return instance;
 		} else {
@@ -281,8 +281,8 @@ public class InstantiationService implements Capability {
 						key)).build();
 		final InstantiationEntry result = innerState.get("entry",
 				INSTANTIATIONENTRY);
-		if(result!=null) {
-		    result.setState(innerState);
+		if (result != null) {
+			result.setState(innerState);
 		}
 		return result;
 	}

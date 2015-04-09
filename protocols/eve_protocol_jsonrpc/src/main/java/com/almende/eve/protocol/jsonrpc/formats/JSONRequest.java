@@ -19,8 +19,6 @@ import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,9 +30,13 @@ public final class JSONRequest extends JSONMessage {
 	private static final Logger			LOG					= Logger.getLogger(JSONRequest.class
 																	.getCanonicalName());
 	private static final long			serialVersionUID	= 1970046457233622444L;
-	private ObjectNode					req					= JOM.createObjectNode();
 	transient private AsyncCallback<?>	callback			= null;
 
+	private JsonNode id = null;
+	private String method = null;
+	private ObjectNode params = null;
+	
+	
 	/**
 	 * Instantiates a new jSON request.
 	 */
@@ -232,7 +234,6 @@ public final class JSONRequest extends JSONMessage {
 	private <T> void init(final JsonNode id, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		this.setRequest(true);
-		setVersion();
 		if (callback != null && (id == null || id.isNull())) {
 			setId(JOM.getInstance().valueToTree(new UUID().toString()));
 		} else {
@@ -250,12 +251,12 @@ public final class JSONRequest extends JSONMessage {
 	 *            the new id
 	 */
 	public void setId(final JsonNode id) {
-		req.set(ID, id);
+		this.id=id;
 	}
 
 	@Override
 	public JsonNode getId() {
-		return req.get(ID);
+		return this.id;
 	}
 
 	/**
@@ -265,7 +266,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the new method
 	 */
 	public void setMethod(final String method) {
-		req.put(METHOD, method);
+		this.method=method;
 	}
 
 	/**
@@ -274,10 +275,7 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the method
 	 */
 	public String getMethod() {
-		if (req.has(METHOD)) {
-			return req.get(METHOD).asText();
-		}
-		return null;
+		return this.method;
 	}
 
 	/**
@@ -287,11 +285,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the new params
 	 */
 	public void setParams(final ObjectNode params) {
-		final ObjectNode newParams = JOM.createObjectNode();
-		if (params != null) {
-			newParams.setAll(params);
-		}
-		req.set(PARAMS, newParams);
+		this.params = params;
 	}
 
 	/**
@@ -300,7 +294,7 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the params
 	 */
 	public ObjectNode getParams() {
-		return (ObjectNode) req.get(PARAMS);
+		return this.params;
 	}
 
 	/**
@@ -312,8 +306,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the value
 	 */
 	public void putParam(final String name, final Object value) {
-		final ObjectMapper mapper = JOM.getInstance();
-		req.with(PARAMS).set(name, mapper.convertValue(value, JsonNode.class));
+		this.params.set(name, JOM.getInstance().convertValue(value, JsonNode.class));
 	}
 
 	/**
@@ -325,7 +318,6 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	public Object getParam(final String name) {
 		final ObjectMapper mapper = JOM.getInstance();
-		final ObjectNode params = req.with(PARAMS);
 		if (params.has(name)) {
 			return mapper.convertValue(params.get(name), Object.class);
 		}
@@ -340,14 +332,16 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the object
 	 */
 	public Object hasParam(final String name) {
-		return req.get(PARAMS).has(name);
+		return this.params.has(name);
 	}
 
 	/**
-	 * Sets the version.
+	 * Gets the jsonrpc version.
+	 *
+	 * @return the jsonrpc version
 	 */
-	private void setVersion() {
-		req.put(JSONRPC, VERSION);
+	public String getJsonrpc() {
+		return VERSION;
 	}
 
 	/**
@@ -371,16 +365,6 @@ public final class JSONRequest extends JSONMessage {
 		this.callback = callback;
 	}
 
-	/**
-	 * Gets the object node.
-	 * 
-	 * @return the object node
-	 */
-	@JsonIgnore
-	public ObjectNode getObjectNode() {
-		return req;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -389,43 +373,10 @@ public final class JSONRequest extends JSONMessage {
 	public String toString() {
 		final ObjectMapper mapper = JOM.getInstance();
 		try {
-			return mapper.writeValueAsString(req);
+			return mapper.writeValueAsString(this);
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
 		return null;
 	}
-
-	/**
-	 * Write object.
-	 * 
-	 * @param out
-	 *            the out
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	private void writeObject(final java.io.ObjectOutputStream out)
-			throws IOException {
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-		mapper.writeValue(out, req);
-	}
-
-	/**
-	 * Read object.
-	 * 
-	 * @param in
-	 *            the in
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws ClassNotFoundException
-	 *             the class not found exception
-	 */
-	private void readObject(final java.io.ObjectInputStream in)
-			throws IOException, ClassNotFoundException {
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
-		req = mapper.readValue(in, ObjectNode.class);
-	}
-
 }

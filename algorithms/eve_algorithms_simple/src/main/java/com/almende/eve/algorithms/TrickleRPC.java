@@ -4,6 +4,8 @@
  */
 package com.almende.eve.algorithms;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 import org.joda.time.DateTime;
@@ -21,15 +23,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Namespace("trickle")
 public class TrickleRPC {
-	private String		namespace	= "trickle.";
-	private Trickle		trickle		= null;
-	private String		intTaskId	= null;
-	private String		sendTaskId	= null;
-	private Scheduler	scheduler	= null;
-	private Runnable	onInterval	= null;
-	private Runnable	onSend		= null;
-	private Executor	executer	= ThreadPool.getPool();
-	private long[]      next        = new long[]{0,0};
+	private String									namespace	= "trickle.";
+	private Trickle									trickle		= null;
+	private String									intTaskId	= null;
+	private String									sendTaskId	= null;
+	private Scheduler								scheduler	= null;
+	private Runnable								onInterval	= null;
+	private Runnable								onSend		= null;
+	private Executor								executer	= ThreadPool
+																		.getPool();
+	private long[]									next		= new long[] {
+			0, 0												};
+
+	private static final Map<String, JSONRequest>	requests	= new HashMap<String, JSONRequest>();
 
 	/**
 	 * Instantiates a new trickle rpc.
@@ -62,9 +68,13 @@ public class TrickleRPC {
 		if (config.has("redundancyFactor")) {
 			redundancyFactor = config.get("redundancyFactor").asInt();
 		}
-		if (config.has("namespace")){
-			namespace = config.get("namespace").asText()+namespace;
+		if (config.has("namespace")) {
+			namespace = config.get("namespace").asText() + namespace;
 		}
+		requests.put(namespace + "send", new JSONRequest(namespace + "send",
+				null));
+		requests.put(namespace + "nextInterval", new JSONRequest(namespace
+				+ "nextInterval", null));
 		trickle = new Trickle(intervalMin, intervalFactor, redundancyFactor);
 		reschedule(trickle.next());
 	}
@@ -78,10 +88,17 @@ public class TrickleRPC {
 			if (intTaskId != null) {
 				scheduler.cancel(intTaskId);
 			}
-			sendTaskId = scheduler.schedule(new JSONRequest(namespace+"send",
-					null), now.plus(intervals[0]));
-			intTaskId = scheduler.schedule(new JSONRequest(
-					namespace+"nextInterval", null),
+//			sendTaskId = scheduler.schedule(new JSONRequest(namespace + "send",
+//					null),
+//					now.plus(intervals[0]));
+//			intTaskId = scheduler.schedule(
+//					new JSONRequest(namespace + "nextInterval",
+//							null),
+//					now.plus(intervals[1]));
+			sendTaskId = scheduler.schedule(requests.get(namespace + "send"),
+					now.plus(intervals[0]));
+			intTaskId = scheduler.schedule(
+					requests.get(namespace + "nextInterval"),
 					now.plus(intervals[1]));
 		}
 	}
@@ -119,13 +136,13 @@ public class TrickleRPC {
 	public void incr() {
 		trickle.incr();
 	}
-	
+
 	/**
 	 * Gets the delay.
 	 *
 	 * @return the delay
 	 */
-	public long getDelay(){
+	public long getDelay() {
 		return next[1];
 	}
 }

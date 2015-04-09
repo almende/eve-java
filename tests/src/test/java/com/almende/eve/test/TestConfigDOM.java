@@ -6,6 +6,7 @@ package com.almende.eve.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
@@ -76,6 +77,28 @@ public class TestConfigDOM extends TestCase {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
+	}
+	
+	/**
+	 * Test expand.
+	 *
+	 * @throws FileNotFoundException
+	 *             the file not found exception
+	 */
+	@Test
+	public void testCompress() throws FileNotFoundException {
+		// First obtain the configuration:
+		final Config config = YamlReader.load(
+				new FileInputStream(new File("target/classes/testCompress.yaml")));
+		
+		final ObjectNode clone = config.deepCopy();
+		LOG.warning("Compress:"+config.compress().toString());
+		LOG.warning("Global:"+Config.getGlobal().toString());
+		ObjectNode result = config.expand();
+		LOG.warning("Expanded:"+result.toString());
+		
+		assertEquals(clone, result);
+		
 	}
 	
 }

@@ -5,7 +5,7 @@ template:
    defaultAgent:
         scheduler:
            class: com.almende.eve.scheduling.SimpleSchedulerBuilder
-        transport:
+        transports:
         -  class: com.almende.eve.transport.http.HttpTransportBuilder
            servletUrl: http://127.0.0.1:8081/agents/
            servletLauncher: JettyLauncher

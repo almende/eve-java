@@ -115,12 +115,41 @@ public class AgentConfig extends Config {
 	/**
 	 * Sets the transport config.
 	 * 
-	 * @param transport
-	 *            the new transport config (can be ObjectNode or
-	 *            ArrayNode, the latter indicating multiple transports)
+	 * @param transports
+	 *            the new transport config
 	 */
+	public void setTransports(final ArrayNode transports) {
+		this.set("transports", transports);
+	}
+	
+	/**
+	 * Adds the transport.
+	 *
+	 * @param transport
+	 *            the transport
+	 */
+	public void addTransport(final ObjectNode transport){
+		this.getTransports().add(transport);
+	}
+
+	/**
+	 * Sets the transport.
+	 *
+	 * @deprecated Please use setTransports(transport[]) or addTransport(transport) instead
+	 * @param transport
+	 *            the new transport
+	 */
+	@Deprecated
 	public void setTransport(final JsonNode transport) {
-		this.set("transport", transport);
+		if (transport == null) {
+			setTransports(JOM.createArrayNode());
+		} else if (transport.isArray()) {
+			setTransports((ArrayNode) transport);
+		} else {
+			ArrayNode other = JOM.createArrayNode();
+			other.add(transport);
+			setTransports(other);
+		}
 	}
 
 	/**
@@ -128,11 +157,15 @@ public class AgentConfig extends Config {
 	 * 
 	 * @return the transport config
 	 */
-	public JsonNode getTransport() {
-		if (this.has("transport")) {
-			return this.get("transport");
+	public ArrayNode getTransports() {
+		final JsonNode res = this.get("transports");
+		if (res != null && !res.isArray()) {
+			LOG.warning("Transports have to be an array!");
+			ArrayNode other = JOM.createArrayNode();
+			other.add(res);
+			return other;
 		}
-		return null;
+		return (ArrayNode) res;
 	}
 
 	/**
