@@ -102,6 +102,22 @@ public interface Caller {
 			throws IOException;
 
 	/**
+	 * Send async.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param request
+	 *            the request
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> void call(final URI url, final JSONRequest request)
+			throws IOException;
+
+	
+	/**
 	 * Call sync.
 	 *
 	 * @param <T>

@@ -32,7 +32,8 @@ public class TestEventBus extends TestCase {
 	 */
 	@Test
 	public void testEvents() {
-		final int nofAgents = 10000;
+		final int nofAgents = 20000;
+		final int pause = 10000;
 
 		LOG.warning("Starting with:" + nofAgents + " agents");
 		DateTime timestamp = DateTime.now();
@@ -86,9 +87,10 @@ public class TestEventBus extends TestCase {
 		 * LOG.warning("All agents ("+nofAgents+") reporting on event in:"
 		 * + (new Duration(timestamp, DateTime.now()).getMillis()) + " ms");
 		 */
-		LOG.warning("Pausing for half a minute!");
+		
+		LOG.warning("Pausing for:"+pause+"ms!");
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(pause);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,9 +101,16 @@ public class TestEventBus extends TestCase {
 		long[] results = new long[i];
 		for (int j = 0; j < i; j++) {
 			int agentId = (int) Math.floor(Math.random() * nofAgents);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			timestamp = DateTime.now();
 			start.sendEvent("report_" + agentId);
 
-			timestamp = DateTime.now();
+			
 			while (start.countReceived(nofAgents) < 1) {
 				try {
 					Thread.sleep(10);

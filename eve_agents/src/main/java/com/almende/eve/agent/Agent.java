@@ -478,11 +478,11 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 * @param transport
 	 *            the transport
 	 */
-	public void addTransport(final Transport transport){
+	public void addTransport(final Transport transport) {
 		this.transport.register(transport);
 		this.config.addTransport(transport.getParams());
 	}
-	
+
 	/**
 	 * Adds the transport.
 	 *
@@ -798,13 +798,19 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 	private class DefaultCaller implements Caller {
 		@Override
+		public <T> void call(final URI url, final JSONRequest message)
+				throws IOException {
+			transport.send(url, protocolStack.outbound(message, url).result,
+					null);
+		}
+
+		@Override
 		public <T> void call(final URI url, final String method,
 				final ObjectNode params, final AsyncCallback<T> callback)
 				throws IOException {
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
+			call(url, message);
 		}
 
 		@Override

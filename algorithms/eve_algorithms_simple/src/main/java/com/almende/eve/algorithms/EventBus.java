@@ -157,12 +157,14 @@ public class EventBus {
 			@Override
 			public void run() {
 				final Edge[] neighborArray = neighbors.getByTag(tag);
-				for (Edge neighbor : neighborArray) {
-					final Params params = new Params();
+				final Params params = new Params();
+				synchronized (events) {
 					params.add("events", events);
+				}
+				final JSONRequest request = new JSONRequest("event.receiveEvents", params);
+				for (Edge neighbor : neighborArray) {
 					try {
-						caller.call(neighbor.getAddress(),
-								"event.receiveEvents", params);
+						caller.call(neighbor.getAddress(),request);
 					} catch (IOException e) {
 						LOG.log(Level.WARNING, "EventBus got IO error", e);
 					}
