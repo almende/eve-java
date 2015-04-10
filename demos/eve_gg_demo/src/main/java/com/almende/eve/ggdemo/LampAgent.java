@@ -1,6 +1,7 @@
 package com.almende.eve.ggdemo;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 import org.apache.http.annotation.ThreadSafe;
@@ -25,7 +26,7 @@ public interface LampAgent extends AgentInterface {
 
 	public boolean isOnBlock() throws InterruptedException;
 
-	public void handleGoal(@Name("goal") Goal goal, @Sender String sender)
+	public void handleGoal(@Name("goal") Goal goal, @Sender URI sender)
 			throws JSONRPCException, JsonProcessingException, IOException;
 
 	public Iterable<String> getNeighbours();

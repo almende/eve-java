@@ -6,7 +6,6 @@ package com.almende.eve.test;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,17 +33,14 @@ public class TestAgents extends TestCase {
 
 	/**
 	 * Test agents.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
-	 * @throws URISyntaxException
-	 *             the URI syntax exception
 	 * @throws InterruptedException
 	 *             the interrupted exception
 	 */
 	@Test
-	public void testAgent() throws IOException, URISyntaxException,
-			InterruptedException {
+	public void testAgent() throws IOException, InterruptedException {
 
 		final InstantiationServiceConfig isconfig = new InstantiationServiceConfig();
 		final FileStateConfig state = new FileStateConfig();
@@ -66,10 +62,10 @@ public class TestAgents extends TestCase {
 
 		ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
-		
+
 		final Params callParams = new Params();
 		callParams.add("message", "Hello world!");
-		agent.pubSend(new URI("http://localhost:8080/agents/example"),
+		agent.pubSend(URI.create("http://localhost:8080/agents/example"),
 				"helloWorld", callParams, new AsyncCallback<String>() {
 
 					@Override
@@ -86,9 +82,10 @@ public class TestAgents extends TestCase {
 				});
 
 		LOG.warning("Sync received:'"
-				+ agent.pubSendSync(new URI(
-						"http://localhost:8080/agents/example"), "helloWorld",
-						callParams,new TypeUtil<String>(){}) + "'");
+				+ agent.pubSendSync(
+						URI.create("http://localhost:8080/agents/example"),
+						"helloWorld", callParams, new TypeUtil<String>() {})
+				+ "'");
 
 		// Try to get rid of the agent instance from memory
 		agent = null;
@@ -99,15 +96,17 @@ public class TestAgents extends TestCase {
 		ac.addTransport(transportConfig);
 		final ExampleAgent tester = new ExampleAgent() {};
 		tester.setConfig(ac);
-		
+
 		LOG.warning("Sync received:'"
 				+ tester.pubSendSync(
-						new URI("http://localhost:8080/agents/example"),
+						URI.create("http://localhost:8080/agents/example"),
 						"helloWorld",
 						callParams.deepCopy().put("message",
-								"Hello world after sleep!"),new TypeUtil<String>(){}) + "'");
-		
-		tester.runComplexTypeTest(new URI("http://localhost:8080/agents/example"));
+								"Hello world after sleep!"),
+						new TypeUtil<String>() {}) + "'");
+
+		tester.runComplexTypeTest(URI
+				.create("http://localhost:8080/agents/example"));
 	}
 
 }

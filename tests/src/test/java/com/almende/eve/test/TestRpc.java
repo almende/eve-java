@@ -22,6 +22,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -65,43 +66,44 @@ public class TestRpc extends TestCase {
 		parms.add("parm", true);
 		Object request = new JSONRequest("testMe", parms, callback);
 
+		final URI myUri = URIUtil.create("local://me");
 		// prepare message for transport
-		Object message = protocol.outbound(request, URI.create("local://me"))
+		Object message = protocol.outbound(request, myUri)
 				.getResult();
 		// transport
 		Object response = protocol
 				.outbound(
-						protocol.inbound(message, URI.create("local://me"))
-								.getResult(), URI.create("local://me"))
+						protocol.inbound(message, myUri)
+								.getResult(), myUri)
 				.getResult();
 		// transport back
-		protocol.inbound(response, URI.create("local://me"));
+		protocol.inbound(response, myUri);
 
 		request = new JSONRequest("test.testMe", parms);
 
 		// prepare message for transport
-		message = protocol.outbound(request, URI.create("local://me"))
+		message = protocol.outbound(request, myUri)
 				.getResult();
 		// transport
 		response = protocol
 				.outbound(
-						protocol.inbound(message, URI.create("local://me"))
-								.getResult(), URI.create("local://me"))
+						protocol.inbound(message, myUri)
+								.getResult(), myUri)
 				.getResult();
 		assertNull(response);
 
 		request = new JSONRequest("failMe", parms, callback);
 
 		// prepare message for transport
-		message = protocol.outbound(request, URI.create("local://me"))
+		message = protocol.outbound(request, myUri)
 				.getResult();
 		// transport
 		response = protocol
 				.outbound(
-						protocol.inbound(message, URI.create("local://me"))
-								.getResult(), URI.create("local://me"))
+						protocol.inbound(message, myUri)
+								.getResult(), myUri)
 				.getResult();
-		protocol.inbound(response, URI.create("local://me"));
+		protocol.inbound(response, myUri);
 
 		try {
 			Thread.sleep(2000);

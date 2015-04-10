@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -46,7 +47,7 @@ public class HttpTransportBuilder extends AbstractCapabilityBuilder<HttpTranspor
 		final String servletUrl = config.getServletUrl();
 		if (servletUrl != null) {
 			try {
-				final URI servletUri = new URI(servletUrl);
+				final URI servletUri = URIUtil.parse(servletUrl);
 				if (services.containsKey(servletUri)) {
 					// Shortcut, it already exists and is launched.
 					return services.get(servletUri);

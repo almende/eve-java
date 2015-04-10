@@ -17,6 +17,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -62,7 +63,7 @@ public class EventAgent extends NodeAgent {
 			final String target = message.substring(7);
 			if (target.equals("*") || target.equals(getId())) {
 				try {
-					caller.call(URI.create("local:0"), "reportEventReceived",
+					caller.call(URIUtil.create("local:0"), "reportEventReceived",
 							null);
 				} catch (IOException e) {
 					LOG.log(Level.WARNING, "Couldn't send report?", e);

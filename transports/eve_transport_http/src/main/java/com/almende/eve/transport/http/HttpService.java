@@ -19,6 +19,7 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.ClassUtil;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -102,7 +103,7 @@ public class HttpService implements TransportService {
 		final String id = config.getId();
 		if (id != null) {
 			try {
-				final URI fullUrl = new URI(myUrl.toASCIIString() + id);
+				final URI fullUrl = URIUtil.parse(myUrl.toASCIIString() + id);
 				if (transports.containsKey(fullUrl)) {
 					result = transports.get(fullUrl);
 					result.getHandle().update(newHandle);
@@ -142,7 +143,7 @@ public class HttpService implements TransportService {
 	 */
 	private HttpTransport get(final String id) {
 		try {
-			final URI fullUrl = new URI(myUrl + id);
+			final URI fullUrl = URIUtil.parse(myUrl + id);
 			return transports.get(fullUrl);
 		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Couldn't parse full Url:" + myUrl + id, e);

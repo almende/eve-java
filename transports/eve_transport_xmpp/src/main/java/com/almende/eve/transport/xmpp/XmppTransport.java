@@ -25,6 +25,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
+import com.almende.util.URIUtil;
 
 /**
  * The Class XmppTransport.
@@ -206,7 +207,7 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 			}
 		}
 		final String body = message.getBody();
-		final URI senderUrl = URI.create("xmpp:" + message.getFrom());
+		final URI senderUrl = URIUtil.create("xmpp:" + message.getFrom());
 		if (body != null) {
 			super.getHandle().get().receive(body, senderUrl, null);
 		}

@@ -106,8 +106,8 @@ public class DHT {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void store(@Name("key") Key key, @Name("value") ObjectNode value,
-			@Name("me") Key remote, @Sender String sender) {
-		rt.seenNode(new Node(remote, URI.create(sender)));
+			@Name("me") Key remote, @Sender URI sender) {
+		rt.seenNode(new Node(remote, sender));
 		Set<TimedValue> current = new TreeSet<TimedValue>();
 		TimedValue tv = new TimedValue(value);
 
@@ -133,8 +133,8 @@ public class DHT {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void delete(@Name("key") Key key, @Name("value") ObjectNode value,
-			@Name("me") Key remote, @Sender String sender) {
-		rt.seenNode(new Node(remote, URI.create(sender)));
+			@Name("me") Key remote, @Sender URI sender) {
+		rt.seenNode(new Node(remote, sender));
 		if (values.containsKey(key)) {
 			Set<TimedValue> current = values.remove(key);
 			TimedValue tv = new TimedValue(value);
@@ -159,8 +159,8 @@ public class DHT {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void deleteAll(@Name("key") Key key, @Name("me") Key remote,
-			@Sender String sender) {
-		rt.seenNode(new Node(remote, URI.create(sender)));
+			@Sender URI sender) {
+		rt.seenNode(new Node(remote, sender));
 		values.remove(key);
 	}
 
@@ -186,8 +186,8 @@ public class DHT {
 	 */
 	@Access(AccessType.PUBLIC)
 	public ObjectNode find_close_nodes(@Name("near") Key near,
-			@Name("me") Key remote, @Sender String sender) {
-		rt.seenNode(new Node(remote, URI.create(sender)));
+			@Name("me") Key remote, @Sender URI sender) {
+		rt.seenNode(new Node(remote, sender));
 		return loc_find_close_nodes(near);
 	}
 
@@ -207,8 +207,8 @@ public class DHT {
 	 */
 	@Access(AccessType.PUBLIC)
 	public ObjectNode find_value(@Name("key") Key key, @Name("me") Key remote, @Name("multiple") Boolean multiple,
-			@Sender String sender) {
-		rt.seenNode(new Node(remote, URI.create(sender)));
+			@Sender URI sender) {
+		rt.seenNode(new Node(remote, sender));
 		if (values.containsKey(key)) {
 			final ObjectNode result = JOM.createObjectNode();
 			final ArrayNode arr = JOM.createArrayNode();

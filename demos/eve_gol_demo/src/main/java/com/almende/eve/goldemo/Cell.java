@@ -15,6 +15,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.util.TypeUtil;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -144,7 +145,7 @@ public class Cell extends Agent {
 		params.put("alive", myState.isAlive());
 		params.put("cycle", 0);
 		for (final String neighbor : neighbors) {
-			final URI uri = URI.create(neighbor);
+			final URI uri = URIUtil.create(neighbor);
 			try {
 				call(uri, "collect", params, null);
 			} catch (final IOException e) {

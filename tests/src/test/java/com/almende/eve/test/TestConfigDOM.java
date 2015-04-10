@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +20,7 @@ import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,7 +57,7 @@ public class TestConfigDOM extends TestCase {
 		}
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("message", "Hi There!");
-		newAgent.pubSend(URI.create("local:example"), "helloWorld", params,
+		newAgent.pubSend(URIUtil.create("local:example"), "helloWorld", params,
 				new AsyncCallback<String>() {
 					
 					@Override

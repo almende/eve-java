@@ -20,6 +20,7 @@ import javax.websocket.Session;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -58,7 +59,7 @@ public class WsServerTransport extends WebsocketTransport {
 		if (session.getUserProperties().containsKey("remoteId")) {
 			final String remoteId = (String) session.getUserProperties().get(
 					"remoteId");
-			final URI key = URI.create("wsclient:" + remoteId);
+			final URI key = URIUtil.create("wsclient:" + remoteId);
 			remotes.remove(key);
 		}
 	}

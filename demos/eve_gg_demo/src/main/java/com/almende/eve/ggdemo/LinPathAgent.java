@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @ThreadSafe
 public class LinPathAgent extends AbstractLampAgent {
 
-	public void handleGoal(@Name("goal") Goal goal, @Sender String sender)
+	public void handleGoal(@Name("goal") Goal goal, @Sender URI sender)
 			throws IOException, JSONRPCException, JsonProcessingException {
 		if (neighbours == null) {
 			neighbours = getNeighbours();

@@ -15,6 +15,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.util.TypeUtil;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -63,7 +64,7 @@ public class HolonAgent extends AbstractLampAgent {
 			params.put("size", size);
 			try {
 				System.out.println(getId() + ": Merging with " + neighbour);
-				Boolean res = callSync(URI.create(neighbour), "merge", params,
+				Boolean res = callSync(URIUtil.create(neighbour), "merge", params,
 						Boolean.class);
 				if (!res) {
 					getState().remove("parent");
@@ -77,13 +78,13 @@ public class HolonAgent extends AbstractLampAgent {
 		}
 	}
 
-	public Boolean merge(@Name("size") int size, @Sender String sender)
+	public Boolean merge(@Name("size") int size, @Sender URI sender)
 			throws JSONRPCException, IOException {
 		if (neighbours == null) {
 			neighbours = getNeighbours();
 		}
 		String parent = getState().get("parent", String.class);
-		if (parent != null && parent.equals(sender)) {
+		if (parent != null && parent.equals(sender.toASCIIString())) {
 			return false;
 		}
 		ArrayList<Sub> oldsubs = getState().get("subs", type);
@@ -104,7 +105,7 @@ public class HolonAgent extends AbstractLampAgent {
 			return false;
 		}
 		Sub sub = new Sub();
-		sub.setAddress(sender);
+		sub.setAddress(sender.toASCIIString());
 		sub.setSize(size);
 		subs.add(sub);
 		if (!getState().putIfUnchanged("subs", subs, oldsubs)) {
@@ -114,11 +115,11 @@ public class HolonAgent extends AbstractLampAgent {
 		return true;
 	}
 
-	public void handleTask(@Name("count") Integer count, @Sender String sender)
+	public void handleTask(@Name("count") Integer count, @Sender URI sender)
 			throws IOException, JSONRPCException {
 		if (sender != null
-				&& !getState().get("parent", String.class).equals(sender)) {
-			System.out.println("Warning: got task from non-parent!!!" + sender);
+				&& !getState().get("parent", String.class).equals(sender.toASCIIString())) {
+			System.out.println("Warning: got task from non-parent!!!" + sender.toASCIIString());
 		}
 		if (count > 0) {
 			lampOn();
@@ -141,7 +142,7 @@ public class HolonAgent extends AbstractLampAgent {
 
 	}
 
-	public void handleGoal(@Name("goal") Goal goal, @Sender String sender)
+	public void handleGoal(@Name("goal") Goal goal, @Sender URI sender)
 			throws IOException, JSONRPCException, JsonProcessingException {
 		String parent = getState().get("parent", String.class);
 
@@ -151,7 +152,7 @@ public class HolonAgent extends AbstractLampAgent {
 					+ parent);
 			ObjectNode params = JOM.createObjectNode();
 			params.set("goal", JOM.getInstance().valueToTree(goal));
-			call(URI.create(parent), "handleGoal", params, null);
+			call(URIUtil.create(parent), "handleGoal", params, null);
 		} else {
 			System.err.println(getId()
 					+ ": HandleGoal received, handling it myself");

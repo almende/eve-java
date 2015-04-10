@@ -23,6 +23,7 @@ import com.almende.eve.transport.ws.WsClientTransportBuilder;
 import com.almende.eve.transport.xmpp.XmppTransportBuilder;
 import com.almende.eve.transport.xmpp.XmppTransportConfig;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -49,7 +50,7 @@ public class TestTransports extends TestCase {
 				.withConfig(params).withHandle(new MyReceiver()).build();
 		transport.connect();
 
-		transport.send(URI.create("xmpp:gloria@openid.almende.org"),
+		transport.send(URIUtil.create("xmpp:gloria@openid.almende.org"),
 				"Hello World", null);
 
 		try {
@@ -72,7 +73,7 @@ public class TestTransports extends TestCase {
 				.withHandle(new MyReceiver()).build();
 		transport.connect();
 
-		transport.send(URI.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
+		transport.send(URIUtil.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
 				null);
 	}
 
@@ -119,9 +120,9 @@ public class TestTransports extends TestCase {
 				.withConfig(clientConfig).withHandle(new MyReceiver()).build();
 		client.connect();
 
-		server.send(URI.create("wsclient:testClient"), "Hi there!", null);
+		server.send(URIUtil.create("wsclient:testClient"), "Hi there!", null);
 
-		client.send(URI.create("ws://localhost:8082/ws/testServer"),
+		client.send(URIUtil.create("ws://localhost:8082/ws/testServer"),
 				"Good day to you!", null);
 
 	}

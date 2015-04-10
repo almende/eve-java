@@ -5,7 +5,6 @@
 package com.almende.eve.test;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,6 +15,7 @@ import org.junit.Test;
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.MyAgent;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 
@@ -39,7 +39,7 @@ public class TestExceptions extends TestCase {
 			public void onReady() {
 				LOG.warning("Starting run");
 				try {
-					call(URI.create("local:Other"), "throwException", null,
+					call(URIUtil.create("local:Other"), "throwException", null,
 							new AsyncCallback<Void>() {
 
 								@Override

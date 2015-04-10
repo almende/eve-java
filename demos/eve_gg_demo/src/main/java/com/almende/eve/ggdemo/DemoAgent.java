@@ -30,7 +30,7 @@ public class DemoAgent extends Agent {
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException, IOException {
 		LampAgent firstLamp = (LampAgent) getAgentHost().getAgent(startLamp);
-		firstLamp.handleGoal(goal, "");
+		firstLamp.handleGoal(goal, null);
 	}
 
 	public void genTopology(@Name("type") String type,

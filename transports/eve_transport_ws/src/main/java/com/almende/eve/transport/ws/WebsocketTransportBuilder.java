@@ -22,6 +22,7 @@ import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportService;
 import com.almende.eve.transport.http.ServletLauncher;
 import com.almende.util.ClassUtil;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -90,7 +91,7 @@ public class WebsocketTransportBuilder extends
 			
 			if (address != null) {
 				try {
-					final URI serverUri = new URI(address);
+					final URI serverUri = URIUtil.parse(address);
 					if (transports.containsKey(serverUri)) {
 						result = transports.get(serverUri);
 						result.getHandle().update(handle);
@@ -151,7 +152,7 @@ public class WebsocketTransportBuilder extends
 			final String id = config.getId();
 			if (id != null) {
 				try {
-					final URI key = new URI("wsclient:" + id);
+					final URI key = URIUtil.parse("wsclient:" + id);
 					LOG.log(Level.WARNING, "Looking up:" + key);
 					if (transports.containsKey(key)) {
 						result = transports.get(key);

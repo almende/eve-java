@@ -13,6 +13,8 @@ import javax.servlet.ServletContextListener;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpointConfig;
 
+import com.almende.util.URIUtil;
+
 /**
  * The listener interface for receiving websocketContext events.
  * The class that is interested in processing a websocketContext
@@ -40,7 +42,7 @@ public class WsServerContextListener implements ServletContextListener {
 				.getServletContext().getAttribute(
 						"javax.websocket.server.ServerContainer");
 		try {
-			final URI myUrl = URI.create(sce.getServletContext()
+			final URI myUrl = URIUtil.create(sce.getServletContext()
 					.getInitParameter("servletUrl"));
 			final ServerEndpointConfig config = ServerEndpointConfig.Builder
 					.create(WebsocketEndpoint.class, myUrl.getPath()).build();

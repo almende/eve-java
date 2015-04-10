@@ -23,6 +23,7 @@ import com.almende.eve.transport.TransportService;
 import com.almende.eve.transport.tokens.TokenRet;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ObjectCache;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.callback.SyncCallback;
@@ -251,7 +252,7 @@ public class ZmqTransport extends AbstractTransport {
 		// ZMQ.HANDSHAKE|senderUrl|tokenJson|timestamp
 		// ZMQ.HANDSHAKE_RESPONSE|senderUrl|tokenJson|null
 		
-		final URI senderUrl = new URI(new String(msg[1].array()));
+		final URI senderUrl = URIUtil.parse(new String(msg[1].array()));
 		final TokenRet token = JOM.getInstance().readValue(msg[2].array(),
 				TokenRet.class);
 		final String body = new String(msg[3].array());

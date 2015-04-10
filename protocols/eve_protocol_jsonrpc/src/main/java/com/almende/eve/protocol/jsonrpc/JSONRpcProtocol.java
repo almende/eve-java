@@ -19,6 +19,7 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.eve.protocol.jsonrpc.formats.RequestParams;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
 import com.almende.util.jackson.JOM;
@@ -33,7 +34,7 @@ public class JSONRpcProtocol implements Protocol {
 																				.getName());
 	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
 	static {
-		EVEREQUESTPARAMS.put(Sender.class, URI.create("local:null"));
+		EVEREQUESTPARAMS.put(Sender.class, URIUtil.create("local:null"));
 	}
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();

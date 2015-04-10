@@ -17,6 +17,7 @@ import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
 import com.almende.eve.transport.http.HttpTransportConfig;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -46,7 +47,7 @@ public class TestHttp extends TestCase {
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new myReceiver()).build();
 		
-		transport.send(URI.create("http://localhost:8080/agents/testAgent"),
+		transport.send(URIUtil.create("http://localhost:8080/agents/testAgent"),
 				"Hello World", null);
 	}
 	

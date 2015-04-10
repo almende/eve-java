@@ -13,6 +13,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 
 /**
@@ -30,8 +31,8 @@ public class MySecondAgent extends Agent {
 	 *            the sender url
 	 */
 	public void result(@Name("returnMessage") String returnMessage,
-			@Sender String senderUrl) {
-		System.out.println("Received a message from " + senderUrl + ": "
+			@Sender URI senderUrl) {
+		System.out.println("Received a message from " + senderUrl.toASCIIString() + ": "
 				+ returnMessage);
 	}
 
@@ -46,7 +47,7 @@ public class MySecondAgent extends Agent {
 
 		// First obtain the helloWorld result synchronous, without parameters.
 		String result = callSync(
-				URI.create("http://localhost:8081/agents/helloWorld/"),
+				URIUtil.create("http://localhost:8081/agents/helloWorld/"),
 				"helloWorld", null, String.class);
 
 		// Secondly obtain the echo result synchronous, with a message
@@ -54,12 +55,12 @@ public class MySecondAgent extends Agent {
 		Params params = new Params();
 		params.add("message", "Hi there!");
 		result += callSync(
-				URI.create("http://localhost:8081/agents/helloWorld/"), "echo",
+				URIUtil.create("http://localhost:8081/agents/helloWorld/"), "echo",
 				params, String.class);
 
 		// Third example: obtain the echo result asynchronously through a
 		// callback.
-		call(URI.create("http://localhost:8081/agents/helloWorld/"), "echo",
+		call(URIUtil.create("http://localhost:8081/agents/helloWorld/"), "echo",
 				params, new AsyncCallback<String>() {
 
 					@Override
@@ -77,7 +78,7 @@ public class MySecondAgent extends Agent {
 
 		// last example: obtain the echo result asynchronously by having the
 		// other agent call one of my methods.
-		call(URI.create("http://localhost:8081/agents/helloWorld/"),
+		call(URIUtil.create("http://localhost:8081/agents/helloWorld/"),
 				"asyncEcho", params);
 
 		return result;

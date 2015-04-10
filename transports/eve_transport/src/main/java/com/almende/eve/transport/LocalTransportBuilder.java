@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -35,7 +36,8 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 			LOG.warning("Parameter 'id' is required!");
 			return null;
 		}
-		final URI address = URI.create("local:" + config.getId());
+		final String addr = "local:" + config.getId();
+		final URI address = URIUtil.create(addr.intern());
 		LocalService result = getLocal(address);
 		if (result == null) {
 			result = new LocalService(address, newHandle, getParams());

@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.StringUtil;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -62,7 +63,7 @@ public class EveServlet extends HttpServlet {
 			final String servletUrl = config.getInitParameter("ServletUrl");
 			if (servletUrl != null) {
 				try {
-					myUrl = new URI(servletUrl);
+					myUrl = URIUtil.parse(servletUrl);
 				} catch (final URISyntaxException e) {
 					LOG.log(Level.WARNING,
 							"Couldn't init servlet, url invalid. ('ServletUrl' init param)",
@@ -268,7 +269,7 @@ public class EveServlet extends HttpServlet {
 		}
 		URI senderUrl = null;
 		try {
-			senderUrl = new URI(sender);
+			senderUrl = URIUtil.parse(sender);
 		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Couldn't parse senderUrl:" + sender, e);
 		}

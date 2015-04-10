@@ -4,9 +4,12 @@
 package com.almende.util.jackson;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
 
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -34,8 +37,9 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
  */
 public final class JOM {
 	private static final ObjectMapper	MAPPER;
+	private static final JOM			SINGLETON	= new JOM();
 	static {
-		MAPPER = createInstance();
+		MAPPER = SINGLETON.createInstance();
 	}
 
 	/**
@@ -84,18 +88,19 @@ public final class JOM {
 	 * 
 	 * @return the object mapper
 	 */
-	private static synchronized ObjectMapper createInstance() {
+	private synchronized ObjectMapper createInstance() {
 		final ObjectMapper mapper = new ObjectMapper();
 
-		mapper.setNodeFactory(new JsonNodeFactory(){
+		mapper.setNodeFactory(new JsonNodeFactory() {
 			private static final long	serialVersionUID	= -1340917885113347742L;
 
 			@Override
-			public ObjectNode objectNode(){
-				return new ObjectNode(this,new LinkedHashMap<String,JsonNode>(2));
+			public ObjectNode objectNode() {
+				return new ObjectNode(this,
+						new LinkedHashMap<String, JsonNode>(2));
 			}
 		});
-		
+
 		// set configuration
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 				false);
@@ -124,11 +129,16 @@ public final class JOM {
 
 		SimpleModule bitSetModule = new SimpleModule("BitSetModule",
 				new Version(1, 0, 0, null, null, null));
-		bitSetModule.addSerializer(new JOM().new CustomBitSetSerializer());
+		bitSetModule.addSerializer(new CustomBitSetSerializer());
 		bitSetModule.addDeserializer(BitSet.class,
-				new JOM().new CustomBitSetDeserializer());
+				new CustomBitSetDeserializer());
 		mapper.registerModule(bitSetModule);
-		
+
+		SimpleModule uriModule = new SimpleModule("UriModule", new Version(1,
+				0, 0, null, null, null));
+		uriModule.addDeserializer(URI.class, new CustomURIDeserializer());
+		mapper.registerModule(uriModule);
+
 		return mapper;
 	}
 
@@ -217,6 +227,43 @@ public final class JOM {
 			final BitSet result = BitSet.valueOf(value);
 			result.set(result.length(), size, false);
 			return result;
+		}
+
+	}
+
+	/**
+	 * The Class CustomBitSetDeserializer.
+	 */
+	public class CustomURIDeserializer extends StdDeserializer<URI> {
+		private static final long	serialVersionUID	= 8734051359812526123L;
+
+		/**
+		 * Instantiates a new custom bit set deserializer.
+		 */
+		public CustomURIDeserializer() {
+			super(URI.class);
+		}
+
+		@Override
+		public URI deserialize(JsonParser jpar, DeserializationContext ctx)
+				throws IOException, JsonProcessingException {
+			final JsonNode node = jpar.readValueAsTree();
+			if (node.isTextual()) {
+				try {
+					return URIUtil.parse(node.asText());
+				} catch (URISyntaxException e) {
+					throw ctx.mappingException(URI.class);
+				}
+			}
+			if (node.isObject()) {
+				final String string = node.get("string").textValue();
+				try {
+					return URIUtil.parse(string);
+				} catch (URISyntaxException e) {
+					throw ctx.mappingException(URI.class);
+				}
+			}
+			throw ctx.mappingException(URI.class);
 		}
 
 	}

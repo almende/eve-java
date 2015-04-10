@@ -4,7 +4,6 @@
  */
 package com.almende.eve.test;
 
-import java.net.URI;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -16,6 +15,7 @@ import com.almende.eve.agent.AgentProxyFactory;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.agent.ExampleAgentInterface;
 import com.almende.eve.transport.http.HttpTransportConfig;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -46,7 +46,7 @@ public class TestProxy extends TestCase {
 		agent.setConfig(config);
 		
 		final ExampleAgentInterface proxy = AgentProxyFactory.genProxy(agent,
-				URI.create("http://localhost:8081/agents/example"),
+				URIUtil.create("http://localhost:8081/agents/example"),
 				ExampleAgentInterface.class);
 		LOG.warning("Proxy got reply:" + proxy.helloWorld("Hi there"));
 		

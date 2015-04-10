@@ -18,6 +18,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,7 +40,7 @@ public class DAALampAgent extends AbstractLampAgent {
 	 * java.lang.String)
 	 */
 	@Override
-	public void handleGoal(Goal goal, String sender) throws JSONRPCException,
+	public void handleGoal(Goal goal, URI sender) throws JSONRPCException,
 			JsonProcessingException, IOException {
 		if (neighbours == null) {
 			neighbours = getNeighbours();
@@ -55,7 +56,7 @@ public class DAALampAgent extends AbstractLampAgent {
 		for (String neighbour : neighbours) {
 			ObjectNode params = JOM.createObjectNode();
 			params.set("goal", JOM.getInstance().valueToTree(goal));
-			call(URI.create(neighbour), "handleGoal", params, null);
+			call(URIUtil.create(neighbour), "handleGoal", params, null);
 		}
 	}
 
@@ -127,7 +128,7 @@ public class DAALampAgent extends AbstractLampAgent {
 					params.add("nofLamps", lampCnt.getCurrentEstimate());
 					params.add("nofOn", onCnt.getCurrentEstimate());
 					try {
-						call(URI.create(neighbour), "daaReceive", params);
+						call(URIUtil.create(neighbour), "daaReceive", params);
 					} catch (IOException e) {}
 				}
 			}

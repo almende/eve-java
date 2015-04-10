@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -47,7 +48,7 @@ public class ZmqTransportConfig extends TransportConfig {
 	public URI getAddress() {
 		if (this.has("address")) {
 			try {
-				return new URI(this.get("address").asText()+(getId()!=null?getId():""));
+				return URIUtil.parse(this.get("address").asText()+(getId()!=null?getId():""));
 			} catch (final URISyntaxException e) {
 				LOG.warning("Couldn't parse URI from: "
 						+ this.get("address").asText());

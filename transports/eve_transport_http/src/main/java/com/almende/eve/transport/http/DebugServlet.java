@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.almende.util.StreamingUtil;
 import com.almende.util.StringUtil;
+import com.almende.util.URIUtil;
 
 /**
  * The Class EveServlet.
@@ -91,7 +92,7 @@ public class DebugServlet extends EveServlet {
 		}
 		URI senderUrl = null;
 		try {
-			senderUrl = new URI(sender);
+			senderUrl = URIUtil.parse(sender);
 		} catch (final URISyntaxException e) {
 			LOG.log(Level.WARNING, "Couldn't parse senderUrl:" + sender, e);
 		}

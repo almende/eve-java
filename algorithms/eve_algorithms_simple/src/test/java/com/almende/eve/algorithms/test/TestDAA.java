@@ -5,7 +5,6 @@
 package com.almende.eve.algorithms.test;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +14,7 @@ import org.junit.Test;
 
 import com.almende.eve.algorithms.DAAValueBean;
 import com.almende.eve.algorithms.test.agents.DAAAgent;
+import com.almende.util.URIUtil;
 
 /**
  * The Class TestValueBean.
@@ -90,7 +90,7 @@ public class TestDAA extends TestCase {
 				{ 2, 1 },  { 3, 0 }, { 4, 1 }, { 4, 2 } };
 
 		for (int[] edge : edges) {
-			agents[edge[0]].addNeighbor(URI.create("local:" + edge[1]));
+			agents[edge[0]].addNeighbor(URIUtil.create("local:" + edge[1]));
 		}
 
 		for (final DAAAgent agent : agents) {

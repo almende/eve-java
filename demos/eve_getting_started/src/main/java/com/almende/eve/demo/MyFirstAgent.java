@@ -58,13 +58,13 @@ public class MyFirstAgent extends Agent {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void asyncEcho(@Name("message") String message,
-			@Sender String senderUrl) throws IOException {
+			@Sender URI senderUrl) throws IOException {
 		
 		String returnMessage = "You said:" + message;
 		ObjectNode params = JOM.createObjectNode();
 		params.put("returnMessage", returnMessage);
 
-		call(URI.create(senderUrl), "result", params);
+		call(senderUrl, "result", params);
 		
 	}
 	

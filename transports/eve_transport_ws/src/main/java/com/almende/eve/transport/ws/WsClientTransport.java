@@ -24,6 +24,7 @@ import org.glassfish.tyrus.client.ClientManager;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -59,7 +60,7 @@ public class WsClientTransport extends WebsocketTransport {
 		final String sURL = config.getServerUrl();
 		if (sURL != null) {
 			try {
-				serverUrl = new URI(sURL);
+				serverUrl = URIUtil.parse(sURL);
 			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING,
 						"'serverUrl' parameter couldn't be parsed", e);
@@ -214,7 +215,7 @@ public class WsClientTransport extends WebsocketTransport {
 					.create().build();
 			cec.getUserProperties().put("address", getAddress());
 			session = client.connectToServer(WebsocketEndpoint.class, cec,
-					new URI(serverUrl + "?id=" + myId));
+					URIUtil.parse(serverUrl + "?id=" + myId));
 
 		} catch (final DeploymentException e) {
 			LOG.log(Level.WARNING, "Can't connect to server", e);
@@ -256,7 +257,7 @@ public class WsClientTransport extends WebsocketTransport {
 		final String sURL = config.getServerUrl();
 		if (sURL != null) {
 			try {
-				serverUrl = new URI(sURL);
+				serverUrl = URIUtil.parse(sURL);
 			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING,
 						"'serverUrl' parameter couldn't be parsed", e);

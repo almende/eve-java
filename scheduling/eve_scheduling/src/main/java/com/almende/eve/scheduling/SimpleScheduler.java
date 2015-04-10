@@ -15,6 +15,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.scheduling.clock.Clock;
 import com.almende.eve.scheduling.clock.RunnableClock;
 import com.almende.eve.transport.Receiver;
+import com.almende.util.URIUtil;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -41,7 +42,7 @@ public class SimpleScheduler implements Scheduler {
 			final Handler<Receiver> handle) {
 		if (params.has("senderUrl")) {
 			try {
-				schedulerUrl = new URI(params.get("senderUrl").asText());
+				schedulerUrl = URIUtil.parse(params.get("senderUrl").asText());
 			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING,
 						"Couldn't parse scheduler senderUrl from parameters.",
@@ -49,11 +50,7 @@ public class SimpleScheduler implements Scheduler {
 			}
 		}
 		if (schedulerUrl == null) {
-			try {
-				schedulerUrl = new URI("local:unnamed_scheduler");
-			} catch (final URISyntaxException e1) {
-				LOG.log(Level.SEVERE, "", e1);
-			}
+			schedulerUrl = URIUtil.create("local:unnamed_scheduler");
 		}
 		this.handle = handle;
 		myParams = params;
