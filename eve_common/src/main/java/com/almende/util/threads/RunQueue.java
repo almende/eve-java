@@ -181,7 +181,7 @@ public class RunQueue extends AbstractExecutorService {
 
 	private boolean addTask(final Runnable command) {
 		synchronized (taskCnt) {
-			if (taskCnt[0] > maxtasks) {
+			if (taskCnt[0] > maxtasks && Thread.currentThread().getStackTrace().length < 10000) {
 				return false;
 			} else {
 				taskCnt[0]++;
