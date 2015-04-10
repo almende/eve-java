@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public class RunQueue extends AbstractExecutorService {
 	private static final Logger		LOG				= Logger.getLogger(RunQueue.class
 															.getName());
+
 	private final Object			terminationLock	= new Object();
 	private final Queue<Worker>		reserve			= new ConcurrentLinkedQueue<Worker>();
 	private final Queue<Runnable>	tasks			= new ConcurrentLinkedQueue<Runnable>();
@@ -33,6 +34,8 @@ public class RunQueue extends AbstractExecutorService {
 	private boolean					isShutdown		= false;
 	private int						interval		= 100;
 	private final int				maxinterval		= 500;
+	private final int				maxtasks		= 100000;
+	private int[]					taskCnt			= new int[1];
 
 	private class Scanner extends Thread {
 		@Override
@@ -95,7 +98,7 @@ public class RunQueue extends AbstractExecutorService {
 
 					if (running.size() <= nofCores) {
 						// Shortcut: Check if there are more tasks available.
-						task = tasks.poll();
+						task = getTask();
 					}
 					if (task == null) {
 						threadDone(this);
@@ -103,7 +106,7 @@ public class RunQueue extends AbstractExecutorService {
 				}
 			}
 			if (task != null) {
-				tasks.add(task);
+				putTask(task);
 			}
 		}
 	}
@@ -119,6 +122,7 @@ public class RunQueue extends AbstractExecutorService {
 			nofCores = 4;
 		}
 		running = new HashSet<Worker>(nofCores);
+		taskCnt[0] = 0;
 		scanner.start();
 	}
 
@@ -175,6 +179,35 @@ public class RunQueue extends AbstractExecutorService {
 		return (running.size() == 0 && waiting.size() == 0 && reserve.size() == 0);
 	}
 
+	private boolean addTask(final Runnable command) {
+		synchronized (taskCnt) {
+			if (taskCnt[0] > maxtasks) {
+				return false;
+			} else {
+				taskCnt[0]++;
+			}
+		}
+		tasks.add(command);
+		return true;
+	}
+
+	private void putTask(final Runnable command) {
+		synchronized (taskCnt) {
+			taskCnt[0]++;
+		}
+		tasks.add(command);
+	}
+
+	private Runnable getTask() {
+		final Runnable task = tasks.poll();
+		if (task != null) {
+			synchronized (taskCnt) {
+				taskCnt[0]--;
+			}
+		}
+		return task;
+	}
+
 	@Override
 	public void execute(final Runnable command) {
 		if (isShutdown()) {
@@ -189,7 +222,9 @@ public class RunQueue extends AbstractExecutorService {
 			thread = getFreeThread();
 		}
 		if (thread == null) {
-			tasks.add(command);
+			if (!addTask(command)) {
+				command.run();
+			}
 		}
 	}
 
@@ -222,10 +257,10 @@ public class RunQueue extends AbstractExecutorService {
 		}
 		if (!thread.isShutdown) {
 			if (running.contains(thread) && running.size() <= nofCores) {
-				final Runnable task = tasks.poll();
+				final Runnable task = getTask();
 				if (task != null) {
 					if (!thread.runTask(task)) {
-						tasks.add(task);
+						putTask(task);
 					} else {
 						return;
 					}

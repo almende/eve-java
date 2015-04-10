@@ -32,7 +32,7 @@ public class TestEventBus extends TestCase {
 	 */
 	@Test
 	public void testEvents() {
-		final int nofAgents = 20000;
+		final int nofAgents = 10000;
 		final int pause = 10000;
 
 		LOG.warning("Starting with:" + nofAgents + " agents");

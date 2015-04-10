@@ -79,27 +79,24 @@ public class TrickleRPC {
 		reschedule(trickle.next());
 	}
 
-	private synchronized void reschedule(final long[] intervals) {
+	private void reschedule(final long[] intervals) {
 		if (intervals[0] >= 0 && intervals[1] >= 0) {
-			final DateTime now = DateTime.now();
+			final DateTime nextSend = DateTime.now().plus(intervals[0]);
+			final DateTime nextInterval = DateTime.now().plus(intervals[1]);
+
 			if (sendTaskId != null) {
 				scheduler.cancel(sendTaskId);
+				sendTaskId = null;
 			}
+			sendTaskId = scheduler.schedule(requests.get(namespace + "send"),
+					nextSend);
+
 			if (intTaskId != null) {
 				scheduler.cancel(intTaskId);
+				intTaskId = null;
 			}
-//			sendTaskId = scheduler.schedule(new JSONRequest(namespace + "send",
-//					null),
-//					now.plus(intervals[0]));
-//			intTaskId = scheduler.schedule(
-//					new JSONRequest(namespace + "nextInterval",
-//							null),
-//					now.plus(intervals[1]));
-			sendTaskId = scheduler.schedule(requests.get(namespace + "send"),
-					now.plus(intervals[0]));
 			intTaskId = scheduler.schedule(
-					requests.get(namespace + "nextInterval"),
-					now.plus(intervals[1]));
+					requests.get(namespace + "nextInterval"), nextInterval);
 		}
 	}
 

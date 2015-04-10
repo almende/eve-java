@@ -5,8 +5,10 @@
 package com.almende.eve.algorithms;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,17 +99,21 @@ public class EventBus {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void doExpiry() {
+		final List<Event> stillToTrigger = new ArrayList<Event>();
 		synchronized (events) {
 			Iterator<Event> iter = events.iterator();
 			while (iter.hasNext()) {
 				Event event = iter.next();
 				if (event.getExpiryTime() < DateTime.now().getMillis()) {
 					if (!event.isTriggered()) {
-						trigger(event);
+						stillToTrigger.add(event);
 					}
 					iter.remove();
 				}
 			}
+		}
+		for (Event event : stillToTrigger){
+			trigger(event);
 		}
 	}
 
@@ -125,11 +131,13 @@ public class EventBus {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void doTriggers() {
-		synchronized (events) {
-			for (Event event : events) {
-				if (!event.isTriggered()) {
-					trigger(event);
-				}
+		Event[] eventArray;
+		synchronized (this.events) {
+			eventArray = this.events.toArray(new Event[0]);
+		}
+		for (Event event : eventArray) {
+			if (!event.isTriggered()) {
+				trigger(event);
 			}
 		}
 	}
@@ -138,9 +146,11 @@ public class EventBus {
 		synchronized (event) {
 			if (!event.isTriggered()) {
 				event.setTriggered(true);
-				scheduler.schedule(event.getMessage(), 0);
+			} else {
+				return;
 			}
 		}
+		scheduler.schedule(event.getMessage(), 0);
 	}
 
 	private void setupGossip() {
@@ -161,10 +171,11 @@ public class EventBus {
 				synchronized (events) {
 					params.add("events", events);
 				}
-				final JSONRequest request = new JSONRequest("event.receiveEvents", params);
+				final JSONRequest request = new JSONRequest(
+						"event.receiveEvents", params);
 				for (Edge neighbor : neighborArray) {
 					try {
-						caller.call(neighbor.getAddress(),request);
+						caller.call(neighbor.getAddress(), request);
 					} catch (IOException e) {
 						LOG.log(Level.WARNING, "EventBus got IO error", e);
 					}
@@ -182,19 +193,25 @@ public class EventBus {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void receiveEvents(final @Name("events") Set<Event> events) {
+		boolean trickleReset = false;
 		synchronized (this.events) {
-			if (this.events.equals(events)) {
-				trickle.incr();
-			} else {
+			if (!this.events.equals(events)) {
 				this.events.addAll(events);
-				trickle.reset();
+				trickleReset = true;
 			}
 		}
+		if (trickleReset) {
+			trickle.reset();
+		} else {
+			trickle.incr();
+		}
+		Event[] eventArray;
 		synchronized (this.events) {
-			for (Event event : this.events) {
-				if (!event.isTriggered()) {
-					trigger(event);
-				}
+			eventArray = this.events.toArray(new Event[0]);
+		}
+		for (Event event : eventArray) {
+			if (!event.isTriggered()) {
+				trigger(event);
 			}
 		}
 	}

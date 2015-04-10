@@ -4,6 +4,8 @@
  */
 package com.almende.eve.scheduling.clock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.Executor;
@@ -37,13 +39,14 @@ public class RunnableClock implements Runnable, Clock {
 	 */
 	@Override
 	public void run() {
+		final List<Runnable> toRun = new ArrayList<Runnable>();
 		synchronized (TIMELINE) {
 			while (!TIMELINE.isEmpty()) {
 				final ClockEntry ce = TIMELINE.firstEntry().getValue();
 				final DateTime now = DateTime.now();
 				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
-					RUNNER.execute(ce.getCallback());
+					toRun.add(ce.getCallback());
 					continue;
 				}
 				final long interval = new Interval(now, ce.getDue())
@@ -65,6 +68,9 @@ public class RunnableClock implements Runnable, Clock {
 				LOG.warning("Lost trigger, should never happen!");
 			}
 		}
+		for (Runnable run : toRun){
+			RUNNER.execute(run);
+		}
 	}
 
 	/*
@@ -81,13 +87,13 @@ public class RunnableClock implements Runnable, Clock {
 			final ClockEntry oldVal = TIMELINE.get(ce);
 			if (oldVal == null || oldVal.getDue().isAfter(due)) {
 				TIMELINE.put(ce, ce);
-				RUNNER.execute(this);
 			} else {
 				LOG.warning(ce.getTriggerId()
 						+ ": Skip adding ce, because has old value earlier than current. "
 						+ oldVal.getTriggerId());
 			}
 		}
+		RUNNER.execute(this);
 	}
 
 	/*
