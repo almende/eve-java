@@ -27,14 +27,8 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static WebsocketTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof WebsocketTransportConfig) {
-			return (WebsocketTransportConfig) node;
-		}
 		final WebsocketTransportConfig res = new WebsocketTransportConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(WebsocketTransportBuilder.class.getName());
-		}
 		return res;
 	}
 

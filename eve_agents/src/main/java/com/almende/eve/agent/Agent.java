@@ -89,9 +89,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(ObjectNode config) {
-		AgentConfig conf = AgentConfig.decorate(config);
-		conf.setClassName(this.getClass().getName());
-		setConfig(conf);
+		config.put("class", this.getClass().getName());
+		setConfig(config);
 	}
 
 	/**
@@ -103,10 +102,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(final String agentId, ObjectNode config) {
-		AgentConfig conf = AgentConfig.decorate(config);
-		conf.setId(agentId);
-		conf.setClassName(this.getClass().getName());
-		setConfig(conf);
+		config.put("id", agentId);
+		config.put("class", this.getClass().getName());
+		setConfig(config);
 	}
 
 	/**
@@ -402,6 +400,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 				if (stateConfig.getId() == null) {
 					stateConfig.setId("scheduler_" + agentId);
+					schedulerConfig.set("state", stateConfig);
 				}
 			}
 			if (agentId != null && schedulerConfig.getId() == null) {

@@ -12,16 +12,17 @@ import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Config.
  */
 public class Config extends ObjectNode {
-	private static Config		global		= new Config();
+	private static Config	global		= new Config();
 
-	private List<Config>		pointers	= new LinkedList<Config>();
-	private boolean				configured	= false;
+	private List<Config>	pointers	= new LinkedList<Config>();
+	private boolean			configured	= false;
 
 	/**
 	 * Instantiates a new config.
@@ -48,15 +49,13 @@ public class Config extends ObjectNode {
 	 * @return the config
 	 */
 	public static Config decorate(final ObjectNode node) {
+		Config res = null;
 		if (node instanceof Config) {
-			return (Config) node;
+			res = (Config) node;
 		} else {
-			final Config res = new Config(node);
-			if (res.has("templates")){
-				res.loadTemplates("templates");
-			}
-			return res;
+			res = new Config(node);
 		}
+		return res;
 	}
 
 	/**
@@ -68,11 +67,13 @@ public class Config extends ObjectNode {
 	 */
 	public Config copy(final ObjectNode node) {
 		if (node != null) {
-			this.setAll(node);
-			if (node instanceof Config) {
-				final Config other = (Config) node;
-				this.setPointers(other.getPointers());
+			if (node == this){
+				//Can't use equals!
+				return this;
 			}
+			Config other = Config.decorate(node);
+			this.pointers.addAll(other.pointers);
+			this.pointers.add(other);
 		}
 		return this;
 	}
@@ -185,9 +186,15 @@ public class Config extends ObjectNode {
 			if (val == null) {
 				continue;
 			}
-			if (!val.isArray()) {
-				//Do something smart, like creating a new ArrayNode with Configs
-				otherres = val.deepCopy();
+			if (val.isArray()) {
+				final ArrayNode array = JOM.createArrayNode();
+				for (JsonNode elem : val) {
+					final Config item = new Config();
+					item.pointers.add(Config.decorate((ObjectNode) elem));
+					array.add(item);
+				}
+				this.set(key, array);
+				otherres = array;
 			} else if (!val.isObject()) {
 				otherres = val;
 			} else {

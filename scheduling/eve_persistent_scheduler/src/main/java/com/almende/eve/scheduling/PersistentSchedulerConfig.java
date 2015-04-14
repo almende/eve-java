@@ -26,14 +26,8 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	 *            the node
 	 */
 	public static PersistentSchedulerConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof PersistentSchedulerConfig) {
-			return (PersistentSchedulerConfig) node;
-		}
 		final PersistentSchedulerConfig res = new PersistentSchedulerConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(PersistentSchedulerBuilder.class.getName());
-		}
 		return res;
 	}
 

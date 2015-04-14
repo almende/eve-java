@@ -26,14 +26,8 @@ public class LocalTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static LocalTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof LocalTransportConfig) {
-			return (LocalTransportConfig) node;
-		}
 		final LocalTransportConfig res = new LocalTransportConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(LocalTransportBuilder.class.getName());
-		}
 		return res;
 	}
 

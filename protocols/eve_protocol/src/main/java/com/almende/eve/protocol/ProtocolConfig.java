@@ -28,9 +28,6 @@ public class ProtocolConfig extends Config {
 	 * @return the protocol config
 	 */
 	public static ProtocolConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof ProtocolConfig) {
-			return (ProtocolConfig) node;
-		}
 		final ProtocolConfig res = new ProtocolConfig();
 		res.copy(node);
 		return res;

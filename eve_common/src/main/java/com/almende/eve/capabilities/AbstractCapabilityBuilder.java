@@ -18,12 +18,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *            the generic type
  */
 public abstract class AbstractCapabilityBuilder<T extends Capability> {
-	private static final Logger	LOG		= Logger.getLogger(AbstractCapabilityBuilder.class
-												.getName());
-	private ClassLoader			cl		= getClass().getClassLoader();
+	private static final Logger	LOG			= Logger.getLogger(AbstractCapabilityBuilder.class
+													.getName());
+	private ClassLoader			cl			= getClass().getClassLoader();
 
-	private Config				params	= null;
-	private Handler<?>			handle	= null;
+	private ObjectNode			parameters	= null;
+	private Handler<?>			handle		= null;
 
 	/**
 	 * With config.
@@ -33,7 +33,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the capability builder
 	 */
 	public AbstractCapabilityBuilder<T> withConfig(final ObjectNode params) {
-		this.params = Config.decorate(params);
+		this.parameters = params;
 		return this;
 	}
 
@@ -69,6 +69,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the t
 	 */
 	public T build() {
+		final Config params = Config.decorate(parameters);
 		final String className = params.getClassName();
 		if (className != null) {
 			try {
@@ -78,7 +79,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 					@SuppressWarnings("unchecked")
 					final AbstractCapabilityBuilder<T> instance = (AbstractCapabilityBuilder<T>) clazz
 							.newInstance();
-					return instance.withClassLoader(cl).withConfig(params)
+					return instance.withClassLoader(cl).withConfig(parameters)
 							.withHandle(handle).build();
 				} else {
 					LOG.log(Level.WARNING, className
@@ -113,7 +114,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the params
 	 */
 	protected final ObjectNode getParams() {
-		return params;
+		return parameters;
 	}
 
 	/**

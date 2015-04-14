@@ -28,14 +28,8 @@ public class CouchStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static CouchStateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof CouchStateConfig) {
-			return (CouchStateConfig) node;
-		}
 		final CouchStateConfig res = new CouchStateConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(CouchStateBuilder.class.getName());
-		}
 		return res;
 	}
 

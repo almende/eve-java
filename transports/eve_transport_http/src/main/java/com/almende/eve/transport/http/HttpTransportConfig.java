@@ -31,9 +31,6 @@ public class HttpTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static HttpTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof HttpTransportConfig) {
-			return (HttpTransportConfig) node;
-		}
 		final HttpTransportConfig res = new HttpTransportConfig();
 		res.copy(node);
 		if (!res.has("class")) {

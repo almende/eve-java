@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
-import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
 import com.almende.eve.instantiation.InstantiationService;
@@ -134,6 +133,9 @@ public final class Boot {
 	 */
 	public static ObjectNode boot(final InputStream is, final ClassLoader cl) {
 		final Config config = YamlReader.load(is);
+		if (config.has("templates")) {
+			config.loadTemplates("templates");
+		}
 		return boot(config, cl);
 	}
 
@@ -191,10 +193,8 @@ public final class Boot {
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 
 		for (final JsonNode agent : agents) {
-			final AgentConfig agentConfig = AgentConfig
-					.decorate((ObjectNode) agent);
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
-					.with(agentConfig).build();
+					.with((ObjectNode) agent).build();
 			LOG.info("Created agent:" + newAgent.getId());
 		}
 	}

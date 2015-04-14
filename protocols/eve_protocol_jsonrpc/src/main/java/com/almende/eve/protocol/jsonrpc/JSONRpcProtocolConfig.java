@@ -27,14 +27,8 @@ public class JSONRpcProtocolConfig extends ProtocolConfig {
 	 *            the node
 	 */
 	public static JSONRpcProtocolConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof JSONRpcProtocolConfig) {
-			return (JSONRpcProtocolConfig) node;
-		}
 		final JSONRpcProtocolConfig res = new JSONRpcProtocolConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(JSONRpcProtocolBuilder.class.getName());
-		}
 		return res;
 	}
 

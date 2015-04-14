@@ -48,7 +48,7 @@ public class JSONRpcProtocolBuilder extends
 			final Handler<Object> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
-			result = new JSONRpcProtocol(config, TYPEUTIL.inject(getHandle()));
+			result = new JSONRpcProtocol(getParams(), TYPEUTIL.inject(getHandle()));
 		}
 		INSTANCES.put(id, result);
 

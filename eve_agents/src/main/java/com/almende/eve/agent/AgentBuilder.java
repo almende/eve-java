@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class AgentBuilder {
 	private static final Logger	LOG			= Logger.getLogger(AgentBuilder.class
 													.getName());
-	private AgentConfig			parameters	= null;
+	private ObjectNode			parameters	= null;
 	private ClassLoader			cl			= getClass().getClassLoader();
 
 	/**
@@ -27,7 +27,7 @@ public class AgentBuilder {
 	 * @return the agent builder
 	 */
 	public AgentBuilder with(final ObjectNode config) {
-		parameters = AgentConfig.decorate(config);
+		parameters = config;
 		return this;
 	}
 
@@ -55,7 +55,8 @@ public class AgentBuilder {
 			LOG.warning("AgentBuilder is not yet initialized!");
 			return null;
 		}
-		final String className = parameters.getClassName();
+		final AgentConfig params = AgentConfig.decorate(parameters);
+		final String className = params.getClassName();
 		if (className == null) {
 			LOG.warning("AgentBuilder requires configuration parameters: class");
 			return null;

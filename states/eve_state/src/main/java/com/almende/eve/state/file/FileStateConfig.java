@@ -31,14 +31,8 @@ public class FileStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static FileStateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof FileStateConfig) {
-			return (FileStateConfig) node;
-		}
 		final FileStateConfig res = new FileStateConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(FileStateBuilder.class.getName());
-		}
 		return res;
 	}
 

@@ -6,7 +6,6 @@ package com.almende.eve.test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +15,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.almende.eve.agent.AgentBuilder;
-import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
@@ -51,8 +49,7 @@ public class TestConfigDOM extends TestCase {
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		ExampleAgent newAgent = null;
 		for (final JsonNode agent : agents) {
-			final AgentConfig agentConfig = AgentConfig.decorate((ObjectNode) agent);
-			newAgent = (ExampleAgent) new AgentBuilder().with(agentConfig)
+			newAgent = (ExampleAgent) new AgentBuilder().with((ObjectNode) agent)
 					.build();
 			LOG.info("Created agent:" + newAgent.getId());
 		}
@@ -78,26 +75,5 @@ public class TestConfigDOM extends TestCase {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {}
 	}
-
-	/**
-	 * Test expand.
-	 *
-	 * @throws FileNotFoundException
-	 *             the file not found exception
-	 */
-	@Test
-	public void testCompress() throws FileNotFoundException {
-		// First obtain the configuration:
-		final Config config = YamlReader.load(new FileInputStream(new File(
-				"target/classes/testCompress.yaml")));
-
-		final ObjectNode clone = config.deepCopy();
-		LOG.warning("Compress:" + config.toString());
-		LOG.warning("Global:" + Config.getGlobal().toString());
-		config.get("some key");
-		LOG.warning("Expanded:" + config.toString());
-
-		assertEquals(clone, config);
-
-	}
 }
+

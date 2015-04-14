@@ -26,14 +26,8 @@ public class SyncSchedulerConfig extends SimpleSchedulerConfig {
 	 *            the node
 	 */
 	public static SyncSchedulerConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof SyncSchedulerConfig) {
-			return (SyncSchedulerConfig) node;
-		}
 		final SyncSchedulerConfig res = new SyncSchedulerConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(SyncSchedulerBuilder.class.getName());
-		}
 		return res;
 	}
 }

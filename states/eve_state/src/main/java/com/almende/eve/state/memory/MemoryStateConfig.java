@@ -27,14 +27,8 @@ public class MemoryStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static MemoryStateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof MemoryStateConfig) {
-			return (MemoryStateConfig) node;
-		}
 		final MemoryStateConfig res = new MemoryStateConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(MemoryStateBuilder.class.getName());
-		}
 		return res;
 	}
 

@@ -270,9 +270,7 @@ public class JSONRpcProtocol implements Protocol {
 	@Override
 	public void delete() {
 		callbacks.clear();
-		JSONRpcProtocolConfig config = JSONRpcProtocolConfig
-				.decorate(getParams());
-		JSONRpcProtocolBuilder.delete(config.getId());
+		JSONRpcProtocolBuilder.delete(myParams.getId());
 	}
 
 }

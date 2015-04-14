@@ -33,14 +33,8 @@ public class AmqpTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static AmqpTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof AmqpTransportConfig) {
-			return (AmqpTransportConfig) node;
-		}
 		final AmqpTransportConfig res = new AmqpTransportConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(AmqpTransportBuilder.class.getName());
-		}
 		return res;
 
 	}

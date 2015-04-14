@@ -28,14 +28,8 @@ public class MongoStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static MongoStateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof MongoStateConfig) {
-			return (MongoStateConfig) node;
-		}
 		final MongoStateConfig res = new MongoStateConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(MongoStateBuilder.class.getName());
-		}
 		return res;
 	}
 	

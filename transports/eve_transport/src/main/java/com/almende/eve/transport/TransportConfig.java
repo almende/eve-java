@@ -26,9 +26,6 @@ public class TransportConfig extends Config {
 	 *            the node
 	 */
 	public static TransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof TransportConfig) {
-			return (TransportConfig) node;
-		}
 		final TransportConfig res = new TransportConfig();
 		res.copy(node);
 		return res;

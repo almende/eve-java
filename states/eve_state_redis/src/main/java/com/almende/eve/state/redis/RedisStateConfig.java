@@ -27,14 +27,8 @@ public class RedisStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static RedisStateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof RedisStateConfig) {
-			return (RedisStateConfig) node;
-		}
 		final RedisStateConfig res = new RedisStateConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(RedisStateBuilder.class.getName());
-		}
 		return res;
 	}
 

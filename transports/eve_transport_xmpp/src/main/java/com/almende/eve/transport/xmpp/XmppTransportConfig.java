@@ -34,14 +34,8 @@ public class XmppTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static XmppTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof XmppTransportConfig) {
-			return (XmppTransportConfig) node;
-		}
 		final XmppTransportConfig res = new XmppTransportConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(XmppTransportBuilder.class.getName());
-		}
 		return res;
 	}
 

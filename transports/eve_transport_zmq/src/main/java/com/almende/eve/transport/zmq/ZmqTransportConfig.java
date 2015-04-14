@@ -34,14 +34,8 @@ public class ZmqTransportConfig extends TransportConfig {
 	 *            the node
 	 */
 	public static ZmqTransportConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof ZmqTransportConfig) {
-			return (ZmqTransportConfig) node;
-		}
 		final ZmqTransportConfig res = new ZmqTransportConfig();
 		res.copy(node);
-		if (!res.has("class")) {
-			res.setClassName(ZmqTransportBuilder.class.getName());
-		}
 		return res;
 	}
 

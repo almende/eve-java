@@ -27,9 +27,6 @@ public class SimpleSchedulerConfig extends Config {
 	 *            the node
 	 */
 	public static SimpleSchedulerConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof SimpleSchedulerConfig) {
-			return (SimpleSchedulerConfig) node;
-		}
 		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
 		res.copy(node);
 		if (!res.has("class")) {

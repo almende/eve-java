@@ -50,9 +50,6 @@ public class AgentConfig extends Config {
 	 * @return the agent config
 	 */
 	public static AgentConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof AgentConfig) {
-			return (AgentConfig) node;
-		};
 		final AgentConfig res = new AgentConfig();
 		res.copy(node);
 		if (!res.has("id")) {

@@ -26,9 +26,6 @@ public class StateConfig extends Config {
 	 *            the node
 	 */
 	public static StateConfig decorate(final ObjectNode node) {
-		if (node != null && node instanceof StateConfig) {
-			return (StateConfig) node;
-		}
 		final StateConfig res = new StateConfig();
 		res.copy(node);
 		return res;
