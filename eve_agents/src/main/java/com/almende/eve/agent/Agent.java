@@ -47,6 +47,7 @@ import com.almende.eve.transport.TransportConfig;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -89,6 +90,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(ObjectNode config) {
+		if (config == null){
+			config = JOM.createObjectNode();
+		}
 		config.put("class", this.getClass().getName());
 		setConfig(config);
 	}
@@ -102,6 +106,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(final String agentId, ObjectNode config) {
+		if (config == null){
+			config = JOM.createObjectNode();
+		}
 		config.put("id", agentId);
 		config.put("class", this.getClass().getName());
 		setConfig(config);
