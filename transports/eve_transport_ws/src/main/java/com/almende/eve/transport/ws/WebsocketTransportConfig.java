@@ -5,34 +5,39 @@
 package com.almende.eve.transport.ws;
 
 import com.almende.eve.transport.TransportConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class WebsocketTransportConfig.
  */
 public class WebsocketTransportConfig extends TransportConfig {
-	
+
+	/**
+	 * Instantiates a new websocket transport config.
+	 */
+	public WebsocketTransportConfig() {
+		super();
+		setClassName(WebsocketTransportBuilder.class.getName());
+	}
+
 	/**
 	 * Instantiates a new websocket transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public WebsocketTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", WebsocketTransportBuilder.class.getName());
+	public static WebsocketTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof WebsocketTransportConfig) {
+			return (WebsocketTransportConfig) node;
 		}
+		final WebsocketTransportConfig res = new WebsocketTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(WebsocketTransportBuilder.class.getName());
+		}
+		return res;
 	}
-	
-	/**
-	 * Instantiates a new websocket transport config.
-	 */
-	public WebsocketTransportConfig() {
-		this(JOM.createObjectNode());
-	}
-	
+
 	/**
 	 * Is this transport the server side of a websocket?.
 	 * 
@@ -42,7 +47,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	public void setServer(final boolean server) {
 		this.put("server", server);
 	}
-	
+
 	/**
 	 * Is this transport the server side of a websocket?.
 	 * 
@@ -54,7 +59,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Sets the url. (server)
 	 * 
@@ -64,7 +69,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	public void setAddress(final String address) {
 		this.put("address", address.replace("/$", ""));
 	}
-	
+
 	/**
 	 * Gets the url. (server)
 	 * 
@@ -79,7 +84,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the servlet launcher class path. (Optional, server)
 	 * 
@@ -89,7 +94,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	public void setServletLauncher(final String servletLauncher) {
 		this.put("servletLauncher", servletLauncher);
 	}
-	
+
 	/**
 	 * Gets the servlet launcher class path. (server)
 	 * 
@@ -101,7 +106,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the id. (client)
 	 * 
@@ -112,7 +117,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 		this.put("id", id);
 		setAddress("wsclient:" + id);
 	}
-	
+
 	/**
 	 * Gets the id. (client)
 	 * 
@@ -124,7 +129,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the server url. (client)
 	 * 
@@ -134,7 +139,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	public void setServerUrl(final String serverUrl) {
 		this.put("serverUrl", serverUrl);
 	}
-	
+
 	/**
 	 * Gets the server url. (client)
 	 * 

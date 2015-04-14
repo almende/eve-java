@@ -50,7 +50,7 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 	 * @return the instance by params
 	 */
 	public CouchStateProvider getInstanceByParams(final ObjectNode params) {
-		final CouchStateConfig config = new CouchStateConfig(params);
+		final CouchStateConfig config = CouchStateConfig.decorate(params);
 		final String key = config.getKey();
 		
 		if (instances.containsKey(key)) {
@@ -85,7 +85,7 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 		 */
 		public CouchStateProvider(final ObjectNode params) {
 			try {
-				final CouchStateConfig config = new CouchStateConfig(params);
+				final CouchStateConfig config = CouchStateConfig.decorate(params);
 				final String url = config.getUrl();
 				final String username = config.getUsername();
 				final String password = config.getPassword();
@@ -121,7 +121,7 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 		 * @return the couch state
 		 */
 		public CouchState get(final ObjectNode params) {
-			final CouchStateConfig config = new CouchStateConfig(params);
+			final CouchStateConfig config = CouchStateConfig.decorate(params);
 			final String id = couchify(config.getId());
 			
 			CouchState state = null;

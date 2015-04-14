@@ -113,7 +113,8 @@ public class Goldemo {
 							"Incorrect input line detected:" + input);
 				}
 				for (int cM = 0; cM < M; cM++) {
-					final AgentConfig agent_config = new AgentConfig(config);
+					final AgentConfig agent_config = AgentConfig
+							.decorate(config.deepCopy());
 					agent_config.setId(AGENTPREFIX + no++);
 					final Cell cell = new Cell(agent_config);
 					cell.create(PATHodd, PATHeven,
@@ -126,7 +127,8 @@ public class Goldemo {
 			int no = 0;
 			for (int cN = 0; cN < N; cN++) {
 				for (int cM = 0; cM < M; cM++) {
-					final AgentConfig agent_config = new AgentConfig(config);
+					final AgentConfig agent_config = AgentConfig
+							.decorate(config.deepCopy());
 					agent_config.setId(AGENTPREFIX + no++);
 					final Cell cell = new Cell(agent_config);
 					cell.create(PATHodd, PATHeven, (Math.random() > 0.5), M * N);
@@ -145,7 +147,7 @@ public class Goldemo {
 		for (final Cell cell : cells) {
 			cell.start();
 		}
-		System.err.println("Started for "+runTime+"s!");
+		System.err.println("Started for " + runTime + "s!");
 		try {
 			Thread.sleep(runTime * 1000);
 		} catch (final InterruptedException e) {
@@ -165,7 +167,8 @@ public class Goldemo {
 		}
 
 		if (reportOnly) {
-			System.out.println("Cycles:" + (max_full - 1) + "("+N+"x"+M+": ~"+((max_full-1)/(runTime))+" cycles/second)");
+			System.out.println("Cycles:" + (max_full - 1) + "(" + N + "x" + M
+					+ ": ~" + ((max_full - 1) / (runTime)) + " cycles/second)");
 			System.out.println(((max_full - 1) * M * N * 8) / (runTime)
 					+ " RPCs/second (" + runTime + " sec)");
 		} else {

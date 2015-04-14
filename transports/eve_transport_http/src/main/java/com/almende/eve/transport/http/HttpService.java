@@ -31,7 +31,7 @@ public class HttpService implements TransportService {
 	private URI								myUrl		= null;
 	private final Map<URI, HttpTransport>	transports	= new HashMap<URI, HttpTransport>();
 	private HttpTransportConfig				myParams	= null;
-	
+
 	/**
 	 * Instantiates a new http service.
 	 * 
@@ -42,8 +42,8 @@ public class HttpService implements TransportService {
 	 */
 	public HttpService(final URI servletUrl, final ObjectNode params) {
 		myUrl = servletUrl;
-		myParams = new HttpTransportConfig(params);
-		
+		myParams = HttpTransportConfig.decorate(params);
+
 		String servletLauncher = myParams.getServletLauncher();
 		if (servletLauncher != null) {
 			if (servletLauncher.equals("JettyLauncher")) {
@@ -59,7 +59,7 @@ public class HttpService implements TransportService {
 				}
 				final ServletLauncher launcher = (ServletLauncher) launcherClass
 						.newInstance();
-				
+
 				final Class<?> servletClass = Class.forName(myParams
 						.getServletClass());
 				if (!ClassUtil.hasInterface(servletClass, Servlet.class)) {
@@ -74,14 +74,14 @@ public class HttpService implements TransportService {
 				} else {
 					LOG.log(Level.WARNING, "Couldn't instantiate servlet!");
 				}
-				
+
 			} catch (final Exception e1) {
 				LOG.log(Level.WARNING,
 						"Failed to load servlet in servletlauncher!", e1);
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -98,7 +98,7 @@ public class HttpService implements TransportService {
 	public <T extends Capability, V> HttpTransport get(final ObjectNode params,
 			final Handler<V> handle) {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL.inject(handle);
-		final HttpTransportConfig config = new HttpTransportConfig(params);
+		final HttpTransportConfig config = HttpTransportConfig.decorate(params);
 		HttpTransport result = null;
 		final String id = config.getId();
 		if (id != null) {
@@ -120,10 +120,9 @@ public class HttpService implements TransportService {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
 	 * transport
@@ -133,7 +132,7 @@ public class HttpService implements TransportService {
 	public void delete(final Transport instance) {
 		transports.remove(instance.getAddress());
 	}
-	
+
 	/**
 	 * Gets the transport
 	 * 
@@ -150,7 +149,7 @@ public class HttpService implements TransportService {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets a pre-existing HttpTransport by URI and id. Called from Servlets
 	 * to
@@ -164,13 +163,14 @@ public class HttpService implements TransportService {
 	 * @return the http transport
 	 */
 	public static HttpTransport get(final URI servletUrl, final String id) {
-		final HttpService service = HttpTransportBuilder.getServices().get(servletUrl);
+		final HttpService service = HttpTransportBuilder.getServices().get(
+				servletUrl);
 		if (service != null) {
 			return service.get(id);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Should the Servlet handle authentication?.
 	 * 
@@ -179,13 +179,14 @@ public class HttpService implements TransportService {
 	 * @return true, if authentication is needed.
 	 */
 	public static boolean doAuthentication(final URI servletUrl) {
-		final HttpService service = HttpTransportBuilder.getServices().get(servletUrl);
+		final HttpService service = HttpTransportBuilder.getServices().get(
+				servletUrl);
 		if (service != null) {
 			return service.doAuthentication();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Should the Servlet handle authentication?
 	 * 
@@ -194,10 +195,9 @@ public class HttpService implements TransportService {
 	private boolean doAuthentication() {
 		return myParams.getDoAuthentication();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 	 */

@@ -13,11 +13,10 @@ import com.almende.util.uuid.UUID;
 /**
  * The Class PersistentSchedulerService.
  */
-public class PersistentSchedulerBuilder extends
-		SimpleSchedulerBuilder {
-	private static final Logger LOG = Logger
-			.getLogger(PersistentSchedulerBuilder.class.getName());
-	
+public class PersistentSchedulerBuilder extends SimpleSchedulerBuilder {
+	private static final Logger	LOG	= Logger.getLogger(PersistentSchedulerBuilder.class
+											.getName());
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -27,8 +26,8 @@ public class PersistentSchedulerBuilder extends
 	 */
 	@Override
 	public PersistentScheduler build() {
-		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(
-				getParams());
+		final PersistentSchedulerConfig config = PersistentSchedulerConfig
+				.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();

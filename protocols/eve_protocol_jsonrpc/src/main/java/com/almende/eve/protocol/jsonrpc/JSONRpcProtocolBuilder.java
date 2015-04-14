@@ -34,7 +34,7 @@ public class JSONRpcProtocolBuilder extends
 	 */
 	@Override
 	public JSONRpcProtocol build() {
-		JSONRpcProtocolConfig config = new JSONRpcProtocolConfig(getParams());
+		JSONRpcProtocolConfig config = JSONRpcProtocolConfig.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();

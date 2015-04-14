@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
 import com.almende.util.URIUtil;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -19,27 +18,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ZmqTransportConfig extends TransportConfig {
 	private static final Logger	LOG	= Logger.getLogger(ZmqTransportConfig.class
 											.getName());
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
 	public ZmqTransportConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(ZmqTransportBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public ZmqTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!this.has("class")) {
-			setClassName(ZmqTransportBuilder.class.getName());
+	public static ZmqTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof ZmqTransportConfig) {
+			return (ZmqTransportConfig) node;
 		}
+		final ZmqTransportConfig res = new ZmqTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(ZmqTransportBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Gets the address.
 	 * 
@@ -48,7 +53,8 @@ public class ZmqTransportConfig extends TransportConfig {
 	public URI getAddress() {
 		if (this.has("address")) {
 			try {
-				return URIUtil.parse(this.get("address").asText()+(getId()!=null?getId():""));
+				return URIUtil.parse(this.get("address").asText()
+						+ (getId() != null ? getId() : ""));
 			} catch (final URISyntaxException e) {
 				LOG.warning("Couldn't parse URI from: "
 						+ this.get("address").asText());
@@ -56,7 +62,7 @@ public class ZmqTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the address.
 	 * 
@@ -66,24 +72,24 @@ public class ZmqTransportConfig extends TransportConfig {
 	public void setAddress(final String address) {
 		this.put("address", address);
 	}
-	
+
 	/**
 	 * Sets the id.
 	 * 
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(final String id){
+	public void setId(final String id) {
 		this.put("id", id);
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
 	 * @return the id
 	 */
-	public String getId(){
-		if (this.has("id")){
+	public String getId() {
+		if (this.has("id")) {
 			return this.get("id").asText();
 		}
 		return null;

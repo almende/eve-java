@@ -4,34 +4,39 @@
  */
 package com.almende.eve.transport;
 
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class LocalTransportConfig.
  */
 public class LocalTransportConfig extends TransportConfig {
-	
+
+	/**
+	 * Instantiates a new local transport config.
+	 */
+	public LocalTransportConfig() {
+		super();
+		setClassName(LocalTransportBuilder.class.getName());
+	}
+
 	/**
 	 * Instantiates a new local transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public LocalTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", LocalTransportBuilder.class.getName());
+	public static LocalTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof LocalTransportConfig) {
+			return (LocalTransportConfig) node;
 		}
+		final LocalTransportConfig res = new LocalTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(LocalTransportBuilder.class.getName());
+		}
+		return res;
 	}
-	
-	/**
-	 * Instantiates a new local transport config.
-	 */
-	public LocalTransportConfig() {
-		this(JOM.createObjectNode());
-	}
-	
+
 	/**
 	 * Instantiates a new local transport config.
 	 * 
@@ -39,10 +44,10 @@ public class LocalTransportConfig extends TransportConfig {
 	 *            the id
 	 */
 	public LocalTransportConfig(final String id) {
-		this(JOM.createObjectNode());
+		this();
 		setId(id);
 	}
-	
+
 	/**
 	 * Sets the id.
 	 * 
@@ -52,7 +57,7 @@ public class LocalTransportConfig extends TransportConfig {
 	public void setId(final String id) {
 		this.put("id", id);
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 

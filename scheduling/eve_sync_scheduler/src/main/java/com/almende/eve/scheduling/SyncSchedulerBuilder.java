@@ -27,7 +27,8 @@ public class SyncSchedulerBuilder extends
 	 */
 	@Override
 	public SyncScheduler build() {
-		final SyncSchedulerConfig config = new SyncSchedulerConfig(getParams());
+		final SyncSchedulerConfig config = SyncSchedulerConfig
+				.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();

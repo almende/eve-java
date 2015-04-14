@@ -55,8 +55,8 @@ public class WsClientTransport extends WebsocketTransport {
 	public WsClientTransport(final URI address, final Handler<Receiver> handle,
 			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
-		final WebsocketTransportConfig config = new WebsocketTransportConfig(
-				params);
+		final WebsocketTransportConfig config = WebsocketTransportConfig
+				.decorate(params);
 		final String sURL = config.getServerUrl();
 		if (sURL != null) {
 			try {

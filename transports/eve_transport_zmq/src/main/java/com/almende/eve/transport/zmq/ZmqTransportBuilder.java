@@ -23,20 +23,20 @@ public class ZmqTransportBuilder extends
 		AbstractCapabilityBuilder<ZmqTransport> {
 	private final Map<URI, ZmqTransport>	instances	= new ConcurrentHashMap<URI, ZmqTransport>();
 	private static ZmqService				singleton	= null;
-	
+
 	@Override
 	public ZmqTransport build() {
 		if (singleton == null) {
 			singleton = new ZmqService();
-			singleton.doesShortcut = new ZmqTransportConfig(getParams())
+			singleton.doesShortcut = ZmqTransportConfig.decorate(getParams())
 					.getDoShortcut();
 		}
 		return singleton.get(getParams(), getHandle());
 	}
-	
+
 	class ZmqService implements TransportService {
 		private boolean	doesShortcut	= true;
-		
+
 		/**
 		 * Gets the ZMQ transport.
 		 * 
@@ -54,10 +54,11 @@ public class ZmqTransportBuilder extends
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL
 					.inject(handle);
-			final ZmqTransportConfig config = new ZmqTransportConfig(params);
+			final ZmqTransportConfig config = ZmqTransportConfig
+					.decorate(params);
 			final URI address = config.getAddress();
 			ZmqTransport result = instances.get(address);
-			
+
 			if (result == null) {
 				result = new ZmqTransport(config, newHandle, this);
 				instances.put(address, result);
@@ -66,10 +67,9 @@ public class ZmqTransportBuilder extends
 			}
 			return result;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
 		 * transport
@@ -79,10 +79,9 @@ public class ZmqTransportBuilder extends
 		public void delete(final Transport instance) {
 			instances.remove(instance.getAddress());
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 		 */

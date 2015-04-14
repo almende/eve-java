@@ -4,34 +4,39 @@
  */
 package com.almende.eve.scheduling;
 
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class PersistentSchedulerConfig.
  */
 public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
-	
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 */
 	public PersistentSchedulerConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(PersistentSchedulerBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public PersistentSchedulerConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			setClassName(PersistentSchedulerBuilder.class.getName());
+	public static PersistentSchedulerConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof PersistentSchedulerConfig) {
+			return (PersistentSchedulerConfig) node;
 		}
+		final PersistentSchedulerConfig res = new PersistentSchedulerConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(PersistentSchedulerBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Sets the state.
 	 * 
@@ -41,7 +46,7 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	public void setState(final ObjectNode node) {
 		this.set("state", node);
 	}
-	
+
 	/**
 	 * Gets the state.
 	 * 

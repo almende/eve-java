@@ -23,14 +23,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> {
 	private static final Logger					LOG			= Logger.getLogger(LocalTransportBuilder.class
 																	.getName());
-	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>(10);
+	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>(
+																	10);
 
 	@Override
 	public Transport build() {
 		final Handler<Receiver> newHandle = Transport.TYPEUTIL
 				.inject(getHandle());
-		final LocalTransportConfig config = new LocalTransportConfig(
-				getParams());
+		final LocalTransportConfig config = LocalTransportConfig
+				.decorate(getParams());
 		final String id = config.getId();
 		if (id == null) {
 			LOG.warning("Parameter 'id' is required!");

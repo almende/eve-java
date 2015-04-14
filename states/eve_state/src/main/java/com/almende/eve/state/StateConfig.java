@@ -5,7 +5,6 @@
 package com.almende.eve.state;
 
 import com.almende.eve.capabilities.Config;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -17,7 +16,7 @@ public class StateConfig extends Config {
 	 * Instantiates a new state config.
 	 */
 	public StateConfig() {
-		this(JOM.createObjectNode());
+		super();
 	}
 	
 	/**
@@ -26,8 +25,13 @@ public class StateConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public StateConfig(final ObjectNode node) {
-		super(node);
+	public static StateConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof StateConfig) {
+			return (StateConfig) node;
+		}
+		final StateConfig res = new StateConfig();
+		res.copy(node);
+		return res;
 	}
 	
 	/**

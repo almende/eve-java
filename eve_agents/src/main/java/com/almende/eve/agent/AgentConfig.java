@@ -28,7 +28,7 @@ public class AgentConfig extends Config {
 	 * Instantiates a new config.
 	 */
 	public AgentConfig() {
-		this(JOM.createObjectNode());
+		super();
 	}
 
 	/**
@@ -38,34 +38,27 @@ public class AgentConfig extends Config {
 	 *            the id
 	 */
 	public AgentConfig(final String id) {
-		super(JOM.createObjectNode());
+		super();
 		setId(id);
 	}
 
 	/**
-	 * Instantiates a new config.
-	 * 
+	 * Decorate.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the agent config
 	 */
-	public AgentConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("id")) {
-			this.put("id", new UUID().toString());
+	public static AgentConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof AgentConfig) {
+			return (AgentConfig) node;
+		};
+		final AgentConfig res = new AgentConfig();
+		res.copy(node);
+		if (!res.has("id")) {
+			res.put("id", new UUID().toString());
 		}
-	}
-
-	/**
-	 * Instantiates a new config.
-	 * 
-	 * @param id
-	 *            the id
-	 * @param node
-	 *            the node
-	 */
-	public AgentConfig(final String id, final ObjectNode node) {
-		super(node);
-		setId(id);
+		return res;
 	}
 
 	/**
@@ -121,21 +114,22 @@ public class AgentConfig extends Config {
 	public void setTransports(final ArrayNode transports) {
 		this.set("transports", transports);
 	}
-	
+
 	/**
 	 * Adds the transport.
 	 *
 	 * @param transport
 	 *            the transport
 	 */
-	public void addTransport(final ObjectNode transport){
+	public void addTransport(final ObjectNode transport) {
 		this.getTransports().add(transport);
 	}
 
 	/**
 	 * Sets the transport.
 	 *
-	 * @deprecated Please use setTransports(transport[]) or addTransport(transport) instead
+	 * @deprecated Please use setTransports(transport[]) or
+	 *             addTransport(transport) instead
 	 * @param transport
 	 *            the new transport
 	 */

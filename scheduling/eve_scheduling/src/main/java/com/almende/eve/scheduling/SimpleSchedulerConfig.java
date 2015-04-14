@@ -5,7 +5,6 @@
 package com.almende.eve.scheduling;
 
 import com.almende.eve.capabilities.Config;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -17,7 +16,8 @@ public class SimpleSchedulerConfig extends Config {
 	 * Instantiates a new simple scheduler config.
 	 */
 	public SimpleSchedulerConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(SimpleSchedulerBuilder.class.getName());
 	}
 
 	/**
@@ -26,11 +26,16 @@ public class SimpleSchedulerConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public SimpleSchedulerConfig(final ObjectNode node) {
-		super(node);
-		if (node == null || !node.has("class")) {
-			setClassName(SimpleSchedulerBuilder.class.getName());
+	public static SimpleSchedulerConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof SimpleSchedulerConfig) {
+			return (SimpleSchedulerConfig) node;
 		}
+		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(SimpleSchedulerBuilder.class.getName());
+		}
+		return res;
 	}
 
 	/**

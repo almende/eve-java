@@ -17,32 +17,31 @@ import com.almende.util.uuid.UUID;
 /**
  * The Class SimpleSchedulerService.
  */
-public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleScheduler> {
-	private static final Logger LOG = Logger
-			.getLogger(SimpleSchedulerBuilder.class.getName());
-	protected static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
-																	};
+public class SimpleSchedulerBuilder extends
+		AbstractCapabilityBuilder<SimpleScheduler> {
+	private static final Logger							LOG			= Logger.getLogger(SimpleSchedulerBuilder.class
+																			.getName());
+	protected static final TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
 	protected static final Map<String, SimpleScheduler>	INSTANCES	= new HashMap<String, SimpleScheduler>();
-	
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.capabilities.CapabilityService#get(com.fasterxml.jackson
 	 * .databind.node.ObjectNode, com.almende.eve.capabilities.handler.Handler,
 	 * java.lang.Class)
 	 */
 	@Override
-	public SimpleScheduler build(){
-		final SimpleSchedulerConfig config = new SimpleSchedulerConfig(getParams());
+	public SimpleScheduler build() {
+		final SimpleSchedulerConfig config = SimpleSchedulerConfig
+				.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();
 			LOG.warning("Parameter 'id' is required for SimpleScheduler. (giving temporary name: "
 					+ id + ")");
 		}
-		
+
 		SimpleScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
 			result = INSTANCES.get(id);
@@ -54,14 +53,14 @@ public class SimpleSchedulerBuilder extends AbstractCapabilityBuilder<SimpleSche
 		INSTANCES.put(id, result);
 		return result;
 	}
-	
+
 	/**
 	 * Delete.
 	 *
 	 * @param id
 	 *            the id
 	 */
-	public static void delete(final String id){
+	public static void delete(final String id) {
 		INSTANCES.remove(id);
 	}
 }

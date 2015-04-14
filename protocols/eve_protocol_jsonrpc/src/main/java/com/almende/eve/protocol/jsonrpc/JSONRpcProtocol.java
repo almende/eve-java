@@ -39,7 +39,7 @@ public class JSONRpcProtocol implements Protocol {
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
-	private ObjectNode								myParams;
+	private JSONRpcProtocolConfig					myParams;
 
 	/**
 	 * Instantiates a new JSON rpc protocol.
@@ -51,9 +51,8 @@ public class JSONRpcProtocol implements Protocol {
 	 */
 	public JSONRpcProtocol(final ObjectNode params, final Handler<Object> handle) {
 		destination = handle;
-		myParams = params;
-		final JSONRpcProtocolConfig config = new JSONRpcProtocolConfig(params);
-		callbacks.setDefTimeout(config.getCallbackTimeout());
+		myParams = JSONRpcProtocolConfig.decorate(params);
+		callbacks.setDefTimeout(myParams.getCallbackTimeout());
 	}
 
 	@Override
@@ -271,7 +270,8 @@ public class JSONRpcProtocol implements Protocol {
 	@Override
 	public void delete() {
 		callbacks.clear();
-		JSONRpcProtocolConfig config = new JSONRpcProtocolConfig(getParams());
+		JSONRpcProtocolConfig config = JSONRpcProtocolConfig
+				.decorate(getParams());
 		JSONRpcProtocolBuilder.delete(config.getId());
 	}
 

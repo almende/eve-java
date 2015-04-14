@@ -112,7 +112,7 @@ public class AgentHost {
 	 */
 	public Agent createAgent(String agentType, String agentId,
 			final ObjectNode config) {
-		final AgentConfig conf = new AgentConfig(config);
+		final AgentConfig conf = AgentConfig.decorate(config);
 		conf.setClassName(agentType);
 		conf.setId(agentId);
 		conf.setScheduler(new SimpleSchedulerConfig());

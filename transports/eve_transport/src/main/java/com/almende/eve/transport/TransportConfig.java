@@ -11,6 +11,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TransportConfig.
  */
 public class TransportConfig extends Config {
+
+	/**
+	 * Instantiates a new transport config.
+	 */
+	public TransportConfig() {
+		super();
+	}
 	
 	/**
 	 * Instantiates a new transport config.
@@ -18,8 +25,14 @@ public class TransportConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public TransportConfig(final ObjectNode node) {
-		super(node);
+	public static TransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof TransportConfig) {
+			return (TransportConfig) node;
+		}
+		final TransportConfig res = new TransportConfig();
+		res.copy(node);
+		return res;
+
 	}
 	
 	/**

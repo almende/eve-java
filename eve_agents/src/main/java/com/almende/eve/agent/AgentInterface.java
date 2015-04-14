@@ -41,7 +41,7 @@ public interface AgentInterface {
 	List<URI> getUrls();
 
 	/**
-	 * Gets the config.
+	 * Gets the config of this Agent, expanded, with no external references.
 	 * 
 	 * @return the config
 	 */

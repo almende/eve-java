@@ -33,7 +33,7 @@ public class WebsocketTransportBuilder extends
 	private static final Logger		LOG			= Logger.getLogger(WebsocketService.class
 														.getName());
 	private static WebsocketService	singleton	= null;
-	
+
 	@Override
 	public WebsocketTransport build() {
 		if (singleton == null) {
@@ -41,7 +41,7 @@ public class WebsocketTransportBuilder extends
 		}
 		return singleton.get(getParams(), getHandle());
 	}
-	
+
 	/**
 	 * Gets the transport.
 	 * 
@@ -55,10 +55,10 @@ public class WebsocketTransportBuilder extends
 		}
 		return null;
 	}
-	
+
 	class WebsocketService implements TransportService {
 		private final Map<URI, WebsocketTransport>	transports	= new HashMap<URI, WebsocketTransport>();
-		
+
 		/**
 		 * Gets the.
 		 * 
@@ -76,8 +76,8 @@ public class WebsocketTransportBuilder extends
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL
 					.inject(handle);
-			final WebsocketTransportConfig config = new WebsocketTransportConfig(
-					params);
+			final WebsocketTransportConfig config = WebsocketTransportConfig
+					.decorate(params);
 			if (config.isServer()) {
 				return getServer(config, newHandle);
 			} else {
@@ -85,10 +85,12 @@ public class WebsocketTransportBuilder extends
 			}
 		}
 
-		private WebsocketTransport getServer(final WebsocketTransportConfig config, final Handler<Receiver> handle){
+		private WebsocketTransport getServer(
+				final WebsocketTransportConfig config,
+				final Handler<Receiver> handle) {
 			WebsocketTransport result = null;
 			final String address = config.getAddress();
-			
+
 			if (address != null) {
 				try {
 					final URI serverUri = URIUtil.parse(address);
@@ -96,11 +98,10 @@ public class WebsocketTransportBuilder extends
 						result = transports.get(serverUri);
 						result.getHandle().update(handle);
 					} else {
-						result = new WsServerTransport(serverUri,
-								handle, this, config);
+						result = new WsServerTransport(serverUri, handle, this,
+								config);
 						transports.put(serverUri, result);
-						String servletLauncher = config
-								.getServletLauncher();
+						String servletLauncher = config.getServletLauncher();
 						if (servletLauncher != null) {
 							if (servletLauncher.equals("JettyLauncher")) {
 								servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
@@ -112,24 +113,22 @@ public class WebsocketTransportBuilder extends
 										ServletLauncher.class)) {
 									throw new IllegalArgumentException(
 											"ServletLauncher class "
-													+ launcherClass
-															.getName()
+													+ launcherClass.getName()
 													+ " must implement "
 													+ ServletLauncher.class
 															.getName());
 								}
 								final ServletLauncher launcher = (ServletLauncher) launcherClass
 										.newInstance();
-								
+
 								final ServerEndpointConfig sec = ServerEndpointConfig.Builder
 										.create(WebsocketEndpoint.class,
-												serverUri.getPath())
-										.build();
+												serverUri.getPath()).build();
 								sec.getUserProperties().put("address",
 										serverUri);
-								
+
 								launcher.add(sec, config);
-								
+
 							} catch (final Exception e1) {
 								LOG.log(Level.WARNING,
 										"Failed to load servlet in servletlauncher!",
@@ -138,16 +137,18 @@ public class WebsocketTransportBuilder extends
 						}
 					}
 				} catch (final URISyntaxException e) {
-					LOG.log(Level.WARNING, "Couldn't parse address:"
-							+ address, e);
+					LOG.log(Level.WARNING, "Couldn't parse address:" + address,
+							e);
 				}
 			} else {
 				LOG.warning("Parameter 'address' is required.");
 			}
 			return result;
 		}
-		
-		private WebsocketTransport getClient(final WebsocketTransportConfig config, final Handler<Receiver> handle){
+
+		private WebsocketTransport getClient(
+				final WebsocketTransportConfig config,
+				final Handler<Receiver> handle) {
 			WebsocketTransport result = null;
 			final String id = config.getId();
 			if (id != null) {
@@ -156,16 +157,15 @@ public class WebsocketTransportBuilder extends
 					LOG.log(Level.WARNING, "Looking up:" + key);
 					if (transports.containsKey(key)) {
 						result = transports.get(key);
-						if (!(new WebsocketTransportConfig(
-								result.getParams())).getServerUrl().equals(
+						if (!(WebsocketTransportConfig.decorate(result
+								.getParams())).getServerUrl().equals(
 								config.getServerUrl())) {
-							((WsClientTransport) result)
-									.updateConfig(config);
+							((WsClientTransport) result).updateConfig(config);
 						}
 						result.getHandle().update(handle);
 					} else {
-						result = new WsClientTransport(key, handle,
-								this, config);
+						result = new WsClientTransport(key, handle, this,
+								config);
 						transports.put(key, result);
 					}
 				} catch (final URISyntaxException e) {
@@ -180,10 +180,9 @@ public class WebsocketTransportBuilder extends
 			}
 			return result;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
 		 * transport
@@ -193,10 +192,9 @@ public class WebsocketTransportBuilder extends
 		public void delete(final Transport instance) {
 			transports.remove(instance.getAddress());
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 		 */
@@ -204,7 +202,7 @@ public class WebsocketTransportBuilder extends
 		public Transport getLocal(final URI address) {
 			return null;
 		}
-		
+
 		/**
 		 * Gets the transport.
 		 * 
@@ -215,6 +213,6 @@ public class WebsocketTransportBuilder extends
 		public WebsocketTransport getTransport(final URI address) {
 			return transports.get(address);
 		}
-		
+
 	}
 }

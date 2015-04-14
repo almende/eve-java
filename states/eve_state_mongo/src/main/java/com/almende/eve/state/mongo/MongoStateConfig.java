@@ -5,7 +5,6 @@
 package com.almende.eve.state.mongo;
 
 import com.almende.eve.state.StateConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -18,7 +17,8 @@ public class MongoStateConfig extends StateConfig {
 	 * Instantiates a new memory state config.
 	 */
 	public MongoStateConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(MongoStateBuilder.class.getName());
 	}
 	
 	/**
@@ -27,11 +27,16 @@ public class MongoStateConfig extends StateConfig {
 	 * @param node
 	 *            the node
 	 */
-	public MongoStateConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", MongoStateBuilder.class.getName());
+	public static MongoStateConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof MongoStateConfig) {
+			return (MongoStateConfig) node;
 		}
+		final MongoStateConfig res = new MongoStateConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(MongoStateBuilder.class.getName());
+		}
+		return res;
 	}
 	
 	/**

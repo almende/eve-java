@@ -22,13 +22,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class AmqpTransportBuilder extends
 		AbstractCapabilityBuilder<AmqpTransport> {
 	private final Map<URI, AmqpTransport>	instances	= new ConcurrentHashMap<URI, AmqpTransport>();
-	private static AmqpService			singleton	= null;
+	private static AmqpService				singleton	= null;
 
 	@Override
 	public AmqpTransport build() {
 		if (singleton == null) {
 			singleton = new AmqpService();
-			singleton.doesShortcut = new AmqpTransportConfig(getParams())
+			singleton.doesShortcut = AmqpTransportConfig.decorate(getParams())
 					.getDoShortcut();
 		}
 		return singleton.get(getParams(), getHandle());
@@ -54,7 +54,8 @@ public class AmqpTransportBuilder extends
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL
 					.inject(handle);
-			final AmqpTransportConfig config = new AmqpTransportConfig(params);
+			final AmqpTransportConfig config = AmqpTransportConfig
+					.decorate(params);
 			final URI address = config.getAddress();
 			AmqpTransport result = instances.get(address);
 

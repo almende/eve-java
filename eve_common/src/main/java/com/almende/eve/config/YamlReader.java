@@ -32,7 +32,7 @@ public class YamlReader {
 	public static Config load(final InputStream is) {
 		final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		try {
-			return new Config((ObjectNode) mapper.readTree(is));
+			return Config.decorate((ObjectNode) mapper.readTree(is));
 		} catch (final JsonProcessingException e) {
 			LOG.log(Level.WARNING, "Couldn't parse Yaml file", e);
 		} catch (final IOException e) {

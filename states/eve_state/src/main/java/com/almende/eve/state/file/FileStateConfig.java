@@ -7,7 +7,6 @@ package com.almende.eve.state.file;
 import java.util.logging.Logger;
 
 import com.almende.eve.state.StateConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -16,27 +15,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class FileStateConfig extends StateConfig {
 	private static final Logger	LOG	= Logger.getLogger(FileStateConfig.class
 											.getSimpleName());
-	
+
 	/**
 	 * Instantiates a new file state config.
 	 */
 	public FileStateConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(FileStateBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new file state config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public FileStateConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", FileStateBuilder.class.getName());
+	public static FileStateConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof FileStateConfig) {
+			return (FileStateConfig) node;
 		}
+		final FileStateConfig res = new FileStateConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(FileStateBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Sets the json. (Optional, default is true)
 	 * 
@@ -46,7 +51,7 @@ public class FileStateConfig extends StateConfig {
 	public void setJson(final boolean json) {
 		this.put("json", json);
 	}
-	
+
 	/**
 	 * Gets the json.
 	 * 
@@ -58,7 +63,7 @@ public class FileStateConfig extends StateConfig {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Sets the path. (Required)
 	 * 
@@ -68,7 +73,7 @@ public class FileStateConfig extends StateConfig {
 	public void setPath(final String path) {
 		this.put("path", path);
 	}
-	
+
 	/**
 	 * Gets the path.
 	 * 
@@ -82,5 +87,5 @@ public class FileStateConfig extends StateConfig {
 				+ "configuration. Using the default path '.eveagents'");
 		return ".eveagents";
 	}
-	
+
 }

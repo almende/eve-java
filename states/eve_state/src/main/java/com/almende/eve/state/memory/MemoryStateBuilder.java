@@ -33,7 +33,7 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState>
 	 */
 	@Override
 	public MemoryState build() {
-		final MemoryStateConfig config = new MemoryStateConfig(getParams());
+		final MemoryStateConfig config = MemoryStateConfig.decorate(getParams());
 		final String id = config.getId();
 		if (id == null) {
 			LOG.warning("Parameter 'id' is required for MemoryState.");

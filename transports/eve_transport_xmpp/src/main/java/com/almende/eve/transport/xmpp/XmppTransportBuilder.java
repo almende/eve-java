@@ -25,7 +25,7 @@ public class XmppTransportBuilder extends
 		AbstractCapabilityBuilder<XmppTransport> {
 	private final Map<URI, XmppTransport>	instances	= new ConcurrentHashMap<URI, XmppTransport>();
 	private static XmppService				singleton	= null;
-	
+
 	// Needed to force Android loading the ReconnectionManager....
 	static {
 		try {
@@ -35,20 +35,20 @@ public class XmppTransportBuilder extends
 		}
 		SmackConfiguration.setPacketReplyTimeout(15000);
 	}
-	
+
 	@Override
 	public XmppTransport build() {
 		if (singleton == null) {
 			singleton = new XmppService();
-			singleton.doesShortcut = new XmppTransportConfig(getParams())
+			singleton.doesShortcut = XmppTransportConfig.decorate(getParams())
 					.getDoShortcut();
 		}
 		return singleton.get(getParams(), getHandle());
 	}
-	
+
 	class XmppService implements TransportService {
 		private boolean	doesShortcut	= true;
-		
+
 		/**
 		 * Gets the actual XMPP transport
 		 * 
@@ -66,10 +66,11 @@ public class XmppTransportBuilder extends
 				final ObjectNode params, final Handler<V> handle) {
 			final Handler<Receiver> newHandle = Transport.TYPEUTIL
 					.inject(handle);
-			final XmppTransportConfig config = new XmppTransportConfig(params);
+			final XmppTransportConfig config = XmppTransportConfig
+					.decorate(params);
 			final URI address = config.getAddress();
 			XmppTransport result = instances.get(address);
-			
+
 			if (result == null) {
 				result = new XmppTransport(config, newHandle, this);
 				instances.put(address, result);
@@ -78,10 +79,9 @@ public class XmppTransportBuilder extends
 			}
 			return result;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#delete(com.almende.eve.
 		 * transport
@@ -91,10 +91,9 @@ public class XmppTransportBuilder extends
 		public void delete(final Transport instance) {
 			instances.remove(instance.getAddress());
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.transport.TransportService#getLocal(java.net.URI)
 		 */

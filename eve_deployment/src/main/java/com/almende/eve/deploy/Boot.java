@@ -119,7 +119,7 @@ public final class Boot {
 	 * @return the object node
 	 */
 	public static ObjectNode boot(final ObjectNode config, final ClassLoader cl) {
-		final Config conf = new Config(config);
+		final Config conf = Config.decorate(config);
 		return boot(conf, null);
 	}
 
@@ -133,7 +133,7 @@ public final class Boot {
 	 * @return the object node
 	 */
 	public static ObjectNode boot(final InputStream is, final ClassLoader cl) {
-		final Config config = YamlReader.load(is).expand();
+		final Config config = YamlReader.load(is);
 		return boot(config, cl);
 	}
 
@@ -167,8 +167,8 @@ public final class Boot {
 		}
 		final ArrayNode iss = (ArrayNode) config.get("instantiationServices");
 		for (final JsonNode service : iss) {
-			final InstantiationServiceConfig isconfig = new InstantiationServiceConfig(
-					(ObjectNode) service);
+			final InstantiationServiceConfig isconfig = InstantiationServiceConfig
+					.decorate((ObjectNode) service);
 			final InstantiationService is = new InstantiationServiceBuilder()
 					.withClassLoader(cl).withConfig(isconfig).build();
 			is.boot();
@@ -191,7 +191,8 @@ public final class Boot {
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 
 		for (final JsonNode agent : agents) {
-			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
+			final AgentConfig agentConfig = AgentConfig
+					.decorate((ObjectNode) agent);
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
 					.with(agentConfig).build();
 			LOG.info("Created agent:" + newAgent.getId());

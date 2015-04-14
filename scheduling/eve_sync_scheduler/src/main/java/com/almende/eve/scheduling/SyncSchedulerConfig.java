@@ -4,31 +4,36 @@
  */
 package com.almende.eve.scheduling;
 
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class PersistentSchedulerConfig.
  */
 public class SyncSchedulerConfig extends SimpleSchedulerConfig {
-	
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 */
 	public SyncSchedulerConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(SyncSchedulerBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public SyncSchedulerConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			setClassName(SyncSchedulerBuilder.class.getName());
+	public static SyncSchedulerConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof SyncSchedulerConfig) {
+			return (SyncSchedulerConfig) node;
 		}
+		final SyncSchedulerConfig res = new SyncSchedulerConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(SyncSchedulerBuilder.class.getName());
+		}
+		return res;
 	}
 }

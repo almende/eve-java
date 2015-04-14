@@ -7,7 +7,6 @@ package com.almende.eve.transport.http;
 import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -16,27 +15,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpTransportConfig extends TransportConfig {
 	private static final Logger	LOG	= Logger.getLogger(HttpTransportConfig.class
 											.getName());
-	
+
 	/**
 	 * Instantiates a new http transport config.
 	 */
 	public HttpTransportConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(HttpTransportBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new http transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public HttpTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			setClassName(HttpTransportBuilder.class.getName());
+	public static HttpTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof HttpTransportConfig) {
+			return (HttpTransportConfig) node;
 		}
+		final HttpTransportConfig res = new HttpTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(HttpTransportBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Sets the url. (Required)
 	 * 
@@ -46,7 +51,7 @@ public class HttpTransportConfig extends TransportConfig {
 	public void setServletUrl(final String url) {
 		this.put("servletUrl", url.replace("/$", ""));
 	}
-	
+
 	/**
 	 * Gets the url.
 	 * 
@@ -58,7 +63,7 @@ public class HttpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the id. (Required)
 	 * 
@@ -68,7 +73,7 @@ public class HttpTransportConfig extends TransportConfig {
 	public void setId(final String id) {
 		this.put("id", id);
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -80,7 +85,7 @@ public class HttpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the servlet launcher class path. (Optional)
 	 * 
@@ -90,7 +95,7 @@ public class HttpTransportConfig extends TransportConfig {
 	public void setServletLauncher(final String servletLauncher) {
 		this.put("servletLauncher", servletLauncher);
 	}
-	
+
 	/**
 	 * Gets the servlet launcher class path.
 	 * 
@@ -102,7 +107,7 @@ public class HttpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the servlet class.
 	 * 
@@ -112,7 +117,7 @@ public class HttpTransportConfig extends TransportConfig {
 	public void setServletClass(final String servletClass) {
 		this.put("servletClass", servletClass);
 	}
-	
+
 	/**
 	 * Gets the servlet class.
 	 * 
@@ -124,7 +129,7 @@ public class HttpTransportConfig extends TransportConfig {
 		}
 		return EveServlet.class.getName();
 	}
-	
+
 	/**
 	 * Gets the do authentication. (Overriden to change the default to false)
 	 * 

@@ -23,9 +23,9 @@ public class InstantiationServiceBuilder extends
 	@Override
 	public InstantiationService build() {
 
-		final InstantiationServiceConfig config = new InstantiationServiceConfig(
-				getParams());
-		final String id = new StateConfig(config.getState()).getId();
+		final InstantiationServiceConfig config = InstantiationServiceConfig
+				.decorate(getParams());
+		final String id = StateConfig.decorate(config.getState()).getId();
 
 		InstantiationService service = null;
 		if (SERVICES.containsKey(id)) {

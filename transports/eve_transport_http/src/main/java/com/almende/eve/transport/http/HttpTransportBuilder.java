@@ -18,22 +18,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class HttpService.
  */
-public class HttpTransportBuilder extends AbstractCapabilityBuilder<HttpTransport> {
+public class HttpTransportBuilder extends
+		AbstractCapabilityBuilder<HttpTransport> {
 	private static final Logger				LOG			= Logger.getLogger(HttpTransportBuilder.class
 																.getName());
 	private static Map<URI, HttpService>	services	= new HashMap<URI, HttpService>();
-	
+
 	@Override
 	public HttpTransport build() {
 		final HttpService service = getInstanceByParams(getParams());
-		if (service != null){
+		if (service != null) {
 			return service.get(getParams(), getHandle());
 		} else {
 			LOG.warning("Couldn't initiate HttpService!");
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Gets the instance by params.
 	 * 
@@ -43,7 +44,7 @@ public class HttpTransportBuilder extends AbstractCapabilityBuilder<HttpTranspor
 	 */
 	public HttpService getInstanceByParams(final ObjectNode params) {
 		HttpService service = null;
-		final HttpTransportConfig config = new HttpTransportConfig(params);
+		final HttpTransportConfig config = HttpTransportConfig.decorate(params);
 		final String servletUrl = config.getServletUrl();
 		if (servletUrl != null) {
 			try {
@@ -54,7 +55,7 @@ public class HttpTransportBuilder extends AbstractCapabilityBuilder<HttpTranspor
 				}
 				service = new HttpService(servletUri, params);
 				services.put(servletUri, service);
-				
+
 			} catch (final URISyntaxException e) {
 				LOG.log(Level.WARNING, "Couldn't parse 'servletUrl'", e);
 			}

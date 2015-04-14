@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -18,27 +17,34 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class AmqpTransportConfig extends TransportConfig {
 	private static final Logger	LOG	= Logger.getLogger(AmqpTransportConfig.class
 											.getName());
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
 	public AmqpTransportConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(AmqpTransportBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public AmqpTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!this.has("class")) {
-			setClassName(AmqpTransportBuilder.class.getName());
+	public static AmqpTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof AmqpTransportConfig) {
+			return (AmqpTransportConfig) node;
 		}
+		final AmqpTransportConfig res = new AmqpTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(AmqpTransportBuilder.class.getName());
+		}
+		return res;
+
 	}
-	
+
 	/**
 	 * Gets the address.
 	 * 
@@ -55,7 +61,7 @@ public class AmqpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the address.
 	 * 
@@ -65,7 +71,7 @@ public class AmqpTransportConfig extends TransportConfig {
 	public void setAddress(final String address) {
 		this.put("address", address);
 	}
-	
+
 	/**
 	 * Gets the password.
 	 * 
@@ -77,7 +83,7 @@ public class AmqpTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the password.
 	 * 

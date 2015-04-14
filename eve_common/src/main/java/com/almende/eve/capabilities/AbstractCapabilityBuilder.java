@@ -22,7 +22,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 												.getName());
 	private ClassLoader			cl		= getClass().getClassLoader();
 
-	private ObjectNode			params	= null;
+	private Config				params	= null;
 	private Handler<?>			handle	= null;
 
 	/**
@@ -33,7 +33,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the capability builder
 	 */
 	public AbstractCapabilityBuilder<T> withConfig(final ObjectNode params) {
-		this.params = params;
+		this.params = Config.decorate(params);
 		return this;
 	}
 
@@ -69,8 +69,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 * @return the t
 	 */
 	public T build() {
-		final Config config = new Config(params).compress();
-		final String className = config.getClassName();
+		final String className = params.getClassName();
 		if (className != null) {
 			try {
 				final Class<?> clazz = Class.forName(className, true, cl);
@@ -79,12 +78,12 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 					@SuppressWarnings("unchecked")
 					final AbstractCapabilityBuilder<T> instance = (AbstractCapabilityBuilder<T>) clazz
 							.newInstance();
-					return instance.withClassLoader(cl).withConfig(config)
+					return instance.withClassLoader(cl).withConfig(params)
 							.withHandle(handle).build();
 				} else {
-					LOG.log(Level.WARNING,
-							className
-									+ " is not a CapabilityBuilder, which is required.");
+					LOG.log(Level.WARNING, className
+							+ " is not a CapabilityBuilder, which is required.");
+					throw new Error();
 				}
 			} catch (final ClassNotFoundException e) {
 				LOG.log(Level.WARNING, "Couldn't find class:" + className, e);
@@ -102,7 +101,8 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 						+ " has incorrect arguments", e);
 			}
 		} else {
-			LOG.warning("Parameter 'class' is required!");
+			LOG.warning("Parameter 'class' is required, incomplete config:"
+					+ params.toString());
 		}
 		return null;
 	}

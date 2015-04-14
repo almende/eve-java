@@ -47,7 +47,6 @@ import com.almende.eve.transport.TransportConfig;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -90,10 +89,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(ObjectNode config) {
-		if (config == null) {
-			config = JOM.createObjectNode();
-		}
-		AgentConfig conf = new AgentConfig(config);
+		AgentConfig conf = AgentConfig.decorate(config);
 		conf.setClassName(this.getClass().getName());
 		setConfig(conf);
 	}
@@ -107,10 +103,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(final String agentId, ObjectNode config) {
-		if (config == null) {
-			config = JOM.createObjectNode();
-		}
-		AgentConfig conf = new AgentConfig(config);
+		AgentConfig conf = AgentConfig.decorate(config);
 		conf.setId(agentId);
 		conf.setClassName(this.getClass().getName());
 		setConfig(conf);
@@ -259,7 +252,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the new config
 	 */
 	public void setConfig(final ObjectNode config) {
-		this.config = (AgentConfig) new AgentConfig(config).compress();
+		this.config = AgentConfig.decorate(config);
 		loadConfig();
 		onReady();
 		try {
@@ -316,15 +309,10 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		return ((JSONRpcProtocol) protocolStack.getLast()).getMethods();
 	}
 
-	/**
-	 * Gets the config.
-	 * 
-	 * @return the config
-	 */
 	@Access(AccessType.PUBLIC)
 	@Override
 	public AgentConfig getConfig() {
-		return new AgentConfig(config.expand());
+		return config;
 	}
 
 	/**
@@ -358,7 +346,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		boolean found = false;
 		if (config != null) {
 			for (JsonNode item : config) {
-				ProtocolConfig conf = new ProtocolConfig((ObjectNode) item);
+				ProtocolConfig conf = ProtocolConfig
+						.decorate((ObjectNode) item);
 				if (agentId != null && conf.getId() == null) {
 					conf.setId(agentId);
 				}
@@ -404,12 +393,12 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the scheduler config
 	 */
 	private void loadScheduler(final ObjectNode params) {
-		final SimpleSchedulerConfig schedulerConfig = new SimpleSchedulerConfig(
-				params);
+		final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
+				.decorate(params);
 		if (schedulerConfig != null) {
 			if (agentId != null && schedulerConfig.has("state")) {
-				final StateConfig stateConfig = new StateConfig(
-						(ObjectNode) schedulerConfig.get("state"));
+				final StateConfig stateConfig = StateConfig
+						.decorate((ObjectNode) schedulerConfig.get("state"));
 
 				if (stateConfig.getId() == null) {
 					stateConfig.setId("scheduler_" + agentId);
@@ -453,7 +442,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 */
 	private void loadState(final ObjectNode sc) {
 		if (sc != null) {
-			final StateConfig stateConfig = new StateConfig(sc);
+			final StateConfig stateConfig = StateConfig.decorate(sc);
 			if (agentId != null && stateConfig.getId() == null) {
 				stateConfig.setId(agentId);
 			}
@@ -491,7 +480,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 */
 	protected void addTransport(final ObjectNode transconfig) {
 		// TODO: Somewhat ugly, not every transport requires an id.
-		TransportConfig transconf = new TransportConfig(transconfig);
+		TransportConfig transconf = TransportConfig.decorate(transconfig);
 		if (transconf.get("id") == null) {
 			transconf.put("id", agentId);
 		}

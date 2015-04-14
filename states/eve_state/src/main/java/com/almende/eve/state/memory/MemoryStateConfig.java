@@ -5,32 +5,37 @@
 package com.almende.eve.state.memory;
 
 import com.almende.eve.state.StateConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class MemoryStateConfig.
  */
 public class MemoryStateConfig extends StateConfig {
-	
+
 	/**
 	 * Instantiates a new memory state config.
 	 */
 	public MemoryStateConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(MemoryStateBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new memory state config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public MemoryStateConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", MemoryStateBuilder.class.getName());
+	public static MemoryStateConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof MemoryStateConfig) {
+			return (MemoryStateConfig) node;
 		}
+		final MemoryStateConfig res = new MemoryStateConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(MemoryStateBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 }

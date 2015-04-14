@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TestConfigDOM extends TestCase {
 	private static final Logger	LOG	= Logger.getLogger(TestConfigDOM.class
 											.getName());
-	
+
 	/**
 	 * Test agents from DOM.
 	 * 
@@ -43,14 +43,15 @@ public class TestConfigDOM extends TestCase {
 	@Test
 	public void testDOM() throws IOException {
 		// First obtain the configuration:
-		final Config config = YamlReader.load(
-				new FileInputStream(new File("target/classes/test.yaml")))
-				.expand();
-		
+		final Config config = YamlReader.load(new FileInputStream(new File(
+				"target/classes/test.yaml")));
+
+		config.loadTemplates("templates");
+
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		ExampleAgent newAgent = null;
 		for (final JsonNode agent : agents) {
-			final AgentConfig agentConfig = new AgentConfig((ObjectNode) agent);
+			final AgentConfig agentConfig = AgentConfig.decorate((ObjectNode) agent);
 			newAgent = (ExampleAgent) new AgentBuilder().with(agentConfig)
 					.build();
 			LOG.info("Created agent:" + newAgent.getId());
@@ -59,26 +60,25 @@ public class TestConfigDOM extends TestCase {
 		params.put("message", "Hi There!");
 		newAgent.pubSend(URIUtil.create("local:example"), "helloWorld", params,
 				new AsyncCallback<String>() {
-					
+
 					@Override
 					public void onSuccess(final String result) {
 						LOG.warning("Received:'" + result + "'");
 					}
-					
+
 					@Override
 					public void onFailure(final Exception exception) {
 						LOG.log(Level.SEVERE, "", exception);
 						fail();
 					}
-					
+
 				});
-		
+
 		try {
 			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		} catch (InterruptedException e) {}
 	}
-	
+
 	/**
 	 * Test expand.
 	 *
@@ -88,17 +88,16 @@ public class TestConfigDOM extends TestCase {
 	@Test
 	public void testCompress() throws FileNotFoundException {
 		// First obtain the configuration:
-		final Config config = YamlReader.load(
-				new FileInputStream(new File("target/classes/testCompress.yaml")));
-		
+		final Config config = YamlReader.load(new FileInputStream(new File(
+				"target/classes/testCompress.yaml")));
+
 		final ObjectNode clone = config.deepCopy();
-		LOG.warning("Compress:"+config.compress().toString());
-		LOG.warning("Global:"+Config.getGlobal().toString());
-		ObjectNode result = config.expand();
-		LOG.warning("Expanded:"+result.toString());
-		
-		assertEquals(clone, result);
-		
+		LOG.warning("Compress:" + config.toString());
+		LOG.warning("Global:" + Config.getGlobal().toString());
+		config.get("some key");
+		LOG.warning("Expanded:" + config.toString());
+
+		assertEquals(clone, config);
+
 	}
-	
 }

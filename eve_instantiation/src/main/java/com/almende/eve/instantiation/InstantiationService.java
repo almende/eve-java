@@ -237,8 +237,8 @@ public class InstantiationService implements Capability {
 		}
 		if (innerState == null) {
 			innerState = new StateBuilder().withConfig(
-					new StateConfig((ObjectNode) myParams.get("state")).put(
-							"id", key)).build();
+					StateConfig.decorate((ObjectNode) myParams.get("state"))
+							.put("id", key)).build();
 		}
 		if (innerState != null) {
 			innerState.put("entry", JOM.getInstance().valueToTree(val));
@@ -260,8 +260,8 @@ public class InstantiationService implements Capability {
 		}
 		if (innerState == null) {
 			innerState = new StateBuilder().withConfig(
-					new StateConfig((ObjectNode) myParams.get("state")).put(
-							"id", key)).build();
+					StateConfig.decorate((ObjectNode) myParams.get("state"))
+							.put("id", key)).build();
 		}
 		if (innerState != null) {
 			innerState.delete();
@@ -277,8 +277,8 @@ public class InstantiationService implements Capability {
 	 */
 	private InstantiationEntry load(final String key) {
 		final State innerState = new StateBuilder().withConfig(
-				new StateConfig((ObjectNode) myParams.get("state")).put("id",
-						key)).build();
+				StateConfig.decorate((ObjectNode) myParams.get("state")).put(
+						"id", key)).build();
 		final InstantiationEntry result = innerState.get("entry",
 				INSTANTIATIONENTRY);
 		if (result != null) {

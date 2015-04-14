@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
 import com.almende.util.URIUtil;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -19,27 +18,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class XmppTransportConfig extends TransportConfig {
 	private static final Logger	LOG	= Logger.getLogger(XmppTransportConfig.class
 											.getName());
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
 	public XmppTransportConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(XmppTransportBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new xmpp transport config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public XmppTransportConfig(final ObjectNode node) {
-		super(node);
-		if (!this.has("class")) {
-			setClassName(XmppTransportBuilder.class.getName());
+	public static XmppTransportConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof XmppTransportConfig) {
+			return (XmppTransportConfig) node;
 		}
+		final XmppTransportConfig res = new XmppTransportConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(XmppTransportBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Gets the address.
 	 * 
@@ -56,7 +61,7 @@ public class XmppTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the address.
 	 * 
@@ -66,7 +71,7 @@ public class XmppTransportConfig extends TransportConfig {
 	public void setAddress(final String address) {
 		this.put("address", address);
 	}
-	
+
 	/**
 	 * Gets the password.
 	 * 
@@ -78,7 +83,7 @@ public class XmppTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the password.
 	 * 

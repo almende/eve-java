@@ -27,7 +27,7 @@ public class AgentBuilder {
 	 * @return the agent builder
 	 */
 	public AgentBuilder with(final ObjectNode config) {
-		parameters = new AgentConfig(config);
+		parameters = AgentConfig.decorate(config);
 		return this;
 	}
 
@@ -62,7 +62,8 @@ public class AgentBuilder {
 		}
 		try {
 			final Class<?> clazz = Class.forName(className, true, cl);
-			if (ClassUtil.hasSuperClass(clazz, Agent.class)) {
+			if (clazz.equals(Agent.class)
+					|| ClassUtil.hasSuperClass(clazz, Agent.class)) {
 				final Agent agent = (Agent) clazz.newInstance();
 				agent.setConfig(parameters);
 				return agent;

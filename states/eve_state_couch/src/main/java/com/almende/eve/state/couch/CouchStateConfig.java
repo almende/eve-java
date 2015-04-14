@@ -5,7 +5,6 @@
 package com.almende.eve.state.couch;
 
 import com.almende.eve.state.StateConfig;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -13,27 +12,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class CouchStateConfig.
  */
 public class CouchStateConfig extends StateConfig {
-	
+
 	/**
 	 * Instantiates a new couch state config.
 	 */
 	public CouchStateConfig() {
-		this(JOM.createObjectNode());
+		super();
+		setClassName(CouchStateBuilder.class.getName());
 	}
-	
+
 	/**
 	 * Instantiates a new couch state config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
-	public CouchStateConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", CouchStateBuilder.class.getName());
+	public static CouchStateConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof CouchStateConfig) {
+			return (CouchStateConfig) node;
 		}
+		final CouchStateConfig res = new CouchStateConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(CouchStateBuilder.class.getName());
+		}
+		return res;
 	}
-	
+
 	/**
 	 * Gets the key.
 	 * 
@@ -44,7 +49,7 @@ public class CouchStateConfig extends StateConfig {
 		return getUsername() + ":" + getPassword() + "@" + getUrl() + "/"
 				+ getDatabase();
 	}
-	
+
 	/**
 	 * Sets the username.
 	 * 
@@ -54,7 +59,7 @@ public class CouchStateConfig extends StateConfig {
 	public void setUsername(final String username) {
 		this.put("username", username);
 	}
-	
+
 	/**
 	 * Gets the username.
 	 * 
@@ -66,7 +71,7 @@ public class CouchStateConfig extends StateConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the password.
 	 * 
@@ -76,7 +81,7 @@ public class CouchStateConfig extends StateConfig {
 	public void setPassword(final String password) {
 		this.put("password", password);
 	}
-	
+
 	/**
 	 * Gets the password.
 	 * 
@@ -88,7 +93,7 @@ public class CouchStateConfig extends StateConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the url.
 	 * 
@@ -98,7 +103,7 @@ public class CouchStateConfig extends StateConfig {
 	public void setUrl(final String url) {
 		this.put("url", url);
 	}
-	
+
 	/**
 	 * Gets the url.
 	 * 
@@ -110,7 +115,7 @@ public class CouchStateConfig extends StateConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the database.
 	 * 
@@ -120,7 +125,7 @@ public class CouchStateConfig extends StateConfig {
 	public void setDatabase(final String database) {
 		this.put("database", database);
 	}
-	
+
 	/**
 	 * Gets the database.
 	 * 

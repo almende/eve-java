@@ -5,7 +5,6 @@
 package com.almende.eve.instantiation;
 
 import com.almende.eve.capabilities.Config;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -16,7 +15,7 @@ public class InstantiationServiceConfig extends Config {
 	 * Instantiates a new memory state config.
 	 */
 	public InstantiationServiceConfig() {
-		this(JOM.createObjectNode());
+		super();
 	}
 
 	/**
@@ -25,11 +24,18 @@ public class InstantiationServiceConfig extends Config {
 	 * @param node
 	 *            the node
 	 */
-	public InstantiationServiceConfig(final ObjectNode node) {
-		super(node);
-		if (!node.has("class")) {
-			this.put("class", InstantiationServiceBuilder.class.getName());
+	public static InstantiationServiceConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof InstantiationServiceConfig) {
+			return (InstantiationServiceConfig) node;
+		};
+		final InstantiationServiceConfig res = new InstantiationServiceConfig();
+		res.copy(node);
+		if (!res.has("class")) {
+			res.put("class", InstantiationServiceBuilder.class.getName());
 		}
+		return res;
+
+		
 	}
 
 	/**

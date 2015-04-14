@@ -29,8 +29,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 	private static final Logger						LOG			= Logger.getLogger(FileStateBuilder.class
 																		.getSimpleName());
-	private static Map<String, FileStateProvider>	instances	= new ConcurrentHashMap<String, FileStateProvider>(10);
-	
+	private static Map<String, FileStateProvider>	instances	= new ConcurrentHashMap<String, FileStateProvider>(
+																		10);
+
 	@Override
 	public State build() {
 		final FileStateProvider provider = getInstanceByParams(getParams());
@@ -41,7 +42,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Gets the instance by params.
 	 * 
@@ -50,10 +51,10 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 	 * @return the instance by params
 	 */
 	private FileStateProvider getInstanceByParams(final ObjectNode params) {
-		
-		final FileStateConfig config = new FileStateConfig(params);
+
+		final FileStateConfig config = FileStateConfig.decorate(params);
 		final String key = config.getPath();
-		
+
 		if (instances.containsKey(key)) {
 			return instances.get(key);
 		} else {
@@ -69,13 +70,14 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			}
 		}
 	}
-	
+
 	class FileStateProvider implements StateService {
-		private String						path		= null;
-		private Boolean						json		= true;
-		private Boolean						multilevel	= false;
-		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>(10);
-		
+		private String									path		= null;
+		private Boolean									json		= true;
+		private Boolean									multilevel	= false;
+		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>(
+																			10);
+
 		/**
 		 * Instantiates a new file state provider.
 		 * 
@@ -83,15 +85,15 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		 *            the params
 		 */
 		public FileStateProvider(final ObjectNode params) {
-			final FileStateConfig config = new FileStateConfig(params);
+			final FileStateConfig config = FileStateConfig.decorate(params);
 			json = config.getJson();
 			setPath(config.getPath());
-			
+
 			if (params.has("multilevel")) {
 				multilevel = params.get("multilevel").asBoolean();
 			}
 		}
-		
+
 		/**
 		 * Instantiates a new file state provider.
 		 * 
@@ -109,7 +111,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			this.multilevel = multilevel;
 			setPath(path);
 		}
-		
+
 		/**
 		 * Instantiates a new file state factory.
 		 * 
@@ -122,7 +124,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			this.json = json;
 			setPath(path);
 		}
-		
+
 		/**
 		 * Instantiates a new file state factory.
 		 * 
@@ -132,7 +134,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		public FileStateProvider(final String path) {
 			this(path, false);
 		}
-		
+
 		/**
 		 * Set the path where the agents data will be stored.
 		 * 
@@ -151,14 +153,14 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 				actualPath += "/";
 			}
 			this.path = actualPath;
-			
+
 			// make the directory
 			final File file = new File(actualPath);
 			if (!file.exists() && !file.mkdir()) {
 				LOG.severe("Could not create State folder!");
 				throw new IllegalStateException();
 			}
-			
+
 			// log info
 			String info = "Agents will be stored in ";
 			try {
@@ -171,7 +173,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 					+ (json ? "(stored in JSON format)"
 							: "(stored in JavaObject format)"));
 		}
-		
+
 		/**
 		 * Gets the.
 		 * 
@@ -180,35 +182,35 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		 * @return the state
 		 */
 		public State get(final ObjectNode params) {
-			final FileStateConfig config = new FileStateConfig(params);
+			final FileStateConfig config = FileStateConfig.decorate(params);
 			final String agentId = config.getId();
-			if (agentId == null){
+			if (agentId == null) {
 				LOG.warning("Parameter 'id' is required for a file State.");
 				return null;
 			}
-			
+
 			State state = null;
 			try {
 				if (!exists(agentId)) {
 					final String filename = getFilename(agentId);
 					final File file = new File(filename);
-					
+
 					file.createNewFile();
 				}
 
 				if (states.containsKey(agentId)) {
 					WeakReference<State> ref = states.get(agentId);
-					if (ref != null){
+					if (ref != null) {
 						state = ref.get();
 					}
 				}
-				if (state == null){
+				if (state == null) {
 					if (json) {
 						state = new ConcurrentJsonFileState(agentId,
 								getFilename(agentId), this, params);
 					} else {
-						state = new ConcurrentSerializableFileState(
-								agentId, getFilename(agentId), this, params);
+						state = new ConcurrentSerializableFileState(agentId,
+								getFilename(agentId), this, params);
 					}
 					states.put(agentId, new WeakReference<State>(state));
 				}
@@ -217,7 +219,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			}
 			return state;
 		}
-		
+
 		/**
 		 * Test if a state with given agentId exists.
 		 * 
@@ -229,7 +231,7 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			final File file = new File(getFilename(agentId));
 			return file.exists();
 		}
-		
+
 		/**
 		 * Get the filename of the saved.
 		 * 
@@ -238,9 +240,9 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		 * @return the filename
 		 */
 		private String getFilename(final String agentId) {
-			
+
 			final String apath = path != null ? path : "./";
-			
+
 			if (multilevel) {
 				// try 1 level of subdirs. I need this badly, tymon
 				final File folder = new File(apath);
@@ -258,10 +260,9 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			}
 			return apath + agentId;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
 		 */
@@ -274,10 +275,9 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			}
 			states.remove(id);
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
@@ -302,11 +302,11 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 				}
 			}
 			Set<String> result = new HashSet<String>(totalList.size());
-			for (final File file : totalList){
+			for (final File file : totalList) {
 				result.add(file.getName());
 			}
 			return result;
 		}
 	}
-	
+
 }

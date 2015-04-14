@@ -45,7 +45,7 @@ public class RedisStateBuilder extends AbstractCapabilityBuilder<RedisState> {
 	}
 
 	private RedisStateProvider getInstanceByParams(final ObjectNode params) {
-		final RedisStateConfig config = new RedisStateConfig(params);
+		final RedisStateConfig config = RedisStateConfig.decorate(params);
 		String key = config.getHost() + ":" + config.getDbId();
 		if (instances.containsKey(key)) {
 			return instances.get(key);
@@ -69,7 +69,7 @@ public class RedisStateBuilder extends AbstractCapabilityBuilder<RedisState> {
 		private static final String	IDKEY	= "AgentIds";
 
 		public RedisStateProvider(final ObjectNode params) {
-			final RedisStateConfig config = new RedisStateConfig(params);
+			final RedisStateConfig config = RedisStateConfig.decorate(params);
 			pool = new JedisPool(new JedisPoolConfig(), config.getHost());
 			id = config.getDbId();
 		}
@@ -92,7 +92,7 @@ public class RedisStateBuilder extends AbstractCapabilityBuilder<RedisState> {
 		}
 
 		public RedisState get(final ObjectNode params) {
-			final RedisStateConfig config = new RedisStateConfig(params);
+			final RedisStateConfig config = RedisStateConfig.decorate(params);
 			final RedisState result = new RedisState(config.getId(), this,
 					config);
 			Jedis redis = getInstance();

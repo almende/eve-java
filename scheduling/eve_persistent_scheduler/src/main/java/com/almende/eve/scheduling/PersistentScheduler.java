@@ -35,7 +35,8 @@ public class PersistentScheduler extends SimpleScheduler {
 			state.delete();
 			state = null;
 		}
-		PersistentSchedulerConfig config = new PersistentSchedulerConfig(getParams());
+		PersistentSchedulerConfig config = PersistentSchedulerConfig
+				.decorate(getParams());
 		SimpleSchedulerBuilder.delete(config.getId());
 	}
 
@@ -50,8 +51,8 @@ public class PersistentScheduler extends SimpleScheduler {
 	public PersistentScheduler(final ObjectNode params,
 			final Handler<Receiver> handle) {
 		super(params, handle);
-		final PersistentSchedulerConfig config = new PersistentSchedulerConfig(
-				params);
+		final PersistentSchedulerConfig config = PersistentSchedulerConfig
+				.decorate(params);
 		if (getClock() == null) {
 			setClock(new RunnableClock());
 		}
@@ -98,7 +99,8 @@ public class PersistentScheduler extends SimpleScheduler {
 	@Override
 	public String schedule(final Object msg, final DateTime due) {
 
-		final TaskEntry entry = new TaskEntry(due, JOM.getInstance().valueToTree(msg));
+		final TaskEntry entry = new TaskEntry(due, JOM.getInstance()
+				.valueToTree(msg));
 		if (state != null) {
 			state.put(entry.getTaskId(), entry);
 		}

@@ -79,7 +79,7 @@ public class MyFirstAgent extends Agent {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		final Config configfile = YamlReader.load(
-				new FileInputStream(new File(args[0]))).expand();
+				new FileInputStream(new File(args[0])));
 		Boot.boot(configfile);
 	}
 

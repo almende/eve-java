@@ -15,12 +15,25 @@ public class ProtocolConfig extends Config {
 
 	/**
 	 * Instantiates a new protocol config.
-	 *
-	 * @param config
-	 *            the config
 	 */
-	public ProtocolConfig(final ObjectNode config) {
-		super(config);
+	public ProtocolConfig() {
+		super();
+	}
+
+	/**
+	 * Instantiates a new protocol config.
+	 *
+	 * @param node
+	 *            the node
+	 * @return the protocol config
+	 */
+	public static ProtocolConfig decorate(final ObjectNode node) {
+		if (node != null && node instanceof ProtocolConfig) {
+			return (ProtocolConfig) node;
+		}
+		final ProtocolConfig res = new ProtocolConfig();
+		res.copy(node);
+		return res;
 	}
 
 	/**
