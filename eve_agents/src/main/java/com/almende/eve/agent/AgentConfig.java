@@ -119,6 +119,9 @@ public class AgentConfig extends Config {
 	 *            the transport
 	 */
 	public void addTransport(final ObjectNode transport) {
+		if (this.getTransports() == null){
+			this.setTransports(JOM.createArrayNode());
+		}
 		this.getTransports().add(transport);
 	}
 
