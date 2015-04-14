@@ -13,11 +13,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeEntry.
  */
 public class InstantiationEntry {
-	private String				wakeKey		= null;
-	private String				className	= null;
-	private ObjectNode			params		= null;
+	private String					wakeKey		= null;
+	private String					className	= null;
+	private ObjectNode				params		= null;
 	private Handler<Configurable>	handler		= null;
-	private State				state		= null;
+	private State					state		= null;
 
 	/**
 	 * Instantiates a new entry.

@@ -7,6 +7,8 @@ package com.almende.eve.agent;
 import java.net.URI;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * The Interface AgentInterface.
  */
@@ -45,6 +47,6 @@ public interface AgentInterface {
 	 * 
 	 * @return the config
 	 */
-	AgentConfig getConfig();
+	ObjectNode getConfig();
 
 }

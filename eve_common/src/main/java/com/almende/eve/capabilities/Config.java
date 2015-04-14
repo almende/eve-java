@@ -228,6 +228,16 @@ public class Config extends ObjectNode {
 		return tu.inject(node);
 	}
 
+	@Override
+	public ObjectNode deepCopy(){
+		final ObjectNode result = JOM.createObjectNode();
+		for (Config other : pointers){
+			result.setAll(other.deepCopy());
+		}
+		result.setAll(super.deepCopy());
+		return result;
+	}
+	
 	/**
 	 * Setup extends.
 	 */
@@ -236,18 +246,6 @@ public class Config extends ObjectNode {
 		final JsonNode extNode = this.get("extends");
 		if (extNode == null || extNode.isNull()) {
 			return;
-		}
-		if (extNode.isObject()) {
-			if (extNode instanceof Config) {
-				getPointers().add((Config) extNode);
-			} else {
-				getPointers().add(new Config((ObjectNode) extNode));
-			}
-			return;
-		}
-		if (extNode.isArray()) {
-			// Not supported!
-			throw new IllegalStateException();
 		}
 		ObjectNode reference = null;
 		boolean found = false;
@@ -271,7 +269,6 @@ public class Config extends ObjectNode {
 				String ref = new UUID().toString();
 				global.set(ref, refConf);
 			}
-			set("extends", reference);
 			getPointers().add(refConf);
 		}
 	}

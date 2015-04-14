@@ -316,8 +316,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 	@Access(AccessType.PUBLIC)
 	@Override
-	public AgentConfig getConfig() {
-		return config;
+	public ObjectNode getConfig() {
+		return config.deepCopy();
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		ObjectNode iscfg = config.getInstantiationService();
 		if (iscfg != null) {
 			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
-			is.register(agentId, config, this.getClass().getName());
+			is.register(agentId, config.deepCopy(), this.getClass().getName());
 		}
 		if (is != null && config.isCanHibernate()) {
 			setHandler(new HibernationHandler<Configurable>(this, agentId, is));
