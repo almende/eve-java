@@ -149,8 +149,8 @@ public final class Boot {
 		if (config.has("templates")) {
 			config.loadTemplates("templates");
 		}
-		loadInstantiationServices(config, cl);
 		loadAgents(config, cl);
+		loadInstantiationServices(config, cl);
 		return config;
 	}
 
