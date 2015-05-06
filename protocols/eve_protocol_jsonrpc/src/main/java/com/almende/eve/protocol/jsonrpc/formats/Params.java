@@ -39,6 +39,26 @@ public class Params extends ObjectNode {
 	}
 
 	/**
+	 * Instantiates a new params, with given text fields (Convenience method)
+	 *
+	 * @param strings
+	 *            the strings
+	 */
+	public Params(String... strings) {
+		this();
+		String last = null;
+		for (String item : strings) {
+			if (last == null) {
+				last = item;
+			} else {
+				put(last, item);
+				last = null;
+			}
+		}
+
+	}
+
+	/**
 	 * Adds a parameter
 	 *
 	 * @param name
@@ -47,7 +67,7 @@ public class Params extends ObjectNode {
 	 *            the value
 	 */
 	public void add(final String name, final Object value) {
-		if (value instanceof JsonNode){
+		if (value instanceof JsonNode) {
 			super.set(name, (JsonNode) value);
 		} else {
 			super.set(name, JOM.getInstance().valueToTree(value));

@@ -133,9 +133,6 @@ public final class Boot {
 	 */
 	public static ObjectNode boot(final InputStream is, final ClassLoader cl) {
 		final Config config = YamlReader.load(is);
-		if (config.has("templates")) {
-			config.loadTemplates("templates");
-		}
 		return boot(config, cl);
 	}
 
@@ -149,6 +146,9 @@ public final class Boot {
 	 * @return the object node
 	 */
 	public static ObjectNode boot(final Config config, final ClassLoader cl) {
+		if (config.has("templates")) {
+			config.loadTemplates("templates");
+		}
 		loadInstantiationServices(config, cl);
 		loadAgents(config, cl);
 		return config;
