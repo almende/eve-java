@@ -96,9 +96,14 @@ public class InstantiationService implements Capability {
 	@JsonIgnore
 	public void boot() {
 		load();
+		int cnt = 0;
 		for (final String key : entries.keySet()) {
-			init(key, true);
+			Object res = init(key, true);
+			if (res != null) {
+				cnt++;
+			}
 		}
+		LOG.info("Booted " + cnt + " agents");
 	}
 
 	/**

@@ -81,7 +81,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	/**
 	 * Instantiates a new agent.
 	 */
-	public Agent() {}
+	public Agent() {
+		config = new AgentConfig();
+	}
 
 	/**
 	 * Instantiates a new agent.

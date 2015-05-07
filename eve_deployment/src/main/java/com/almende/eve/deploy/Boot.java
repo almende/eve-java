@@ -189,13 +189,18 @@ public final class Boot {
 		if (!config.has("agents")) {
 			return;
 		}
-
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 
 		for (final JsonNode agent : agents) {
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
 					.with((ObjectNode) agent).build();
-			LOG.info("Created agent:" + newAgent.getId());
+			if (newAgent != null) {
+				LOG.info("Created agent:" + newAgent.getId());
+			} else {
+				LOG.warning("Failed to create agent:"
+						+ (agent.has("id") ? agent.get("id").asText()
+								: "unknown"));
+			}
 		}
 	}
 }
