@@ -212,6 +212,9 @@ class ClockEntry implements Comparable<ClockEntry> {
 		if (this == o) {
 			return true;
 		}
+		if (o == null){
+			return false;
+		}
 		if (!(o instanceof ClockEntry)) {
 			return false;
 		}
