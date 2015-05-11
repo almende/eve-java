@@ -86,7 +86,7 @@ final class NamespaceUtil {
 					namespace = destClazz.getAnnotation(Namespace.class)
 							.value();
 				} else {
-					return;
+					continue;
 				}
 			}
 			final String path = steps + "." + namespace;
@@ -139,7 +139,7 @@ final class NamespaceUtil {
 		if (!CACHE.containsKey(reducedPath)) {
 			try {
 				throw new IllegalStateException("Non resolveable path given:'"
-						+ path + "' \n checked:"
+						+ path + "' became:'" + reducedPath + "' \n checked:"
 						+ JOM.getInstance().writeValueAsString(CACHE));
 			} catch (final JsonProcessingException e) {
 				throw new IllegalStateException("Non resolveable path given:'"
