@@ -51,6 +51,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * graph.randomWalk({"tag":-tag-,"steps":-steps-,"origin":-URI-,"runId":-id-})
  * //perform the randomwalk, report to origin<br>
  * graph.reportRandomWalk({""runId":-id-}) //Report resulting node (through the
+ * 
  * @Sender)<br>
  */
 @Namespace("graph")
@@ -287,6 +288,11 @@ public class Graph {
 	public void randomWalk(@Name("tag") String tag, @Name("steps") int steps,
 			@Name("origin") URI origin, @Name("runId") String runId)
 			throws IOException {
+		Edge edge = getRandomEdge(tag);
+		if (edge == null) {
+			LOG.warning("Failed to obtain a correctly tagged edge:" + tag);
+			return;
+		}
 		URI next = getRandomEdge(tag).getAddress();
 		if (steps > 0) {
 			Params params = new Params();

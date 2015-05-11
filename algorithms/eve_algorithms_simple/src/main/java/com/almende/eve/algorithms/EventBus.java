@@ -112,7 +112,7 @@ public class EventBus {
 				}
 			}
 		}
-		for (Event event : stillToTrigger){
+		for (Event event : stillToTrigger) {
 			trigger(event);
 		}
 	}
@@ -196,8 +196,12 @@ public class EventBus {
 		boolean trickleReset = false;
 		synchronized (this.events) {
 			if (!this.events.equals(events)) {
-				this.events.addAll(events);
-				trickleReset = true;
+				for (Event event: events){
+					if (DateTime.now().isBefore(event.getExpiryTime())){
+						this.events.add(event);
+						trickleReset = true;
+					}
+				}
 			}
 		}
 		if (trickleReset) {
@@ -221,7 +225,7 @@ public class EventBus {
 	 *
 	 * @return the trickle
 	 */
-	@Namespace("*")
+	@Namespace("trickle")
 	public TrickleRPC getTrickle() {
 		return trickle;
 	}

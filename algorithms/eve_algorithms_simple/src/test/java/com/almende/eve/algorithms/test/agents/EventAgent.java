@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.algorithms.EventBus;
+import com.almende.eve.algorithms.agents.NodeAgent;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
@@ -36,18 +37,10 @@ public class EventAgent extends NodeAgent {
 	 *            the id
 	 * @param config
 	 *            the config
-	 * @param start
-	 *            the start
 	 */
-	public EventAgent(String id, ObjectNode config, URI start) {
+	public EventAgent(String id, ObjectNode config) {
 		super(id, config);
-		if (start != null) {
-			try {
-				getGraph().addNode2SFN(start, "SFN", 3, 7);
-			} catch (IOException e) {
-				LOG.log(Level.WARNING, "Couldn't join SFN!", e);
-			}
-		}
+		addNode2SFN();
 		events = new EventBus(getScheduler(), caller, getGraph(), "SFN");
 	}
 

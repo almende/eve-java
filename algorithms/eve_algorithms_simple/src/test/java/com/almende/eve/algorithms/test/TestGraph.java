@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.algorithms.Edge;
-import com.almende.eve.algorithms.test.agents.NodeAgent;
+import com.almende.eve.algorithms.agents.NodeAgent;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
