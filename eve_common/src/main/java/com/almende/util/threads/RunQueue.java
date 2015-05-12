@@ -21,21 +21,22 @@ import java.util.logging.Logger;
  * -Approximately nofCPU threads in Running state.
  */
 public class RunQueue extends AbstractExecutorService {
-	private static final Logger		LOG				= Logger.getLogger(RunQueue.class
-															.getName());
+	private static final Logger		LOG					= Logger.getLogger(RunQueue.class
+																.getName());
 
-	private final Object			terminationLock	= new Object();
-	private final Queue<Worker>		reserve			= new ConcurrentLinkedQueue<Worker>();
-	private final Queue<Runnable>	tasks			= new ConcurrentLinkedQueue<Runnable>();
-	private final HashSet<Worker>	waiting			= new HashSet<Worker>(8);
-	private final Scanner			scanner			= new Scanner();
+	private final Object			terminationLock		= new Object();
+	private final Queue<Worker>		reserve				= new ConcurrentLinkedQueue<Worker>();
+	private final Queue<Runnable>	tasks				= new ConcurrentLinkedQueue<Runnable>();
+	private final HashSet<Worker>	waiting				= new HashSet<Worker>(8);
+	private final Scanner			scanner				= new Scanner();
+	private static final int		MAXTASKS			= 50000;
+	private static final int		MAXTASKSPERWORKER	= 1000;
 	private int						nofCores;
-	private HashSet<Worker>			running			= null;
-	private boolean					isShutdown		= false;
-	private int						interval		= 100;
-	private final int				maxinterval		= 500;
-	private final int				maxtasks		= 100000;
-	private int[]					taskCnt			= new int[1];
+	private HashSet<Worker>			running				= null;
+	private boolean					isShutdown			= false;
+	private int						interval			= 100;
+	private final int				maxinterval			= 500;
+	private int[]					taskCnt				= new int[1];
 
 	private class Scanner extends Thread {
 		@Override
@@ -56,6 +57,7 @@ public class RunQueue extends AbstractExecutorService {
 		final private Object	lock		= new Object();
 		private Runnable		task		= null;
 		private boolean			isShutdown	= false;
+		private int				taskCnt		= 0;
 
 		public boolean runTask(final Runnable task) {
 			if (this.task != null) {
@@ -73,6 +75,7 @@ public class RunQueue extends AbstractExecutorService {
 					return false;
 				}
 				this.task = task;
+				taskCnt++;
 				lock.notify();
 			}
 			return true;
@@ -95,7 +98,7 @@ public class RunQueue extends AbstractExecutorService {
 					}
 					task.run();
 					task = null;
-
+					taskCnt--;
 					if (running.size() <= nofCores) {
 						// Shortcut: Check if there are more tasks available.
 						task = getTask();
@@ -180,12 +183,16 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private boolean addTask(final Runnable command) {
-		synchronized (taskCnt) {
-			if (taskCnt[0] > maxtasks && Thread.currentThread().getStackTrace().length < 10000) {
-				return false;
-			} else {
-				taskCnt[0]++;
+		if (taskCnt[0] > MAXTASKS) {
+			Thread thread = Thread.currentThread();
+			if (thread instanceof Worker) {
+				if (((Worker) thread).taskCnt <= MAXTASKSPERWORKER) {
+					return false;
+				}
 			}
+		}
+		synchronized (taskCnt) {
+			taskCnt[0]++;
 		}
 		tasks.add(command);
 		return true;
@@ -223,7 +230,10 @@ public class RunQueue extends AbstractExecutorService {
 		}
 		if (thread == null) {
 			if (!addTask(command)) {
+				thread = (Worker) Thread.currentThread();
+				thread.taskCnt++;
 				command.run();
+				thread.taskCnt--;
 			}
 		}
 	}
