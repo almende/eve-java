@@ -13,7 +13,7 @@ package com.almende.eve.algorithms;
 public class Trickle {
 	// Milliseconds
 	private long	intervalMin			= 100;
-	private long	intervalMax			= (long) (Math.pow(2,16) * intervalMin);
+	private long	intervalMax			= (long) (Math.pow(2, 16) * intervalMin);
 	private int		redundancyFactor	= 3;
 
 	private long	currentInterval		= 100;
@@ -36,7 +36,7 @@ public class Trickle {
 	 */
 	public Trickle(long intervalMin, int intervalFactor, int redundancyFactor) {
 		this.intervalMin = intervalMin;
-		this.intervalMax = (long) (Math.pow(2,intervalFactor) * intervalMin);
+		this.intervalMax = (long) (Math.pow(2, intervalFactor) * intervalMin);
 		this.redundancyFactor = redundancyFactor;
 	}
 
@@ -47,7 +47,7 @@ public class Trickle {
 	 *         the next interval
 	 */
 	public long[] next() {
-		
+
 		currentInterval = Math.min(intervalMax, currentInterval * 2);
 		counter = 0;
 		final long[] result = {
@@ -80,7 +80,11 @@ public class Trickle {
 	 */
 	public long[] reset() {
 		if (currentInterval <= intervalMin) {
-			return new long[] { 0, 0 };
+			currentInterval = intervalMin;
+			return new long[] {
+					currentInterval
+							- Math.round(Math.random() * (currentInterval / 2)),
+					currentInterval };
 		} else {
 			currentInterval = intervalMin / 2;
 			return next();
