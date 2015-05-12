@@ -156,8 +156,8 @@ public class EventBus {
 	private void setupGossip() {
 		final ObjectNode config = JOM.createObjectNode();
 		config.put("intervalFactor", 16);
-		config.put("intervalMin", 100);
-		config.put("redundancyFactor", 2);
+		config.put("intervalMin", 10);
+		config.put("redundancyFactor", 4);
 		config.put("namespace", "event.");
 
 		trickle = new TrickleRPC(config, scheduler, new Runnable() {

@@ -66,10 +66,7 @@ public class TestGraph extends TestCase {
 	 */
 	@Test
 	public void testSFNGraph() throws IOException {
-		int nofEdges = 3;
-		int startDegree = 2;
-		int startSteps = 7;
-		int nofNodes = 500;
+		int nofNodes = 100;
 
 		// Generate X agent scalefree network:
 		// add M connections per step
@@ -77,29 +74,11 @@ public class TestGraph extends TestCase {
 		AgentConfig config = new AgentConfig();
 		config.setClassName(NodeAgent.class.getName());
 
-		List<NodeAgent> agents = new ArrayList<NodeAgent>(nofNodes + 10);
-		// start by having X0=max(10,M) agents in a ring lattice manner with
-		// degree S . each with a Random factor
-		final int max = Math.max(10, nofEdges);
-		for (int i = 0; i < max; i++) {
+		List<NodeAgent> agents = new ArrayList<NodeAgent>(nofNodes);
+		for (int i=0; i< nofNodes; i++ ){
 			NodeAgent agent = new NodeAgent("" + i, config);
 			agents.add(agent);
-		}
-		for (int i = 0; i < max; i++) {
-			NodeAgent agent = agents.get(i);
-			for (int j = 0; j < startDegree; j++) {
-				NodeAgent other = agents.get((i + j + 1) % max);
-				if (other.equals(agent))
-					continue;
-				agent.getGraph().addEdge(new Edge(other.getUrls().get(0), "SFN",null));
-			}
-		}
-		
-		NodeAgent start = agents.get(0);
-		for (int i=max; i< nofNodes; i++ ){
-			NodeAgent agent = new NodeAgent("" + i, config);
-			agents.add(agent);
-			agent.getGraph().addNode2SFN(start.getUrls().get(0), "SFN", nofEdges, startSteps);
+			agent.addNode2SFN();
 		}
 		
 		LOG.warning(writeVisGraph(agents));

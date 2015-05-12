@@ -79,8 +79,8 @@ public class TrickleRPC {
 		reschedule(trickle.next());
 	}
 
-	private void reschedule(final long[] intervals) {
-		if (intervals[0] >= 0 && intervals[1] >= 0) {
+	private synchronized void reschedule(final long[] intervals) {
+		if (intervals != null && intervals[0] >= 0 && intervals[1] >= 0) {
 			final DateTime nextSend = DateTime.now().plus(intervals[0]);
 			final DateTime nextInterval = DateTime.now().plus(intervals[1]);
 

@@ -81,12 +81,9 @@ public class Trickle {
 	public long[] reset() {
 		if (currentInterval <= intervalMin) {
 			currentInterval = intervalMin;
-			return new long[] {
-					currentInterval
-							- Math.round(Math.random() * (currentInterval / 2)),
-					currentInterval };
+			return null;
 		} else {
-			currentInterval = intervalMin / 2;
+			currentInterval = intervalMin/2;
 			return next();
 		}
 	}
