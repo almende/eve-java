@@ -219,6 +219,9 @@ class ClockEntry implements Comparable<ClockEntry> {
 			return false;
 		}
 		final ClockEntry other = (ClockEntry) o;
+		if (triggerId == null || other.triggerId == null){
+			return false;
+		}
 		return triggerId.equals(other.triggerId);
 	}
 
