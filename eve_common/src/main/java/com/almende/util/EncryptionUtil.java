@@ -95,7 +95,10 @@ public final class EncryptionUtil {
 		pbeCipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParamSpec);
 		
 		final byte[] encryptedText = pbeCipher.doFinal(text.getBytes("UTF-8"));
-		return Base64.encodeBase64String(encryptedText);
+		
+		String encodedString = new String(Base64.encodeBase64(encryptedText));
+		String safeString = encodedString.replace('+','-').replace('/','_');
+		return safeString;
 	}
 	
 	/**
@@ -135,7 +138,7 @@ public final class EncryptionUtil {
 		pbeCipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParamSpec);
 		
 		final byte[] text = pbeCipher.doFinal(Base64
-				.decodeBase64(encryptedText));
+				.decodeBase64(encryptedText.getBytes()));
 		return new String(text, "UTF-8").intern();
 	}
 }
