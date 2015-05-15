@@ -60,7 +60,7 @@ public class AsyncCallbackQueue<T> {
 				final AsyncCallback<T> callback = me.pull(id);
 				if (callback != null) {
 					callback.onFailure(new TimeoutException(
-							"Timeout occurred for request with id '" + id
+							"Timeout occurred for callback with id '" + id
 									+ "': " + description));
 				}
 			}

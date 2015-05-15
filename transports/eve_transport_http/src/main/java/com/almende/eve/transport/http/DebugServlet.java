@@ -108,6 +108,7 @@ public class DebugServlet extends EveServlet {
 			} catch (final IOException e) {
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Receiver raised exception:" + e.getMessage());
+				LOG.log(Level.WARNING,"Receiver raised exception:",e);
 			}
 		} else {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

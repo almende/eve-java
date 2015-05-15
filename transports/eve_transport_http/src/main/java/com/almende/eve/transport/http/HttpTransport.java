@@ -156,7 +156,7 @@ public class HttpTransport extends AbstractTransport {
 		final String tag = new UUID().toString();
 		final SyncCallback<String> callback = new SyncCallback<String>() {
 		};
-		callbacks.push(tag, "", callback);
+		callbacks.push(tag, "(inbound http call:"+body+")", callback);
 		
 		super.getHandle().get().receive(body, senderUrl, tag);
 		try {
