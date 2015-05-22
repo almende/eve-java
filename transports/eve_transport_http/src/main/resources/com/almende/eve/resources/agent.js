@@ -73,6 +73,8 @@ function Controller($scope, $resource) {
                 var err = response.error;
                 $scope.error = 'Error ' + err.code + ': ' + err.message +
                     ((err.data && err.data.description) ? ', ' + err.data.description : '');
+            } else {
+               $scope.error = "";
             }
             callback(response.error, response.result);
         }, function (err) {
@@ -171,6 +173,7 @@ function Controller($scope, $resource) {
                     else {
                         $scope.result = (response.result != undefined) ? String(response.result) : '';
                     }
+          		    $scope.error = "";
                 }
 
                 $scope.resize(document.getElementById('result'));
@@ -218,6 +221,8 @@ function Controller($scope, $resource) {
 					var err = response.error;
 				    $scope.error = 'Error ' + err.code + ': ' + err.message +
         	            ((err.data && err.data.description) ? ', ' + err.data.description : '');
+				} else {
+				    $scope.error = "";
 				}
 
                 $scope.resize(document.getElementById('response'));
