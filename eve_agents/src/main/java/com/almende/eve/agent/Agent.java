@@ -92,7 +92,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(ObjectNode config) {
-		if (config == null){
+		if (config == null) {
 			config = JOM.createObjectNode();
 		}
 		config.put("class", this.getClass().getName());
@@ -108,7 +108,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the config
 	 */
 	public Agent(final String agentId, ObjectNode config) {
-		if (config == null){
+		if (config == null) {
 			config = JOM.createObjectNode();
 		}
 		config.put("id", agentId);

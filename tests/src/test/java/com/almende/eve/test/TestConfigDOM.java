@@ -77,6 +77,12 @@ public class TestConfigDOM extends TestCase {
 		
 		
 		LOG.warning("Agent config:"+newAgent.getConfig());
+		
+		
+		try {
+			Thread.sleep(40000);
+		} catch (InterruptedException e) {}
+		
 	}
 }
 

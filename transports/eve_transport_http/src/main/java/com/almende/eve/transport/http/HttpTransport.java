@@ -38,12 +38,12 @@ public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
 	private final AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
-	private final TokenStore					tokenstore	=	new TokenStore();
+	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
 																	"https",
 																	"web");
-	
+
 	/**
 	 * Instantiates a new http transport.
 	 * 
@@ -63,7 +63,6 @@ public class HttpTransport extends AbstractTransport {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
 	 * java.lang.String, java.lang.String)
 	 */
@@ -77,7 +76,7 @@ public class HttpTransport extends AbstractTransport {
 					callback.onSuccess(message);
 					return;
 				} else {
-					LOG.warning("Tag set, but no callback found! " + callback);
+					LOG.warning("Tag set, but no callback found!");
 				}
 			} else {
 				LOG.warning("Tag set, but no callbacks found!");
@@ -99,8 +98,8 @@ public class HttpTransport extends AbstractTransport {
 					httpPost = new HttpPost(receiverUri);
 					// invoke via Apache HttpClient request:
 					httpPost.setEntity(new StringEntity(message));
-					
-//					// Add token for HTTP handshake
+
+					// // Add token for HTTP handshake
 					httpPost.addHeader("X-Eve-Token", tokenstore.create()
 							.toString());
 					httpPost.addHeader("X-Eve-SenderUrl", senderUrl);
@@ -127,10 +126,9 @@ public class HttpTransport extends AbstractTransport {
 			}
 		});
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
 	 * java.lang.String)
 	 */
@@ -139,7 +137,7 @@ public class HttpTransport extends AbstractTransport {
 			final String tag) throws IOException {
 		send(receiverUri, Base64.encodeBase64String(message), tag);
 	}
-	
+
 	/**
 	 * Receive.
 	 * 
@@ -154,10 +152,9 @@ public class HttpTransport extends AbstractTransport {
 	public String receive(final String body, final URI senderUrl)
 			throws IOException {
 		final String tag = new UUID().toString();
-		final SyncCallback<String> callback = new SyncCallback<String>() {
-		};
-		callbacks.push(tag, "(inbound http call:"+body+")", callback);
-		
+		final SyncCallback<String> callback = new SyncCallback<String>() {};
+		callbacks.push(tag, "(inbound http call:" + body + ")", callback);
+
 		super.getHandle().get().receive(body, senderUrl, tag);
 		try {
 			return callback.get();
@@ -166,7 +163,7 @@ public class HttpTransport extends AbstractTransport {
 					"Receiver raised exception:" + e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * Gets the tokenstore of this transport
 	 * 
@@ -178,7 +175,6 @@ public class HttpTransport extends AbstractTransport {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -186,10 +182,9 @@ public class HttpTransport extends AbstractTransport {
 		// Nothing todo at this point, maybe re-register the Servlet if
 		// ServletLauncher is configured?
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
@@ -197,15 +192,14 @@ public class HttpTransport extends AbstractTransport {
 		// Nothing todo at this point, maybe disable receival through the
 		// handler?
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
 		return protocols;
 	}
-	
+
 }

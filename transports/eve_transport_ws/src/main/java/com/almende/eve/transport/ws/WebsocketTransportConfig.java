@@ -70,13 +70,18 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 * @return the url
 	 */
 	public String getAddress() {
-		if (this.has("address")) {
-			return this.get("address").asText();
+		String address = "";
+		if (this.isServer()) {
+			if (this.has("address")) {
+				address += this.get("address").asText();
+			}
+			if (this.has("id")) {
+				address += "/" + this.get("id").asText();
+			}
+		} else {
+			address = "wsclient:" + this.get("id").asText();
 		}
-		if (this.has("id")) {
-			return "wsclient:" + this.get("id").asText();
-		}
-		return null;
+		return address;
 	}
 
 	/**

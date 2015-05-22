@@ -6,6 +6,23 @@ templates:
          class: com.almende.eve.state.memory.MemoryStateBuilder
       scheduler:
          class: com.almende.eve.scheduling.SimpleSchedulerBuilder
+      transports:   
+      -  class: com.almende.eve.transport.http.HttpTransportBuilder
+         servletUrl: http://localhost:8081/agents/
+         servletLauncher: JettyLauncher
+         servletClass: com.almende.eve.transport.http.DebugServlet
+         doShortcut: true
+         doAuthentication: false
+         jetty: 
+           port: 8081
+      -  class: com.almende.eve.transport.ws.WebsocketTransportBuilder
+         address: ws://localhost:8081/ws
+         servletLauncher: JettyLauncher
+         server: true
+         doShortcut: true
+         doAuthentication: false
+         jetty: 
+           port: 8081
    specialAgent:
       extends: templates/defaultAgent
       scheduler: 
