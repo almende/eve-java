@@ -204,21 +204,17 @@ public final class JSONRequest extends JSONMessage {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Value of member 'jsonrpc' is not equal to '2.0'");
 		}
-		if (!request.has(METHOD)) {
+		try {
+			JOM.getInstance().readerForUpdating(this).readValue(request);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "Couldn't parse incoming request",e);
+			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,e.getLocalizedMessage(),e);
+		}
+		if (getMethod() == null){
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'method' missing in request");
 		}
-		if (!(request.get(METHOD).isTextual())) {
-			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
-					"Member 'method' is no String");
-		}
-		if (request.has(PARAMS) && !(request.get(PARAMS).isObject())) {
-			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
-					"Member 'params' is no ObjectNode");
-		}
-
-		init(request.get(ID), request.get(METHOD).asText(),
-				(ObjectNode) request.get(PARAMS), null);
+		this.setRequest(true);
 	}
 
 	/**
@@ -294,6 +290,9 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the params
 	 */
 	public ObjectNode getParams() {
+		if (this.params == null){
+			return JOM.createObjectNode();
+		}
 		return this.params;
 	}
 

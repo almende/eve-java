@@ -15,6 +15,7 @@ import com.almende.eve.instantiation.CanHibernate;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
@@ -42,6 +43,17 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		return "You said:" + message;
 	}
 
+    /**
+	 * Test optional.
+	 *
+	 * @param optional
+	 *            the optional
+	 * @return the string
+	 */
+    public String testOptional(@Optional @Name("optional") String optional){
+    	return optional;
+    }
+	
 	/**
 	 * Gets the person.
 	 *
