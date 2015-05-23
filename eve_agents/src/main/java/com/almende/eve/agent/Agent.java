@@ -21,6 +21,7 @@ import com.almende.eve.instantiation.Configurable;
 import com.almende.eve.instantiation.HibernationHandler;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
+import com.almende.eve.protocol.Protocol;
 import com.almende.eve.protocol.ProtocolBuilder;
 import com.almende.eve.protocol.ProtocolConfig;
 import com.almende.eve.protocol.ProtocolStack;
@@ -30,6 +31,7 @@ import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
+import com.almende.eve.protocol.jsonrpc.formats.JSONMessage;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.eve.scheduling.SchedulerBuilder;
@@ -358,13 +360,17 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				if (agentId != null && conf.getId() == null) {
 					conf.setId(agentId);
 				}
+
+				final Protocol protocol = new ProtocolBuilder()
+						.withConfig((ObjectNode) conf).withHandle(handler)
+						.build();
 				if (JSONRpcProtocolBuilder.class.getName().equals(
 						conf.getClassName())) {
 					found = true;
+					final JSONRpcProtocol prot = (JSONRpcProtocol) protocol;
+					prot.setCaller(sender);
 				}
-				protocolStack.add(new ProtocolBuilder()
-						.withConfig((ObjectNode) conf).withHandle(handler)
-						.build());
+				protocolStack.add(protocol);
 			}
 		}
 		if (config == null || !found) {
@@ -373,8 +379,10 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			if (agentId != null && conf.getId() == null) {
 				conf.setId(agentId);
 			}
-			protocolStack.add(new JSONRpcProtocolBuilder().withConfig(conf)
-					.withHandle(handler).build());
+			final JSONRpcProtocol protocol = new JSONRpcProtocolBuilder()
+					.withConfig(conf).withHandle(handler).build();
+			protocol.setCaller(sender);
+			protocolStack.add(protocol);
 		}
 	}
 
@@ -782,23 +790,25 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			// E.g. during destroy()!
 			return;
 		}
-		final Object response = protocolStack.outbound(
-				protocolStack.inbound(msg, senderUrl).getResult(), senderUrl).result;
-		if ((tag != null || response != null) && transport != null) {
-			try {
-				transport.send(senderUrl, response, tag);
-			} catch (final Exception e) {
-				LOG.log(Level.WARNING, "Couldn't send message", e);
-			}
-		}
+		protocolStack.inbound(msg, senderUrl, tag);
 	}
 
 	private class DefaultCaller implements Caller {
+
 		@Override
-		public <T> void call(final URI url, final JSONRequest message)
+		public <T> void call(final URI url, final JSONMessage message,
+				final String tag) throws IOException {
+
+			protocolStack.outbound(message, url, tag);
+			transport.send(url, message, tag);
+		}
+
+		@Override
+		public <T> void call(final URI url, final JSONMessage message)
 				throws IOException {
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
+
+			protocolStack.outbound(message, url, null);
+			transport.send(url, message, null);
 		}
 
 		@Override
@@ -816,8 +826,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				throws IOException {
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
+			protocolStack.outbound(message, url, null);
+			transport.send(url, message, null);
 		}
 
 		@Override
@@ -862,8 +872,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			final SyncCallback<T> callback = new SyncCallback<T>(type) {};
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			transport.send(url, protocolStack.outbound(message, url).result,
-					null);
+			protocolStack.outbound(message, url, null);
+			transport.send(url, message, null);
 			try {
 				return callback.get();
 			} catch (final Exception e) {

@@ -8,14 +8,50 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * The Class ProtocolStack.
  */
-public class ProtocolStack implements Protocol {
+public class ProtocolStack {
 	private final LinkedList<Protocol>	stack	= new LinkedList<Protocol>();
-
+	
+	/**
+	 * Inbound.
+	 *
+	 * @param msg
+	 *            the msg
+	 * @param peerUrl
+	 *            the peer url
+	 * @param tag
+	 *            the tag
+	 */
+	public void inbound(final Object msg, final URI peerUrl, final String tag){
+		final Iterator<Protocol> iter = stack.iterator();
+		final Meta wrapper = new Meta(msg,peerUrl,tag);
+		while (wrapper.isDoNext() && iter.hasNext()) {
+			final Protocol protocol = iter.next();
+			protocol.inbound(wrapper);
+		}
+	}
+	
+	/**
+	 * Outbound.
+	 *
+	 * @param msg
+	 *            the msg
+	 * @param peerUrl
+	 *            the peer url
+	 * @param tag
+	 *            the tag
+	 */
+	public void outbound(final Object msg, final URI peerUrl, final String tag){
+		final Iterator<Protocol> iter = stack.descendingIterator();
+		final Meta wrapper = new Meta(msg,peerUrl,tag);
+		while (wrapper.isDoNext() && iter.hasNext()) {
+			final Protocol protocol = iter.next();
+			protocol.outbound(wrapper);
+		}
+	}
+	
 	/**
 	 * Adds the protocol at the end of the stack
 	 *
@@ -60,38 +96,9 @@ public class ProtocolStack implements Protocol {
 		return stack.getFirst();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.almende.eve.capabilities.Capability#getParams()
+	/**
+	 * Delete.
 	 */
-	@Override
-	public ObjectNode getParams() {
-		return null;
-	}
-
-	@Override
-	public Meta inbound(final Object msg, URI senderUrl) {
-		final Iterator<Protocol> iter = stack.iterator();
-		Meta res = new Meta(msg);
-		while (res.doNext && iter.hasNext()) {
-			final Protocol protocol = iter.next();
-			res = protocol.inbound(res.valid ? res.result : msg, senderUrl);
-		}
-		return res;
-	}
-
-	@Override
-	public Meta outbound(final Object msg, final URI recipientUrl) {
-		final Iterator<Protocol> iter = stack.descendingIterator();
-		Meta res = new Meta(msg);
-		while (res.doNext && iter.hasNext()) {
-			Protocol protocol = iter.next();
-			res = protocol.outbound(res.valid ? res.result : msg, recipientUrl);
-		}
-		return res;
-	}
-
-	@Override
 	public void delete() {
 		for (Protocol protocol : stack) {
 			protocol.delete();

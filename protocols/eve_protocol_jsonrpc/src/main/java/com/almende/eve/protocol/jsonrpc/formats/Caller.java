@@ -28,7 +28,7 @@ public interface Caller {
 	 * @return the urls
 	 */
 	List<URI> getSenderUrls() ;
-	
+
 	/**
 	 * Send async.
 	 * 
@@ -113,9 +113,25 @@ public interface Caller {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final JSONRequest request)
+	<T> void call(final URI url, final JSONMessage request)
 			throws IOException;
 
+	/**
+	 * Send async.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param url
+	 *            the url
+	 * @param request
+	 *            the request
+	 * @param tag
+	 *            the tag
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> void call(final URI url, final JSONMessage request, final String tag)
+			throws IOException;
 	
 	/**
 	 * Call sync.

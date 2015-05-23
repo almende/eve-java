@@ -4,8 +4,6 @@
  */
 package com.almende.eve.protocol;
 
-import java.net.URI;
-
 import com.almende.eve.capabilities.Capability;
 
 /**
@@ -14,66 +12,12 @@ import com.almende.eve.capabilities.Capability;
 public interface Protocol extends Capability {
 
 	/**
-	 * The Class Meta.
-	 */
-	class Meta {
-		public Object	result	= null;
-		public boolean	doNext	= true;
-		public boolean	valid	= true;
-
-		public Meta() {}
-
-		public Meta(final Object result, final boolean doNext,
-				final boolean valid) {
-			this.result = result;
-			this.doNext = doNext;
-			this.valid = valid;
-		}
-
-		public Meta(final Object result) {
-			this.result = result;
-		}
-
-		public String toString() {
-			return result.toString();
-		}
-
-		public Object getResult() {
-			return result;
-		}
-
-		public void setResult(Object result) {
-			this.result = result;
-		}
-
-		public boolean isDoNext() {
-			return doNext;
-		}
-
-		public void setDoNext(boolean doNext) {
-			this.doNext = doNext;
-		}
-
-		public boolean isValid() {
-			return valid;
-		}
-
-		public void setValid(boolean valid) {
-			this.valid = valid;
-		}
-
-	}
-
-	/**
 	 * Handle inbound messages, converting them from the right protocols.
 	 *
 	 * @param msg
 	 *            the msg
-	 * @param senderUrl
-	 *            the sender url
-	 * @return the modified msg or null if no chaining is allowed
 	 */
-	Meta inbound(final Object msg, final URI senderUrl);
+	void inbound(final Meta msg);
 
 	/**
 	 * Handle outbound messages, converting them into the right protocols.
@@ -81,10 +25,7 @@ public interface Protocol extends Capability {
 	 * @param msg
 	 *            the msg or null if this protocol creates the content (is a
 	 *            source)
-	 * @param recipientUrl
-	 *            the recipient url
-	 * @return the modified msg
 	 */
-	Meta outbound(final Object msg, final URI recipientUrl);
+	void outbound(final Meta msg);
 
 }

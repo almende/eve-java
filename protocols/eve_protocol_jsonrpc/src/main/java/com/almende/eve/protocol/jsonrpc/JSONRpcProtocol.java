@@ -4,6 +4,7 @@
  */
 package com.almende.eve.protocol.jsonrpc;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -11,9 +12,11 @@ import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.Protocol;
+import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.protocol.jsonrpc.formats.JSONMessage;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
@@ -39,6 +42,7 @@ public class JSONRpcProtocol implements Protocol {
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
 	private final Handler<Object>					destination;
+	private Handler<Caller>							caller				= null;
 	private JSONRpcProtocolConfig					myParams;
 
 	/**
@@ -55,19 +59,39 @@ public class JSONRpcProtocol implements Protocol {
 		callbacks.setDefTimeout(myParams.getCallbackTimeout());
 	}
 
-	@Override
-	public Meta inbound(final Object msg, final URI senderUrl) {
-		final JSONResponse response = invoke(msg, senderUrl);
-		return new Meta(response, response == null, response != null);
-
+	/**
+	 * Sets the caller.
+	 *
+	 * @param caller
+	 *            the new caller
+	 */
+	public void setCaller(final Handler<Caller> caller) {
+		this.caller = caller;
 	}
 
-	public Meta outbound(final Object msg, final URI recipientUrl) {
-		if (msg instanceof JSONRequest) {
-			final JSONRequest request = (JSONRequest) msg;
+	@Override
+	public void inbound(final Meta input) {
+		final JSONResponse response = invoke(input.getResult(), input.getPeer());
+		if (response != null) {
+			if (caller == null){
+				LOG.warning("JSONRpcProtocol has response, but no caller given.");
+				input.setDoNext(false);
+				return;
+			}
+			try {
+				caller.get().call(input.getPeer(), response, input.getTag());
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "Couldn't send response", e);
+			}
+		}
+		input.setDoNext(false);
+	}
+
+	public void outbound(final Meta output) {
+		if (output.getResult() instanceof JSONRequest) {
+			final JSONRequest request = (JSONRequest) output.getResult();
 			addCallback(request, request.getCallback());
 		}
-		return new Meta(msg);
 	}
 
 	/**
