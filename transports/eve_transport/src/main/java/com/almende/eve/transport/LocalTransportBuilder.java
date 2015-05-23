@@ -38,7 +38,7 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 			return null;
 		}
 		final String addr = "local:" + config.getId();
-		final URI address = URIUtil.create(addr.intern());
+		final URI address = URIUtil.create(addr);
 		LocalService result = getLocal(address);
 		if (result == null) {
 			result = new LocalService(address, newHandle, getParams());

@@ -43,7 +43,7 @@ public final class URIUtil {
 				return res;
 			}
 		}
-		final URI newUri = new URI(uri);
+		final URI newUri = new URI(uri.intern());
 		uris.put(uri, new WeakReference<URI>(newUri));
 		return newUri;
 	}
@@ -63,7 +63,7 @@ public final class URIUtil {
 				return res;
 			}
 		}
-		final URI newUri = URI.create(uri);
+		final URI newUri = URI.create(uri.intern());
 		uris.put(uri, new WeakReference<URI>(newUri));
 		return newUri;
 	}
