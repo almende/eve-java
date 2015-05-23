@@ -43,17 +43,26 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		return "You said:" + message;
 	}
 
-    /**
+	/**
 	 * Test optional.
 	 *
 	 * @param optional
 	 *            the optional
 	 * @return the string
 	 */
-    public String testOptional(@Optional @Name("optional") String optional){
-    	return optional;
-    }
-	
+	public String testOptional(@Optional @Name("optional") String optional) {
+		return optional;
+	}
+
+	/**
+	 * Check thread.
+	 *
+	 * @return the string
+	 */
+	public long checkThread() {
+		return Thread.currentThread().getId();
+	}
+
 	/**
 	 * Gets the person.
 	 *
@@ -162,7 +171,7 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		}
 		try {
 			final List<MessageContainer> message = callSync(uri, "getMessage",
-					params, new TypeUtil<List<MessageContainer>>(){});
+					params, new TypeUtil<List<MessageContainer>>() {});
 			LOG.info("received message:" + message.get(0).getMessage());
 
 		} catch (IOException e) {
@@ -170,8 +179,8 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		}
 		try {
 			params.put("message", "Hi There!");
-			final String message = callSync(uri, "helloWorld",
-					params, String.class);
+			final String message = callSync(uri, "helloWorld", params,
+					String.class);
 			LOG.info("received message:" + message);
 
 		} catch (IOException e) {
@@ -184,7 +193,7 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	public void doSomething() {
 		LOG.info("Doing something!");
 	}
-	
+
 	@Override
 	public String doMore() {
 		LOG.info("Doing more!");

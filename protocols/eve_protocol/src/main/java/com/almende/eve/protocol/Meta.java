@@ -1,20 +1,38 @@
+/*
+ * Copyright: Almende B.V. (2014), Rotterdam, The Netherlands
+ * License: The Apache Software License, Version 2.0
+ */
 package com.almende.eve.protocol;
 
 import java.net.URI;
+import java.util.Iterator;
 
 /**
  * The Class Meta.
  */
 public class Meta {
-	private Object	result	= null;
-	private URI		peer	= null;
-	private String	tag		= null;
-	private boolean	doNext	= true;
+	private Object				result	= null;
+	private URI					peer	= null;
+	private String				tag		= null;
+	private Iterator<Protocol>	iter	= null;
 
 	/**
 	 * Instantiates a new meta.
 	 */
 	public Meta() {}
+
+	/**
+	 * Instantiates a new meta.
+	 *
+	 * @param clone
+	 *            the clone
+	 */
+	public Meta(Meta clone) {
+		this.result = clone.result;
+		this.peer = clone.peer;
+		this.tag = clone.tag;
+		this.iter = clone.iter;
+	}
 
 	/**
 	 * Instantiates a new meta.
@@ -25,11 +43,14 @@ public class Meta {
 	 *            the peer
 	 * @param tag
 	 *            the tag
+	 * @param iter
+	 *            the iter
 	 */
-	public Meta(final Object result, final URI peer, final String tag) {
+	public Meta(final Object result, final URI peer, final String tag, final Iterator<Protocol> iter) {
 		this.result = result;
 		this.peer = peer;
 		this.tag = tag;
+		this.iter = iter;
 	}
 
 	public String toString() {
@@ -54,26 +75,7 @@ public class Meta {
 	public void setResult(final Object result) {
 		this.result = result;
 	}
-
-	/**
-	 * Checks if is do next.
-	 *
-	 * @return true, if is do next
-	 */
-	public boolean isDoNext() {
-		return doNext;
-	}
-
-	/**
-	 * Sets the do next.
-	 *
-	 * @param doNext
-	 *            the new do next
-	 */
-	public void setDoNext(final boolean doNext) {
-		this.doNext = doNext;
-	}
-
+	
 	/**
 	 * Sets the tag.
 	 *
@@ -110,5 +112,44 @@ public class Meta {
 	 */
 	public void setPeer(final URI peer) {
 		this.peer = peer;
+	}
+
+	/**
+	 * Gets the iter.
+	 *
+	 * @return the iter
+	 */
+	public Iterator<Protocol> getIter() {
+		return iter;
+	}
+
+	/**
+	 * Sets the iter.
+	 *
+	 * @param iter
+	 *            the new iter
+	 */
+	public void setIter(final Iterator<Protocol> iter) {
+		this.iter = iter;
+	}
+
+	/**
+	 * Next in.
+	 */
+	public void nextIn(){
+		if (iter.hasNext()){
+			final Protocol protocol = iter.next();
+			protocol.inbound(this);
+		}
+	}
+
+	/**
+	 * Next out.
+	 */
+	public void nextOut(){
+		if (iter.hasNext()){
+			final Protocol protocol = iter.next();
+			protocol.outbound(this);
+		}
 	}
 }
