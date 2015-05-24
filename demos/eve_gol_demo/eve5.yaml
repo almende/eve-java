@@ -1,32 +1,9 @@
 # Eve configuration
 
-transport:
-    class: com.almende.eve.transport.http.HttpTransportBuilder
-    servletUrl: http://127.0.0.1:8081/agents/
-    servletLauncher: JettyLauncher
-    doShortcut: false
-    doAuthentication: false
-    jetty: 
-        port: 8081
-
-#state:
-#  class: com.almende.eve.state.memory.MemoryStateBuilder
-
-#state:
-#   class: com.almende.eve.state.file.FileStateBuilder
-#   json: true
-#   path: .eveagents_gol_demo
-
-#state:
-#    class: com.almende.eve.state.mongo.MongoStateBuilder
-
 state:
-    class: com.almende.eve.state.couch.CouchStateBuilder
-
+  class: com.almende.eve.state.memory.MemoryStateBuilder
 
 gol:
   runTime: 50
   columns: 5
   rows: 5
-  OddUrl: http://127.0.0.1:8081/agents/
-  EvenUrl: http://127.0.0.1:8081/agents/

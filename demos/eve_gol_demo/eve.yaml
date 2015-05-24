@@ -6,6 +6,10 @@
 
 state:
   class: com.almende.eve.state.memory.MemoryStateBuilder
+#protocols:
+#- class: com.almende.eve.protocol.InboxProtocolBuilder
+
+
 
 gol:
   runTime: 50
