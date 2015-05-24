@@ -29,10 +29,11 @@ public interface AgentInterface {
 
 	/**
 	 * Retrieve a list with all the available methods.
+	 * Defined according to: http://www.simple-is-better.org/json-rpc/jsonrpc20-schema-service-descriptor.html
 	 * 
 	 * @return methods
 	 */
-	List<Object> getMethods();
+	ObjectNode getMethods();
 
 	/**
 	 * Retrieve an array with the agents urls (can be one or multiple), and

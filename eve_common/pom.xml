@@ -19,6 +19,7 @@
 		<joda-convert.version>1.6</joda-convert.version>
 		<codec.version>1.9</codec.version>
 		<jackson.version>2.4.1</jackson.version>
+		<jsonSchema.version>2.5.3</jsonSchema.version>		
 	</properties>
 
 	<dependencies>
@@ -51,6 +52,11 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jsonSchema</artifactId>
+			<version>${jsonSchema.version}</version>
 		</dependency>
 	</dependencies>
 </project>

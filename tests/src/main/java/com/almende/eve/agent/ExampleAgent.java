@@ -64,7 +64,7 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	}
 
 	/**
-	 * Gets the person.
+	 * Gets the message.
 	 *
 	 * @param test
 	 *            the test
@@ -73,6 +73,18 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	public List<MessageContainer> getMessage(
 			@Name("message") final MessageContainer test) {
 		return Arrays.asList(test);
+	}
+
+	/**
+	 * Gets the messages.
+	 *
+	 * @param test
+	 *            the test
+	 * @return the messages
+	 */
+	public List<MessageContainer> getMessages(
+			@Name("message") final List<MessageContainer> test) {
+		return test;
 	}
 
 	/**

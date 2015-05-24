@@ -4,6 +4,7 @@
 package com.almende.util.jackson;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.BitSet;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -31,6 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 
 /**
  * The Class JOM.
@@ -177,6 +181,22 @@ public final class JOM {
 		return MAPPER.getTypeFactory().uncheckedSimpleType(c);
 	}
 
+	/**
+	 * Gets the type schema.
+	 *
+	 * @param c
+	 *            the c
+	 * @return the type schema
+	 * @throws JsonMappingException
+	 *             the json mapping exception
+	 */
+	public static ObjectNode getTypeSchema(final Type c) throws JsonMappingException{
+		SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
+		getInstance().acceptJsonFormatVisitor(getInstance().constructType(c), visitor);
+		JsonSchema jsonSchema = visitor.finalSchema();
+		return getInstance().valueToTree(jsonSchema);
+	}
+	
 	/**
 	 * The Class CustomBitSetSerializer.
 	 */

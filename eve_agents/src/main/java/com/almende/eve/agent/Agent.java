@@ -314,7 +314,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	@Access(AccessType.PUBLIC)
 	@Override
 	@JsonIgnore
-	public List<Object> getMethods() {
+	public ObjectNode getMethods() {
 		return ((JSONRpcProtocol) protocolStack.getLast()).getMethods();
 	}
 

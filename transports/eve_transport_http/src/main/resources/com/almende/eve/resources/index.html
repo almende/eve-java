@@ -60,16 +60,16 @@
                         class="chzn-select"
                         ng-model="methodName"
                         ng-change="setMethod()">
-                    <option ng-repeat="method in methods" ng-selected="setParams">{{method.method}}</option>
+                    <option ng-repeat="methodName in methodKeys" ng-selected="setParams">{{methodName}}</option>
                 </select>
-
             </td>
         </tr>
         <tr ng-show="mode=='form' && method.params.length > 0">
             <th>Params</th>
             <th>Name</th>
             <th>Value</th>
-            <th>Type</th>
+            <th>JsType</th>
+            <th>JavaType</th>
             <th>Required</th>
         </tr>
         <tr ng-show="mode=='form' && method.params.length == 0">
@@ -79,9 +79,10 @@
         <tr ng-repeat="param in method.params" ng-show="mode=='form'">
             <td></td>
             <td>{{param.name}}</td>
-            <td ng-show="isPrimitiveType(param.type)"><input type="text" ng-model="param.value" /></td>
-            <td ng-show="!isPrimitiveType(param.type)"><textarea ng-model="param.value" onkeyup="resize(this);"></textarea></td>
-            <td>{{param.type}}</td>
+            <td ng-show="isPrimitiveType(param.type.type)"><input type="text" ng-model="param.value" /></td>
+            <td ng-show="!isPrimitiveType(param.type.type)"><textarea ng-model="param.value" onkeyup="resize(this)"></textarea></td>
+            <td>{{param.type.type}}</td>
+            <td>{{param.description}}</td>
             <td>{{param.required}}</td>
         </tr>
 

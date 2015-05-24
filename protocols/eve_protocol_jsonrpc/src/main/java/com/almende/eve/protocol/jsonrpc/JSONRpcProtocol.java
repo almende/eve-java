@@ -6,7 +6,6 @@ package com.almende.eve.protocol.jsonrpc;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,7 +72,7 @@ public class JSONRpcProtocol implements Protocol {
 	public void inbound(final Meta input) {
 		final JSONResponse response = invoke(input.getResult(), input.getPeer());
 		if (response != null) {
-			if (caller == null){
+			if (caller == null) {
 				LOG.warning("JSONRpcProtocol has response, but no caller given.");
 				return;
 			}
@@ -83,7 +82,8 @@ public class JSONRpcProtocol implements Protocol {
 				LOG.log(Level.WARNING, "Couldn't send response", e);
 			}
 		}
-		//TODO: currently not calling next on protocol stack, in the future use this as a filter, sometimes forward.
+		// TODO: currently not calling next on protocol stack, in the future use
+		// this as a filter, sometimes forward.
 	}
 
 	public void outbound(final Meta output) {
@@ -222,8 +222,8 @@ public class JSONRpcProtocol implements Protocol {
 	 * 
 	 * @return the methods
 	 */
-	public List<Object> getMethods() {
-		return JSONRpc.describe(getHandle().get(), EVEREQUESTPARAMS, auth);
+	public ObjectNode getMethods() {
+		return JSONRpc.describe(getHandle().get(), EVEREQUESTPARAMS, "", auth);
 	}
 
 	private <T> void addCallback(final JSONRequest request,

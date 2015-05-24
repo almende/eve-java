@@ -11,12 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +34,8 @@ import com.almende.util.AnnotationUtil.AnnotatedParam;
 import com.almende.util.Defines;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -212,22 +209,25 @@ final public class JSONRpc {
 	}
 
 	/**
-	 * _describe.
-	 * 
+	 * Describe all JSON-RPC methods of given class.
+	 * Format:
+	 * http://www.simple-is-better.org/json-rpc/jsonrpc20-schema-service-
+	 * descriptor.html
+	 *
 	 * @param c
-	 *            the c
+	 *            The class to be described
 	 * @param requestParams
-	 *            the request params
+	 *            Optional request parameters.
 	 * @param namespace
 	 *            the namespace
 	 * @param auth
-	 *            the auth
-	 * @return the map
+	 *            the authorizor
+	 * @return the Map
 	 */
-	private static Map<String, Object> _describe(final Object c,
+	public static ObjectNode describe(final Object c,
 			final RequestParams requestParams, String namespace,
 			final Authorizor auth) {
-		final Map<String, Object> methods = new TreeMap<String, Object>();
+		final ObjectNode methods = JOM.createObjectNode();
 		try {
 			if (c == null) {
 				return methods;
@@ -236,42 +236,39 @@ final public class JSONRpc {
 					.getClass());
 			for (final AnnotatedMethod method : annotatedClass.getMethods()) {
 				if (isAvailable(method, null, requestParams, auth)) {
+					final ObjectNode result = JOM.createObjectNode();
+					result.put("type", "method");
+					result.put("description", typeToString(method.getGenericReturnType()));
+					result.set("returns",
+							typeToJsonSchema(method.getGenericReturnType()));
 					// format as JSON
-					final List<Object> descParams = new ArrayList<Object>(4);
+					final ArrayNode params = JOM.createArrayNode();
 					for (final AnnotatedParam param : method.getParams()) {
 						if (getRequestAnnotation(param, requestParams) == null) {
-							final String name = getName(param);
-							final Map<String, Object> paramData = new HashMap<String, Object>(3);
-							paramData.put("name", name);
-							paramData.put("type",
-									typeToString(param.getGenericType()));
+							final ObjectNode paramData = JOM.createObjectNode();
+
+							paramData.put("name", getName(param));
+							paramData.put("description", typeToString(param.getGenericType()));
+							paramData.set("type", typeToJsonSchema(param.getGenericType()));
 							paramData.put("required", isRequired(param));
-							descParams.add(paramData);
+							params.add(paramData);
 						}
 					}
-
-					final Map<String, Object> result = new HashMap<String, Object>(1);
-					result.put("type",
-							typeToString(method.getGenericReturnType()));
-
-					final Map<String, Object> desc = new HashMap<String, Object>(3);
+					result.set("params", params);
 					if (namespace.equals("*")) {
 						namespace = annotatedClass.getAnnotation(
 								Namespace.class).value();
 					}
 					final String methodName = namespace.equals("") ? method
 							.getName() : namespace + "." + method.getName();
-					desc.put("method", methodName);
-					desc.put("params", descParams);
-					desc.put("result", result);
-					methods.put(methodName, desc);
+					methods.set(methodName, result);
 				}
 			}
 			for (final AnnotatedMethod method : annotatedClass
 					.getAnnotatedMethods(Namespace.class)) {
 				final String innerNamespace = method.getAnnotation(
 						Namespace.class).value();
-				methods.putAll(_describe(
+				methods.setAll(describe(
 						method.getActualMethod().invoke(c, (Object[]) null),
 						requestParams, innerNamespace, auth));
 			}
@@ -281,38 +278,6 @@ final public class JSONRpc {
 			return null;
 		}
 		return methods;
-	}
-
-	/**
-	 * Describe all JSON-RPC methods of given class.
-	 * 
-	 * @param c
-	 *            The class to be described
-	 * @param requestParams
-	 *            Optional request parameters.
-	 * @param auth
-	 *            the authorizor
-	 * @return the list
-	 */
-	public static List<Object> describe(final Object c,
-			final RequestParams requestParams, final Authorizor auth) {
-		try {
-			final Map<String, Object> methods = _describe(c, requestParams, "",
-					auth);
-
-			// create a sorted array
-			final TreeSet<String> methodNames = new TreeSet<String>(
-					methods.keySet());
-			final List<Object> sortedMethods = new ArrayList<Object>(methodNames.size());
-			for (final String methodName : methodNames) {
-				sortedMethods.add(methods.get(methodName));
-			}
-			return sortedMethods;
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Failed to describe class:" + c.toString(),
-					e);
-			return null;
-		}
 	}
 
 	/**
@@ -346,6 +311,10 @@ final public class JSONRpc {
 		return s;
 	}
 
+	private static ObjectNode typeToJsonSchema(final Type c) throws JsonMappingException{
+		return JOM.getTypeSchema(c);
+	}
+	
 	/**
 	 * Retrieve a description of an error.
 	 * 

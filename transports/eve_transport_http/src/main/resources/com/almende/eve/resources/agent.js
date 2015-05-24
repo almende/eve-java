@@ -5,6 +5,37 @@
 
 angular.module('controller', ['ngResource']);
 
+Object.keys = Object.keys || (function () {
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !{toString:null}.propertyIsEnumerable("toString"),
+        DontEnums = [ 
+            'toString', 'toLocaleString', 'valueOf', 'hasOwnProperty',
+            'isPrototypeOf', 'propertyIsEnumerable', 'constructor'
+        ],
+        DontEnumsLength = DontEnums.length;
+
+    return function (o) {
+        if (typeof o != "object" && typeof o != "function" || o === null)
+            throw new TypeError("Object.keys called on a non-object");
+
+        var result = [];
+        for (var name in o) {
+            if (hasOwnProperty.call(o, name))
+                result.push(name);
+        }
+
+        if (hasDontEnumBug) {
+            for (var i = 0; i < DontEnumsLength; i++) {
+                if (hasOwnProperty.call(o, DontEnums[i]))
+                    result.push(DontEnums[i]);
+            }   
+        }
+
+        return result;
+    };
+	})(); 
+
+
 /**
  * Adjust the height of given textarea to match its contents
  * @param {Element} elem HTML DOM Textarea element
@@ -87,11 +118,12 @@ function Controller($scope, $resource) {
      * Change the currently selected method
      */
     $scope.setMethod = function () {
-        for (var i = 0; i < $scope.methods.length; i++) {
-            var method = $scope.methods[i];
-            if (method.method == $scope.methodName) {
-                $scope.method = method;
-		$scope.request = JSON.stringify(form2json(), null, 2);
+    	var keys = Object.keys($scope.methods);
+        for (var i = 0; i < keys.length; i++) {
+            var method = keys[i];
+            if (method == $scope.methodName) {
+                $scope.method = $scope.methods[method];
+				$scope.request = JSON.stringify(form2json(), null, 2);
                 break;
             }
         }
@@ -120,29 +152,55 @@ function Controller($scope, $resource) {
         return d.toISOString ? d.toISOString() : d.toString();
     };
 
+	function formExample(type){
+		if (type.type == "object"){		
+			var result = {};
+			var keys = Object.keys(type.properties);
+			for (var i = 0; i < keys.length; i++){
+				var val = type.properties[keys[i]];
+				result[keys[i]]=formExample(val);
+			}
+			return result;
+		} else if (type.type == "array") {
+			var result = [];
+			result.push(formExample(type.items));
+			return result;
+		} else if (type.type == "string"){
+			return "EXAMPLE";
+		} else if (type.type == "boolean"){
+		    return true;
+		} else if (type.type == "integer" || type.type == "number"){
+			return 0;
+		} else if (type.type == "null"){
+			return null;
+		}
+		return null;
+	}
 
     function form2json() {
             var request = {};
             request.id = 1;
-	    if ($scope.method == undefined){
+	    	if (typeof $scope.method == "undefined"){
 	            request.method = "getMethods";
 	            request.params = {};
-		    return request;
+		   		return request;
             }
-            request.method = $scope.method.method;
+            request.method = $scope.methodName;
             request.params = {};
             for (var i = 0; i < $scope.method.params.length; i++) {
                 var param = $scope.method.params[i];
+                if ((param.type.type == "object" || param.type.type == "array") && !param.value){
+                	param.value = JSON.stringify(formExample(param.type));
+                } 
                 if (param.required || (param.value && param.value.length > 0) ) {
-                    if (param.type.toLowerCase() == 'string') {
+                    if (param.type.type == 'string') {
                         request.params[param.name] = param.value;
-                    }
-                    else {
-                        request.params[param.name] = JSON.parse(param.value);
+                    } else {
+                        request.params[param.name] = param.value?JSON.parse(param.value):null;
                     }
                 }
             }
-	return request;
+		return request;
     }
 
     /**
@@ -270,20 +328,21 @@ function Controller($scope, $resource) {
         send ('getMethods', {}, function (err, result) {
             if (!err) {
                 $scope.methods = result;
-                $scope.methodName = $scope.methods[0].method;
+                $scope.methodKeys = Object.keys(result);
+                $scope.methodName = $scope.methodKeys[0];
                 $scope.setMethod();
-
-                // update method select box and the json version
+				
+				// update method select box and the json version
                 setTimeout(function () {
                     new Chosen(document.getElementById('methods'));
-		    $scope.request = JSON.stringify(form2json(), null, 2);
+		    		$scope.request = JSON.stringify(form2json(), null, 2);
                 }, 15);
             }
         });
     };
 
     $scope.request = JSON.stringify(form2json(), null, 2);
-
+	$scope.methodKeys = [];
     $scope.loading = true;
     $scope.load();
 }
