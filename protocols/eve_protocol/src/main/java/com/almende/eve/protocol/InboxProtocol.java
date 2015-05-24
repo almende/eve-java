@@ -63,7 +63,10 @@ public class InboxProtocol implements Protocol {
 
 	@Override
 	public void inbound(Meta msg) {
-		inbox.add(msg);
+		try {
+			inbox.put(msg);
+		} catch (InterruptedException e) {
+		}		
 		// explicitely not calling next on protocol stack from this point.
 	}
 
