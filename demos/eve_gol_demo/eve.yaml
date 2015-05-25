@@ -8,11 +8,12 @@ state:
   class: com.almende.eve.state.memory.MemoryStateBuilder
 #protocols:
 #- class: com.almende.eve.protocol.InboxProtocolBuilder
-
-
+protocols:
+-  class: com.almende.eve.protocol.TraceProtocolBuilder
+   filename: .traces_
 
 gol:
-  runTime: 50
-  columns: 30
-  rows: 30
+  runTime: 10
+  columns: 5
+  rows: 5
 
