@@ -7,6 +7,8 @@ package com.almende.eve.protocol;
 import java.net.URI;
 import java.util.Iterator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Class Meta.
  */
@@ -119,6 +121,7 @@ public class Meta {
 	 *
 	 * @return the iter
 	 */
+	@JsonIgnore
 	public Iterator<Protocol> getIter() {
 		return iter;
 	}
@@ -129,6 +132,7 @@ public class Meta {
 	 * @param iter
 	 *            the new iter
 	 */
+	@JsonIgnore
 	public void setIter(final Iterator<Protocol> iter) {
 		this.iter = iter;
 	}
@@ -136,6 +140,7 @@ public class Meta {
 	/**
 	 * Next in.
 	 */
+	@JsonIgnore
 	public void nextIn(){
 		if (iter.hasNext()){
 			final Protocol protocol = iter.next();
@@ -146,6 +151,7 @@ public class Meta {
 	/**
 	 * Next out.
 	 */
+	@JsonIgnore
 	public void nextOut(){
 		if (iter.hasNext()){
 			final Protocol protocol = iter.next();
