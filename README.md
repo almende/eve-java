@@ -18,7 +18,7 @@ Documentation is available on http://almende.github.com/eve
 <dependency>
     <groupId>com.almende.eve</groupId>
     <artifactId>eve-full</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.1</version>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ or with embedded Jetty 9 servlet container:
 <dependency>
     <groupId>com.almende.eve</groupId>
     <artifactId>eve-full-embed</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.1</version>
 </dependency>
 ```
 
