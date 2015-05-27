@@ -71,13 +71,15 @@ public class EventAgent extends NodeAgent {
 	 *
 	 * @param message
 	 *            the message
+	 * @param expiryAge
+	 *            the expiry age
 	 */
-	public void sendEvent(String message) {
+	public void sendEvent(String message, long expiryAge) {
 		getState().clear();
 		
 		final Params params = new Params();
 		params.add("message", message);
-		events.sendEvent(new JSONRequest("receiveEvent", params));
+		events.sendEvent(new JSONRequest("receiveEvent", params), expiryAge);
 	}
 
 	/**

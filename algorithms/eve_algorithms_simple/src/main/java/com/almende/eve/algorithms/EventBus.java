@@ -40,6 +40,8 @@ public class EventBus {
 	private String						tag				= null;
 	private Set<Event>					events			= new HashSet<Event>(2);
 
+	private long						expiryInterval	= 500;
+
 	private static final JSONRequest	EXPIRYREQUEST	= new JSONRequest(
 																"event.scheduleExpiry",
 																null);
@@ -71,14 +73,31 @@ public class EventBus {
 	}
 
 	/**
-	 * Send a message to all EventBus participants;
+	 * Send a message to all EventBus participants, with the default expiry age
+	 * of 1 minute (60000 millis)
 	 *
 	 * @param message
 	 *            the message
 	 */
 	public void sendEvent(JSONRequest message) {
-		final Event event = new Event(DateTime.now().plus(60000).getMillis(),
-				message, caller.getSenderUrls().get(0));
+		sendEvent(message, 60000);
+	}
+
+	/**
+	 * Send event.
+	 *
+	 * @param message
+	 *            the message
+	 * @param expiryAge
+	 *            the expiry age
+	 */
+	public void sendEvent(JSONRequest message, long expiryAge) {
+		if (expiryAge > 0 && expiryAge < expiryInterval){
+			//speed up expiry after next run.
+			expiryInterval = expiryAge;
+		}
+		final Event event = new Event(DateTime.now().plus(expiryAge)
+				.getMillis(), message, caller.getSenderUrls().get(0));
 		synchronized (events) {
 			events.add(event);
 		}
@@ -91,7 +110,7 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleExpiry() {
 		doExpiry();
-		scheduler.schedule(EXPIRYREQUEST, DateTime.now().plus(60000));
+		scheduler.schedule(EXPIRYREQUEST, DateTime.now().plus(expiryInterval));
 	}
 
 	/**
@@ -127,7 +146,7 @@ public class EventBus {
 	}
 
 	/**
-	 * Do triggers.
+	 * Do triggers, as a precaution if the normal triggering fails.
 	 */
 	@Access(AccessType.PUBLIC)
 	public void doTriggers() {
@@ -196,8 +215,8 @@ public class EventBus {
 		boolean trickleReset = false;
 		synchronized (this.events) {
 			if (!this.events.equals(events)) {
-				for (Event event: events){
-					if (DateTime.now().isBefore(event.getExpiryTime())){
+				for (Event event : events) {
+					if (DateTime.now().isBefore(event.getExpiryTime())) {
 						this.events.add(event);
 						trickleReset = true;
 					}

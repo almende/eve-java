@@ -30,7 +30,7 @@ public class TestEventBus extends TestCase {
 	 */
 	@Test
 	public void testEvents() {
-		final int nofAgents = 5000;
+		final int nofAgents = 10000;
 		final int pause = 10000;
 
 		LOG.warning("Starting with:" + nofAgents + " agents");
@@ -91,7 +91,7 @@ public class TestEventBus extends TestCase {
 				e.printStackTrace();
 			}
 			timestamp = DateTime.now();
-			agents.get(0).sendEvent("report_" + agentId);
+			agents.get(0).sendEvent("report_" + agentId, 5000);
 
 			while (agents.get(0).countReceived(nofAgents) < 1) {
 				try {
