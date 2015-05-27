@@ -119,7 +119,7 @@ public class AgentConfig extends Config {
 	 *            the transport
 	 */
 	public void addTransport(final ObjectNode transport) {
-		if (this.getTransports() == null){
+		if (this.getTransports() == null) {
 			this.setTransports(JOM.createArrayNode());
 		}
 		this.getTransports().add(transport);
@@ -154,9 +154,20 @@ public class AgentConfig extends Config {
 	public ArrayNode getTransports() {
 		final JsonNode res = this.get("transports");
 		if (res != null && !res.isArray()) {
-			LOG.warning("Transports have to be an array!");
-			ArrayNode other = JOM.createArrayNode();
+			LOG.warning("This configuration is deprecated! Transports have to be an array!");
+			final ArrayNode other = JOM.createArrayNode();
 			other.add(res);
+			return other;
+		}
+		if (res == null && this.has("transport")) {
+			LOG.warning("This configuration is deprecated! Transport should be renamed to 'transports' and needs to be an array.");
+			final ArrayNode other = JOM.createArrayNode();
+			final JsonNode transport = this.get("transport");
+			if (transport.isArray()) {
+				other.addAll((ArrayNode) transport);
+			} else {
+				other.add(transport);
+			}
 			return other;
 		}
 		return (ArrayNode) res;
