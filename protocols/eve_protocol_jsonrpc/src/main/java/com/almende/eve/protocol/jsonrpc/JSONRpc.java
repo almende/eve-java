@@ -259,9 +259,15 @@ final public class JSONRpc {
 						namespace = annotatedClass.getAnnotation(
 								Namespace.class).value();
 					}
-					final String methodName = namespace.equals("") ? method
-							.getName() : namespace + "." + method.getName();
-					methods.set(methodName, result);
+					
+					String methodName = method.getName();
+					Name anno = method.getAnnotation(Name.class);
+					if (anno != null){
+						methodName = anno.value();
+					}
+					
+					final String fullName = namespace.equals("") ? methodName : namespace + "." + methodName;
+					methods.set(fullName, result);
 				}
 			}
 			for (final AnnotatedMethod method : annotatedClass

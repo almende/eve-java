@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * Annotation for parameter names.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = ElementType.PARAMETER)
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 @Documented
 public @interface Name {
 	

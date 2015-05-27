@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
@@ -163,6 +164,20 @@ final class NamespaceUtil {
 				.getClass());
 		final List<AnnotatedMethod> methods = newClazz
 				.getMethods(reducedMethod);
+		if (methods.isEmpty()){
+			//Fall back to checking for @Name methods.
+			final List<AnnotatedMethod> namedMethods = newClazz
+					.getAnnotatedMethods(Name.class);
+			if (!namedMethods.isEmpty()){
+				for (AnnotatedMethod method: namedMethods){
+					if (reducedMethod.equals(method.getAnnotation(Name.class).value())){
+						methods.add(method);
+						//TODO: If we ever want to support method overloading, this needs to be fixed to continue searching other @Name methods.
+						break;
+					}
+				}
+			}
+		}
 		if (!methods.isEmpty()) {
 			// TODO: If we ever want to support method overloading, this needs
 			// to be fixed to return multiple methods.

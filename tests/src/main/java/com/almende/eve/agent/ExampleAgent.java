@@ -55,6 +55,16 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	}
 
 	/**
+	 * Named method.
+	 *
+	 * @return the string
+	 */
+	@Name("testNamedMethod")
+	public String namedMethod(){
+		return "ok, worked correctly!";
+	}
+	
+	/**
 	 * Check thread.
 	 *
 	 * @return the string
