@@ -10,7 +10,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Interface AgentInterface.
+ * The Interface AgentInterface, these are methods that the DebugServlet uses.
  */
 public interface AgentInterface {
 	/**

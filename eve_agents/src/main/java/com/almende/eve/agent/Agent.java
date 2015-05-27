@@ -121,7 +121,11 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	/**
 	 * On ready, is being run after the configuration has been loaded.
 	 */
-	protected void onReady() {}
+	protected void onReady() {
+		//Running old methods for backwards compatibility.
+		onInit();
+		onBoot();
+	}
 
 	/**
 	 * On destroy, is being run before the destroy() method is started.
