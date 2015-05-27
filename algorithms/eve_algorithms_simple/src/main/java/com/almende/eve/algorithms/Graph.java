@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * graph, potentially existing of tagged subgraphs, with edges that can carry a
  * Comparable Weight.
  * Among management tooling, the class also contains a Scale-Free-Network
- * generator algorithm and some graph search tools. <br>
+ * generator algorithm (based on: http://arxiv.org/pdf/1105.3347.pdf) and some graph search tools. <br>
  * API:<br>
  * <br>
  * graph.addEdge({"edge":{"node":-URI-,"tag":-tag-,"weight":-object-}}); //Add

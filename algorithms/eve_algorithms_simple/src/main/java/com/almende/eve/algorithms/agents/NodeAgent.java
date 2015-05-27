@@ -28,11 +28,19 @@ public class NodeAgent extends Agent {
 	/** The initial nodes. */
 	protected static URI[]		initialNodes		= new URI[10];
 	protected static int[]		initialNodeCount	= new int[] { 0 };
+	
+	//Some magic values given from the SFN paper: http://arxiv.org/pdf/1105.3347.pdf
+	private static final int    INITNODEMAX			= 10;
+	private static final int    NOFEDGESPERNODE		= 3;
+	private static final int    INITIALWALKLENGTH	= 7;
 
 	/**
 	 * Adds the node2 sfn.
+	 *
+	 * @param tag
+	 *            the tag
 	 */
-	public void addNode2SFN() {
+	public void addNode2SFN(final String tag) {
 		if (initialNodeCount[0] < 10) {
 			synchronized (initialNodeCount) {
 				switch (initialNodeCount[0]) {
@@ -45,21 +53,22 @@ public class NodeAgent extends Agent {
 						initialNodes[1] = getUrls().get(0);
 						try {
 							getGraph().addEdges(Arrays.asList(initialNodes[0]),
-									"SFN");
+									tag);
 						} catch (IOException e) {
 							LOG.log(Level.WARNING, "Failed to init SFN", e);
 						}
 						return;
 					default:
-						if (initialNodeCount[0] < 10) {
+						if (initialNodeCount[0] < INITNODEMAX) {
 							int myIndex = initialNodeCount[0]++;
 							initialNodes[myIndex] = getUrls().get(0);
 							try {
-								getGraph().addEdges(
-										Arrays.asList(
-												initialNodes[myIndex - 2],
-												initialNodes[myIndex - 1]),
-										"SFN");
+								getGraph()
+										.addEdges(
+												Arrays.asList(
+														initialNodes[myIndex - 2],
+														initialNodes[myIndex - 1]),
+												tag);
 							} catch (IOException e) {
 								LOG.log(Level.WARNING, "Failed to init SFN", e);
 							}
@@ -70,7 +79,7 @@ public class NodeAgent extends Agent {
 			}
 		}
 		try {
-			getGraph().addNode2SFN(initialNodes[0], "SFN", 3, 7);
+			getGraph().addNode2SFN(initialNodes[0], tag, NOFEDGESPERNODE, INITIALWALKLENGTH);
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Couldn't join SFN!", e);
 		}

@@ -78,7 +78,7 @@ public class TestGraph extends TestCase {
 		for (int i=0; i< nofNodes; i++ ){
 			NodeAgent agent = new NodeAgent("" + i, config);
 			agents.add(agent);
-			agent.addNode2SFN();
+			agent.addNode2SFN("SFN");
 		}
 		
 		LOG.warning(writeVisGraph(agents));

@@ -41,7 +41,7 @@ public class EventAgent extends NodeAgent {
 	public EventAgent(String id, ObjectNode config) {
 		super(id, config);
 		events = new EventBus(getScheduler(), caller, getGraph(), "SFN");
-		addNode2SFN();
+		addNode2SFN("SFN");
 
 	}
 	
