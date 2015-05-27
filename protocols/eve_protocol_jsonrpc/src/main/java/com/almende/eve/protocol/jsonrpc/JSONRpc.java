@@ -401,7 +401,12 @@ final public class JSONRpc {
 					final Annotation a = getRequestAnnotation(p, requestParams);
 					if (a != null) {
 						// this is a systems parameter
-						objects[i + offset] = requestParams.get(a);
+						if (a.annotationType().equals(Sender.class) && p.getType().equals(String.class)){
+							LOG.warning("Deprecated parameter usage: @Sender should now by an URI i.s.o. String");
+							objects[i + offset] = requestParams.get(a).toString();
+						} else {
+							objects[i + offset] = requestParams.get(a);
+						}
 					} else {
 						final String name = getName(p);
 						if (name != null) {
