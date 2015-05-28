@@ -5,16 +5,14 @@
 package com.almende.eve.algorithms.test.agents;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.almende.eve.agent.Agent;
 import com.almende.eve.algorithms.DAA;
 import com.almende.eve.algorithms.DAAValueBean;
+import com.almende.eve.algorithms.Edge;
 import com.almende.eve.algorithms.TrickleRPC;
+import com.almende.eve.algorithms.agents.NodeAgent;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
@@ -28,10 +26,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class DAAAgent.
  */
 @Access(AccessType.PUBLIC)
-public class DAAAgent extends Agent {
+public class DAAAgent extends NodeAgent {
 	private DAA			daa			= new DAA();
 	private TrickleRPC	trickle		= null;
-	private List<URI>	neighbors	= new ArrayList<URI>();
 
 	/**
 	 * Instantiates a new DAA agent.
@@ -51,16 +48,6 @@ public class DAAAgent extends Agent {
 	@Namespace("*")
 	public TrickleRPC getTrickle() {
 		return trickle;
-	}
-
-	/**
-	 * Adds the neighbor.
-	 *
-	 * @param address
-	 *            the address
-	 */
-	public void addNeighbor(final URI address) {
-		neighbors.add(address);
 	}
 
 	/**
@@ -94,9 +81,9 @@ public class DAAAgent extends Agent {
 			public void run() {
 				final Params params = new Params();
 				params.add("value", daa.getCurrentEstimate());
-				for (final URI agent : neighbors) {
+				for (final Edge agent : getGraph().getByTag("daa")) {
 					try {
-						call(agent, "daaReceive", params);
+						call(agent.getAddress(), "daaReceive", params);
 					} catch (IOException e) {}
 				}
 			}

@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The API class for the Distributed Aggregation Algorithm.
+ * The API class for the Distributed Aggregation Algorithm (Separable Function Computation)
  */
 public class DAA {
 	protected int			width			= 1000;

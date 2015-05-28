@@ -5,6 +5,8 @@
 package com.almende.eve.algorithms.test;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +30,7 @@ public class TestDAA extends TestCase {
 	@Test
 	public void testValueBean() {
 
-		final int width = 10000;
+		final int width = 1000;
 		final double value = 0.345;
 		DAAValueBean bean = new DAAValueBean(width, 10);
 		bean.generate(value).setTTL(10);
@@ -90,7 +92,7 @@ public class TestDAA extends TestCase {
 				{ 2, 1 },  { 3, 0 }, { 4, 1 }, { 4, 2 } };
 
 		for (int[] edge : edges) {
-			agents[edge[0]].addNeighbor(URIUtil.create("local:" + edge[1]));
+			agents[edge[0]].getGraph().addEdges(Arrays.asList(new URI[]{URIUtil.create("local:" + edge[1])}),"daa");
 		}
 
 		for (final DAAAgent agent : agents) {

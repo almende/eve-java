@@ -9,26 +9,19 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.almende.eve.algorithms.EventBus;
-import com.almende.eve.algorithms.agents.NodeAgent;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
-import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
-import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
-import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class EventAgent.
  */
-public class EventAgent extends NodeAgent {
-	private static final Logger	LOG		= Logger.getLogger(EventAgent.class
-												.getName());
-
-	private EventBus			events	= null;
+public class EventAgent extends com.almende.eve.algorithms.agents.AbstractEventAgent {
+	private static final Logger	LOG	= Logger.getLogger(EventAgent.class
+											.getName());
 
 	/**
 	 * Instantiates a new event agent.
@@ -40,11 +33,8 @@ public class EventAgent extends NodeAgent {
 	 */
 	public EventAgent(String id, ObjectNode config) {
 		super(id, config);
-		events = new EventBus(getScheduler(), caller, getGraph(), "SFN");
-		addNode2SFN("SFN");
-
 	}
-	
+
 	/**
 	 * Receive event.
 	 *
@@ -57,39 +47,13 @@ public class EventAgent extends NodeAgent {
 			final String target = message.substring(7);
 			if (target.equals("*") || target.equals(getId())) {
 				try {
-					caller.call(URIUtil.create("local:0"), "reportEventReceived",
-							null);
+					caller.call(URIUtil.create("local:0"),
+							"reportEventReceived", null);
 				} catch (IOException e) {
 					LOG.log(Level.WARNING, "Couldn't send report?", e);
 				}
 			}
 		}
-	}
-
-	/**
-	 * Send event.
-	 *
-	 * @param message
-	 *            the message
-	 * @param expiryAge
-	 *            the expiry age
-	 */
-	public void sendEvent(String message, long expiryAge) {
-		getState().clear();
-		
-		final Params params = new Params();
-		params.add("message", message);
-		events.sendEvent(new JSONRequest("receiveEvent", params), expiryAge);
-	}
-
-	/**
-	 * Gets the event bus.
-	 *
-	 * @return the event bus
-	 */
-	@Namespace("event")
-	public EventBus getEventBus() {
-		return events;
 	}
 
 	/**

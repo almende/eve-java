@@ -21,25 +21,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class NodeAgent.
  */
 @Access(AccessType.PUBLIC)
-public class NodeAgent extends Agent {
+public class NodeAgent extends Agent implements NodeAgentInterface {
 	private static final Logger	LOG					= Logger.getLogger(NodeAgent.class
 															.getName());
 	private Graph				graph				= new Graph(super.caller);
 	/** The initial nodes. */
 	protected static URI[]		initialNodes		= new URI[10];
 	protected static int[]		initialNodeCount	= new int[] { 0 };
-	
-	//Some magic values given from the SFN paper: http://arxiv.org/pdf/1105.3347.pdf
-	private static final int    INITNODEMAX			= 10;
-	private static final int    NOFEDGESPERNODE		= 3;
-	private static final int    INITIALWALKLENGTH	= 7;
 
-	/**
-	 * Adds the node2 sfn.
-	 *
-	 * @param tag
-	 *            the tag
-	 */
+	// Some magic values given from the SFN paper:
+	// http://arxiv.org/pdf/1105.3347.pdf
+	private static final int	INITNODEMAX			= 10;
+	private static final int	NOFEDGESPERNODE		= 3;
+	private static final int	INITIALWALKLENGTH	= 7;
+
 	public void addNode2SFN(final String tag) {
 		if (initialNodeCount[0] < 10) {
 			synchronized (initialNodeCount) {
@@ -79,7 +74,8 @@ public class NodeAgent extends Agent {
 			}
 		}
 		try {
-			getGraph().addNode2SFN(initialNodes[0], tag, NOFEDGESPERNODE, INITIALWALKLENGTH);
+			getGraph().addNode2SFN(initialNodes[0], tag, NOFEDGESPERNODE,
+					INITIALWALKLENGTH);
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Couldn't join SFN!", e);
 		}
@@ -104,11 +100,6 @@ public class NodeAgent extends Agent {
 		super();
 	}
 
-	/**
-	 * Gets the network.
-	 *
-	 * @return the network
-	 */
 	@Namespace("graph")
 	public Graph getGraph() {
 		return graph;
