@@ -81,6 +81,14 @@ public class JSONRpcProtocol implements Protocol {
 			} catch (IOException e) {
 				LOG.log(Level.WARNING, "Couldn't send response", e);
 			}
+		} else if (input.getTag() != null){
+			//Always send a response if tag is set. (also a response on a response, for simulation feedback)
+			final JSONResponse ok = new JSONResponse();
+			try {
+				caller.get().call(input.getPeer(), ok, input.getTag());
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "Couldn't send response", e);
+			}
 		}
 		// TODO: currently not calling next on protocol stack, in the future use
 		// this as a filter, sometimes forward.
