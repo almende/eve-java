@@ -28,6 +28,7 @@ import com.almende.eve.protocol.ProtocolStack;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
+import com.almende.eve.protocol.jsonrpc.RpcBasedProtocol;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
@@ -122,7 +123,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 * On ready, is being run after the configuration has been loaded.
 	 */
 	protected void onReady() {
-		//Running old methods for backwards compatibility.
+		// Running old methods for backwards compatibility.
 		onInit();
 		onBoot();
 	}
@@ -319,6 +320,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	@Override
 	@JsonIgnore
 	public ObjectNode getMethods() {
+		// TODO: find a different way to get this list. (maybe loop over all
+		// protocols, let each JSONRpcProtocol add methods.
 		return ((JSONRpcProtocol) protocolStack.getLast()).getMethods();
 	}
 
@@ -371,7 +374,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				if (JSONRpcProtocolBuilder.class.getName().equals(
 						conf.getClassName())) {
 					found = true;
-					final JSONRpcProtocol prot = (JSONRpcProtocol) protocol;
+				}
+				if (protocol instanceof RpcBasedProtocol) {
+					final RpcBasedProtocol prot = (RpcBasedProtocol) protocol;
 					prot.setCaller(sender);
 				}
 				protocolStack.add(protocol);

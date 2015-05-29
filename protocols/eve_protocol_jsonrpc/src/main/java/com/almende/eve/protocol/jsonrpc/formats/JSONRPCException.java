@@ -343,16 +343,6 @@ public class JSONRPCException extends RuntimeException {
 		this.remote = remote;
 	}
 
-	/**
-	 * Gets the object node.
-	 * 
-	 * @return the object node
-	 */
-	@JsonIgnore
-	public JsonNode getJsonNode() {
-		return JOM.getInstance().valueToTree(this);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Throwable#toString()

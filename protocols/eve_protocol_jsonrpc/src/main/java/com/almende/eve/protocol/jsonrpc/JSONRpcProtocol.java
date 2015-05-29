@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.Meta;
-import com.almende.eve.protocol.Protocol;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
@@ -24,14 +23,13 @@ import com.almende.eve.protocol.jsonrpc.formats.RequestParams;
 import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.AsyncCallbackQueue;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class JSONRpcProtocol.
  */
-public class JSONRpcProtocol implements Protocol {
+public class JSONRpcProtocol implements RpcBasedProtocol {
 	private static final Logger						LOG					= Logger.getLogger(JSONRpcProtocol.class
 																				.getName());
 	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
@@ -81,8 +79,9 @@ public class JSONRpcProtocol implements Protocol {
 			} catch (IOException e) {
 				LOG.log(Level.WARNING, "Couldn't send response", e);
 			}
-		} else if (input.getTag() != null){
-			//Always send a response if tag is set. (also a response on a response, for simulation feedback)
+		} else if (input.getTag() != null) {
+			// Always send a response if tag is set. (also a response on a
+			// response, for simulation feedback)
 			final JSONResponse ok = new JSONResponse();
 			try {
 				caller.get().call(input.getPeer(), ok, input.getTag());
@@ -122,60 +121,6 @@ public class JSONRpcProtocol implements Protocol {
 	}
 
 	/**
-	 * Convert incoming message object to JSONMessage if possible. Returns null
-	 * if the message can't be interpreted as a JSONMessage.
-	 * 
-	 * @param msg
-	 *            the msg
-	 * @return the JSON message
-	 */
-	public static JSONMessage jsonConvert(final Object msg) {
-		JSONMessage jsonMsg = null;
-		if (msg == null) {
-			LOG.warning("Message null!");
-			return null;
-		}
-		try {
-			if (msg instanceof JSONMessage) {
-				jsonMsg = (JSONMessage) msg;
-			} else {
-				ObjectNode json = null;
-				if (msg instanceof String) {
-					final String message = (String) msg;
-					if (message.startsWith("{")
-							|| message.trim().startsWith("{")) {
-
-						json = (ObjectNode) JOM.getInstance().readTree(message);
-					}
-				} else if (msg instanceof ObjectNode
-						|| (msg instanceof JsonNode && ((JsonNode) msg)
-								.isObject())) {
-					json = (ObjectNode) msg;
-				} else {
-					LOG.info("Message unknown type:" + msg.getClass());
-				}
-				if (json != null) {
-					if (JSONRpc.isResponse(json)) {
-						final JSONResponse response = new JSONResponse(json);
-						jsonMsg = response;
-					} else if (JSONRpc.isRequest(json)) {
-						final JSONRequest request = new JSONRequest(json);
-						jsonMsg = request;
-					} else {
-						LOG.info("Message contains valid JSON, but is not JSON-RPC:"
-								+ json);
-					}
-				}
-			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING,
-					"Message triggered exception in trying to convert it to a JSONMessage.",
-					e);
-		}
-		return jsonMsg;
-	}
-
-	/**
 	 * Invoke this RPC msg.
 	 * 
 	 * @param msg
@@ -185,7 +130,7 @@ public class JSONRpcProtocol implements Protocol {
 	 * @return the JSON response
 	 */
 	public JSONResponse invoke(final Object msg, final URI senderUrl) {
-		final JSONMessage jsonMsg = jsonConvert(msg);
+		final JSONMessage jsonMsg = JSONMessage.jsonConvert(msg);
 		if (jsonMsg == null) {
 			LOG.log(Level.INFO, "Received non-JSONRPC message:'" + msg + "'");
 			return null;

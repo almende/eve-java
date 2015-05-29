@@ -591,28 +591,4 @@ final public class JSONRpc {
 		return null;
 	}
 
-	/**
-	 * Check if given json object contains all fields required for a
-	 * json-rpc request (id, method, params).
-	 * 
-	 * @param json
-	 *            the json
-	 * @return true, if is request
-	 */
-	public static boolean isRequest(final ObjectNode json) {
-		return json.has("method");
-	}
-
-	/**
-	 * Check if given json object contains all fields required for a
-	 * json-rpc response (id, result or error).
-	 * 
-	 * @param json
-	 *            the json
-	 * @return true, if is response
-	 */
-	public static boolean isResponse(final ObjectNode json) {
-		return (json.has("result") || json.has("error"));
-	}
-
 }

@@ -27,5 +27,5 @@ public interface Protocol extends Capability {
 	 *            source)
 	 */
 	void outbound(final Meta msg);
-
+	
 }

@@ -32,10 +32,8 @@ public final class JSONRequest extends JSONMessage {
 	private static final long			serialVersionUID	= 1970046457233622444L;
 	transient private AsyncCallback<?>	callback			= null;
 
-	private JsonNode id = null;
 	private String method = null;
-	private ObjectNode params = null;
-	
+	private ObjectNode params = null;	
 	
 	/**
 	 * Instantiates a new jSON request.
@@ -195,15 +193,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the request
 	 */
 	public void init(final JsonNode request) {
-		if (request == null || request.isNull()) {
-			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
-					"Request is null");
-		}
-		if (request.has(JSONRPC) && request.get(JSONRPC).isTextual()
-				&& !request.get(JSONRPC).asText().equals(VERSION)) {
-			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
-					"Value of member 'jsonrpc' is not equal to '2.0'");
-		}
+		super.init(request);
 		try {
 			JOM.getInstance().readerForUpdating(this).readValue(request);
 		} catch (IOException e) {
@@ -214,7 +204,6 @@ public final class JSONRequest extends JSONMessage {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'method' missing in request");
 		}
-		this.setRequest(true);
 	}
 
 	/**
@@ -229,7 +218,6 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	private <T> void init(final JsonNode id, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback) {
-		this.setRequest(true);
 		if (callback != null && (id == null || id.isNull())) {
 			setId(JOM.getInstance().valueToTree(new UUID().toString()));
 		} else {
@@ -238,21 +226,6 @@ public final class JSONRequest extends JSONMessage {
 		setMethod(method);
 		setParams(params);
 		setCallback(callback);
-	}
-
-	/**
-	 * Sets the id.
-	 * 
-	 * @param id
-	 *            the new id
-	 */
-	public void setId(final JsonNode id) {
-		this.id=id;
-	}
-
-	@Override
-	public JsonNode getId() {
-		return this.id;
 	}
 
 	/**
@@ -335,15 +308,6 @@ public final class JSONRequest extends JSONMessage {
 	}
 
 	/**
-	 * Gets the jsonrpc version.
-	 *
-	 * @return the jsonrpc version
-	 */
-	public String getJsonrpc() {
-		return VERSION;
-	}
-
-	/**
 	 * Gets the callback.
 	 *
 	 * @return the callback
@@ -364,6 +328,12 @@ public final class JSONRequest extends JSONMessage {
 		this.callback = callback;
 	}
 
+	@Override
+	@JsonIgnore
+	public boolean isRequest(){
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -372,7 +342,14 @@ public final class JSONRequest extends JSONMessage {
 	public String toString() {
 		final ObjectMapper mapper = JOM.getInstance();
 		try {
-			return mapper.writeValueAsString(this);
+			ObjectNode tree = mapper.valueToTree(this);
+			if (tree.get(ID) == null || tree.get(ID).isNull()){
+				tree.remove(ID);
+			}
+			if (tree.get(EXTRA) == null || tree.get(EXTRA).isNull()) {
+				tree.remove(EXTRA);
+			}
+			return tree.toString();
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
