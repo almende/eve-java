@@ -67,12 +67,12 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	}
 
 	@Override
-	public void inbound(final Meta input) {
+	public boolean inbound(final Meta input) {
 		final JSONResponse response = invoke(input.getResult(), input.getPeer());
 		if (response != null) {
 			if (caller == null) {
 				LOG.warning("JSONRpcProtocol has response, but no caller given.");
-				return;
+				return false;
 			}
 			try {
 				caller.get().call(input.getPeer(), response, input.getTag());
@@ -91,14 +91,15 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		}
 		// TODO: currently not calling next on protocol stack, in the future use
 		// this as a filter, sometimes forward.
+		return true;
 	}
 
-	public void outbound(final Meta output) {
+	public boolean outbound(final Meta output) {
 		if (output.getResult() instanceof JSONRequest) {
 			final JSONRequest request = (JSONRequest) output.getResult();
 			addCallback(request, request.getCallback());
 		}
-		output.nextOut();
+		return output.nextOut();
 	}
 
 	/**

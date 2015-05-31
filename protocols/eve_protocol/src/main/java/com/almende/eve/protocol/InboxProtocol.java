@@ -62,18 +62,19 @@ public class InboxProtocol implements Protocol {
 	}
 
 	@Override
-	public void inbound(Meta msg) {
+	public boolean inbound(Meta msg) {
 		try {
 			inbox.put(msg);
 		} catch (InterruptedException e) {
 		}		
 		// explicitely not calling next on protocol stack from this point.
+		return false;
 	}
 
 	@Override
-	public void outbound(Meta msg) {
+	public boolean outbound(Meta msg) {
 		// just forwarding...
-		msg.nextOut();
+		return msg.nextOut();
 	}
 
 }

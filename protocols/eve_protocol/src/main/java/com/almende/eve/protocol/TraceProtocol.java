@@ -40,7 +40,7 @@ public class TraceProtocol implements Protocol {
 		this.logger = Logger.getLogger("TraceProtocol_" + this.params.getId());
 		this.logger.setLevel(Level.ALL);
 		if (this.params.getFileName() != null) {
-			String filename = this.params.getFileName()+ this.params.getId();
+			String filename = this.params.getFileName() + this.params.getId();
 			try {
 				handler = new FileHandler(filename);
 				this.logger.addHandler(handler);
@@ -72,26 +72,27 @@ public class TraceProtocol implements Protocol {
 		}
 	}
 
-	private void log(Meta msg) {
+	private void log(final Meta msg, final boolean inbound) {
 		try {
-			logger.fine(JOM.getInstance().writeValueAsString(msg));
+			logger.fine((inbound ? "IN :" : "OUT:")
+					+ JOM.getInstance().writeValueAsString(msg));
 		} catch (JsonProcessingException e) {
 			LOG.log(Level.WARNING, "Couldn't serialize tracemessage", e);
 		}
 	}
 
 	@Override
-	public void inbound(Meta msg) {
-		log(msg);
+	public boolean inbound(Meta msg) {
+		log(msg, true);
 		// just forwarding...
-		msg.nextIn();
+		return msg.nextIn();
 	}
 
 	@Override
-	public void outbound(Meta msg) {
-		log(msg);
+	public boolean outbound(Meta msg) {
+		log(msg, false);
 		// just forwarding...
-		msg.nextOut();
+		return msg.nextOut();
 	}
 
 	class MyFormatter extends Formatter {

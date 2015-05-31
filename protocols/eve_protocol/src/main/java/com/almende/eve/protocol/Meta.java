@@ -139,23 +139,29 @@ public class Meta {
 
 	/**
 	 * Next in.
+	 *
+	 * @return true, if successful
 	 */
 	@JsonIgnore
-	public void nextIn(){
+	public boolean nextIn(){
 		if (iter.hasNext()){
 			final Protocol protocol = iter.next();
-			protocol.inbound(this);
+			return protocol.inbound(this);
 		}
+		return true;
 	}
 
 	/**
 	 * Next out.
+	 *
+	 * @return true, if successful
 	 */
 	@JsonIgnore
-	public void nextOut(){
+	public boolean nextOut(){
 		if (iter.hasNext()){
 			final Protocol protocol = iter.next();
-			protocol.outbound(this);
+			return protocol.outbound(this);
 		}
+		return true;
 	}
 }

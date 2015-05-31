@@ -13,7 +13,7 @@ import java.util.LinkedList;
  */
 public class ProtocolStack {
 	private final LinkedList<Protocol>	stack	= new LinkedList<Protocol>();
-	
+
 	/**
 	 * Inbound.
 	 *
@@ -23,16 +23,18 @@ public class ProtocolStack {
 	 *            the peer url
 	 * @param tag
 	 *            the tag
+	 * @return true, if the entire stack is done.
 	 */
-	public void inbound(final Object msg, final URI peerUrl, final String tag){
+	public boolean inbound(final Object msg, final URI peerUrl, final String tag) {
 		final Iterator<Protocol> iter = stack.iterator();
-		final Meta wrapper = new Meta(msg,peerUrl,tag,iter);
-		if (iter.hasNext()){
+		final Meta wrapper = new Meta(msg, peerUrl, tag, iter);
+		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
-			protocol.inbound(wrapper);
+			return protocol.inbound(wrapper);
 		}
+		return true;
 	}
-	
+
 	/**
 	 * Outbound.
 	 *
@@ -42,16 +44,19 @@ public class ProtocolStack {
 	 *            the peer url
 	 * @param tag
 	 *            the tag
+	 * @return true, if the entire stack is done.
 	 */
-	public void outbound(final Object msg, final URI peerUrl, final String tag){
+	public boolean outbound(final Object msg, final URI peerUrl,
+			final String tag) {
 		final Iterator<Protocol> iter = stack.descendingIterator();
-		final Meta wrapper = new Meta(msg,peerUrl,tag,iter);
-		if (iter.hasNext()){
+		final Meta wrapper = new Meta(msg, peerUrl, tag, iter);
+		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
-			protocol.outbound(wrapper);
+			return protocol.outbound(wrapper);
 		}
+		return true;
 	}
-	
+
 	/**
 	 * Adds the protocol at the end of the stack
 	 *

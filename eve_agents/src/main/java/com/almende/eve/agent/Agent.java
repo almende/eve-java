@@ -808,16 +808,18 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		public <T> void call(final URI url, final JSONMessage message,
 				final String tag) throws IOException {
 
-			protocolStack.outbound(message, url, tag);
-			transport.send(url, message, tag);
+			if (protocolStack.outbound(message, url, tag)) {
+				transport.send(url, message, tag);
+			}
 		}
 
 		@Override
 		public <T> void call(final URI url, final JSONMessage message)
 				throws IOException {
 
-			protocolStack.outbound(message, url, null);
-			transport.send(url, message, null);
+			if (protocolStack.outbound(message, url, null)) {
+				transport.send(url, message, null);
+			}
 		}
 
 		@Override
@@ -835,8 +837,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				throws IOException {
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			protocolStack.outbound(message, url, null);
-			transport.send(url, message, null);
+			if (protocolStack.outbound(message, url, null)) {
+				transport.send(url, message, null);
+			}
 		}
 
 		@Override
@@ -881,8 +884,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			final SyncCallback<T> callback = new SyncCallback<T>(type) {};
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			protocolStack.outbound(message, url, null);
-			transport.send(url, message, null);
+			if (protocolStack.outbound(message, url, null)) {
+				transport.send(url, message, null);
+			}
 			try {
 				return callback.get();
 			} catch (final Exception e) {

@@ -16,8 +16,9 @@ public interface Protocol extends Capability {
 	 *
 	 * @param msg
 	 *            the msg
+	 * @return true, if entire stack has been walked through
 	 */
-	void inbound(final Meta msg);
+	boolean inbound(final Meta msg);
 
 	/**
 	 * Handle outbound messages, converting them into the right protocols.
@@ -25,7 +26,8 @@ public interface Protocol extends Capability {
 	 * @param msg
 	 *            the msg or null if this protocol creates the content (is a
 	 *            source)
+	 * @return true, if entire stack has been walked through
 	 */
-	void outbound(final Meta msg);
+	boolean outbound(final Meta msg);
 	
 }
