@@ -118,7 +118,7 @@ public class AgentHost {
 		conf.setScheduler(new SimpleSchedulerConfig());
 		conf.setState(new MemoryStateConfig());
 
-		final Agent agent = new AgentBuilder().with(conf).build();
+		final Agent agent = new AgentBuilder().withConfig(conf).build();
 
 		addAgent(agentId, agent);
 		return agent;

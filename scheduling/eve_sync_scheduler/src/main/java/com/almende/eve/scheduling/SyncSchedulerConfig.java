@@ -19,6 +19,10 @@ public class SyncSchedulerConfig extends SimpleSchedulerConfig {
 		setClassName(SyncSchedulerBuilder.class.getName());
 	}
 
+	private SyncSchedulerConfig(boolean local) {
+		super();
+	}
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
@@ -26,8 +30,11 @@ public class SyncSchedulerConfig extends SimpleSchedulerConfig {
 	 *            the node
 	 */
 	public static SyncSchedulerConfig decorate(final ObjectNode node) {
-		final SyncSchedulerConfig res = new SyncSchedulerConfig();
+		final SyncSchedulerConfig res = new SyncSchedulerConfig(true);
 		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(SyncSchedulerBuilder.class.getName());
+		}
 		return res;
 	}
 }

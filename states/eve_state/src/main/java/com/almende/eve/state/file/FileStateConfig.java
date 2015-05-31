@@ -24,6 +24,10 @@ public class FileStateConfig extends StateConfig {
 		setClassName(FileStateBuilder.class.getName());
 	}
 
+	private FileStateConfig(boolean local) {
+		super();
+	}
+
 	/**
 	 * Instantiates a new file state config.
 	 * 
@@ -31,8 +35,11 @@ public class FileStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static FileStateConfig decorate(final ObjectNode node) {
-		final FileStateConfig res = new FileStateConfig();
+		final FileStateConfig res = new FileStateConfig(true);
 		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(FileStateBuilder.class.getName());
+		}
 		return res;
 	}
 

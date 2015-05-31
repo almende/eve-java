@@ -49,7 +49,7 @@ public class TestConfigDOM extends TestCase {
 		final ArrayNode agents = (ArrayNode) config.get("agents");
 		ExampleAgent newAgent = null;
 		for (final JsonNode agent : agents) {
-			newAgent = (ExampleAgent) new AgentBuilder().with((ObjectNode) agent)
+			newAgent = (ExampleAgent) new AgentBuilder().withConfig((ObjectNode) agent)
 					.build();
 			LOG.info("Created agent:" + newAgent.getId());
 		}

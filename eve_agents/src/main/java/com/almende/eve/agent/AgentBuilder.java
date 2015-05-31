@@ -26,7 +26,7 @@ public class AgentBuilder {
 	 *            the config
 	 * @return the agent builder
 	 */
-	public AgentBuilder with(final ObjectNode config) {
+	public AgentBuilder withConfig(final ObjectNode config) {
 		parameters = config;
 		return this;
 	}

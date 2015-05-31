@@ -20,6 +20,10 @@ public class MemoryStateConfig extends StateConfig {
 		setClassName(MemoryStateBuilder.class.getName());
 	}
 
+	private MemoryStateConfig(boolean local) {
+		super();
+	}
+
 	/**
 	 * Instantiates a new memory state config.
 	 * 
@@ -27,8 +31,11 @@ public class MemoryStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static MemoryStateConfig decorate(final ObjectNode node) {
-		final MemoryStateConfig res = new MemoryStateConfig();
+		final MemoryStateConfig res = new MemoryStateConfig(true);
 		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(MemoryStateBuilder.class.getName());
+		}
 		return res;
 	}
 

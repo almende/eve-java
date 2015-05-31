@@ -193,7 +193,7 @@ public final class Boot {
 
 		for (final JsonNode agent : agents) {
 			final Agent newAgent = new AgentBuilder().withClassLoader(cl)
-					.with((ObjectNode) agent).build();
+					.withConfig((ObjectNode) agent).build();
 			if (newAgent != null) {
 				LOG.info("Created agent:" + newAgent.getId());
 			} else {

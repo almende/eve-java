@@ -19,6 +19,10 @@ public class SimpleSchedulerConfig extends Config {
 		super();
 		setClassName(SimpleSchedulerBuilder.class.getName());
 	}
+	
+	private SimpleSchedulerConfig(boolean local){
+		super();
+	}
 
 	/**
 	 * Instantiates a new simple scheduler config.
@@ -27,7 +31,7 @@ public class SimpleSchedulerConfig extends Config {
 	 *            the node
 	 */
 	public static SimpleSchedulerConfig decorate(final ObjectNode node) {
-		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
+		final SimpleSchedulerConfig res = new SimpleSchedulerConfig(true);
 		res.copy(node);
 		if (!res.has("class")) {
 			res.setClassName(SimpleSchedulerBuilder.class.getName());

@@ -19,6 +19,10 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 		setClassName(PersistentSchedulerBuilder.class.getName());
 	}
 
+	private PersistentSchedulerConfig(boolean local) {
+		super();
+	}
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
@@ -26,8 +30,12 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	 *            the node
 	 */
 	public static PersistentSchedulerConfig decorate(final ObjectNode node) {
-		final PersistentSchedulerConfig res = new PersistentSchedulerConfig();
+		final PersistentSchedulerConfig res = new PersistentSchedulerConfig(
+				true);
 		res.copy(node);
+		if (!res.has("class")) {
+			res.setClassName(PersistentSchedulerBuilder.class.getName());
+		}
 		return res;
 	}
 

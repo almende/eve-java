@@ -17,7 +17,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @param <T>
  *            the generic type
  */
-public abstract class AbstractCapabilityBuilder<T extends Capability> {
+public abstract class AbstractCapabilityBuilder<T extends Capability>
+		implements CapabilityBuilderInterface<T> {
 	private static final Logger	LOG			= Logger.getLogger(AbstractCapabilityBuilder.class
 													.getName());
 	private ClassLoader			cl			= getClass().getClassLoader();
@@ -32,7 +33,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 *            the params
 	 * @return the capability builder
 	 */
-	public AbstractCapabilityBuilder<T> withConfig(final ObjectNode params) {
+	public CapabilityBuilderInterface<T> withConfig(final ObjectNode params) {
 		this.parameters = params;
 		return this;
 	}
@@ -44,7 +45,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 *            the handle
 	 * @return the capability builder
 	 */
-	public AbstractCapabilityBuilder<T> withHandle(final Handler<?> handle) {
+	public CapabilityBuilderInterface<T> withHandle(final Handler<?> handle) {
 		this.handle = handle;
 		return this;
 	}
@@ -56,7 +57,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability> {
 	 *            the cl
 	 * @return the abstract capability builder
 	 */
-	public AbstractCapabilityBuilder<T> withClassLoader(final ClassLoader cl) {
+	public CapabilityBuilderInterface<T> withClassLoader(final ClassLoader cl) {
 		if (cl != null) {
 			this.cl = cl;
 		}
