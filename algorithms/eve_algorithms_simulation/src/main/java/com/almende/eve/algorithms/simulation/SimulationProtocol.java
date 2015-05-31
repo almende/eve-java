@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,15 +78,21 @@ public class SimulationProtocol implements RpcBasedProtocol {
 
 	private void receiveTracerReport(final JsonNode jsonNode) {
 		final Tracer tracer = TRACER.inject(jsonNode);
-		outboundTracers.remove(tracer);
+		synchronized (outboundTracers) {
+			outboundTracers.remove(tracer);
+		}
 	}
 
 	private void storeOutboundTracer(Tracer tracer) {
-		outboundTracers.add(tracer);
+		synchronized (outboundTracers) {
+			outboundTracers.add(tracer);
+		}
 	}
 
 	private void storeInboundTracer(Tracer tracer) {
-		inboundTracers.add(tracer);
+		synchronized (inboundTracers) {
+			inboundTracers.add(tracer);
+		}
 	}
 
 	private boolean doTracer() {
@@ -110,26 +117,32 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		if (tracers == null) {
 			return;
 		}
-		for (Tracer tracer : tracers) {
-			final ObjectNode extra = JOM.createObjectNode();
-			extra.set("@simtracerreport", JOM.getInstance().valueToTree(tracer));
-			if (resp != null && tracer.getOwner().equals(peer)) {
-				if (resp.getExtra() == null) {
-					resp.setExtra(extra);
+		synchronized (tracers) {
+			final Iterator<Tracer> iter = tracers.iterator();
+			while (iter.hasNext()) {
+				final Tracer tracer = iter.next();
+				final ObjectNode extra = JOM.createObjectNode();
+				extra.set("@simtracerreport",
+						JOM.getInstance().valueToTree(tracer));
+				if (resp != null && tracer.getOwner().equals(peer)) {
+					if (resp.getExtra() == null) {
+						resp.setExtra(extra);
+					} else {
+						resp.getExtra().setAll(extra);
+					}
 				} else {
-					resp.getExtra().setAll(extra);
+					final Params params = new Params();
+					params.set("tracer", JOM.getInstance().valueToTree(tracer));
+					final JSONRequest message = new JSONRequest(
+							"scheduler.receiveTracerReport", params);
+					message.setExtra(extra);
+					try {
+						caller.get().call(tracer.getOwner(), message);
+					} catch (IOException e) {
+						LOG.log(Level.WARNING, "Failed to send tracerreport", e);
+					}
 				}
-			} else {
-				final Params params = new Params();
-				params.set("tracer", extra);
-				final JSONRequest message = new JSONRequest(
-						"scheduler.receiveTracerReport", params);
-				message.setExtra(extra);
-				try {
-					caller.get().call(tracer.getOwner(), message);
-				} catch (IOException e) {
-					LOG.log(Level.WARNING, "Failed to send tracerreport", e);
-				}
+				iter.remove();
 			}
 		}
 	}
@@ -144,27 +157,31 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	 */
 
 	@Override
-	public void inbound(Meta msg) {
+	public boolean inbound(Meta msg) {
 
 		JSONMessage message = JSONMessage.jsonConvert(msg.getResult());
 		if (message != null) {
 			// Parse inbound message, check for tracer.
 			msg.setResult(message);
-			if (message.isRequest()) {
-				// If tracer found, tag message with my tag
-				// Store tracer
-				final JSONRequest request = (JSONRequest) message;
-				final Object tracerObj = request.getParams().remove(
-						"@simtracer");
-				if (tracerObj != null) {
-					Tracer tracer = TRACER.inject(tracerObj);
-					msg.setTag("tracer");
-					storeInboundTracer(tracer);
-					inc();
-				}
-			}
 			if (message.getExtra() != null) {
 				final ObjectNode extra = message.getExtra();
+				if (message.isRequest()) {
+					// If tracer found, tag message with my tag
+					// Store tracer
+					final JSONRequest request = (JSONRequest) message;
+					if (!"scheduler.receiveTracerReport".equals(request
+							.getMethod())) {
+						final Object tracerObj = extra.remove("@simtracer");
+						if (tracerObj != null) {
+							Tracer tracer = TRACER.inject(tracerObj);
+							msg.setTag("tracer");
+							storeInboundTracer(tracer);
+							inc();
+						}
+					} else {
+						return msg.nextIn();
+					}
+				}
 				final JsonNode report = extra.remove("@simtracerreport");
 				if (report != null) {
 					receiveTracerReport(report);
@@ -172,11 +189,11 @@ public class SimulationProtocol implements RpcBasedProtocol {
 				}
 			}
 		}
-		msg.nextIn();
+		return msg.nextIn();
 	}
 
 	@Override
-	public void outbound(Meta msg) {
+	public boolean outbound(Meta msg) {
 		// if my tag on message, check if "empty" message, if so, drop. Else
 		// forward.
 		// Mark tracer as done for response
@@ -184,11 +201,10 @@ public class SimulationProtocol implements RpcBasedProtocol {
 			dec();
 			msg.setTag(null);
 			final JSONResponse message = (JSONResponse) msg.getResult();
-
-			if (message.getResult() == null) {
+			if (message.getResult() == null || message.getResult().isNull()) {
 				sendReports(checkTracers(), null, msg.getPeer());
 				// skip forwarding
-				return;
+				return false;
 			} else {
 				sendReports(checkTracers(), message, msg.getPeer());
 			}
@@ -197,22 +213,27 @@ public class SimulationProtocol implements RpcBasedProtocol {
 					.jsonConvert(msg.getResult());
 			if (message != null) {
 				if (message.isRequest()) {
-					final Tracer tracer = createTracer();
-					final ObjectNode extra = JOM.createObjectNode();
-					extra.set("@simtracer",
-							JOM.getInstance().valueToTree(tracer));
-					if (message.getExtra() == null) {
-						message.setExtra(extra);
+					final JSONRequest request = (JSONRequest) message;
+					if (!"scheduler.receiveTracerReport".equals(request
+							.getMethod())) {
+						final Tracer tracer = createTracer();
+						final ObjectNode extra = JOM.createObjectNode();
+						extra.set("@simtracer",
+								JOM.getInstance().valueToTree(tracer));
+						if (message.getExtra() == null) {
+							message.setExtra(extra);
+						} else {
+							message.getExtra().setAll(extra);
+						}
+						storeOutboundTracer(tracer);
 					} else {
-						message.getExtra().setAll(extra);
+						return msg.nextOut();
+
 					}
-					storeOutboundTracer(tracer);
 				}
 			}
 		}
-
-		// just forwarding...
-		msg.nextOut();
+		return msg.nextOut();
 	}
 
 }

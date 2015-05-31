@@ -25,6 +25,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>eve-algorithms-simulation</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>eve-scheduling-persistent</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

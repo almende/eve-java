@@ -29,6 +29,7 @@ class Tracer {
 		this.owner = owner;
 	}
 
+	@Override
 	public int hashCode() {
 		if (this.id == null) {
 			return -1;
@@ -36,6 +37,7 @@ class Tracer {
 		return this.id.hashCode();
 	}
 
+	@Override
 	public boolean equals(final Object o) {
 		if (o == null) {
 			return false;
@@ -51,5 +53,10 @@ class Tracer {
 		}
 		final Tracer other = (Tracer) o;
 		return this.id.equals(other.id);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + ":" + this.id + ":" + this.owner;
 	}
 }

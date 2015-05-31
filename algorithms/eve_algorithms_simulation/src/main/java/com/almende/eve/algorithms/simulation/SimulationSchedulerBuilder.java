@@ -4,20 +4,25 @@
  */
 package com.almende.eve.algorithms.simulation;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.scheduling.SimpleSchedulerBuilder;
 import com.almende.eve.transport.Receiver;
+import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
 
 /**
  * The Class PersistentSchedulerService.
  */
 public class SimulationSchedulerBuilder extends
-		SimpleSchedulerBuilder {
-	private static final Logger							LOG			= Logger.getLogger(SimulationSchedulerBuilder.class
-																			.getName());
+		AbstractCapabilityBuilder<SimulationScheduler> {
+	private static final Logger								LOG			= Logger.getLogger(SimulationSchedulerBuilder.class
+																				.getName());
+	private static final TypeUtil<Handler<Receiver>>		TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
+	private static final Map<String, SimulationScheduler>	INSTANCES	= new HashMap<String, SimulationScheduler>();
 
 	/*
 	 * (non-Javadoc)
@@ -43,10 +48,20 @@ public class SimulationSchedulerBuilder extends
 			final Handler<Receiver> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
-			result = new SimulationScheduler(config, TYPEUTIL.inject(getHandle()));
+			result = new SimulationScheduler(config,
+					TYPEUTIL.inject(getHandle()));
 		}
 		INSTANCES.put(id, result);
 		return result;
 	}
 
+	/**
+	 * Delete.
+	 *
+	 * @param id
+	 *            the id
+	 */
+	public static void delete(final String id) {
+		INSTANCES.remove(id);
+	}
 }

@@ -31,7 +31,23 @@ public class SimulationClock extends RunnableClock {
 
 	@Override
 	public void run() {
-		//Doesn't do anything
+		final List<Runnable> toRun = new ArrayList<Runnable>();
+		synchronized (TIMELINE) {
+			while (!TIMELINE.isEmpty()) {
+				final ClockEntry ce = TIMELINE.firstEntry().getValue();
+				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
+					TIMELINE.remove(ce);
+					toRun.add(ce.getCallback());
+					continue;
+				}
+				if (!toRun.isEmpty()) {
+					for (Runnable run : toRun) {
+						RUNNER.execute(run);
+					}
+				}
+				return;
+			}
+		}
 	}
 
 	private void startNextTriggers() {
@@ -44,8 +60,6 @@ public class SimulationClock extends RunnableClock {
 					toRun.add(ce.getCallback());
 					continue;
 				}
-				// TODO: if (toRun is empty, move clock to new TIMELINE stamp,
-				// fill with all at that level.
 				if (!toRun.isEmpty()) {
 					for (Runnable run : toRun) {
 						RUNNER.execute(run);
@@ -54,6 +68,12 @@ public class SimulationClock extends RunnableClock {
 				} else {
 					now = ce.getDue();
 				}
+			}
+			if (!toRun.isEmpty()) {
+				for (Runnable run : toRun) {
+					RUNNER.execute(run);
+				}
+				return;
 			}
 		}
 	}
