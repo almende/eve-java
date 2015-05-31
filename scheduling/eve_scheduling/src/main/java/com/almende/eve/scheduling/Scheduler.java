@@ -21,6 +21,15 @@ public interface Scheduler extends Capability {
 	 * @return the long
 	 */
 	long now();
+	
+	/**
+	 * Returns a (virtual) DateTime representation of the current time. For
+	 * real-time this maps to Unixtime, for simulated time this can be offset,
+	 * different tempo, or even discrete timestamps.
+	 *
+	 * @return the date time
+	 */
+	DateTime nowDateTime();
 
 	/**
 	 * Schedule.

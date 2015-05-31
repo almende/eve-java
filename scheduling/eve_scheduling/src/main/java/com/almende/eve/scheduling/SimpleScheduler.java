@@ -25,10 +25,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SimpleScheduler implements Scheduler {
 	private static final Logger	LOG				= Logger.getLogger(SimpleScheduler.class
 														.getName());
-	private URI					schedulerUrl	= null;
-	private Handler<Receiver>	handle			= null;
-	private Clock				clock			= null;
-	private ObjectNode			myParams		= null;
+	protected URI				schedulerUrl	= null;
+	protected Handler<Receiver>	handle			= null;
+	protected Clock				clock			= null;
+	protected ObjectNode		myParams		= null;
 
 	/**
 	 * Instantiates a new abstract scheduler.
@@ -56,6 +56,10 @@ public class SimpleScheduler implements Scheduler {
 		myParams = params;
 	}
 
+	protected void handleTrigger(final Object msg) {
+		handle.get().receive(msg, schedulerUrl, null);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.scheduling.Scheduler#schedule(java.lang.Object,
@@ -71,7 +75,7 @@ public class SimpleScheduler implements Scheduler {
 
 			@Override
 			public void run() {
-				handle.get().receive(msg, schedulerUrl, null);
+				handleTrigger(msg);
 			}
 
 		});
@@ -127,7 +131,7 @@ public class SimpleScheduler implements Scheduler {
 	 * 
 	 * @return the clock
 	 */
-	public Clock getClock() {
+	protected Clock getClock() {
 		return clock;
 	}
 
@@ -150,17 +154,22 @@ public class SimpleScheduler implements Scheduler {
 
 	@Override
 	public String schedule(Object msg, int delay) {
-		return schedule(msg, DateTime.now().plus(delay));
+		return schedule(msg, nowDateTime().plus(delay));
 	}
 
 	@Override
 	public String schedule(Object msg, long delay) {
-		return schedule(msg, DateTime.now().plus(delay));
+		return schedule(msg, nowDateTime().plus(delay));
 	}
 
 	@Override
 	public long now() {
 		return System.currentTimeMillis();
+	}
+
+	@Override
+	public DateTime nowDateTime() {
+		return DateTime.now();
 	}
 
 	@Override

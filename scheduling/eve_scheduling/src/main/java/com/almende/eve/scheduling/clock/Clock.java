@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
  * The Interface Clock.
  */
 public interface Clock {
-	
+
 	/**
 	 * Request trigger.
 	 * 
@@ -22,7 +22,15 @@ public interface Clock {
 	 *            the callback
 	 */
 	void requestTrigger(String triggerId, DateTime due, Runnable callback);
-	
+
+	/**
+	 * Progress time, for clocks that wait for next timestamp, reports current
+	 * time;.
+	 *
+	 * @return the current timestamp
+	 */
+	DateTime progressTime();
+
 	/**
 	 * Cancel a triggerRequest.
 	 * 
@@ -30,10 +38,10 @@ public interface Clock {
 	 *            the trigger id
 	 */
 	void cancel(String triggerId);
-	
+
 	/**
 	 * Clear all triggerRequests!.
 	 */
 	void clear();
-	
+
 }
