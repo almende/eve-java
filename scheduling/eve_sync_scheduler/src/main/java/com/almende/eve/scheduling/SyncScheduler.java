@@ -45,6 +45,11 @@ public class SyncScheduler extends SimpleScheduler {
 		return super.now() + offset;
 	}
 
+	@Override
+	public DateTime nowDateTime() {
+		return super.nowDateTime().plus(offset);
+	}
+
 	/**
 	 * Sets the caller.
 	 *
@@ -152,7 +157,8 @@ public class SyncScheduler extends SimpleScheduler {
 		try {
 			final Long result = caller.callSync(peer, "syncScheduler.ping",
 					JOM.createObjectNode(), Long.class);
-			final long roundtrip = new Duration(start,DateTime.now()).getMillis();
+			final long roundtrip = new Duration(start, DateTime.now())
+					.getMillis();
 			final long offset = result - now() + (roundtrip / 2);
 			LOG.info("Sync resulted in offset:" + offset + " ( " + roundtrip
 					+ ":" + start + ":" + result + ")");
