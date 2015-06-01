@@ -142,18 +142,8 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		}
 	}
 
-	/*
-	 * trace on inbound call, add tag, keep in list.
-	 * outbound call, send new tracers, in list.
-	 * When report on tracer, remove tracer from list;
-	 * If seen my response (throught tag garanteed) and tracers empty, clear
-	 * tracer.
-	 * When all tracers gone, send report to trace owner. (Requires caller!)
-	 */
-
 	@Override
 	public boolean inbound(final Meta msg) {
-
 		JSONMessage message = JSONMessage.jsonConvert(msg.getResult());
 		if (message != null) {
 			// Parse inbound message, check for tracer.
@@ -198,9 +188,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 
 	@Override
 	public boolean outbound(final Meta msg) {
-		// if my tag on message, check if "empty" message, if so, drop. Else
-		// forward.
-		// Mark tracer as done for response
 		if (doTracer()) {
 			final JSONMessage message = JSONMessage
 					.jsonConvert(msg.getResult());

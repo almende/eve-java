@@ -137,6 +137,11 @@ public class RunnableClock implements Runnable, Clock {
 	public void start() {
 		// Nothing todo, time progresses by itself:)
 	}
+	
+	@Override
+	public void stop() {
+		// Nothing todo, time progresses by itself:)
+	}
 
 	@Override
 	public void done(final String triggerId) {

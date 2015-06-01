@@ -54,6 +54,11 @@ public interface Clock {
 	void start();
 
 	/**
+	 * Stop this clock, for clocks that have discrete time.
+	 */
+	void stop();
+	
+	/**
 	 * Cancel a triggerRequest.
 	 * 
 	 * @param triggerId

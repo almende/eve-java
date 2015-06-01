@@ -20,6 +20,7 @@ import com.almende.eve.scheduling.clock.RunnableClock;
 public class SimulationClock extends RunnableClock {
 	private DateTime	now				= null;
 	private Set<String>	activeTriggers	= new HashSet<String>();
+	private boolean		paused			= false;
 
 	/**
 	 * Instantiates a new simulation clock.
@@ -44,7 +45,13 @@ public class SimulationClock extends RunnableClock {
 
 	@Override
 	public void start() {
+		paused = false;
 		startNextTriggers();
+	}
+
+	@Override
+	public void stop() {
+		paused = true;
 	}
 
 	@Override
@@ -63,7 +70,7 @@ public class SimulationClock extends RunnableClock {
 	public void run() {
 		final List<Runnable> toRun = new ArrayList<Runnable>();
 		synchronized (TIMELINE) {
-			while (!TIMELINE.isEmpty()) {
+			while (!TIMELINE.isEmpty() && !paused) {
 				final ClockEntry ce = TIMELINE.firstEntry().getValue();
 				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
@@ -72,44 +79,27 @@ public class SimulationClock extends RunnableClock {
 						activeTriggers.add(ce.getTriggerId());
 					}
 					continue;
-				}
-				if (!toRun.isEmpty()) {
-					for (Runnable run : toRun) {
-						RUNNER.execute(run);
-					}
-				}
-				return;
-			}
-		}
-	}
-
-	private void startNextTriggers() {
-		final List<Runnable> toRun = new ArrayList<Runnable>();
-		synchronized (TIMELINE) {
-			while (!TIMELINE.isEmpty()) {
-				final ClockEntry ce = TIMELINE.firstEntry().getValue();
-				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
-					TIMELINE.remove(ce);
-					toRun.add(ce.getCallback());
-					synchronized (activeTriggers) {
-						activeTriggers.add(ce.getTriggerId());
-					}
-					continue;
-				}
-				if (!toRun.isEmpty()) {
-					for (Runnable run : toRun) {
-						RUNNER.execute(run);
-					}
-					return;
 				} else {
-					now = ce.getDue();
+					break;
 				}
 			}
 			if (!toRun.isEmpty()) {
 				for (Runnable run : toRun) {
 					RUNNER.execute(run);
 				}
-				return;
+			}
+		}
+	}
+
+	private void startNextTriggers() {
+		run();
+		if (activeTriggers.isEmpty()){
+			synchronized (TIMELINE) {
+				if (!TIMELINE.isEmpty() && !paused){
+					final ClockEntry ce = TIMELINE.firstEntry().getValue();
+					now = ce.getDue();
+					run();
+				}
 			}
 		}
 	}
