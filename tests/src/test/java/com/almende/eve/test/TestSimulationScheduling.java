@@ -46,6 +46,7 @@ public class TestSimulationScheduling extends TestCase {
 		traceprot.setFileName(".");
 		protocols.add(traceprot);
 		protocols.add(simprot);
+//		protocols.add(traceprot);
 		config.setProtocols(protocols);
 
 		final AgentConfig config2 = new AgentConfig();
@@ -57,10 +58,12 @@ public class TestSimulationScheduling extends TestCase {
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
-		protocols2.add(simprot2);
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");
+//		protocols2.add(traceprot2);
+		protocols2.add(simprot2);
 		protocols2.add(traceprot2);
+		
 		config2.setProtocols(protocols2);
 		new AgentBuilder().withConfig(config2).build();
 
@@ -75,6 +78,7 @@ public class TestSimulationScheduling extends TestCase {
 		try {
 			Thread.sleep(5000);
 		} catch (final InterruptedException e) {}
-
+		
+		assertTrue(agent.isStop());
 	}
 }

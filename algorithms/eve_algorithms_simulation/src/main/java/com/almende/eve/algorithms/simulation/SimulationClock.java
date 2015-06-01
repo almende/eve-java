@@ -59,10 +59,8 @@ public class SimulationClock extends RunnableClock {
 		if (triggerId != null) {
 			synchronized (activeTriggers) {
 				activeTriggers.remove(triggerId);
-				if (activeTriggers.isEmpty()) {
-					startNextTriggers();
-				}
 			}
+			startNextTriggers();
 		}
 	}
 
@@ -83,22 +81,24 @@ public class SimulationClock extends RunnableClock {
 					break;
 				}
 			}
-			if (!toRun.isEmpty()) {
-				for (Runnable run : toRun) {
-					RUNNER.execute(run);
-				}
+		}
+		if (!toRun.isEmpty()) {
+			for (Runnable run : toRun) {
+				RUNNER.execute(run);
 			}
 		}
 	}
 
 	private void startNextTriggers() {
 		run();
-		if (activeTriggers.isEmpty()){
-			synchronized (TIMELINE) {
-				if (!TIMELINE.isEmpty() && !paused){
-					final ClockEntry ce = TIMELINE.firstEntry().getValue();
-					now = ce.getDue();
-					run();
+		synchronized (TIMELINE) {
+			if (!TIMELINE.isEmpty() && !paused) {
+				synchronized (activeTriggers) {
+					if (activeTriggers.isEmpty()) {
+						final ClockEntry ce = TIMELINE.firstEntry().getValue();
+						now = ce.getDue();
+						run();
+					}
 				}
 			}
 		}

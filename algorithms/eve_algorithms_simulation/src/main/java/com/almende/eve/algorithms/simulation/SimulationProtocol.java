@@ -26,7 +26,6 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
-import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -42,7 +41,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 
 	private Set<Tracer>						outboundTracers	= new HashSet<Tracer>();
 	private Set<Tracer>						inboundTracers	= new HashSet<Tracer>();
-	private Map<String,Boolean>				inboundRequests = new HashMap<String,Boolean>();
+	private Map<String, Boolean>			inboundRequests	= new HashMap<String, Boolean>();
 	private Handler<Caller>					caller			= null;
 
 	/**
@@ -90,7 +89,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	}
 
 	private boolean doTracer() {
-		return !inboundTracers.isEmpty();
+		return !inboundRequests.isEmpty();
 	}
 
 	private Collection<Tracer> checkTracers() {
@@ -113,6 +112,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		}
 		synchronized (tracers) {
 			final Iterator<Tracer> iter = tracers.iterator();
+
 			while (iter.hasNext()) {
 				final Tracer tracer = iter.next();
 				final ObjectNode extra = JOM.createObjectNode();
@@ -144,10 +144,10 @@ public class SimulationProtocol implements RpcBasedProtocol {
 
 	@Override
 	public boolean inbound(final Meta msg) {
-		JSONMessage message = JSONMessage.jsonConvert(msg.getResult());
+		JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
 		if (message != null) {
 			// Parse inbound message, check for tracer.
-			msg.setResult(message);
+			msg.setMsg(message);
 			if (message.getExtra() != null) {
 				final ObjectNode extra = message.getExtra();
 				if (message.isRequest()) {
@@ -158,27 +158,35 @@ public class SimulationProtocol implements RpcBasedProtocol {
 							.getMethod())) {
 						final Object tracerObj = extra.remove("@simtracer");
 						if (tracerObj != null) {
-							Tracer tracer = TRACER.inject(tracerObj);
-							storeInboundTracer(tracer);
-							
-							if (request.getId() != null && !request.getId().isNull()){
-								inboundRequests.put(request.getId().asText(),false);
-							} else {
-								request.setId(JOM.getInstance().valueToTree(new UUID().toString()));
-								inboundRequests.put(request.getId().asText(),true);
+							synchronized (inboundRequests) {
+								Tracer tracer = TRACER.inject(tracerObj);
+								storeInboundTracer(tracer);
+								if (request.getId() != null
+										&& !request.getId().isNull()) {
+									inboundRequests.put(request.getId()
+											.asText(), false);
+								} else {
+									request.setId(JOM.getInstance()
+											.valueToTree(tracer.getId()));
+									inboundRequests.put(request.getId()
+											.asText(), true);
+								}
 							}
+
 						}
 					}
 				}
 				final JsonNode report = extra.remove("@simtracerreport");
 				if (report != null) {
-					Tracer tracer = TRACER.inject(report);
-					if (outboundTracers.contains(tracer)) {
-						receiveTracerReport(tracer);
-						sendReports(checkTracers(), null, msg.getPeer());
-					} else {
-						//Onwards to scheduler.
-						return msg.nextIn();
+					final Tracer tracer = TRACER.inject(report);
+					synchronized (outboundTracers) {
+						if (outboundTracers.contains(tracer)) {
+							receiveTracerReport(tracer);
+							sendReports(checkTracers(), null, msg.getPeer());
+							if (message.isRequest()) {
+								return false;
+							}
+						}
 					}
 				}
 			}
@@ -189,8 +197,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	@Override
 	public boolean outbound(final Meta msg) {
 		if (doTracer()) {
-			final JSONMessage message = JSONMessage
-					.jsonConvert(msg.getResult());
+			final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
 			if (message != null) {
 				if (message.isRequest()) {
 					final JSONRequest request = (JSONRequest) message;
@@ -209,11 +216,15 @@ public class SimulationProtocol implements RpcBasedProtocol {
 					}
 				} else {
 					final JSONResponse response = (JSONResponse) message;
-					Boolean drop = inboundRequests.remove(response.getId().textValue());
-					if (drop != null && drop && msg.getTag() == null){
+					Boolean drop = null;
+					synchronized (inboundRequests) {
+						drop = inboundRequests.remove(response.getId()
+								.textValue());
+					}
+					if (drop != null && drop && msg.getTag() == null) {
 						sendReports(checkTracers(), null, msg.getPeer());
 						// skip forwarding
-						return false;						
+						return false;
 					} else {
 						sendReports(checkTracers(), response, msg.getPeer());
 					}

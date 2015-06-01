@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * The Class Meta.
  */
 public class Meta {
-	private Object				result	= null;
+	private Object				msg	= null;
 	private URI					peer	= null;
 	private String				tag		= null;
 	private Iterator<Protocol>	iter	= null;
@@ -30,7 +30,7 @@ public class Meta {
 	 *            the clone
 	 */
 	public Meta(Meta clone) {
-		this.result = clone.result;
+		this.msg = clone.msg;
 		this.peer = clone.peer;
 		this.tag = clone.tag;
 		this.iter = clone.iter;
@@ -39,7 +39,7 @@ public class Meta {
 	/**
 	 * Instantiates a new meta.
 	 *
-	 * @param result
+	 * @param msg
 	 *            the result
 	 * @param peer
 	 *            the peer
@@ -48,15 +48,15 @@ public class Meta {
 	 * @param iter
 	 *            the iter
 	 */
-	public Meta(final Object result, final URI peer, final String tag, final Iterator<Protocol> iter) {
-		this.result = result;
+	public Meta(final Object msg, final URI peer, final String tag, final Iterator<Protocol> iter) {
+		this.msg = msg;
 		this.peer = peer;
 		this.tag = tag;
 		this.iter = iter;
 	}
 
 	public String toString() {
-		return result.toString();
+		return msg.toString();
 	}
 
 	/**
@@ -64,18 +64,18 @@ public class Meta {
 	 *
 	 * @return the result
 	 */
-	public Object getResult() {
-		return result;
+	public Object getMsg() {
+		return msg;
 	}
 
 	/**
 	 * Sets the result.
 	 *
-	 * @param result
+	 * @param msg
 	 *            the new result
 	 */
-	public void setResult(final Object result) {
-		this.result = result;
+	public void setMsg(final Object msg) {
+		this.msg = msg;
 	}
 	
 	/**

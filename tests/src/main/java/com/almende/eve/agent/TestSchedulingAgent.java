@@ -144,5 +144,14 @@ public class TestSchedulingAgent extends Agent {
 	public Scheduler getScheduler() {
 		return super.getScheduler();
 	}
+	
+	/**
+	 * Checks if is stop.
+	 *
+	 * @return true, if is stop
+	 */
+	public boolean isStop(){
+		return stop;
+	}
 
 }
