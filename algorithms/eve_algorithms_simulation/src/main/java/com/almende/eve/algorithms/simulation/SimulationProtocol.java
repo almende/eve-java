@@ -7,8 +7,10 @@ package com.almende.eve.algorithms.simulation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +26,7 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
+import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -39,8 +42,8 @@ public class SimulationProtocol implements RpcBasedProtocol {
 
 	private Set<Tracer>						outboundTracers	= new HashSet<Tracer>();
 	private Set<Tracer>						inboundTracers	= new HashSet<Tracer>();
+	private Map<String,Boolean>				inboundRequests = new HashMap<String,Boolean>();
 	private Handler<Caller>					caller			= null;
-	private int								seenResponse	= 0;
 
 	/**
 	 * Instantiates a new inbox protocol.
@@ -68,14 +71,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	@Override
 	public void delete() {}
 
-	private synchronized void inc() {
-		seenResponse++;
-	}
-
-	private synchronized void dec() {
-		seenResponse--;
-	}
-
 	private void receiveTracerReport(final Tracer tracer) {
 		synchronized (outboundTracers) {
 			outboundTracers.remove(tracer);
@@ -99,7 +94,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	}
 
 	private Collection<Tracer> checkTracers() {
-		if (outboundTracers.isEmpty() && seenResponse <= 0) {
+		if (outboundTracers.isEmpty() && inboundRequests.isEmpty()) {
 			return inboundTracers;
 		}
 		return null;
@@ -166,7 +161,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 			if (message.getExtra() != null) {
 				final ObjectNode extra = message.getExtra();
 				if (message.isRequest()) {
-					// If tracer found, tag message with my tag
+					// If tracer found, make sure we have id, if not add one.
 					// Store tracer
 					final JSONRequest request = (JSONRequest) message;
 					if (!"scheduler.receiveTracerReport".equals(request
@@ -174,9 +169,14 @@ public class SimulationProtocol implements RpcBasedProtocol {
 						final Object tracerObj = extra.remove("@simtracer");
 						if (tracerObj != null) {
 							Tracer tracer = TRACER.inject(tracerObj);
-							msg.setTag("tracer");
 							storeInboundTracer(tracer);
-							inc();
+							
+							if (request.getId() != null && !request.getId().isNull()){
+								inboundRequests.put(request.getId().asText(),false);
+							} else {
+								request.setId(JOM.getInstance().valueToTree(new UUID().toString()));
+								inboundRequests.put(request.getId().asText(),true);
+							}
 						}
 					}
 				}
@@ -201,18 +201,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		// if my tag on message, check if "empty" message, if so, drop. Else
 		// forward.
 		// Mark tracer as done for response
-		if ("tracer".equals(msg.getTag())) {
-			dec();
-			msg.setTag(null);
-			final JSONResponse message = (JSONResponse) msg.getResult();
-			if (message.getResult() == null || message.getResult().isNull()) {
-				sendReports(checkTracers(), null, msg.getPeer());
-				// skip forwarding
-				return false;
-			} else {
-				sendReports(checkTracers(), message, msg.getPeer());
-			}
-		} else if (doTracer()) {
+		if (doTracer()) {
 			final JSONMessage message = JSONMessage
 					.jsonConvert(msg.getResult());
 			if (message != null) {
@@ -230,9 +219,16 @@ public class SimulationProtocol implements RpcBasedProtocol {
 							message.getExtra().setAll(extra);
 						}
 						storeOutboundTracer(tracer);
+					}
+				} else {
+					final JSONResponse response = (JSONResponse) message;
+					Boolean drop = inboundRequests.remove(response.getId().textValue());
+					if (drop != null && drop && msg.getTag() == null){
+						sendReports(checkTracers(), null, msg.getPeer());
+						// skip forwarding
+						return false;						
 					} else {
-						return msg.nextOut();
-
+						sendReports(checkTracers(), response, msg.getPeer());
 					}
 				}
 			}

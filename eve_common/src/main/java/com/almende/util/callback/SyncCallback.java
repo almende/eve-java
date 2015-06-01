@@ -17,6 +17,7 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	private T			response	= null;
 	private Exception	exception	= null;
 	private boolean		done		= false;
+	private boolean		waiting		= false;
 
 	/**
 	 * Instantiates a new sync callback.
@@ -35,6 +36,24 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 		super();
 	}
 
+	/**
+	 * Checks if is waiting.
+	 *
+	 * @return true, if is someone is waiting for this callback.
+	 */
+	public boolean isWaiting() {
+		return waiting;
+	}
+	
+	/**
+	 * Checks if is done.
+	 *
+	 * @return true, if is done
+	 */
+	public boolean isDone() {
+		return done;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -75,14 +94,17 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	 */
 	public T get() throws Exception {
 		synchronized (this) {
+			waiting=true;
 			while (!done) {
 				wait();
 			}
 		}
-
+		waiting=false;
 		if (exception != null) {
 			throw exception;
 		}
 		return type.inject(response);
 	}
+
+
 };
