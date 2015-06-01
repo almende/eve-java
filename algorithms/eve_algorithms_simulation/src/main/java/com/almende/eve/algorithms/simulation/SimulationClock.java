@@ -5,7 +5,9 @@
 package com.almende.eve.algorithms.simulation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -16,7 +18,8 @@ import com.almende.eve.scheduling.clock.RunnableClock;
  * The Class SimulationClock.
  */
 public class SimulationClock extends RunnableClock {
-	private DateTime	now	= null;
+	private DateTime	now				= null;
+	private Set<String>	activeTriggers	= new HashSet<String>();
 
 	/**
 	 * Instantiates a new simulation clock.
@@ -30,6 +33,33 @@ public class SimulationClock extends RunnableClock {
 	}
 
 	@Override
+	public DateTime nowDateTime() {
+		return this.now;
+	}
+
+	@Override
+	public long now() {
+		return this.now.getMillis();
+	}
+
+	@Override
+	public void start() {
+		startNextTriggers();
+	}
+
+	@Override
+	public void done(final String triggerId) {
+		if (triggerId != null) {
+			synchronized (activeTriggers) {
+				activeTriggers.remove(triggerId);
+				if (activeTriggers.isEmpty()) {
+					startNextTriggers();
+				}
+			}
+		}
+	}
+
+	@Override
 	public void run() {
 		final List<Runnable> toRun = new ArrayList<Runnable>();
 		synchronized (TIMELINE) {
@@ -38,6 +68,9 @@ public class SimulationClock extends RunnableClock {
 				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
 					toRun.add(ce.getCallback());
+					synchronized (activeTriggers) {
+						activeTriggers.add(ce.getTriggerId());
+					}
 					continue;
 				}
 				if (!toRun.isEmpty()) {
@@ -58,6 +91,9 @@ public class SimulationClock extends RunnableClock {
 				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
 					TIMELINE.remove(ce);
 					toRun.add(ce.getCallback());
+					synchronized (activeTriggers) {
+						activeTriggers.add(ce.getTriggerId());
+					}
 					continue;
 				}
 				if (!toRun.isEmpty()) {
@@ -77,11 +113,4 @@ public class SimulationClock extends RunnableClock {
 			}
 		}
 	}
-
-	@Override
-	public DateTime progressTime() {
-		startNextTriggers();
-		return now;
-	}
-
 }

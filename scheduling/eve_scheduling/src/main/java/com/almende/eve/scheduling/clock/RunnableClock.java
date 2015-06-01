@@ -123,8 +123,23 @@ public class RunnableClock implements Runnable, Clock {
 	}
 
 	@Override
-	public DateTime progressTime() {
+	public DateTime nowDateTime() {
 		// Nothing todo, time progresses by itself:)
 		return DateTime.now();
+	}
+
+	@Override
+	public long now() {
+		return nowDateTime().getMillis();
+	}
+
+	@Override
+	public void start() {
+		// Nothing todo, time progresses by itself:)
+	}
+
+	@Override
+	public void done(final String triggerId) {
+		// Nothing todo, timeprogresses by itself:)
 	}
 }

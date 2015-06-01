@@ -56,7 +56,7 @@ public class SimpleScheduler implements Scheduler {
 		myParams = params;
 	}
 
-	protected void handleTrigger(final Object msg) {
+	protected void handleTrigger(final Object msg, final String triggerId) {
 		handle.get().receive(msg, schedulerUrl, null);
 	}
 
@@ -75,7 +75,7 @@ public class SimpleScheduler implements Scheduler {
 
 			@Override
 			public void run() {
-				handleTrigger(msg);
+				handleTrigger(msg, uuid);
 			}
 
 		});
@@ -164,12 +164,12 @@ public class SimpleScheduler implements Scheduler {
 
 	@Override
 	public long now() {
-		return System.currentTimeMillis();
+		return clock.now();
 	}
 
 	@Override
 	public DateTime nowDateTime() {
-		return DateTime.now();
+		return clock.nowDateTime();
 	}
 
 	@Override

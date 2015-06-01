@@ -4,11 +4,7 @@
  */
 package com.almende.eve.algorithms.simulation;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
-
-import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
@@ -16,6 +12,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.formats.JSONMessage;
 import com.almende.eve.scheduling.SimpleScheduler;
+import com.almende.eve.scheduling.clock.Clock;
 import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,10 +21,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimulationScheduler.
  */
 public class SimulationScheduler extends SimpleScheduler {
-	private static final Logger	LOG				= Logger.getLogger(SimulationScheduler.class
-														.getName());
-	protected DateTime			simTime			= null;
-	private Set<Tracer>			outboundTracers	= new HashSet<Tracer>();
+	private static final Logger	LOG			= Logger.getLogger(SimulationScheduler.class
+													.getName());
+	private static Clock		sharedClock	= null;
 
 	/**
 	 * Instantiates a new simulation scheduler.
@@ -39,15 +35,17 @@ public class SimulationScheduler extends SimpleScheduler {
 	 */
 	public SimulationScheduler(ObjectNode params, Handler<Receiver> handle) {
 		super(params, handle);
-		simTime = new DateTime(0);
-		clock = new SimulationClock(simTime.getMillis());
+		if (sharedClock == null) {
+			sharedClock = new SimulationClock(0);
+		}
+		clock = sharedClock;
 	}
 
 	/**
 	 * Start.
 	 */
 	public void start() {
-		simTime = clock.progressTime();
+		clock.start();
 	}
 
 	/**
@@ -58,12 +56,7 @@ public class SimulationScheduler extends SimpleScheduler {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void receiveTracerReport(final @Name("tracer") Tracer tracer) {
-		synchronized (outboundTracers) {
-			outboundTracers.remove(tracer);
-			if (outboundTracers.isEmpty()) {
-				simTime = clock.progressTime();
-			}
-		}
+		clock.done(tracer.getId());
 	}
 
 	private Tracer createTracer() {
@@ -73,10 +66,11 @@ public class SimulationScheduler extends SimpleScheduler {
 	}
 
 	@Override
-	protected void handleTrigger(final Object msg) {
+	protected void handleTrigger(final Object msg, final String triggerId) {
 		JSONMessage message = JSONMessage.jsonConvert(msg);
 		if (message != null) {
 			final Tracer tracer = createTracer();
+			tracer.setId(triggerId);
 			final ObjectNode extra = JOM.createObjectNode();
 			extra.set("@simtracer", JOM.getInstance().valueToTree(tracer));
 			if (message.getExtra() == null) {
@@ -84,25 +78,12 @@ public class SimulationScheduler extends SimpleScheduler {
 			} else {
 				message.getExtra().setAll(extra);
 			}
-			synchronized (outboundTracers) {
-				outboundTracers.add(tracer);
-			}
 			handle.get().receive(message, schedulerUrl, null);
 		} else {
 			LOG.warning("Scheduler tries to send Non-JSON-RPC message, doesn't work with SimulationScheduler.");
 			handle.get().receive(msg, schedulerUrl, null);
 		}
 
-	}
-
-	@Override
-	public long now() {
-		return simTime.getMillis();
-	}
-
-	@Override
-	public DateTime nowDateTime() {
-		return simTime;
 	}
 
 	@Override
