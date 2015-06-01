@@ -4,6 +4,8 @@
  */
 package com.almende.eve.test;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -13,6 +15,7 @@ import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.TestSchedulingAgent;
 import com.almende.eve.algorithms.simulation.SimulationProtocolConfig;
 import com.almende.eve.algorithms.simulation.SimulationSchedulerConfig;
+import com.almende.eve.protocol.TraceProtocolConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -23,9 +26,12 @@ public class TestSimulationScheduling extends TestCase {
 
 	/**
 	 * Test scheduling.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testScheduling() {
+	public void testScheduling() throws IOException {
 		final SimulationSchedulerConfig params = new SimulationSchedulerConfig();
 		params.setSenderUrl("local:testSim1");
 
@@ -36,15 +42,33 @@ public class TestSimulationScheduling extends TestCase {
 
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
-		// final TraceProtocolConfig traceprot = new TraceProtocolConfig();
-		// traceprot.setFileName(".");
-		// protocols.add(traceprot);
+		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
+		traceprot.setFileName(".");
+		protocols.add(traceprot);
 		protocols.add(simprot);
 		config.setProtocols(protocols);
 
+		final AgentConfig config2 = new AgentConfig();
+		config2.setClassName(TestSchedulingAgent.class.getName());
+		config2.put("id", "testSim2");
+		final SimulationSchedulerConfig params2 = new SimulationSchedulerConfig();
+		params2.setSenderUrl("local:testSim2");
+		config2.setScheduler(params2);
+
+		final ArrayNode protocols2 = JOM.createArrayNode();
+		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
+		protocols2.add(simprot2);
+		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
+		traceprot2.setFileName(".");
+		protocols2.add(traceprot2);
+		config2.setProtocols(protocols2);
+		new AgentBuilder().withConfig(config2).build();
+
 		TestSchedulingAgent agent = (TestSchedulingAgent) new AgentBuilder()
 				.withConfig(config).build();
-		agent.scheduleTask();
+		agent.startLocal();
+		agent.startRemote();
+
 		agent.scheduleStop(6000000);
 		agent.start();
 

@@ -164,11 +164,17 @@ public class SimpleScheduler implements Scheduler {
 
 	@Override
 	public long now() {
+		if (clock == null) {
+			clock = new RunnableClock();
+		}
 		return clock.now();
 	}
 
 	@Override
 	public DateTime nowDateTime() {
+		if (clock == null) {
+			clock = new RunnableClock();
+		}
 		return clock.nowDateTime();
 	}
 

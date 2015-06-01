@@ -76,20 +76,19 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		seenResponse--;
 	}
 
-	private void receiveTracerReport(final JsonNode jsonNode) {
-		final Tracer tracer = TRACER.inject(jsonNode);
+	private void receiveTracerReport(final Tracer tracer) {
 		synchronized (outboundTracers) {
 			outboundTracers.remove(tracer);
 		}
 	}
 
-	private void storeOutboundTracer(Tracer tracer) {
+	private void storeOutboundTracer(final Tracer tracer) {
 		synchronized (outboundTracers) {
 			outboundTracers.add(tracer);
 		}
 	}
 
-	private void storeInboundTracer(Tracer tracer) {
+	private void storeInboundTracer(final Tracer tracer) {
 		synchronized (inboundTracers) {
 			inboundTracers.add(tracer);
 		}
@@ -113,7 +112,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	}
 
 	private void sendReports(final Collection<Tracer> tracers,
-			final JSONResponse resp, final URI peer) {
+			JSONResponse resp, final URI peer) {
 		if (tracers == null) {
 			return;
 		}
@@ -130,6 +129,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 					} else {
 						resp.getExtra().setAll(extra);
 					}
+					resp = null;
 				} else {
 					final Params params = new Params();
 					params.set("tracer", JOM.getInstance().valueToTree(tracer));
@@ -157,7 +157,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	 */
 
 	@Override
-	public boolean inbound(Meta msg) {
+	public boolean inbound(final Meta msg) {
 
 		JSONMessage message = JSONMessage.jsonConvert(msg.getResult());
 		if (message != null) {
@@ -178,14 +178,18 @@ public class SimulationProtocol implements RpcBasedProtocol {
 							storeInboundTracer(tracer);
 							inc();
 						}
-					} else {
-						return msg.nextIn();
 					}
 				}
 				final JsonNode report = extra.remove("@simtracerreport");
 				if (report != null) {
-					receiveTracerReport(report);
-					sendReports(checkTracers(), null, msg.getPeer());
+					Tracer tracer = TRACER.inject(report);
+					if (outboundTracers.contains(tracer)) {
+						receiveTracerReport(tracer);
+						sendReports(checkTracers(), null, msg.getPeer());
+					} else {
+						//Onwards to scheduler.
+						return msg.nextIn();
+					}
 				}
 			}
 		}
@@ -193,7 +197,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	}
 
 	@Override
-	public boolean outbound(Meta msg) {
+	public boolean outbound(final Meta msg) {
 		// if my tag on message, check if "empty" message, if so, drop. Else
 		// forward.
 		// Mark tracer as done for response
@@ -235,5 +239,4 @@ public class SimulationProtocol implements RpcBasedProtocol {
 		}
 		return msg.nextOut();
 	}
-
 }
