@@ -40,7 +40,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-protocol-jsonrpc</artifactId>
+			<artifactId>eve-protocol-rpcbased</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>

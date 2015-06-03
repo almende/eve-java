@@ -18,6 +18,7 @@
 	<modules>
 		<module>eve_protocol</module>
 		<module>eve_protocol_jsonrpc</module>
+		<module>eve_protocol_rpcbased</module>
 	</modules>
 
 	<properties>

@@ -9,9 +9,9 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>eve-protocol-jsonrpc</artifactId>
+	<artifactId>eve-protocol-rpcbased</artifactId>
 
-	<name>EVE Protocol JSON-RPC - basic handling</name>
+	<name>EVE Protocol JSON-RPC - support protocols</name>
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
@@ -19,9 +19,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.almende.eve</groupId>
-			<artifactId>eve-protocol-common</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
 			<version>${project.parent.version}</version>
+			<artifactId>eve-protocol-jsonrpc</artifactId>
+
 		</dependency>
 	</dependencies>
 </project>
