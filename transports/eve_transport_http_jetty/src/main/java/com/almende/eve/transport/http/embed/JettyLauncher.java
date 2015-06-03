@@ -33,9 +33,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JettyLauncher implements ServletLauncher {
 	private static final Logger				LOG			= Logger.getLogger(JettyLauncher.class
 																.getName());
-	private static Server					server		= null;
-	private static ServletContextHandler	context		= null;
-	private static ServerContainer			wscontainer	= null;
+	protected static Server					server		= null;
+	protected static ServletContextHandler	context		= null;
+	protected static ServerContainer		wscontainer	= null;
 
 	/**
 	 * Inits the server.
