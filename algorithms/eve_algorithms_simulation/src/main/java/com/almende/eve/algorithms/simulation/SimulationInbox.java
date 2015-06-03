@@ -7,6 +7,7 @@ package com.almende.eve.algorithms.simulation;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -59,7 +60,6 @@ public class SimulationInbox {
 	 *            the msg id
 	 */
 	public void add(final Meta meta, final UUID msgId) {
-		LOG.warning(id + ": adding inbound message:" + meta.getMsg());
 		Queue<QueueEntry> queue = null;
 		synchronized (inbox) {
 			if (inbox.containsKey(id)) {
@@ -94,8 +94,6 @@ public class SimulationInbox {
 			if (count == null || count == -1) {
 				count = 0;
 			}
-			LOG.warning(id + ": heartBeat:" + msgCount + " from "
-					+ (count + msgCount));
 			seenHeartBeats.put(id, count + msgCount);
 		}
 		duringSendRound.unlock();
@@ -109,7 +107,6 @@ public class SimulationInbox {
 		synchronized (seenHeartBeats) {
 			synchronized (inbox) {
 				synchronized (inboxSize) {
-					LOG.warning(id + ": doing next round:" + inboxSize[0]);
 					copy = new HashMap<String, Queue<QueueEntry>>(inbox);
 					inbox.clear();
 					seenHeartBeats.clear();
@@ -120,24 +117,26 @@ public class SimulationInbox {
 		}
 		if (copy != null) {
 			// Send each agent it's messages in order, single threaded per agent
-			for (final Queue<QueueEntry> queue : copy.values()) {
+			for (final Entry<String, Queue<QueueEntry>> entry : copy.entrySet()) {
 				ThreadPool.getPool().execute(new Runnable() {
 					@Override
 					public void run() {
-						final Iterator<QueueEntry> iter = queue.iterator();
+						final Iterator<QueueEntry> iter = entry.getValue()
+								.iterator();
 						while (iter.hasNext()) {
-							QueueEntry entry = iter.next();
+							final QueueEntry item = iter.next();
 							synchronized (counter) {
 								counter[0]--;
-								LOG.warning("Sending next message onwards: "
-										+ counter[0] + " : "
-										+ entry.meta.getMsg());
-								counter.notify();
+								counter.notifyAll();
 							}
-							entry.meta.nextIn();
+							ThreadPool.getPool().execute(new Runnable() {
+								@Override
+								public void run() {
+									item.meta.nextIn();
+								}
+							});
 						}
 					}
-
 				});
 			}
 		}

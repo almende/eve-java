@@ -314,8 +314,8 @@ public class SimulationProtocol implements RpcBasedProtocol {
 								outboundCallbacks
 										.add((SyncCallback<?>) callback);
 							}
+							incCounter();
 						}
-						incCounter();
 					}
 				} else {
 					final JSONResponse response = (JSONResponse) message;
