@@ -31,5 +31,27 @@ public class SimulationProtocolConfig extends ProtocolConfig {
 		res.copy(node);
 		return res;
 	}
-	
+
+	/**
+	 * Sets the strong consistency.
+	 *
+	 * @param strongConsistency
+	 *            the new strong consistency
+	 */
+	public void setStrongConsistency(final boolean strongConsistency) {
+		this.put("strongConsistency", strongConsistency);
+	}
+
+	/**
+	 * Checks if is strong consistency.
+	 *
+	 * @return true, if is strong consistency
+	 */
+	public boolean isStrongConsistency() {
+		if (has("strongConsistency")) {
+			return get("strongConsistency").asBoolean();
+		}
+		return false;
+	}
+
 }
