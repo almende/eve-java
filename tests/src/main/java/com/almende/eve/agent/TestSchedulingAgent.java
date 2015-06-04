@@ -37,7 +37,7 @@ public class TestSchedulingAgent extends Agent {
 	 */
 	public void doTask() {
 		LOG.info(getId() + ": Doing something at:"
-				+ getScheduler().nowDateTime() + "(" + DateTime.now() + ")");
+				+ getScheduler().nowDateTime());
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class TestSchedulingAgent extends Agent {
 	 */
 	public String doTaskWithReply() {
 		LOG.info(getId() + ": Doing something with reply at:"
-				+ getScheduler().nowDateTime() + "(" + DateTime.now() + ")");
+				+ getScheduler().nowDateTime());
 		return "reply!";
 	}
 
@@ -106,21 +106,18 @@ public class TestSchedulingAgent extends Agent {
 				@Override
 				public void onSuccess(String result) {
 					LOG.info("Got async reply:" + result + " at:"
-							+ getScheduler().nowDateTime() + "("
-							+ DateTime.now() + ")");
+							+ getScheduler().nowDateTime());
 				}
 
 				@Override
 				public void onFailure(Exception exception) {
-					LOG.log(Level.WARNING,
-							"Got Failure at:" + getScheduler().nowDateTime()
-									+ "(" + DateTime.now() + ")", exception);
+					LOG.log(Level.WARNING, "Got Failure at:"
+							+ getScheduler().nowDateTime(), exception);
 				}
 			});
-//			LOG.info("Got reply:"
-//					+ callSync(other, "doTaskWithReply", null, String.class)
-//					+ " at:" + getScheduler().nowDateTime() + "("
-//					+ DateTime.now() + ")");
+			LOG.info("Got reply:"
+					+ callSync(other, "doTaskWithReply", null, String.class)
+					+ " at:" + getScheduler().nowDateTime());
 
 			call(other, "doTask", null);
 
@@ -131,15 +128,17 @@ public class TestSchedulingAgent extends Agent {
 	 * Do stop.
 	 */
 	public void doStop() {
-		LOG.info("Stopping at:" + getScheduler().nowDateTime() + "("
-				+ DateTime.now() + ")");
 		stop = true;
+		LOG.info("Stopped at:" + getScheduler().nowDateTime() + "("
+				+ DateTime.now() + ")");
 	}
 
 	/**
 	 * Start.
 	 */
 	public void start() {
+		LOG.info("Starting at:" + getScheduler().nowDateTime() + "("
+				+ DateTime.now() + ")");
 		((SimulationScheduler) getScheduler()).start();
 	}
 

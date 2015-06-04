@@ -44,6 +44,7 @@ public class TestSimulationScheduling extends TestCase {
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot = new SimulationInboxProtocolConfig();
+		simInprot.setSupportSynccalls(true);
 
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
@@ -64,6 +65,7 @@ public class TestSimulationScheduling extends TestCase {
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot2 = new SimulationInboxProtocolConfig();
+		simInprot2.setSupportSynccalls(true);
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");

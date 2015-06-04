@@ -4,6 +4,7 @@
  */
 package com.almende.eve.algorithms.simulation;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import com.almende.eve.capabilities.handler.Handler;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SimulationInboxProtocol extends InboxProtocol {
 	private final static Integer[]	inboxCnt	= new Integer[] { 0 };
 	private final static Integer[]	latch		= new Integer[] { 0 };
+	private BlockingQueue<Meta>		outbox		= new PriorityBlockingQueue<Meta>();
 
 	// private final static Integer[] msgInCnt = new Integer[] { 0 };
 	// private final static Integer[] msgOutCnt = new Integer[] { 0 };
@@ -37,23 +39,24 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		synchronized (inboxCnt) {
 			inboxCnt[0]++;
 		}
-		setInbox(new PriorityBlockingQueue<Meta>(), false);
 		initLooper();
 	}
 
 	@Override
 	public boolean inbound(Meta msg) {
-		final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
-		if (message != null) {
-			msg.setMsg(message);
-			if (message.getId() == null || message.getId().isNull()) {
-				message.setId(JOM.getInstance().valueToTree(new UUID().toString()));
+		synchronized (getInbox()) {
+			final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
+			if (message != null) {
+				msg.setMsg(message);
+				if (message.getId() == null || message.getId().isNull()) {
+					message.setId(JOM.getInstance().valueToTree(
+							new UUID().toString()));
+				}
+				final UUID id = new UUID(message.getId().textValue());
+				return super.inbound(new QueueEntry(msg, id));
 			}
-			final UUID id = new UUID(message.getId().textValue());
-			return super.inbound(new QueueEntry(msg, id));
+			return super.inbound(new QueueEntry(msg));
 		}
-		return super.inbound(new QueueEntry(msg));
-
 	}
 
 	private void waitForHeartBeat() {
@@ -67,12 +70,17 @@ public class SimulationInboxProtocol extends InboxProtocol {
 					latch.wait();
 				} catch (InterruptedException e) {}
 			}
+			// Copy inbox to -currentSendBox
+			synchronized (getInbox()) {
+				outbox.addAll(getInbox());
+				getInbox().clear();
+			}
 		}
 	};
 
-	public Meta getNext() throws InterruptedException {
-		if (!getInbox().isEmpty()) {
-			return super.getNext();
+	public Meta getNext(BlockingQueue<Meta> inbox) throws InterruptedException {
+		if (!inbox.isEmpty()) {
+			return super.getNext(inbox);
 		}
 		return null;
 	}
@@ -86,7 +94,7 @@ public class SimulationInboxProtocol extends InboxProtocol {
 				while (!stop[0]) {
 					waitForHeartBeat();
 					try {
-						Meta next = getNext();
+						Meta next = getNext(outbox);
 						while (next != null) {
 							next(next);
 							final Boolean[] sequencer = getSequencer();
@@ -95,7 +103,7 @@ public class SimulationInboxProtocol extends InboxProtocol {
 									sequencer.wait();
 								}
 							}
-							next = getNext();
+							next = getNext(outbox);
 						}
 					} catch (InterruptedException e) {
 						// Nothing todo.

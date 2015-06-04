@@ -70,7 +70,7 @@ public class InboxProtocol implements Protocol {
 				stop[0] = false;
 				while (!stop[0]) {
 					try {
-						final Meta next = getNext();
+						final Meta next = getNext(inbox);
 						next(next);
 						synchronized (sequencer) {
 							while (!sequencer[0]) {
@@ -88,11 +88,13 @@ public class InboxProtocol implements Protocol {
 	/**
 	 * Gets the next.
 	 *
+	 * @param inbox
+	 *            the inbox
 	 * @return the next
 	 * @throws InterruptedException
 	 *             the interrupted exception
 	 */
-	protected Meta getNext() throws InterruptedException {
+	protected Meta getNext(final BlockingQueue<Meta> inbox) throws InterruptedException {
 		// sequencer[0] is the actual wait latch
 		sequencer[0] = false;
 		// sequencer[1] is the flag to skip triggering on the
