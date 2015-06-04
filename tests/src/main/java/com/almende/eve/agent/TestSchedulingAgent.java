@@ -115,9 +115,9 @@ public class TestSchedulingAgent extends Agent {
 							+ getScheduler().nowDateTime(), exception);
 				}
 			});
-			LOG.info("Got reply:"
-					+ callSync(other, "doTaskWithReply", null, String.class)
-					+ " at:" + getScheduler().nowDateTime());
+//			LOG.info("Got reply:"
+//					+ callSync(other, "doTaskWithReply", null, String.class)
+//					+ " at:" + getScheduler().nowDateTime());
 
 			call(other, "doTask", null);
 

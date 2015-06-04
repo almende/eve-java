@@ -33,9 +33,12 @@ public class TestSimulationScheduling extends TestCase {
 	 */
 	@Test
 	public void testSchedulingStrong() throws IOException {
+		final boolean supportSyncCalls = true;
+		final boolean atomicNetwork = true;
+		
+		
 		final SimulationSchedulerConfig params = new SimulationSchedulerConfig();
 		params.setSenderUrl("local:testSim1s");
-		// params.setStrongConsistency(true);
 
 		final AgentConfig config = new AgentConfig();
 		config.setClassName(TestSchedulingAgent.class.getName());
@@ -44,14 +47,13 @@ public class TestSimulationScheduling extends TestCase {
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationTimeProtocolConfig simprot = new SimulationTimeProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot = new SimulationInboxProtocolConfig();
-		simInprot.setSupportSynccalls(true);
+		simInprot.setSupportSynccalls(supportSyncCalls);
+		simInprot.setAtomicNetwork(atomicNetwork);
 
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
 		protocols.add(simprot);
 		protocols.add(simInprot);
-		// protocols.add(traceprot);
-		// protocols.add(traceprot);
 		config.setProtocols(protocols);
 		config.setScheduler(params);
 
@@ -60,19 +62,17 @@ public class TestSimulationScheduling extends TestCase {
 		config2.put("id", "testSim2s");
 		final SimulationSchedulerConfig params2 = new SimulationSchedulerConfig();
 		params2.setSenderUrl("local:testSim2s");
-		// params2.setStrongConsistency(true);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationTimeProtocolConfig simprot2 = new SimulationTimeProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot2 = new SimulationInboxProtocolConfig();
-		simInprot2.setSupportSynccalls(true);
+		simInprot2.setSupportSynccalls(supportSyncCalls);
+		simInprot2.setAtomicNetwork(atomicNetwork);
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");
-		// protocols2.add(traceprot2);
 		protocols2.add(simprot2);
 		protocols2.add(simInprot2);
-		// protocols2.add(traceprot2);
 
 		config2.setProtocols(protocols2);
 		config2.setScheduler(params2);
@@ -87,7 +87,7 @@ public class TestSimulationScheduling extends TestCase {
 		agent.start();
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(50000);
 		} catch (final InterruptedException e) {}
 
 		assertTrue(agent.isStop());
@@ -115,8 +115,7 @@ public class TestSimulationScheduling extends TestCase {
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
 		protocols.add(simprot);
-		protocols.add(traceprot);
-		// protocols.add(traceprot);
+
 		config.setProtocols(protocols);
 		config.setScheduler(params);
 
@@ -132,9 +131,7 @@ public class TestSimulationScheduling extends TestCase {
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");
-		// protocols2.add(traceprot2);
 		protocols2.add(simprot2);
-		protocols2.add(traceprot2);
 
 		config2.setProtocols(protocols2);
 		config2.setScheduler(params2);

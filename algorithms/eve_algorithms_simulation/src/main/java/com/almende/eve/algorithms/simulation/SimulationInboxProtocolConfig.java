@@ -38,25 +38,25 @@ public class SimulationInboxProtocolConfig extends InboxProtocolConfig {
 	}
 
 	/**
-	 * Checks if is support synccalls.
+	 * Should the network become atomic, zero-time duration transfers?
 	 *
-	 * @return true, if is support synccalls
+	 * @param atomicNetwork
+	 *            the new atomic network
 	 */
-	public boolean isSupportSynccalls() {
-		if (this.has("supportSynccalls")) {
-			return this.get("supportSynccalls").asBoolean();
+	public void setAtomicNetwork(final boolean atomicNetwork){
+		this.put("atomicNetwork", atomicNetwork);
+	}
+	
+	/**
+	 * Should the network become atomic, zero-time duration transfers?
+	 *
+	 * @return true, if is atomic network
+	 */
+	public boolean isAtomicNetwork() {
+		if (this.has("atomicNetwork")){
+			return this.get("atomicNetwork").asBoolean();
 		}
 		return false;
 	}
-
-	/**
-	 * Sets the support synccalls.
-	 *
-	 * @param supportSynccalls
-	 *            the new support synccalls
-	 */
-	public void setSupportSynccalls(final boolean supportSynccalls) {
-		this.put("supportSynccalls", supportSynccalls);
-	}
-
+	
 }
