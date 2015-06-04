@@ -78,7 +78,6 @@ public class SimulationScheduler extends SimpleScheduler {
 			} else {
 				message.getExtra().setAll(extra);
 			}
-			SimulationInboxProtocol.schedulerOut();
 			handle.get().receive(message, schedulerUrl, null);
 		} else {
 			LOG.warning("Scheduler tries to send Non-JSON-RPC message, doesn't work with SimulationScheduler.");

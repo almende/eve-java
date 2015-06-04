@@ -87,7 +87,7 @@ public class TestSimulationScheduling extends TestCase {
 		agent.start();
 
 		try {
-			Thread.sleep(50000);
+			Thread.sleep(5000);
 		} catch (final InterruptedException e) {}
 
 		assertTrue(agent.isStop());

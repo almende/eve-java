@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimulationInboxProtocol.
  */
 public class SimulationInboxProtocol extends InboxProtocol {
+	private final static Boolean[]			isWork			= new Boolean[] { false };
+
 	private final static Integer[]			inboxCnt		= new Integer[] { 0 };
 	private final static Integer[]			latch			= new Integer[] { 0 };
 	private BlockingQueue<Meta>				outbox			= new PriorityBlockingQueue<Meta>();
@@ -48,16 +50,21 @@ public class SimulationInboxProtocol extends InboxProtocol {
 	}
 
 	/**
-	 * Scheduler out reporting
+	 * Scheduler out reporting.
+	 *
+	 * @param count
+	 *            the count
 	 */
-	public static void schedulerOut() {
+	public static void schedulerOut(final int count) {
+		inWork();
 		synchronized (msgOutCnt) {
-			msgOutCnt[0]++;
+			msgOutCnt[0] += count;
 		}
 	}
 
 	@Override
 	public boolean outbound(Meta msg) {
+		inWork();
 		boolean res = false;
 		if (isAtomicNetwork) {
 			final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
@@ -85,6 +92,7 @@ public class SimulationInboxProtocol extends InboxProtocol {
 
 	@Override
 	public boolean inbound(Meta msg) {
+		inWork();
 		boolean res = false;
 		final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
 		UUID id = null;
@@ -125,6 +133,33 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		return res;
 	}
 
+	private static void inWork() {
+		if (!isWork[0]) {
+			synchronized (isWork) {
+				isWork[0] = true;
+				isWork.notifyAll();
+			}
+		}
+	}
+
+	private static void outOfWork() {
+		if (isWork[0]) {
+			synchronized (isWork) {
+				isWork[0] = false;
+			}
+		}
+	}
+
+	private void waitForWork() {
+		synchronized (isWork) {
+			while (!isWork[0]) {
+				try {
+					isWork.wait();
+				} catch (InterruptedException e) {}
+			}
+		}
+	}
+
 	private void waitForNetwork() {
 		synchronized (msgInCnt) {
 			boolean wait = false;
@@ -140,6 +175,7 @@ public class SimulationInboxProtocol extends InboxProtocol {
 	}
 
 	private void waitForHeartBeat() {
+		waitForWork();
 		synchronized (latch) {
 			latch[0]++;
 			if (latch[0] == inboxCnt[0]) {
@@ -160,6 +196,9 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		synchronized (getInbox()) {
 			outbox.addAll(getInbox());
 			getInbox().clear();
+		}
+		if (outbox.isEmpty()) {
+			outOfWork();
 		}
 	};
 
@@ -193,7 +232,6 @@ public class SimulationInboxProtocol extends InboxProtocol {
 					} catch (InterruptedException e) {
 						// Nothing todo.
 					}
-
 				}
 			}
 		});
