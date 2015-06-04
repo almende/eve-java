@@ -31,7 +31,7 @@ public class SimulationSchedulerConfig extends SimpleSchedulerConfig {
 		res.copy(node);
 		return res;
 	}
-	
+
 	/**
 	 * Sets the strong consistency.
 	 *

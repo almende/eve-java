@@ -16,8 +16,8 @@ import com.almende.util.uuid.UUID;
  */
 public class SimulationTimeProtocolBuilder extends
 		AbstractCapabilityBuilder<SimulationTimeProtocol> {
-	private static final Logger LOG = Logger
-			.getLogger(SimulationTimeProtocolBuilder.class.getName());
+	private static final Logger									LOG			= Logger.getLogger(SimulationTimeProtocolBuilder.class
+																					.getName());
 	private static final Map<String, SimulationTimeProtocol>	INSTANCES	= new HashMap<String, SimulationTimeProtocol>();
 
 	/*
@@ -29,7 +29,8 @@ public class SimulationTimeProtocolBuilder extends
 	 */
 	@Override
 	public SimulationTimeProtocol build() {
-		SimulationTimeProtocolConfig config = SimulationTimeProtocolConfig.decorate(getParams());
+		SimulationTimeProtocolConfig config = SimulationTimeProtocolConfig
+				.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();
@@ -53,7 +54,7 @@ public class SimulationTimeProtocolBuilder extends
 	 * @param id
 	 *            the id
 	 */
-	public static void delete(final String id){
+	public static void delete(final String id) {
 		INSTANCES.remove(id);
 	}
 }

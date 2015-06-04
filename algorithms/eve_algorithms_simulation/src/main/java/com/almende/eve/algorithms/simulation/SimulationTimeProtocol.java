@@ -28,20 +28,19 @@ import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 /**
  * The Class SimulationTimeProtocol.
  */
 public class SimulationTimeProtocol implements RpcBasedProtocol {
-	private static final Logger				LOG					= Logger.getLogger(SimulationTimeProtocol.class
-																		.getName());
-	private static final TypeUtil<Tracer>	TRACER				= new TypeUtil<Tracer>() {};
-	private SimulationTimeProtocolConfig		params				= null;
+	private static final Logger				LOG				= Logger.getLogger(SimulationTimeProtocol.class
+																	.getName());
+	private static final TypeUtil<Tracer>	TRACER			= new TypeUtil<Tracer>() {};
+	private SimulationTimeProtocolConfig	params			= null;
 
-	private Set<Tracer>						outboundTracers		= new HashSet<Tracer>();
-	private Set<Tracer>						inboundTracers		= new HashSet<Tracer>();
-	private Map<String, Boolean>			inboundRequests		= new HashMap<String, Boolean>();
-	private Handler<Caller>					caller				= null;
+	private Set<Tracer>						outboundTracers	= new HashSet<Tracer>();
+	private Set<Tracer>						inboundTracers	= new HashSet<Tracer>();
+	private Map<String, Boolean>			inboundRequests	= new HashMap<String, Boolean>();
+	private Handler<Caller>					caller			= null;
 
 	/**
 	 * Instantiates a new inbox protocol.

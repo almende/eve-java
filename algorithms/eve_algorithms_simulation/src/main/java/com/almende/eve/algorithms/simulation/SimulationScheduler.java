@@ -21,12 +21,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimulationScheduler.
  */
 public class SimulationScheduler extends SimpleScheduler {
-	private static final Logger	LOG					= Logger.getLogger(SimulationScheduler.class
-															.getName());
-	private static Clock		sharedClock			= null;
+	private static final Logger	LOG			= Logger.getLogger(SimulationScheduler.class
+													.getName());
+	private static Clock		sharedClock	= null;
 
-//	private boolean				strongConsistency	= false;
-//	private OldSimulationInbox		inbox				= null;
+	// private boolean strongConsistency = false;
+	// private OldSimulationInbox inbox = null;
 
 	/**
 	 * Instantiates a new simulation scheduler.
@@ -43,12 +43,12 @@ public class SimulationScheduler extends SimpleScheduler {
 		}
 		clock = sharedClock;
 
-//		SimulationSchedulerConfig config = SimulationSchedulerConfig
-//				.decorate(params);
-//		strongConsistency = config.isStrongConsistency();
-//		if (strongConsistency) {
-//			inbox = new OldSimulationInbox("scheduler_" + clock.hashCode());
-//		}
+		// SimulationSchedulerConfig config = SimulationSchedulerConfig
+		// .decorate(params);
+		// strongConsistency = config.isStrongConsistency();
+		// if (strongConsistency) {
+		// inbox = new OldSimulationInbox("scheduler_" + clock.hashCode());
+		// }
 
 	}
 
@@ -89,13 +89,13 @@ public class SimulationScheduler extends SimpleScheduler {
 			} else {
 				message.getExtra().setAll(extra);
 			}
-//			if (strongConsistency) {
-//				while (!inbox.heartBeat(1)) {
-//					try {
-//						Thread.sleep(1);
-//					} catch (InterruptedException e) {}
-//				}
-//			}
+			// if (strongConsistency) {
+			// while (!inbox.heartBeat(1)) {
+			// try {
+			// Thread.sleep(1);
+			// } catch (InterruptedException e) {}
+			// }
+			// }
 			handle.get().receive(message, schedulerUrl, null);
 		} else {
 			LOG.warning("Scheduler tries to send Non-JSON-RPC message, doesn't work with SimulationScheduler.");

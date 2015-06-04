@@ -51,7 +51,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
@@ -70,7 +71,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return res;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#getMsg()
 	 */
 	@Override
@@ -78,7 +80,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return this.meta.getMsg();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#setMsg(java.lang.Object)
 	 */
 	@Override
@@ -86,7 +89,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		this.meta.setMsg(msg);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#setTag(java.lang.String)
 	 */
 	@Override
@@ -94,7 +98,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		this.meta.setTag(tag);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#getTag()
 	 */
 	@Override
@@ -102,7 +107,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return this.meta.getTag();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#getPeer()
 	 */
 	@Override
@@ -110,7 +116,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return this.meta.getPeer();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#setPeer(java.net.URI)
 	 */
 	@Override
@@ -118,7 +125,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		this.meta.setPeer(peer);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#getIter()
 	 */
 	@Override
@@ -127,7 +135,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return this.meta.getIter();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#setIter(java.util.Iterator)
 	 */
 	@Override
@@ -136,7 +145,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		this.meta.setIter(iter);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#nextIn()
 	 */
 	@Override
@@ -145,7 +155,8 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 		return this.meta.nextIn();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.almende.eve.protocol.Meta#nextOut()
 	 */
 	@Override
@@ -162,7 +173,7 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 	public Meta getMeta() {
 		return this.meta;
 	}
-	
+
 	/**
 	 * Sets the meta.
 	 *
@@ -170,6 +181,6 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 	 *            the new meta
 	 */
 	public void setMeta(final Meta meta) {
-		this.meta=meta;
+		this.meta = meta;
 	}
 }
