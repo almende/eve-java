@@ -24,11 +24,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class InboxProtocol implements Protocol {
 
+	/** The inbox. */
 	private BlockingQueue<Meta>	inbox		= new LinkedBlockingQueue<Meta>();
 	private InboxProtocolConfig	params		= null;
 	protected final Boolean[]	stop		= new Boolean[] { false };
 	private Set<String>			callbackIds	= new HashSet<String>(5);
-	final Boolean[]				sequencer	= new Boolean[2];
+	final Boolean[]				sequencer	= new Boolean[] { false, false };
 	protected Runnable			loop		= null;
 
 	/**
@@ -44,6 +45,23 @@ public class InboxProtocol implements Protocol {
 		initDefLoop();
 	}
 
+	/**
+	 * Instantiates a new inbox protocol.
+	 *
+	 * @param params
+	 *            the params
+	 * @param handle
+	 *            the handle
+	 * @param noInit
+	 *            the no init
+	 */
+	public InboxProtocol(final ObjectNode params, final Handler<Object> handle, boolean noInit) {
+		this.params = InboxProtocolConfig.decorate(params);
+	}
+	
+	/**
+	 * Inits the def loop.
+	 */
 	protected void initDefLoop() {
 		chgLooper(new Runnable() {
 			// Agent thread
@@ -67,6 +85,13 @@ public class InboxProtocol implements Protocol {
 		});
 	}
 
+	/**
+	 * Gets the next.
+	 *
+	 * @return the next
+	 * @throws InterruptedException
+	 *             the interrupted exception
+	 */
 	protected Meta getNext() throws InterruptedException {
 		// sequencer[0] is the actual wait latch
 		sequencer[0] = false;
@@ -87,12 +112,20 @@ public class InboxProtocol implements Protocol {
 		return next;
 	}
 
+	/**
+	 * Next.
+	 *
+	 * @param next
+	 *            the next
+	 */
 	protected void next(final Meta next) {
 		ThreadPool.getPool().execute(new Runnable() {
 
 			@Override
 			public void run() {
-				next.nextIn();
+				if (next != null) {
+					next.nextIn();
+				}
 				synchronized (sequencer) {
 					if (!sequencer[1]) {
 						sequencer[0] = true;
@@ -128,7 +161,7 @@ public class InboxProtocol implements Protocol {
 	}
 
 	/**
-	 * Replaces the inbox send loop;
+	 * Replaces the inbox send loop;.
 	 *
 	 * @param loop
 	 *            the new looper
@@ -157,7 +190,7 @@ public class InboxProtocol implements Protocol {
 	 * @see com.almende.eve.capabilities.Capability#getParams()
 	 */
 	@Override
-	public ObjectNode getParams() {
+	public InboxProtocolConfig getParams() {
 		return this.params;
 	}
 
