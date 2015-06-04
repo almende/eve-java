@@ -6,12 +6,10 @@ package com.almende.eve.algorithms.simulation;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,11 +24,7 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
-import com.almende.util.callback.AsyncCallback;
-import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
-import com.almende.util.threads.ThreadPool;
-import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -49,11 +43,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	private Map<String, Boolean>			inboundRequests		= new HashMap<String, Boolean>();
 	private Handler<Caller>					caller				= null;
 
-	private boolean							strongConsistency	= true;
-	private SimulationInbox					inbox				= null;
-	private Integer[]						counter				= new Integer[1];
-	private List<SyncCallback<?>>			outboundCallbacks	= new ArrayList<SyncCallback<?>>();
-
 	/**
 	 * Instantiates a new inbox protocol.
 	 *
@@ -65,13 +54,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	public SimulationProtocol(final ObjectNode params,
 			final Handler<Object> handle) {
 		this.params = SimulationProtocolConfig.decorate(params);
-
-		this.strongConsistency = this.params.isStrongConsistency();
-		if (this.strongConsistency) {
-			inbox = new SimulationInbox(this.params.getId());
-			counter[0] = 0;
-			heartbeatCheck();
-		}
 	}
 
 	@Override
@@ -212,80 +194,7 @@ public class SimulationProtocol implements RpcBasedProtocol {
 				}
 			}
 		}
-		if (strongConsistency) {
-			// TODO: what is id is null, what order would messages then get?
-			// Still is random now!
-			final UUID uuid = message.getId() != null ? new UUID(message
-					.getId().asText()) : new UUID();
-			inbox.add(msg, uuid);
-			return false;
-		} else {
-			return msg.nextIn();
-		}
-	}
-
-	private void heartbeatCheck() {
-		ThreadPool.getPool().execute(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					synchronized (counter) {
-						if (counter[0] == 0) {
-							try {
-								counter.wait(100);
-							} catch (InterruptedException e) {}
-							continue;
-						}
-					}
-					synchronized (inboundRequests) {
-						if (inboundRequests.isEmpty()) {
-							synchronized (counter) {
-								if (counter[0] > 0) {
-									if (inbox.heartBeat(Integer
-											.valueOf(counter[0]))) {
-										counter[0] = 0;
-									}
-								}
-							}
-							continue;
-						}
-						if (outboundCallbacks.size() == 0) {
-							continue;
-						}
-						final Iterator<SyncCallback<?>> iter = outboundCallbacks
-								.iterator();
-						int count = 0;
-						while (iter.hasNext()) {
-							final SyncCallback<?> callback = iter.next();
-							if (callback.isWaiting()) {
-								count++;
-							} else if (callback.isDone()) {
-								iter.remove();
-							}
-						}
-						if (inboundRequests.size() == count) {
-							synchronized (counter) {
-								if (counter[0] > 0) {
-									if (inbox.heartBeat(Integer
-											.valueOf(counter[0]))) {
-										counter[0] = 0;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-	}
-
-	private void incCounter() {
-		if (strongConsistency) {
-			synchronized (counter) {
-				counter[0]++;
-				counter.notify();
-			}
-		}
+		return msg.nextIn();
 	}
 
 	@Override
@@ -307,15 +216,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 							message.getExtra().setAll(extra);
 						}
 						storeOutboundTracer(tracer);
-						if (strongConsistency) {
-							AsyncCallback<?> callback = request.getCallback();
-							if (callback != null
-									&& callback instanceof SyncCallback<?>) {
-								outboundCallbacks
-										.add((SyncCallback<?>) callback);
-							}
-							incCounter();
-						}
 					}
 				} else {
 					final JSONResponse response = (JSONResponse) message;
@@ -329,7 +229,6 @@ public class SimulationProtocol implements RpcBasedProtocol {
 							return false;
 						} else {
 							sendReports(checkTracers(), response, msg.getPeer());
-							incCounter();
 						}
 					}
 				}

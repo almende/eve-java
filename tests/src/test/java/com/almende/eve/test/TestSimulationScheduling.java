@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.TestSchedulingAgent;
+import com.almende.eve.algorithms.simulation.SimulationInboxProtocolConfig;
 import com.almende.eve.algorithms.simulation.SimulationProtocolConfig;
 import com.almende.eve.algorithms.simulation.SimulationSchedulerConfig;
 import com.almende.eve.protocol.TraceProtocolConfig;
@@ -34,7 +35,7 @@ public class TestSimulationScheduling extends TestCase {
 	public void testSchedulingStrong() throws IOException {
 		final SimulationSchedulerConfig params = new SimulationSchedulerConfig();
 		params.setSenderUrl("local:testSim1s");
-		params.setStrongConsistency(true);
+		// params.setStrongConsistency(true);
 
 		final AgentConfig config = new AgentConfig();
 		config.setClassName(TestSchedulingAgent.class.getName());
@@ -42,12 +43,13 @@ public class TestSimulationScheduling extends TestCase {
 
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
-		simprot.setStrongConsistency(true);
+		final SimulationInboxProtocolConfig simInprot = new SimulationInboxProtocolConfig();
 
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
 		protocols.add(simprot);
-		protocols.add(traceprot);
+		protocols.add(simInprot);
+		// protocols.add(traceprot);
 		// protocols.add(traceprot);
 		config.setProtocols(protocols);
 		config.setScheduler(params);
@@ -57,17 +59,18 @@ public class TestSimulationScheduling extends TestCase {
 		config2.put("id", "testSim2s");
 		final SimulationSchedulerConfig params2 = new SimulationSchedulerConfig();
 		params2.setSenderUrl("local:testSim2s");
-		params2.setStrongConsistency(true);
+		// params2.setStrongConsistency(true);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
-		simprot2.setStrongConsistency(true);
+		final SimulationInboxProtocolConfig simInprot2 = new SimulationInboxProtocolConfig();
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");
 		// protocols2.add(traceprot2);
 		protocols2.add(simprot2);
-		protocols2.add(traceprot2);
+		protocols2.add(simInprot2);
+		// protocols2.add(traceprot2);
 
 		config2.setProtocols(protocols2);
 		config2.setScheduler(params2);
@@ -87,7 +90,7 @@ public class TestSimulationScheduling extends TestCase {
 
 		assertTrue(agent.isStop());
 	}
-	
+
 	/**
 	 * Test scheduling.
 	 *
@@ -106,7 +109,6 @@ public class TestSimulationScheduling extends TestCase {
 
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
-		simprot.setStrongConsistency(false);
 
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
@@ -125,7 +127,6 @@ public class TestSimulationScheduling extends TestCase {
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
-		simprot2.setStrongConsistency(false);
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");

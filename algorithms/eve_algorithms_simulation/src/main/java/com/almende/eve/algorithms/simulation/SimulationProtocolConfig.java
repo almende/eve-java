@@ -21,37 +21,26 @@ public class SimulationProtocolConfig extends ProtocolConfig {
 	}
 
 	/**
+	 * Instantiates a new simulation protocol config.
+	 *
+	 * @param skipClass
+	 *            the skip class
+	 */
+	public SimulationProtocolConfig(final boolean skipClass) {
+		super();
+	}
+
+	/**
 	 * Instantiates a new JSON rpc protocol config.
-	 * 
+	 *
 	 * @param node
 	 *            the node
+	 * @return the simulation protocol config
 	 */
 	public static SimulationProtocolConfig decorate(final ObjectNode node) {
-		final SimulationProtocolConfig res = new SimulationProtocolConfig();
+		final SimulationProtocolConfig res = new SimulationProtocolConfig(true);
 		res.copy(node);
 		return res;
-	}
-
-	/**
-	 * Sets the strong consistency.
-	 *
-	 * @param strongConsistency
-	 *            the new strong consistency
-	 */
-	public void setStrongConsistency(final boolean strongConsistency) {
-		this.put("strongConsistency", strongConsistency);
-	}
-
-	/**
-	 * Checks if is strong consistency.
-	 *
-	 * @return true, if is strong consistency
-	 */
-	public boolean isStrongConsistency() {
-		if (has("strongConsistency")) {
-			return get("strongConsistency").asBoolean();
-		}
-		return false;
 	}
 
 }
