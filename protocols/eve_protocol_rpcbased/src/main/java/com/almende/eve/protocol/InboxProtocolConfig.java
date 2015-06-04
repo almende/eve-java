@@ -4,7 +4,6 @@
  */
 package com.almende.eve.protocol;
 
-import com.almende.eve.protocol.ProtocolConfig;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -20,6 +19,10 @@ public class InboxProtocolConfig extends ProtocolConfig {
 		setClassName(InboxProtocolBuilder.class.getName());
 	}
 
+	private InboxProtocolConfig(boolean skipClass) {
+		super();
+	}
+
 	/**
 	 * Instantiates a new JSON rpc protocol config.
 	 * 
@@ -27,9 +30,31 @@ public class InboxProtocolConfig extends ProtocolConfig {
 	 *            the node
 	 */
 	public static InboxProtocolConfig decorate(final ObjectNode node) {
-		final InboxProtocolConfig res = new InboxProtocolConfig();
+		final InboxProtocolConfig res = new InboxProtocolConfig(true);
 		res.copy(node);
 		return res;
 	}
-	
+
+	/**
+	 * Checks if is support synccalls.
+	 *
+	 * @return true, if is support synccalls
+	 */
+	public boolean isSupportSynccalls() {
+		if (this.has("supportSynccalls")) {
+			return this.get("supportSynccalls").asBoolean();
+		}
+		return false;
+	}
+
+	/**
+	 * Sets the support synccalls.
+	 *
+	 * @param supportSynccalls
+	 *            the new support synccalls
+	 */
+	public void setSupportSynccalls(final boolean supportSynccalls) {
+		this.put("supportSynccalls", supportSynccalls);
+	}
+
 }

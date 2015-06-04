@@ -12,61 +12,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The Class Meta.
  */
-public class Meta {
-	private Object				msg	= null;
-	private URI					peer	= null;
-	private String				tag		= null;
-	private Iterator<Protocol>	iter	= null;
-
-	/**
-	 * Instantiates a new meta.
-	 */
-	public Meta() {}
-
-	/**
-	 * Instantiates a new meta.
-	 *
-	 * @param clone
-	 *            the clone
-	 */
-	public Meta(Meta clone) {
-		this.msg = clone.msg;
-		this.peer = clone.peer;
-		this.tag = clone.tag;
-		this.iter = clone.iter;
-	}
-
-	/**
-	 * Instantiates a new meta.
-	 *
-	 * @param msg
-	 *            the result
-	 * @param peer
-	 *            the peer
-	 * @param tag
-	 *            the tag
-	 * @param iter
-	 *            the iter
-	 */
-	public Meta(final Object msg, final URI peer, final String tag, final Iterator<Protocol> iter) {
-		this.msg = msg;
-		this.peer = peer;
-		this.tag = tag;
-		this.iter = iter;
-	}
-
-	public String toString() {
-		return msg.toString();
-	}
+public interface Meta {
 
 	/**
 	 * Gets the result.
 	 *
 	 * @return the result
 	 */
-	public Object getMsg() {
-		return msg;
-	}
+	Object getMsg();
 
 	/**
 	 * Sets the result.
@@ -74,37 +27,29 @@ public class Meta {
 	 * @param msg
 	 *            the new result
 	 */
-	public void setMsg(final Object msg) {
-		this.msg = msg;
-	}
-	
+	void setMsg(final Object msg);
+
 	/**
 	 * Sets the tag.
 	 *
 	 * @param tag
 	 *            the new tag
 	 */
-	public void setTag(final String tag) {
-		this.tag = tag;
-	}
+	void setTag(final String tag);
 
 	/**
 	 * Gets the tag.
 	 *
 	 * @return the tag
 	 */
-	public String getTag() {
-		return this.tag;
-	}
+	String getTag();
 
 	/**
 	 * Gets the peer.
 	 *
 	 * @return the peer
 	 */
-	public URI getPeer() {
-		return peer;
-	}
+	URI getPeer();
 
 	/**
 	 * Sets the peer.
@@ -112,9 +57,7 @@ public class Meta {
 	 * @param peer
 	 *            the new peer
 	 */
-	public void setPeer(final URI peer) {
-		this.peer = peer;
-	}
+	void setPeer(final URI peer);
 
 	/**
 	 * Gets the iter.
@@ -122,9 +65,7 @@ public class Meta {
 	 * @return the iter
 	 */
 	@JsonIgnore
-	public Iterator<Protocol> getIter() {
-		return iter;
-	}
+	Iterator<Protocol> getIter();
 
 	/**
 	 * Sets the iter.
@@ -133,9 +74,7 @@ public class Meta {
 	 *            the new iter
 	 */
 	@JsonIgnore
-	public void setIter(final Iterator<Protocol> iter) {
-		this.iter = iter;
-	}
+	void setIter(final Iterator<Protocol> iter);
 
 	/**
 	 * Next in.
@@ -143,13 +82,7 @@ public class Meta {
 	 * @return true, if successful
 	 */
 	@JsonIgnore
-	public boolean nextIn(){
-		if (iter.hasNext()){
-			final Protocol protocol = iter.next();
-			return protocol.inbound(this);
-		}
-		return true;
-	}
+	boolean nextIn();
 
 	/**
 	 * Next out.
@@ -157,11 +90,5 @@ public class Meta {
 	 * @return true, if successful
 	 */
 	@JsonIgnore
-	public boolean nextOut(){
-		if (iter.hasNext()){
-			final Protocol protocol = iter.next();
-			return protocol.outbound(this);
-		}
-		return true;
-	}
+	boolean nextOut();
 }

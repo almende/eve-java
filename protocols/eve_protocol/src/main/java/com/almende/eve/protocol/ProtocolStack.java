@@ -27,7 +27,7 @@ public class ProtocolStack {
 	 */
 	public boolean inbound(final Object msg, final URI peerUrl, final String tag) {
 		final Iterator<Protocol> iter = stack.iterator();
-		final Meta wrapper = new Meta(msg, peerUrl, tag, iter);
+		final Meta wrapper = new MetaImpl(msg, peerUrl, tag, iter);
 		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
 			return protocol.inbound(wrapper);
@@ -49,7 +49,7 @@ public class ProtocolStack {
 	public boolean outbound(final Object msg, final URI peerUrl,
 			final String tag) {
 		final Iterator<Protocol> iter = stack.descendingIterator();
-		final Meta wrapper = new Meta(msg, peerUrl, tag, iter);
+		final Meta wrapper = new MetaImpl(msg, peerUrl, tag, iter);
 		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
 			return protocol.outbound(wrapper);
