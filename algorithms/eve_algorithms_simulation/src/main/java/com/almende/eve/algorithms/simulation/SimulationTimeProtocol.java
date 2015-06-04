@@ -28,15 +28,15 @@ import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+
 /**
- * The Class InboxProtocol, provides an easy way to get a single threaded agent,
- * only one inbound message in a single thread at a time.
+ * The Class SimulationTimeProtocol.
  */
-public class SimulationProtocol implements RpcBasedProtocol {
-	private static final Logger				LOG					= Logger.getLogger(SimulationProtocol.class
+public class SimulationTimeProtocol implements RpcBasedProtocol {
+	private static final Logger				LOG					= Logger.getLogger(SimulationTimeProtocol.class
 																		.getName());
 	private static final TypeUtil<Tracer>	TRACER				= new TypeUtil<Tracer>() {};
-	private SimulationProtocolConfig		params				= null;
+	private SimulationTimeProtocolConfig		params				= null;
 
 	private Set<Tracer>						outboundTracers		= new HashSet<Tracer>();
 	private Set<Tracer>						inboundTracers		= new HashSet<Tracer>();
@@ -51,9 +51,9 @@ public class SimulationProtocol implements RpcBasedProtocol {
 	 * @param handle
 	 *            the handle
 	 */
-	public SimulationProtocol(final ObjectNode params,
+	public SimulationTimeProtocol(final ObjectNode params,
 			final Handler<Object> handle) {
-		this.params = SimulationProtocolConfig.decorate(params);
+		this.params = SimulationTimeProtocolConfig.decorate(params);
 	}
 
 	@Override

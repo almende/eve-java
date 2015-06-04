@@ -14,7 +14,7 @@ import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.TestSchedulingAgent;
 import com.almende.eve.algorithms.simulation.SimulationInboxProtocolConfig;
-import com.almende.eve.algorithms.simulation.SimulationProtocolConfig;
+import com.almende.eve.algorithms.simulation.SimulationTimeProtocolConfig;
 import com.almende.eve.algorithms.simulation.SimulationSchedulerConfig;
 import com.almende.eve.protocol.TraceProtocolConfig;
 import com.almende.util.jackson.JOM;
@@ -42,7 +42,7 @@ public class TestSimulationScheduling extends TestCase {
 		config.put("id", "testSim1s");
 
 		final ArrayNode protocols = JOM.createArrayNode();
-		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
+		final SimulationTimeProtocolConfig simprot = new SimulationTimeProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot = new SimulationInboxProtocolConfig();
 		simInprot.setSupportSynccalls(true);
 
@@ -63,7 +63,7 @@ public class TestSimulationScheduling extends TestCase {
 		// params2.setStrongConsistency(true);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
-		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
+		final SimulationTimeProtocolConfig simprot2 = new SimulationTimeProtocolConfig();
 		final SimulationInboxProtocolConfig simInprot2 = new SimulationInboxProtocolConfig();
 		simInprot2.setSupportSynccalls(true);
 
@@ -110,7 +110,7 @@ public class TestSimulationScheduling extends TestCase {
 		config.put("id", "testSim1w");
 
 		final ArrayNode protocols = JOM.createArrayNode();
-		final SimulationProtocolConfig simprot = new SimulationProtocolConfig();
+		final SimulationTimeProtocolConfig simprot = new SimulationTimeProtocolConfig();
 
 		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
 		traceprot.setFileName(".");
@@ -128,7 +128,7 @@ public class TestSimulationScheduling extends TestCase {
 		params2.setStrongConsistency(false);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
-		final SimulationProtocolConfig simprot2 = new SimulationProtocolConfig();
+		final SimulationTimeProtocolConfig simprot2 = new SimulationTimeProtocolConfig();
 
 		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
 		traceprot2.setFileName(".");

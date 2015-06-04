@@ -10,14 +10,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRpcProtocolConfig.
  */
-public class SimulationProtocolConfig extends ProtocolConfig {
+public class SimulationTimeProtocolConfig extends ProtocolConfig {
 
 	/**
 	 * Instantiates a new JSON rpc protocol config.
 	 */
-	public SimulationProtocolConfig() {
+	public SimulationTimeProtocolConfig() {
 		super();
-		setClassName(SimulationProtocolBuilder.class.getName());
+		setClassName(SimulationTimeProtocolBuilder.class.getName());
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class SimulationProtocolConfig extends ProtocolConfig {
 	 * @param skipClass
 	 *            the skip class
 	 */
-	public SimulationProtocolConfig(final boolean skipClass) {
+	public SimulationTimeProtocolConfig(final boolean skipClass) {
 		super();
 	}
 
@@ -37,8 +37,8 @@ public class SimulationProtocolConfig extends ProtocolConfig {
 	 *            the node
 	 * @return the simulation protocol config
 	 */
-	public static SimulationProtocolConfig decorate(final ObjectNode node) {
-		final SimulationProtocolConfig res = new SimulationProtocolConfig(true);
+	public static SimulationTimeProtocolConfig decorate(final ObjectNode node) {
+		final SimulationTimeProtocolConfig res = new SimulationTimeProtocolConfig(true);
 		res.copy(node);
 		return res;
 	}

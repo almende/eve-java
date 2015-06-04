@@ -14,11 +14,11 @@ import com.almende.util.uuid.UUID;
 /**
  * The Class JSONRpcProtocolBuilder.
  */
-public class SimulationProtocolBuilder extends
-		AbstractCapabilityBuilder<SimulationProtocol> {
+public class SimulationTimeProtocolBuilder extends
+		AbstractCapabilityBuilder<SimulationTimeProtocol> {
 	private static final Logger LOG = Logger
-			.getLogger(SimulationProtocolBuilder.class.getName());
-	private static final Map<String, SimulationProtocol>	INSTANCES	= new HashMap<String, SimulationProtocol>();
+			.getLogger(SimulationTimeProtocolBuilder.class.getName());
+	private static final Map<String, SimulationTimeProtocol>	INSTANCES	= new HashMap<String, SimulationTimeProtocol>();
 
 	/*
 	 * (non-Javadoc)
@@ -28,8 +28,8 @@ public class SimulationProtocolBuilder extends
 	 * .JsonNode, com.almende.eve.capabilities.handler.Handler, java.lang.Class)
 	 */
 	@Override
-	public SimulationProtocol build() {
-		SimulationProtocolConfig config = SimulationProtocolConfig.decorate(getParams());
+	public SimulationTimeProtocol build() {
+		SimulationTimeProtocolConfig config = SimulationTimeProtocolConfig.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();
@@ -37,11 +37,11 @@ public class SimulationProtocolBuilder extends
 					+ id + ")");
 		}
 
-		SimulationProtocol result;
+		SimulationTimeProtocol result;
 		if (INSTANCES.containsKey(id)) {
 			result = INSTANCES.get(id);
 		} else {
-			result = new SimulationProtocol(getParams(), null);
+			result = new SimulationTimeProtocol(getParams(), null);
 		}
 		INSTANCES.put(id, result);
 		return result;
