@@ -1,6 +1,5 @@
 /**
  * @file AnnotationUtil.java
- * 
  *       AnnotationUtil is a utility to get all annotations of a class, its
  *       methods,
  *       and the method parameters. Returned annotations include all annotations
@@ -9,9 +8,7 @@
  *       Requested classes are cached, so requesting a classes annotations
  *       repeatedly
  *       is fast.
- * 
  *       Example usage:
- * 
  *       AnnotatedClass annotatedClass = AnnotationUtil.get(MyClass.class);
  *       List<AnnotatedMethod> methods = annotatedClass.getMethods();
  *       for (AnnotatedMethod method : methods) {
@@ -21,21 +18,17 @@
  *       System.out.println("    Annotation: " + annotation.toString());
  *       }
  *       }
- * 
  * @brief
  *        AnnotationUtil is a utility to retrieve merged annotations from a
  *        class
  *        including all its superclasses and interfaces.
- * 
  * @license
  *          Licensed under the Apache License, Version 2.0 (the "License"); you
  *          may not
  *          use this file except in compliance with the License. You may obtain
  *          a copy
  *          of the License at
- * 
  *          http://www.apache.org/licenses/LICENSE-2.0
- * 
  *          Unless required by applicable law or agreed to in writing, software
  *          distributed under the License is distributed on an "AS IS" BASIS,
  *          WITHOUT
@@ -44,9 +37,7 @@
  *          License for the specific language governing permissions and
  *          limitations under
  *          the License.
- * 
  *          Copyright (c) 2013 Almende B.V.
- * 
  * @author Jos de Jong, <jos@almende.org>
  * @date 2013-01-21
  */
@@ -63,6 +54,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,12 +66,12 @@ import java.util.logging.Logger;
  * The Class AnnotationUtil.
  */
 public final class AnnotationUtil {
-	private static final Logger					LOG						= Logger.getLogger(AnnotationUtil.class
-																				.getName());
-	private static Map<String, AnnotatedClass>	cache					= new ConcurrentHashMap<String, AnnotatedClass>();
-	
+	private static final Logger					LOG		= Logger.getLogger(AnnotationUtil.class
+																.getName());
+	private static Map<String, AnnotatedClass>	cache	= new ConcurrentHashMap<String, AnnotatedClass>();
+
 	private AnnotationUtil() {};
-	
+
 	/**
 	 * Get all annotations of a class, methods, and parameters.
 	 * Returned annotations include all annotations of the classes interfaces
@@ -96,25 +89,25 @@ public final class AnnotationUtil {
 		}
 		return annotatedClazz;
 	}
-	
+
 	/**
 	 * AnnotatedClass describes a class, its annotations, and its methods.
 	 */
-	public static class AnnotatedClass {
-		
+	public static class AnnotatedClass extends AnnotatedThing {
+
 		/** The clazz. */
-		private Class<?>					clazz		= null;
-		
-		//TODO: convert to Maps for indexed searches:
-		/** The annotations. */
-		private final List<Annotation>		annotations	= new ArrayList<Annotation>();
-		
-		/** The methods. */
-		private final List<AnnotatedMethod>	methods		= new ArrayList<AnnotatedMethod>();
-		
-		/** The fields. */
-		private final List<AnnotatedField>	fields		= new ArrayList<AnnotatedField>();
-		
+		private Class<?>									clazz		= null;
+		private final List<AnnotatedMethod>					methodList	= new ArrayList<AnnotatedMethod>(
+																				5);
+		private final Map<Class<?>, List<AnnotatedMethod>>	methods		= new HashMap<Class<?>, List<AnnotatedMethod>>(
+																				5);
+		private final Map<String, List<AnnotatedMethod>>	methodNames	= new HashMap<String, List<AnnotatedMethod>>(
+																				5);
+		private final List<AnnotatedField>					fieldList	= new ArrayList<AnnotatedField>(
+																				1);
+		private final Map<Class<?>, List<AnnotatedField>>	fields		= new HashMap<Class<?>, List<AnnotatedField>>(
+																				1);
+
 		/**
 		 * Create a new AnnotatedClass.
 		 *
@@ -124,8 +117,11 @@ public final class AnnotationUtil {
 		public AnnotatedClass(final Class<?> clazz) {
 			this.clazz = clazz;
 			merge(clazz);
+			AnnotationUtil.convertMethods(methods, methodList);
+			AnnotationUtil.convertMethodNames(methodNames, methodList);
+			AnnotationUtil.convertFields(fields, fieldList);
 		}
-		
+
 		/**
 		 * Recursively merge a class into this AnnotatedClass.
 		 * The method loops over all the classess interfaces and superclasses
@@ -141,22 +137,22 @@ public final class AnnotationUtil {
 			Class<?> c = clazz;
 			while (c != null && c != Object.class) {
 				// merge the annotations
-				AnnotationUtil.merge(annotations, c.getDeclaredAnnotations());
-				
+				super.merge(c.getDeclaredAnnotations());
+
 				// merge the methods
-				AnnotationUtil.merge(methods, c.getDeclaredMethods());
-				AnnotationUtil.merge(fields, c.getDeclaredFields());
-				
+				AnnotationUtil.merge(methodList, c.getDeclaredMethods());
+				AnnotationUtil.merge(fieldList, c.getDeclaredFields());
+
 				// merge all interfaces and the superclasses of the interfaces
 				for (final Class<?> i : c.getInterfaces()) {
 					merge(i);
 				}
-				
+
 				// ok now again for the superclass
 				c = c.getSuperclass();
 			}
 		}
-		
+
 		/**
 		 * Get the actual Java class described by this AnnotatedClass.
 		 * 
@@ -165,16 +161,20 @@ public final class AnnotationUtil {
 		public Class<?> getActualClass() {
 			return clazz;
 		}
-		
+
 		/**
 		 * Get all methods including methods declared in superclasses.
 		 * 
 		 * @return methods
 		 */
 		public List<AnnotatedMethod> getMethods() {
-			return methods;
+			final List<AnnotatedMethod> res = new ArrayList<AnnotatedMethod>();
+			for (List<AnnotatedMethod> sublist : methods.values()) {
+				res.addAll(sublist);
+			}
+			return res;
 		}
-		
+
 		/**
 		 * Get all methods including methods declared in superclasses, filtered
 		 * by name.
@@ -184,15 +184,13 @@ public final class AnnotationUtil {
 		 * @return filteredMethods
 		 */
 		public List<AnnotatedMethod> getMethods(final String name) {
-			final List<AnnotatedMethod> filteredMethods = new ArrayList<AnnotatedMethod>();
-			for (final AnnotatedMethod method : methods) {
-				if (method.getName().equals(name)) {
-					filteredMethods.add(method);
-				}
+			if (methodNames.containsKey(name)) {
+				return methodNames.get(name);
+			} else {
+				return Collections.emptyList();
 			}
-			return filteredMethods;
 		}
-		
+
 		/**
 		 * Get all methods including methods declared in superclasses, filtered
 		 * by annotation.
@@ -205,15 +203,13 @@ public final class AnnotationUtil {
 		 */
 		public <T> List<AnnotatedMethod> getAnnotatedMethods(
 				final Class<T> annotation) {
-			final List<AnnotatedMethod> filteredMethods = new ArrayList<AnnotatedMethod>();
-			for (final AnnotatedMethod method : methods) {
-				if (method.getAnnotation(annotation) != null) {
-					filteredMethods.add(method);
-				}
+			if (methods.containsKey(annotation)) {
+				return methods.get(annotation);
+			} else {
+				return Collections.emptyList();
 			}
-			return filteredMethods;
 		}
-		
+
 		/**
 		 * Get all fields including fields declared in superclasses, filtered
 		 * by annotation.
@@ -226,63 +222,28 @@ public final class AnnotationUtil {
 		 */
 		public <T> List<AnnotatedField> getAnnotatedFields(
 				final Class<T> annotation) {
-			final List<AnnotatedField> filteredFields = new ArrayList<AnnotatedField>();
-			for (final AnnotatedField field : fields) {
-				if (field.getAnnotation(annotation) != null) {
-					filteredFields.add(field);
-				}
+			if (fields.containsKey(annotation)) {
+				return fields.get(annotation);
+			} else {
+				return Collections.emptyList();
 			}
-			return filteredFields;
-		}
-		
-		/**
-		 * Get all annotations defined on this class, its superclasses, and its
-		 * interfaces.
-		 * 
-		 * @return annotations
-		 */
-		public List<Annotation> getAnnotations() {
-			return annotations;
-		}
-		
-		/**
-		 * Get an annotation of this class by type.
-		 * Returns null if not available.
-		 * 
-		 * @param <T>
-		 *            the generic type
-		 * @param type
-		 *            the type
-		 * @return annotation
-		 */
-		@SuppressWarnings("unchecked")
-		public <T> T getAnnotation(final Class<T> type) {
-			for (final Annotation annotation : annotations) {
-				if (annotation.annotationType() == type) {
-					return (T) annotation;
-				}
-			}
-			return null;
 		}
 	}
-	
+
 	/**
 	 * The Class AnnotatedField.
 	 */
-	public static class AnnotatedField {
-		
+	public static class AnnotatedField extends AnnotatedThing {
+
 		/** The field. */
-		private Field					field		= null;
-		
+		private Field	field	= null;
+
 		/** The name. */
-		private String					name		= null;
-		
+		private String	name	= null;
+
 		/** The type. */
-		private Type					type		= null;
-		
-		/** The annotations. */
-		private final List<Annotation>	annotations	= new ArrayList<Annotation>();
-		
+		private Type	type	= null;
+
 		/**
 		 * Instantiates a new annotated field.
 		 * 
@@ -290,13 +251,14 @@ public final class AnnotationUtil {
 		 *            the field
 		 */
 		public AnnotatedField(final Field field) {
+			super();
 			this.field = field;
 			name = field.getName();
 			type = field.getType();
-			
+
 			merge(field);
 		}
-		
+
 		/**
 		 * Merge a java method into this Annotated method.
 		 * Annotations and parameter annotations will be merged.
@@ -305,9 +267,9 @@ public final class AnnotationUtil {
 		 *            the field
 		 */
 		private void merge(final Field field) {
-			AnnotationUtil.merge(annotations, field.getDeclaredAnnotations());
+			super.merge(field.getDeclaredAnnotations());
 		}
-		
+
 		/**
 		 * Gets the field.
 		 * 
@@ -316,7 +278,7 @@ public final class AnnotationUtil {
 		public Field getField() {
 			return field;
 		}
-		
+
 		/**
 		 * Gets the name.
 		 * 
@@ -325,7 +287,7 @@ public final class AnnotationUtil {
 		public String getName() {
 			return name;
 		}
-		
+
 		/**
 		 * Gets the type.
 		 * 
@@ -334,62 +296,32 @@ public final class AnnotationUtil {
 		public Type getType() {
 			return type;
 		}
-		
-		/**
-		 * Gets the annotations.
-		 * 
-		 * @return the annotations
-		 */
-		public List<Annotation> getAnnotations() {
-			return annotations;
-		}
-		
-		/**
-		 * Get an annotation of this field by type.
-		 * Returns null if not available.
-		 * 
-		 * @param <T>
-		 *            the generic type
-		 * @param type
-		 *            the type
-		 * @return annotation
-		 */
-		@SuppressWarnings("unchecked")
-		public <T> T getAnnotation(final Class<T> type) {
-			for (final Annotation annotation : annotations) {
-				if (annotation.annotationType() == type) {
-					return (T) annotation;
-				}
-			}
-			return null;
-		}
+
 	}
-	
+
 	/**
 	 * AnnotatedMethod describes a method and its parameters.
 	 */
-	public static class AnnotatedMethod {
-		
+	public static class AnnotatedMethod extends AnnotatedThing {
+
 		/** The method. */
 		private final Method				method;
-		
+
 		/** The name. */
 		private String						name				= null;
-		
+
 		/** The return type. */
 		private Class<?>					returnType			= null;
-		
+
 		/** The generic return type. */
 		private Type						genericReturnType	= null;
-		
-		/** The annotations. */
-		private final List<Annotation>		annotations			= new ArrayList<Annotation>();
-		
+
 		/** The parameters. */
-		private final List<AnnotatedParam>	parameters			= new ArrayList<AnnotatedParam>();
-		
+		private final List<AnnotatedParam>	parameters			= new ArrayList<AnnotatedParam>(
+																		5);
+
 		private MethodHandle				methodHandle;
-		
+
 		/**
 		 * Instantiates a new annotated method.
 		 * 
@@ -400,13 +332,15 @@ public final class AnnotationUtil {
 		 */
 		public AnnotatedMethod(final Method method)
 				throws IllegalAccessException {
+			super();
+
 			this.method = method;
 			method.setAccessible(true);
 			name = method.getName();
 			returnType = method.getReturnType();
 			genericReturnType = method.getGenericReturnType();
 			merge(method);
-			
+
 			if (Defines.HASMETHODHANDLES) {
 				MethodType newType;
 				if (Modifier.isStatic(method.getModifiers())) {
@@ -420,18 +354,20 @@ public final class AnnotationUtil {
 					newType = newType.changeReturnType(void.class);
 				}
 				try {
-				methodHandle = new ConstantCallSite(MethodHandles.lookup()
-						.unreflect(method).asType(newType)
-						.asSpreader(Object[].class, newType.parameterCount()))
-						.dynamicInvoker();
-				} catch (WrongMethodTypeException e){
+					methodHandle = new ConstantCallSite(MethodHandles
+							.lookup()
+							.unreflect(method)
+							.asType(newType)
+							.asSpreader(Object[].class,
+									newType.parameterCount())).dynamicInvoker();
+				} catch (WrongMethodTypeException e) {
 					final IllegalAccessException res = new IllegalAccessException();
 					res.initCause(e);
 					throw res;
 				}
 			}
 		}
-		
+
 		/**
 		 * Merge a java method into this Annotated method.
 		 * Annotations and parameter annotations will be merged.
@@ -441,8 +377,8 @@ public final class AnnotationUtil {
 		 */
 		private void merge(final Method method) {
 			// merge the annotations
-			AnnotationUtil.merge(annotations, method.getDeclaredAnnotations());
-			
+			super.merge(method.getDeclaredAnnotations());
+
 			// merge the params
 			final Annotation[][] params = method.getParameterAnnotations();
 			final Class<?>[] types = method.getParameterTypes();
@@ -456,7 +392,7 @@ public final class AnnotationUtil {
 				}
 			}
 		}
-		
+
 		/**
 		 * Get the actual method as MethodHandler.
 		 * 
@@ -465,7 +401,7 @@ public final class AnnotationUtil {
 		public MethodHandle getMethodHandle() {
 			return methodHandle;
 		}
-		
+
 		/**
 		 * Get the actual Java method described by this AnnotatedMethod.
 		 * 
@@ -474,7 +410,7 @@ public final class AnnotationUtil {
 		public Method getActualMethod() {
 			return method;
 		}
-		
+
 		/**
 		 * Get the method name.
 		 * 
@@ -483,7 +419,7 @@ public final class AnnotationUtil {
 		public String getName() {
 			return name;
 		}
-		
+
 		/**
 		 * Get the return type of the method.
 		 * 
@@ -492,7 +428,7 @@ public final class AnnotationUtil {
 		public Class<?> getReturnType() {
 			return returnType;
 		}
-		
+
 		/**
 		 * Get the generic return type of the method.
 		 * 
@@ -501,37 +437,7 @@ public final class AnnotationUtil {
 		public Type getGenericReturnType() {
 			return genericReturnType;
 		}
-		
-		/**
-		 * Get all annotations of this method, defined in all implementations
-		 * and interfaces of the class.
-		 * 
-		 * @return annotations
-		 */
-		public List<Annotation> getAnnotations() {
-			return annotations;
-		}
-		
-		/**
-		 * Get an annotation of this method by type.
-		 * Returns null if not available.
-		 * 
-		 * @param <T>
-		 *            the generic type
-		 * @param type
-		 *            the type
-		 * @return annotation
-		 */
-		@SuppressWarnings("unchecked")
-		public <T> T getAnnotation(final Class<T> type) {
-			for (final Annotation annotation : annotations) {
-				if (annotation.annotationType() == type) {
-					return (T) annotation;
-				}
-			}
-			return null;
-		}
-		
+
 		/**
 		 * Get all parameter annotations of this method, defined in all
 		 * implementations and interfaces of the methods declaring class.
@@ -542,27 +448,27 @@ public final class AnnotationUtil {
 			return parameters;
 		}
 	}
-	
+
 	/**
 	 * AnnotatedParam describes all annotations of a parameter.
 	 */
-	public static class AnnotatedParam {
-		
+	public static class AnnotatedParam extends AnnotatedThing {
+
 		/** The annotations. */
-		private final List<Annotation>	annotations	= new ArrayList<Annotation>();
-		
+
 		/** The type. */
-		private Class<?>				type		= null;
-		
+		private Class<?>	type		= null;
+
 		/** The generic type. */
-		private Type					genericType	= null;
-		
+		private Type		genericType	= null;
+
 		/**
 		 * Instantiates a new annotated param.
 		 */
 		public AnnotatedParam() {
+			super();
 		}
-		
+
 		/**
 		 * Instantiates a new annotated param.
 		 * 
@@ -575,23 +481,60 @@ public final class AnnotationUtil {
 		 */
 		public AnnotatedParam(final Annotation[] annotations,
 				final Class<?> type, final Type genericType) {
+			super();
 			this.type = type;
 			this.genericType = genericType;
-			
+
 			merge(annotations);
 		}
-		
+
+		/**
+		 * Get the type of the parameter.
+		 * 
+		 * @return type
+		 */
+		public Class<?> getType() {
+			return type;
+		}
+
+		/**
+		 * Get the generic type of the parameter.
+		 * 
+		 * @return genericType
+		 */
+		public Type getGenericType() {
+			return genericType;
+		}
+	}
+
+	/**
+	 * The Class AnnotatedThing.
+	 */
+	public static class AnnotatedThing {
+
+		private final List<Annotation>					annotationList	= new ArrayList<Annotation>();
+
+		private final Map<Class<?>, List<Annotation>>	annotations		= new HashMap<Class<?>, List<Annotation>>(
+																				1);
+
+		/**
+		 * Instantiates a new annotated thing.
+		 */
+		public AnnotatedThing() {}
+
 		/**
 		 * Merge.
 		 * 
 		 * @param annotations
 		 *            the annotations
 		 */
-		private void merge(final Annotation[] annotations) {
+		public void merge(final Annotation[] annotations) {
 			// merge the annotations
-			AnnotationUtil.merge(this.annotations, annotations);
+			AnnotationUtil.merge(this.annotationList, annotations);
+			AnnotationUtil.convertAnnotations(this.annotations,
+					this.annotationList);
 		}
-		
+
 		/**
 		 * Get all annotations of this parameter, defined in all implementations
 		 * and interfaces of the class.
@@ -599,9 +542,16 @@ public final class AnnotationUtil {
 		 * @return annotations
 		 */
 		public List<Annotation> getAnnotations() {
-			return annotations;
+			if (annotations.size() == 1) {
+				return annotations.values().iterator().next();
+			}
+			List<Annotation> res = new ArrayList<Annotation>();
+			for (List<Annotation> sublist : annotations.values()) {
+				res.addAll(sublist);
+			}
+			return res;
 		}
-		
+
 		/**
 		 * Get an annotation of this parameter by type.
 		 * Returns null if not available.
@@ -614,33 +564,14 @@ public final class AnnotationUtil {
 		 */
 		@SuppressWarnings("unchecked")
 		public <T> T getAnnotation(final Class<T> type) {
-			for (final Annotation annotation : annotations) {
-				if (annotation.annotationType() == type) {
-					return (T) annotation;
-				}
+			List<Annotation> res = annotations.get(type);
+			if (res != null && !res.isEmpty()) {
+				return (T) res.get(0);
 			}
 			return null;
 		}
-		
-		/**
-		 * Get the type of the parameter.
-		 * 
-		 * @return type
-		 */
-		public Class<?> getType() {
-			return type;
-		}
-		
-		/**
-		 * Get the generic type of the parameter.
-		 * 
-		 * @return genericType
-		 */
-		public Type getGenericType() {
-			return genericType;
-		}
 	}
-	
+
 	/**
 	 * Merge an array with annotations (listB) into a list with
 	 * annotations (listA).
@@ -665,7 +596,66 @@ public final class AnnotationUtil {
 			}
 		}
 	}
-	
+
+	private static void convertFields(
+			final Map<Class<?>, List<AnnotatedField>> fields,
+			final List<AnnotatedField> fieldList) {
+		for (AnnotatedField field : fieldList) {
+			for (Annotation annotation : field.getAnnotations()) {
+				List<AnnotatedField> list = fields.get(annotation
+						.annotationType());
+				if (list == null) {
+					list = new ArrayList<AnnotatedField>(1);
+					fields.put(annotation.annotationType(), list);
+				}
+				list.add(field);
+			}
+		}
+	}
+
+	private static void convertMethodNames(
+			final Map<String, List<AnnotatedMethod>> methodNames,
+			final List<AnnotatedMethod> methodList) {
+		for (AnnotatedMethod method : methodList) {
+			List<AnnotatedMethod> list = methodNames.get(method.name);
+			if (list == null) {
+				list = new ArrayList<AnnotatedMethod>(1);
+				methodNames.put(method.name, list);
+			}
+			list.add(method);
+		}
+	}
+
+	private static void convertMethods(
+			final Map<Class<?>, List<AnnotatedMethod>> methods,
+			final List<AnnotatedMethod> methodList) {
+		for (AnnotatedMethod method : methodList) {
+			for (Annotation annotation : method.getAnnotations()) {
+				List<AnnotatedMethod> list = methods.get(annotation
+						.annotationType());
+				if (list == null) {
+					list = new ArrayList<AnnotatedMethod>(1);
+					methods.put(annotation.annotationType(), list);
+				}
+				list.add(method);
+			}
+		}
+	}
+
+	private static void convertAnnotations(
+			final Map<Class<?>, List<Annotation>> annotations,
+			final List<Annotation> annotationList) {
+		for (Annotation annotation : annotationList) {
+			List<Annotation> list = annotations
+					.get(annotation.annotationType());
+			if (list == null) {
+				list = new ArrayList<Annotation>(1);
+				annotations.put(annotation.annotationType(), list);
+			}
+			list.add(annotation);
+		}
+	}
+
 	/**
 	 * Merge an array of methods (listB) into a list with method
 	 * annotations (listA).
@@ -686,7 +676,7 @@ public final class AnnotationUtil {
 					break;
 				}
 			}
-			
+
 			if (methodAnnotations != null) {
 				methodAnnotations.merge(b);
 			} else {
@@ -699,7 +689,7 @@ public final class AnnotationUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * Merge an array with annotations (listB) into a list with
 	 * annotations (listA).
@@ -719,7 +709,7 @@ public final class AnnotationUtil {
 					break;
 				}
 			}
-			
+
 			if (fieldAnnotations != null) {
 				fieldAnnotations.merge(b);
 			} else {
@@ -727,7 +717,7 @@ public final class AnnotationUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * Test if two methods have equal names, return type, param count,
 	 * and param types.
@@ -746,7 +736,7 @@ public final class AnnotationUtil {
 		if (a.getReturnType() != b.getReturnType()) {
 			return false;
 		}
-		
+
 		final Class<?>[] paramsa = a.getParameterTypes();
 		final Class<?>[] paramsb = b.getParameterTypes();
 		if (paramsa.length != paramsb.length) {
@@ -757,10 +747,10 @@ public final class AnnotationUtil {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Test if two fields have equal names and types.
 	 * 

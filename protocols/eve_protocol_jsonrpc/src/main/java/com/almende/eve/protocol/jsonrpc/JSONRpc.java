@@ -583,6 +583,8 @@ final public class JSONRpc {
 	 */
 	private static Annotation getRequestAnnotation(final AnnotatedParam param,
 			final RequestParams requestParams) {
+		//TODO: expensive way of checking, better is the other way around!
+		
 		for (final Annotation annotation : param.getAnnotations()) {
 			if (requestParams != null && requestParams.has(annotation)) {
 				return annotation;
