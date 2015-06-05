@@ -5,6 +5,7 @@
 package com.almende.eve.protocol.jsonrpc.formats;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,14 +18,14 @@ public class RequestParams {
 	 * Map with full class path of an annotation type as key,
 	 * and an arbitrary object as value.
 	 */
-	private final Map<String, Object>	params	= new HashMap<String, Object>(1);
-	
+	private final Map<Class<?>, Object>	params	= new HashMap<Class<?>, Object>(
+														1);
+
 	/**
 	 * Instantiates a new request params.
 	 */
-	public RequestParams() {
-	}
-	
+	public RequestParams() {}
+
 	/**
 	 * Put.
 	 * 
@@ -34,9 +35,9 @@ public class RequestParams {
 	 *            the value
 	 */
 	public void put(final Class<?> annotationType, final Object value) {
-		params.put(annotationType.getName(), value);
+		params.put(annotationType, value);
 	}
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -45,20 +46,9 @@ public class RequestParams {
 	 * @return the object
 	 */
 	public Object get(final Class<?> annotationType) {
-		return params.get(annotationType.getName());
+		return params.get(annotationType);
 	}
-	
-	/**
-	 * Checks for.
-	 * 
-	 * @param annotationType
-	 *            the annotation type
-	 * @return true, if successful
-	 */
-	public boolean has(final Class<?> annotationType) {
-		return params.containsKey(annotationType.getName());
-	}
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -69,7 +59,7 @@ public class RequestParams {
 	public Object get(final Annotation annotation) {
 		return get(annotation.annotationType());
 	}
-	
+
 	/**
 	 * Checks for.
 	 * 
@@ -78,7 +68,16 @@ public class RequestParams {
 	 * @return true, if successful
 	 */
 	public boolean has(final Annotation annotation) {
-		return has(annotation.annotationType());
+		return params.containsKey(annotation.annotationType());
 	}
-	
+
+	/**
+	 * Values.
+	 *
+	 * @return the collection
+	 */
+	public Collection<Class<?>> keys() {
+		return params.keySet();
+	}
+
 }
