@@ -320,6 +320,7 @@ public final class AnnotationUtil {
 		private final List<AnnotatedParam>	parameters			= new ArrayList<AnnotatedParam>(
 																		5);
 
+		private boolean						isVoid				= false;
 		private MethodHandle				methodHandle;
 
 		/**
@@ -339,27 +340,37 @@ public final class AnnotationUtil {
 			name = method.getName();
 			returnType = method.getReturnType();
 			genericReturnType = method.getGenericReturnType();
+			isVoid = (returnType == void.class || returnType == Void.class);
 			merge(method);
 
 			if (Defines.HASMETHODHANDLES) {
 				MethodType newType;
-				if (Modifier.isStatic(method.getModifiers())) {
-					newType = MethodType.genericMethodType(parameters.size(),
-							method.isVarArgs());
+
+				int i = 0;
+				if (!Modifier.isStatic(method.getModifiers())) {
+					i = 1;
+				}
+				Class<?>[] parameterArray = new Class<?>[parameters.size() + i];
+				if (i == 1) {
+					parameterArray[0] = method.getDeclaringClass();
+				}
+				for (AnnotatedParam parm : parameters) {
+					parameterArray[i++] = parm.getType();
+				}
+				if (isVoid) {
+					newType = MethodType.methodType(void.class, parameterArray);
 				} else {
-					newType = MethodType.genericMethodType(
-							parameters.size() + 1, method.isVarArgs());
+					newType = MethodType.methodType(Object.class,
+							parameterArray);
 				}
-				if (method.getReturnType() == Void.class) {
-					newType = newType.changeReturnType(void.class);
-				}
+
 				try {
 					methodHandle = new ConstantCallSite(MethodHandles
 							.lookup()
 							.unreflect(method)
 							.asType(newType)
 							.asSpreader(Object[].class,
-									newType.parameterCount())).dynamicInvoker();
+									newType.parameterCount())).getTarget();
 				} catch (WrongMethodTypeException e) {
 					final IllegalAccessException res = new IllegalAccessException();
 					res.initCause(e);
@@ -391,6 +402,15 @@ public final class AnnotationUtil {
 					parameters.get(i).merge(params[i]);
 				}
 			}
+		}
+
+		/**
+		 * Checks if is void.
+		 *
+		 * @return true, if is void
+		 */
+		public boolean isVoid() {
+			return isVoid;
 		}
 
 		/**

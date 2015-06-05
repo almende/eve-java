@@ -156,12 +156,17 @@ final public class JSONRpc {
 			final MethodHandle methodHandle = annotatedMethod.getMethodHandle();
 			final Method method = annotatedMethod.getActualMethod();
 
-			Object result;
+			Object result = null;
+
 			if (Defines.HASMETHODHANDLES) {
 				final Object[] params = castParams(realDest,
 						request.getParams(), annotatedMethod.getParams(),
 						requestParams);
-				result = methodHandle.invokeExact(params);
+				if (annotatedMethod.isVoid()) {
+					methodHandle.invokeExact(params);
+				} else {
+					result = methodHandle.invokeExact(params);
+				}
 			} else {
 				final Object[] params = castParams(request.getParams(),
 						annotatedMethod.getParams(), requestParams);
@@ -238,7 +243,8 @@ final public class JSONRpc {
 				if (isAvailable(method, null, requestParams, auth)) {
 					final ObjectNode result = JOM.createObjectNode();
 					result.put("type", "method");
-					result.put("description", typeToString(method.getGenericReturnType()));
+					result.put("description",
+							typeToString(method.getGenericReturnType()));
 					result.set("returns",
 							typeToJsonSchema(method.getGenericReturnType()));
 					// format as JSON
@@ -248,8 +254,10 @@ final public class JSONRpc {
 							final ObjectNode paramData = JOM.createObjectNode();
 
 							paramData.put("name", getName(param));
-							paramData.put("description", typeToString(param.getGenericType()));
-							paramData.set("type", typeToJsonSchema(param.getGenericType()));
+							paramData.put("description",
+									typeToString(param.getGenericType()));
+							paramData.set("type",
+									typeToJsonSchema(param.getGenericType()));
 							paramData.put("required", isRequired(param));
 							params.add(paramData);
 						}
@@ -259,14 +267,15 @@ final public class JSONRpc {
 						namespace = annotatedClass.getAnnotation(
 								Namespace.class).value();
 					}
-					
+
 					String methodName = method.getName();
 					Name anno = method.getAnnotation(Name.class);
-					if (anno != null){
+					if (anno != null) {
 						methodName = anno.value();
 					}
-					
-					final String fullName = namespace.equals("") ? methodName : namespace + "." + methodName;
+
+					final String fullName = namespace.equals("") ? methodName
+							: namespace + "." + methodName;
 					methods.set(fullName, result);
 				}
 			}
@@ -317,10 +326,11 @@ final public class JSONRpc {
 		return s;
 	}
 
-	private static ObjectNode typeToJsonSchema(final Type c) throws JsonMappingException{
+	private static ObjectNode typeToJsonSchema(final Type c)
+			throws JsonMappingException {
 		return JOM.getTypeSchema(c);
 	}
-	
+
 	/**
 	 * Retrieve a description of an error.
 	 * 
@@ -401,9 +411,11 @@ final public class JSONRpc {
 					final Annotation a = getRequestAnnotation(p, requestParams);
 					if (a != null) {
 						// this is a systems parameter
-						if (a.annotationType().equals(Sender.class) && p.getType().equals(String.class)){
+						if (a.annotationType().equals(Sender.class)
+								&& p.getType().equals(String.class)) {
 							LOG.warning("Deprecated parameter usage: @Sender should now by an URI i.s.o. String");
-							objects[i + offset] = requestParams.get(a).toString();
+							objects[i + offset] = requestParams.get(a)
+									.toString();
 						} else {
 							objects[i + offset] = requestParams.get(a);
 						}
@@ -583,9 +595,9 @@ final public class JSONRpc {
 	 */
 	private static Annotation getRequestAnnotation(final AnnotatedParam param,
 			final RequestParams requestParams) {
-		for (Class<?> search : requestParams.keys()){
+		for (Class<?> search : requestParams.keys()) {
 			Annotation annotation = (Annotation) param.getAnnotation(search);
-			if (annotation != null){
+			if (annotation != null) {
 				return annotation;
 			}
 		}
