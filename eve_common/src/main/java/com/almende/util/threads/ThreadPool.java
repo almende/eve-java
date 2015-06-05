@@ -23,15 +23,15 @@ public class ThreadPool {
 																		.defaultThreadFactory();
 	private static ScheduledThreadPoolExecutor	scheduledPool	= null;
 	private static RunQueue						queue			= null;
-	
+
 	static {
 		initPools();
 	}
 
 	private static void initPools() {
-		List<Runnable> openTasks  = new ArrayList<Runnable>();
-		if (queue != null){
-			 openTasks.addAll(queue.shutdownNow());
+		List<Runnable> openTasks = new ArrayList<Runnable>();
+		if (queue != null) {
+			openTasks.addAll(queue.shutdownNow());
 		}
 		if (scheduledPool != null) {
 			scheduledPool.purge();
@@ -39,7 +39,7 @@ public class ThreadPool {
 		}
 		scheduledPool = new ScheduledThreadPoolExecutor(nofCores, factory,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		
+
 		try {
 			ScheduledThreadPoolExecutor.class.getMethod(
 					"setRemoveOnCancelPolicy", Boolean.class);
@@ -48,17 +48,20 @@ public class ThreadPool {
 			// Do nothing, Java 6 environment
 		}
 
-		scheduledPool.scheduleAtFixedRate(new Runnable(){
+		scheduledPool.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				scheduledPool.purge();
-			}}, 1000, 1000, TimeUnit.MILLISECONDS);
-		
+			}
+		}, 1000, 1000, TimeUnit.MILLISECONDS);
+
 		queue = new RunQueue();
-		for (Runnable task : openTasks){
-			if (task instanceof RunnableScheduledFuture){
+		for (Runnable task : openTasks) {
+			if (task instanceof RunnableScheduledFuture) {
 				final RunnableScheduledFuture<?> futureTask = (RunnableScheduledFuture<?>) task;
-				scheduledPool.schedule(futureTask, futureTask.getDelay(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+				scheduledPool.schedule(futureTask,
+						futureTask.getDelay(TimeUnit.MILLISECONDS),
+						TimeUnit.MILLISECONDS);
 			} else {
 				queue.execute(task);
 			}
@@ -74,6 +77,18 @@ public class ThreadPool {
 	public static void setNofCores(int nofCores) {
 		ThreadPool.nofCores = nofCores;
 		initPools();
+	}
+
+	/**
+	 * Sets the max tasks that may be handled concurrently in the Runqueue,
+	 * falls back to calling thread handling inbound calls; (Some natural number
+	 * would be around 100.000)
+	 *
+	 * @param maxtasks
+	 *            the new max tasks
+	 */
+	public static void setMaxTasks(final int maxtasks) {
+		queue.setMaxTasks(maxtasks);
 	}
 
 	/**

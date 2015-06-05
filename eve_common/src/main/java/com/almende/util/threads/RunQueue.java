@@ -29,7 +29,7 @@ public class RunQueue extends AbstractExecutorService {
 	private final Queue<Runnable>	tasks				= new ConcurrentLinkedQueue<Runnable>();
 	private final HashSet<Worker>	waiting				= new HashSet<Worker>(8);
 	private final Scanner			scanner				= new Scanner();
-	private static final int		MAXTASKS			= 50000;
+	private static int				maxtasks			= -1;
 	private static final int		MAXTASKSPERWORKER	= 1000;
 	private int						nofCores;
 	private HashSet<Worker>			running				= null;
@@ -129,6 +129,25 @@ public class RunQueue extends AbstractExecutorService {
 		scanner.start();
 	}
 
+	/**
+	 * Sets the max tasks.
+	 *
+	 * @param max
+	 *            the new max tasks
+	 */
+	public void setMaxTasks(final int max) {
+		maxtasks = max;
+		if (maxtasks > 0) {
+			synchronized (taskCnt) {
+				taskCnt[0] = tasks.size();
+			}
+		} else {
+			synchronized (taskCnt) {
+				taskCnt[0] = 0;
+			}
+		}
+	}
+
 	@Override
 	public void shutdown() {
 		isShutdown = true;
@@ -183,31 +202,33 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private boolean addTask(final Runnable command) {
-		if (taskCnt[0] > MAXTASKS) {
+		if (maxtasks > 0 && taskCnt[0] > maxtasks) {
+			// TODO: find a way to limit this without a shared counter! For
+			// example: runtime to add task > 1a2 ms?
 			Thread thread = Thread.currentThread();
 			if (thread instanceof Worker) {
 				if (((Worker) thread).taskCnt <= MAXTASKSPERWORKER) {
+					// Do this task yourself!
 					return false;
 				}
 			}
 		}
-		synchronized (taskCnt) {
-			taskCnt[0]++;
-		}
-		tasks.add(command);
+		putTask(command);
 		return true;
 	}
 
 	private void putTask(final Runnable command) {
-		synchronized (taskCnt) {
-			taskCnt[0]++;
+		if (maxtasks > 0) {
+			synchronized (taskCnt) {
+				taskCnt[0]++;
+			}
 		}
 		tasks.add(command);
 	}
 
 	private Runnable getTask() {
 		final Runnable task = tasks.poll();
-		if (task != null) {
+		if (maxtasks > 0 && task != null) {
 			synchronized (taskCnt) {
 				taskCnt[0]--;
 			}
