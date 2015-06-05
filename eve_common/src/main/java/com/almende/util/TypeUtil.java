@@ -27,8 +27,10 @@ public abstract class TypeUtil<T> {
 	/**
 	 * The Constant LOG.
 	 */
-	static final Logger		LOG	= Logger.getLogger(TypeUtil.class.getName());
-	private final JavaType	valueType;
+	static final Logger			LOG		= Logger.getLogger(TypeUtil.class
+												.getName());
+	static final ObjectMapper	MAPPER	= JOM.getInstance();
+	private final JavaType		valueType;
 
 	/**
 	 * Instantiates a new type util.
@@ -142,9 +144,9 @@ public abstract class TypeUtil<T> {
 		if (target == null) {
 			return new TypeUtil<T>(Void.class) {};
 		}
-		if (target instanceof Class<?>){
-			//Security, but price is unchecked warning....
-			return new TypeUtil<T>((Class<T>) target){};
+		if (target instanceof Class<?>) {
+			// Security, but price is unchecked warning....
+			return new TypeUtil<T>((Class<T>) target) {};
 		}
 		Type gsc = target.getClass().getGenericSuperclass();
 		ParameterizedType ptype = null;
@@ -155,8 +157,7 @@ public abstract class TypeUtil<T> {
 					(Class<?>) gsc, target.getClass());
 		}
 		if (ptype == null) {
-			gsc = target.getClass()
-					.getGenericInterfaces()[0];
+			gsc = target.getClass().getGenericInterfaces()[0];
 			if (gsc instanceof ParameterizedType) {
 				ptype = (ParameterizedType) gsc;
 			}
@@ -252,7 +253,6 @@ public abstract class TypeUtil<T> {
 		if (fullType.hasRawClass(Void.class)) {
 			return null;
 		}
-		final ObjectMapper mapper = JOM.getInstance();
 		if (value instanceof JsonNode) {
 			if (fullType.getRawClass().equals(JsonNode.class)) {
 				return (T) value;
@@ -261,7 +261,7 @@ public abstract class TypeUtil<T> {
 				return null;
 			}
 			try {
-				return mapper.convertValue(value, fullType);
+				return MAPPER.convertValue(value, fullType);
 			} catch (final Exception e) {
 				final ClassCastException cce = new ClassCastException(
 						"Failed to convert value:" + value + " -----> "
