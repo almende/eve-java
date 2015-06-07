@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -22,10 +23,9 @@ public final class JSONResponse extends JSONMessage {
 	private static final long		serialVersionUID	= 12392962249054051L;
 	private static final Logger		LOG					= Logger.getLogger(JSONResponse.class
 																.getName());
-	private static final JavaType	JSONNODETYPE		= JOM.getTypeFactory()
-																.constructType(
-																		JsonNode.class);
-
+	private static ObjectMapper		MAPPER				= JOM.getInstance();
+	private static JavaType			JSONNODETYPE		= JOM.getTypeFactory().constructType(JsonNode.class);
+	private static ObjectReader		READER				= MAPPER.reader(JSONResponse.class);
 	private JsonNode				result				= null;
 	private JSONRPCException		error				= null;
 
@@ -45,8 +45,7 @@ public final class JSONResponse extends JSONMessage {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONResponse(final String json) throws IOException {
-		final ObjectMapper mapper = JOM.getInstance();
-		init(mapper.valueToTree(json));
+		init(MAPPER.readTree(json));
 	}
 
 	/**
@@ -118,7 +117,7 @@ public final class JSONResponse extends JSONMessage {
 					"Member 'error' is no ObjectNode");
 		}
 		try {
-			JOM.getInstance().readerForUpdating(this).readValue(jsonNode);
+			READER.withValueToUpdate(this).readValue(jsonNode);
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Couldn't parse incoming response", e);
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
@@ -151,8 +150,7 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public void setResult(final Object result) {
 		if (result != null) {
-			final ObjectMapper mapper = JOM.getInstance();
-			this.result = (JsonNode) mapper.convertValue(result, JSONNODETYPE);
+			this.result = (JsonNode) MAPPER.convertValue(result,JSONNODETYPE);
 			setError(null);
 		} else {
 			this.result = null;

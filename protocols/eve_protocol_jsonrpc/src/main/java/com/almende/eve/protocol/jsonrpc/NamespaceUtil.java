@@ -25,7 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 final class NamespaceUtil {
 	private static final Map<String, AnnotatedMethod[]>	CACHE		= new HashMap<String, AnnotatedMethod[]>();
-	private static final NamespaceUtil					INSTANCE	= new NamespaceUtil();
 	private static final Pattern						PATTERN		= Pattern
 																			.compile("\\.[^.]+$");
 
@@ -33,28 +32,6 @@ final class NamespaceUtil {
 	 * Instantiates a new namespace util.
 	 */
 	private NamespaceUtil() {};
-
-	/**
-	 * Gets the.
-	 * 
-	 * @param destination
-	 *            the destination
-	 * @param path
-	 *            the path
-	 * @return the call tuple
-	 * @throws IllegalAccessException
-	 *             the illegal access exception
-	 * @throws InvocationTargetException
-	 *             the invocation target exception
-	 * @throws NoSuchMethodException
-	 *             the no such method exception
-	 */
-	public static CallTuple get(final Object destination, final String path)
-			throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException {
-
-		return INSTANCE._get(destination, path);
-	}
 
 	/**
 	 * Populate cache.
@@ -70,9 +47,9 @@ final class NamespaceUtil {
 	 * @throws InvocationTargetException
 	 *             the invocation target exception
 	 */
-	private void populateCache(final Object destination, final String steps,
-			final AnnotatedMethod[] methods) throws IllegalAccessException,
-			InvocationTargetException {
+	private static void populateCache(final Object destination,
+			final String steps, final AnnotatedMethod[] methods)
+			throws IllegalAccessException, InvocationTargetException {
 		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		for (final AnnotatedMethod method : clazz
 				.getAnnotatedMethods(Namespace.class)) {
@@ -103,7 +80,7 @@ final class NamespaceUtil {
 	}
 
 	/**
-	 * _get.
+	 * get.
 	 *
 	 * @param destination
 	 *            the destination
@@ -116,12 +93,10 @@ final class NamespaceUtil {
 	 *             the invocation target exception
 	 * @throws NoSuchMethodException
 	 *             the no such method exception
-	 * @throws UnsupportedOperationException
-	 *             the unsupported operation exception
 	 */
-	private CallTuple _get(final Object destination, final String path)
+	public static CallTuple get(final Object destination, final String path)
 			throws IllegalAccessException, InvocationTargetException,
-			NoSuchMethodException, UnsupportedOperationException {
+			NoSuchMethodException {
 		final CallTuple result = new CallTuple();
 		String reducedPath = "";
 		String reducedMethod = path;
@@ -164,15 +139,18 @@ final class NamespaceUtil {
 				.getClass());
 		final List<AnnotatedMethod> methods = newClazz
 				.getMethods(reducedMethod);
-		if (methods.isEmpty()){
-			//Fall back to checking for @Name methods.
+		if (methods.isEmpty()) {
+			// Fall back to checking for @Name methods.
 			final List<AnnotatedMethod> namedMethods = newClazz
 					.getAnnotatedMethods(Name.class);
-			if (!namedMethods.isEmpty()){
-				for (AnnotatedMethod method: namedMethods){
-					if (reducedMethod.equals(method.getAnnotation(Name.class).value())){
+			if (!namedMethods.isEmpty()) {
+				for (AnnotatedMethod method : namedMethods) {
+					if (reducedMethod.equals(method.getAnnotation(Name.class)
+							.value())) {
 						methods.add(method);
-						//TODO: If we ever want to support method overloading, this needs to be fixed to continue searching other @Name methods.
+						// TODO: If we ever want to support method overloading,
+						// this needs to be fixed to continue searching other
+						// @Name methods.
 						break;
 					}
 				}
@@ -197,7 +175,7 @@ final class NamespaceUtil {
 	/**
 	 * The Class CallTuple.
 	 */
-	public class CallTuple {
+	public static class CallTuple {
 
 		/** The destination. */
 		private Object			destination;

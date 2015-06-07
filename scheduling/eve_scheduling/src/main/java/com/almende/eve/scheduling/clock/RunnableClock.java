@@ -6,8 +6,9 @@ package com.almende.eve.scheduling.clock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,7 +26,7 @@ import com.almende.util.threads.ThreadPool;
 public class RunnableClock implements Runnable, Clock {
 	private static final Logger								LOG			= Logger.getLogger(RunnableClock.class
 																				.getName());
-	protected final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new TreeMap<ClockEntry, ClockEntry>();
+	protected final NavigableMap<ClockEntry, ClockEntry>	TIMELINE	= new ConcurrentSkipListMap<ClockEntry, ClockEntry>();
 	protected static final ScheduledExecutorService			SCHEDULER	= ThreadPool
 																				.getScheduledPool();
 	protected static final Executor							RUNNER		= ThreadPool
@@ -39,36 +40,40 @@ public class RunnableClock implements Runnable, Clock {
 	@Override
 	public void run() {
 		final List<Runnable> toRun = new ArrayList<Runnable>();
-		synchronized (TIMELINE) {
-			while (!TIMELINE.isEmpty()) {
-				final ClockEntry ce = TIMELINE.firstEntry().getValue();
-				final DateTime now = DateTime.now();
-				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
-					TIMELINE.remove(ce);
-					toRun.add(ce.getCallback());
-					continue;
-				}
-				final long interval = new Interval(now, ce.getDue())
-						.toDurationMillis();
-				if (interval <= 0) {
-					continue;
-				}
-				if (future == null
-						|| future.getDelay(TimeUnit.MILLISECONDS) != interval) {
-					if (future != null) {
-						future.cancel(false);
-					}
-					future = SCHEDULER.schedule(this, interval,
-							TimeUnit.MILLISECONDS);
-				}
+		while (true) {
+			final Entry<ClockEntry,ClockEntry> first = TIMELINE.firstEntry();
+			if (first == null){
 				break;
 			}
-			if (future == null && !TIMELINE.isEmpty()) {
-				LOG.warning("Lost trigger, should never happen!");
+			ClockEntry ce = first.getValue();
+			final DateTime now = DateTime.now();
+
+			if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
+				TIMELINE.remove(ce);
+				toRun.add(ce.getCallback());
+				continue;
 			}
+			final long interval = new Interval(now, ce.getDue())
+					.toDurationMillis();
+			if (interval <= 5) {
+				break;
+			}
+			if (future == null
+					|| future.getDelay(TimeUnit.MILLISECONDS) > interval) {
+				if (future != null) {
+					future.cancel(false);
+				}
+				future = SCHEDULER.schedule(this, interval,
+						TimeUnit.MILLISECONDS);
+			}
+			break;
 		}
 		for (Runnable run : toRun) {
 			RUNNER.execute(run);
+		}
+		if (future == null && !TIMELINE.isEmpty()) {
+			// recurse
+			run();
 		}
 	}
 
@@ -81,16 +86,15 @@ public class RunnableClock implements Runnable, Clock {
 	@Override
 	public void requestTrigger(final String triggerId, final DateTime due,
 			final Runnable callback) {
-		synchronized (TIMELINE) {
-			final ClockEntry ce = new ClockEntry(triggerId, due, callback);
-			final ClockEntry oldVal = TIMELINE.get(ce);
-			if (oldVal == null || oldVal.getDue().isAfter(due)) {
-				TIMELINE.put(ce, ce);
-			} else {
-				LOG.warning(ce.getTriggerId()
-						+ ": Skip adding ce, because has old value earlier than current. "
-						+ oldVal.getTriggerId());
-			}
+		final ClockEntry ce = new ClockEntry(triggerId, due, callback);
+
+		final ClockEntry oldVal = TIMELINE.get(ce);
+		if (oldVal == null || oldVal.getDue().isAfter(due)) {
+			TIMELINE.put(ce, ce);
+		} else {
+			LOG.warning(ce.getTriggerId()
+					+ ": Skip adding ce, because has old value earlier than current. "
+					+ oldVal.getTriggerId());
 		}
 		RUNNER.execute(this);
 	}
@@ -101,10 +105,8 @@ public class RunnableClock implements Runnable, Clock {
 	 */
 	@Override
 	public void cancel(final String triggerId) {
-		synchronized (TIMELINE) {
-			final ClockEntry ce = new ClockEntry(triggerId, null, null);
-			TIMELINE.remove(ce);
-		}
+		final ClockEntry ce = new ClockEntry(triggerId, null, null);
+		TIMELINE.remove(ce);
 	}
 
 	/*
@@ -113,12 +115,10 @@ public class RunnableClock implements Runnable, Clock {
 	 */
 	@Override
 	public void clear() {
-		synchronized (TIMELINE) {
-			TIMELINE.clear();
-			if (future != null) {
-				future.cancel(false);
-				future = null;
-			}
+		TIMELINE.clear();
+		if (future != null) {
+			future.cancel(false);
+			future = null;
 		}
 	}
 
@@ -137,7 +137,7 @@ public class RunnableClock implements Runnable, Clock {
 	public void start() {
 		// Nothing todo, time progresses by itself:)
 	}
-	
+
 	@Override
 	public void stop() {
 		// Nothing todo, time progresses by itself:)

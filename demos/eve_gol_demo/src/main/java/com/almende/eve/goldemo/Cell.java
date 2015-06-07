@@ -14,9 +14,9 @@ import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
 import com.almende.util.URIUtil;
-import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -141,9 +141,9 @@ public class Cell extends Agent {
 			neighbors = getState().get("neighbors", NEIGHBORTYPE);
 		}
 		final CycleState myState = getState().get("val_0", CYCLESTATETYPE);
-		final ObjectNode params = JOM.createObjectNode();
-		params.put("alive", myState.isAlive());
-		params.put("cycle", 0);
+		final Params params = new Params();
+		params.add("alive", myState.isAlive());
+		params.add("cycle", 0);
 		for (final String neighbor : neighbors) {
 			final URI uri = URIUtil.create(neighbor);
 			try {
@@ -216,11 +216,11 @@ public class Cell extends Agent {
 				if (getState().get("Stopped", BOOLEANSTATE)) {
 					return;
 				}
-				final ObjectNode params = JOM.createObjectNode();
-				params.put("alive", newState.isAlive());
-				params.put("cycle", currentCycle);
+				final Params params = new Params();
+				params.add("alive", newState.isAlive());
+				params.add("cycle", currentCycle);
 				for (final String neighbor : neighbors) {
-					final URI uri = URI.create(neighbor);
+					final URI uri = URIUtil.create(neighbor);
 					try {
 						call(uri, "collect", params, null);
 					} catch (final IOException e) {

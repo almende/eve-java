@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * A factory for creating AgentProxy objects.
  */
 public final class AgentProxyFactory {
+	private static final TypeUtil<JsonNode>	JSONNODETYPE	= new TypeUtil<JsonNode>() {};
 
 	private AgentProxyFactory() {}
 
@@ -81,7 +82,7 @@ public final class AgentProxyFactory {
 						}
 						SyncCallback<JsonNode> callback = null;
 						if (doSync) {
-							callback = new SyncCallback<JsonNode>() {};
+							callback = new SyncCallback<JsonNode>(JSONNODETYPE) {};
 						}
 						try {
 							sender.call(receiverUrl, method, args, callback);

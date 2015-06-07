@@ -13,29 +13,27 @@ import java.util.concurrent.TimeoutException;
 import com.almende.util.threads.ThreadPool;
 
 /**
- * Queue to hold a list with callbacks in progress.
- * The Queue handles timeouts on the callbacks.
+ * Store to hold a map with callbacks in progress.
+ * The Store handles timeouts on the callbacks.
  * 
  * @param <T>
  *            the generic type
  */
-public class AsyncCallbackQueue<T> {
-	private final Map<Object, CallbackHandler>	queue		= new ConcurrentHashMap<Object, CallbackHandler>(5);
-	// FIXME: provide some means for the Appengine implementation of
-	// ThreadManager.
-	
+public class AsyncCallbackStore<T> {
+	private final Map<Object, CallbackHandler>	store			= new ConcurrentHashMap<Object, CallbackHandler>(
+																		5);
+
 	/** timeout in seconds */
-	private int									defTimeout	= 30;
-	
+	private int									defTimeout		= 30;
+
 	/**
-	 * Append a callback to the queue.
-	 * 
-	 * The callback must be pulled from the queue again within the
+	 * Place a callback in the store..
+	 * The callback must be pulled from the store again within the
 	 * timeout. If not, the callback.onFailure will be called with a
-	 * TimeoutException as argument, and is deleted from the queue.
-	 * 
+	 * TimeoutException as argument, and the callback will be deleted from the
+	 * store.
 	 * The method will throw an exception when a callback with the same id
-	 * is already in the queue.
+	 * is already in the store.
 	 * 
 	 * @param id
 	 *            the id
@@ -44,65 +42,85 @@ public class AsyncCallbackQueue<T> {
 	 * @param callback
 	 *            the callback
 	 */
-	public void push(final Object id, final String description,
+	public void put(final Object id, final String description,
 			final AsyncCallback<T> callback) {
-		if (queue.containsKey(id)) {
+		if (store.containsKey(id)) {
 			throw new IllegalStateException("Callback with id '" + id
 					+ "' already in queue");
 		}
-		
-		final AsyncCallbackQueue<T> me = this;
 		final CallbackHandler handler = new CallbackHandler();
 		handler.callback = callback;
-		handler.timeout = ThreadPool.getScheduledPool().schedule(new Runnable() {
-			@Override
+
+		ThreadPool.getPool().execute(new Runnable() {
 			public void run() {
-				final AsyncCallback<T> callback = me.pull(id);
-				if (callback != null) {
-					callback.onFailure(new TimeoutException(
-							"Timeout occurred for callback with id '" + id
-									+ "': " + description));
+				if (handler.done) {
+					return;
+				} else {
+					ScheduledFuture<?> timeout = ThreadPool.getScheduledPool()
+							.schedule(new Runnable() {
+								@Override
+								public void run() {
+									final AsyncCallback<T> callback = handler.callback;
+									if (callback != null && !handler.done) {
+										callback.onFailure(new TimeoutException(
+												"Timeout occurred for callback with id '"
+														+ id + "': "
+														+ description));
+
+									}
+								}
+							}, defTimeout, TimeUnit.SECONDS);
+					if (!handler.done) {
+						handler.timeout = timeout;
+					} else {
+						timeout.cancel(true);
+					}
 				}
-			}
-		}, defTimeout, TimeUnit.SECONDS);
-		queue.put(id, handler);
+
+			};
+		});
+		store.put(id, handler);
 	}
-	
+
 	/**
-	 * Pull a callback from the queue. The callback can be pulled from the
-	 * queue only once. If no callback is found with given id, null will
+	 * Get a callback from the Store. The callback can be pulled from the
+	 * store only once. If no callback is found with given id, null will
 	 * be returned.
 	 * 
 	 * @param id
 	 *            the id
 	 * @return the async callback
 	 */
-	public AsyncCallback<T> pull(final Object id) {
-		final CallbackHandler handler = queue.remove(id);
+	public AsyncCallback<T> get(final Object id) {
+		final CallbackHandler handler = store.remove(id);
 		if (handler != null) {
+			handler.done = true;
 			// stop the timeout
-			handler.timeout.cancel(true);
-			handler.timeout = null;
+			if (handler.timeout != null) {
+				handler.timeout.cancel(true);
+				handler.timeout = null;
+			}
 			return handler.callback;
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Remove all callbacks from the queue.
 	 */
 	public synchronized void clear() {
-		queue.clear();
+		store.clear();
 	}
-	
+
 	/**
 	 * Helper class to store a callback and its timeout task.
 	 */
 	private class CallbackHandler {
+		private boolean				done	= false;
 		private AsyncCallback<T>	callback;
-		private ScheduledFuture<?>	timeout;
+		private ScheduledFuture<?>	timeout	= null;
 	}
-	
+
 	/**
 	 * Gets the default callback timeout.
 	 * 
@@ -111,7 +129,7 @@ public class AsyncCallbackQueue<T> {
 	public int getDefTimeout() {
 		return defTimeout;
 	}
-	
+
 	/**
 	 * Sets the default callback timeout.
 	 * 
@@ -121,5 +139,5 @@ public class AsyncCallbackQueue<T> {
 	public void setDefTimeout(int defTimeout) {
 		this.defTimeout = defTimeout;
 	}
-	
+
 }

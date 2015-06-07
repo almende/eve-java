@@ -11,6 +11,8 @@ import java.util.Queue;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 /**
@@ -54,10 +56,11 @@ public class RunQueue extends AbstractExecutorService {
 	}
 
 	private class Worker extends Thread {
-		final private Object	lock		= new Object();
-		private Runnable		task		= null;
-		private boolean			isShutdown	= false;
-		private int				taskCnt		= 0;
+		final private ReentrantLock	lock		= new ReentrantLock();
+		final private Condition		condition	= lock.newCondition();
+		private Runnable			task		= null;
+		private boolean				isShutdown	= false;
+		private int					taskCnt		= 0;
 
 		public boolean runTask(final Runnable task) {
 			if (this.task != null) {
@@ -70,43 +73,53 @@ public class RunQueue extends AbstractExecutorService {
 			if (task == null) {
 				return true;
 			}
-			synchronized (lock) {
+			if (lock.tryLock()) {
 				if (this.task != null) {
+					lock.unlock();
 					return false;
 				}
 				this.task = task;
 				taskCnt++;
-				lock.notify();
+				condition.signal();
+				lock.unlock();
+				return true;
+			} else {
+				return false;
 			}
-			return true;
 		}
 
 		@Override
 		public void run() {
 			while (!isShutdown) {
-				synchronized (lock) {
-					while (task == null) {
-						try {
-							lock.wait();
-						} catch (InterruptedException e) {}
-						if (isShutdown) {
-							return;
-						}
-					}
-					if (!running.contains(this)) {
-						threadContinue(this);
-					}
-					task.run();
-					task = null;
-					taskCnt--;
-					if (running.size() <= nofCores) {
-						// Shortcut: Check if there are more tasks available.
-						task = getTask();
-					}
-					if (task == null) {
-						threadDone(this);
+				try {
+					lock.lockInterruptibly();
+				} catch (InterruptedException e1) {
+					continue;
+				}
+				while (task == null) {
+					try {
+						condition.await();
+					} catch (InterruptedException e) {}
+					if (isShutdown) {
+						return;
 					}
 				}
+				if (!running.contains(this)) {
+					threadContinue(this);
+				}
+				task.run();
+				task = null;
+				taskCnt--;
+				if (running.size() <= nofCores) {
+					// Shortcut: Check if there are more tasks available.
+					task = getTask();
+				}
+				if (task == null) {
+					threadDone(this);
+				} else {
+					taskCnt++;
+				}
+				lock.unlock();
 			}
 			if (task != null) {
 				putTask(task);

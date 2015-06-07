@@ -13,16 +13,14 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.auth.DefaultAuthorizor;
-import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.protocol.jsonrpc.formats.JSONMessage;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
-import com.almende.eve.protocol.jsonrpc.formats.RequestParams;
-import com.almende.util.URIUtil;
+import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
-import com.almende.util.callback.AsyncCallbackQueue;
+import com.almende.util.callback.AsyncCallbackStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -32,12 +30,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JSONRpcProtocol implements RpcBasedProtocol {
 	private static final Logger						LOG					= Logger.getLogger(JSONRpcProtocol.class
 																				.getName());
-	private static final RequestParams				EVEREQUESTPARAMS	= new RequestParams();
-	static {
-		EVEREQUESTPARAMS.put(Sender.class, URIUtil.create("local:null"));
-	}
+	private static final TypeUtil<JSONResponse>     JSONRESPONSETYPE	= new TypeUtil<JSONResponse>(){};
 	private Authorizor								auth				= new DefaultAuthorizor();
-	private final AsyncCallbackQueue<JSONResponse>	callbacks			= new AsyncCallbackQueue<JSONResponse>();
+	private final AsyncCallbackStore<JSONResponse>	callbacks			= new AsyncCallbackStore<JSONResponse>();
 	private final Handler<Object>					destination;
 	private Handler<Caller>							caller				= null;
 	private JSONRpcProtocolConfig					myParams;
@@ -140,12 +135,10 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		try {
 			if (jsonMsg.isRequest()) {
 				final JSONRequest request = (JSONRequest) jsonMsg;
-				final RequestParams params = new RequestParams();
-				params.put(Sender.class, senderUrl);
-				return JSONRpc.invoke(destination.get(), request, params, auth);
+				return JSONRpc.invoke(destination.get(), request, senderUrl, auth);
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
-				final AsyncCallback<JSONResponse> callback = callbacks.pull(id);
+				final AsyncCallback<JSONResponse> callback = callbacks.get(id);
 				if (callback != null) {
 					final JSONResponse response = (JSONResponse) jsonMsg;
 					final JSONRPCException error = response.getError();
@@ -177,7 +170,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	 * @return the methods
 	 */
 	public ObjectNode getMethods() {
-		return JSONRpc.describe(getHandle().get(), EVEREQUESTPARAMS, "", auth);
+		return JSONRpc.describe(getHandle().get(), "", auth);
 	}
 
 	private <T> void addCallback(final JSONRequest request,
@@ -190,7 +183,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
-		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>() {
+		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>(JSONRESPONSETYPE) {
 			@Override
 			public void onSuccess(final JSONResponse response) {
 				final Exception err = response.getError();
@@ -222,7 +215,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		};
 
 		if (callbacks != null) {
-			callbacks.push(((JSONMessage) request).getId(), request.toString(),
+			callbacks.put(((JSONMessage) request).getId(), "Outbound message callback.",
 					responseCallback);
 		}
 	}

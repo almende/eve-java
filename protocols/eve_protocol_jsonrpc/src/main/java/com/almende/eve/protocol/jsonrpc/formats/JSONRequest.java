@@ -21,6 +21,7 @@ import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -30,11 +31,13 @@ public final class JSONRequest extends JSONMessage {
 	private static final Logger			LOG					= Logger.getLogger(JSONRequest.class
 																	.getCanonicalName());
 	private static final long			serialVersionUID	= 1970046457233622444L;
+	private static final ObjectMapper	MAPPER				= JOM.getInstance();
+	private static final ObjectReader	READER				= MAPPER.reader(JSONRequest.class);
 	transient private AsyncCallback<?>	callback			= null;
 
-	private String method = null;
-	private ObjectNode params = null;	
-	
+	private String						method				= null;
+	private ObjectNode					params				= null;
+
 	/**
 	 * Instantiates a new jSON request.
 	 */
@@ -51,8 +54,7 @@ public final class JSONRequest extends JSONMessage {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONRequest(final String json) throws IOException {
-		final ObjectMapper mapper = JOM.getInstance();
-		init(mapper.readTree(json));
+		init(MAPPER.readTree(json));
 	}
 
 	/**
@@ -142,7 +144,7 @@ public final class JSONRequest extends JSONMessage {
 						.getAnnotation(Name.class);
 				if (nameAnnotation != null && nameAnnotation.value() != null) {
 					final String name = nameAnnotation.value();
-					final JsonNode paramValue = JOM.getInstance().valueToTree(
+					final JsonNode paramValue = MAPPER.valueToTree(
 							args[i]);
 					params.set(name, paramValue);
 				} else {
@@ -155,13 +157,12 @@ public final class JSONRequest extends JSONMessage {
 						+ " in method '" + method.getName() + "' is null.");
 			}
 		}
-		JsonNode id = null;
-		try {
-			id = JOM.getInstance().valueToTree(new UUID().toString());
-		} catch (final Exception e) {
-			LOG.log(Level.SEVERE, "Failed to generate UUID for request", e);
+		if (callback != null){
+			final JsonNode id = MAPPER.createObjectNode().textNode(new UUID().toString());
+			init(id, method.getName(), params, callback);
+		} else {
+			init(null, method.getName(), params, null);
 		}
-		init(id, method.getName(), params, callback);
 	}
 
 	/**
@@ -195,12 +196,13 @@ public final class JSONRequest extends JSONMessage {
 	public void init(final JsonNode request) {
 		super.init(request);
 		try {
-			JOM.getInstance().readerForUpdating(this).readValue(request);
+			READER.withValueToUpdate(this).readValue(request);
 		} catch (IOException e) {
-			LOG.log(Level.WARNING, "Couldn't parse incoming request",e);
-			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,e.getLocalizedMessage(),e);
+			LOG.log(Level.WARNING, "Couldn't parse incoming request", e);
+			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
+					e.getLocalizedMessage(), e);
 		}
-		if (getMethod() == null){
+		if (getMethod() == null) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Member 'method' missing in request");
 		}
@@ -219,7 +221,7 @@ public final class JSONRequest extends JSONMessage {
 	private <T> void init(final JsonNode id, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		if (callback != null && (id == null || id.isNull())) {
-			setId(JOM.getInstance().valueToTree(new UUID().toString()));
+			setId(MAPPER.createObjectNode().textNode(new UUID().toString()));
 		} else {
 			setId(id);
 		}
@@ -235,7 +237,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the new method
 	 */
 	public void setMethod(final String method) {
-		this.method=method;
+		this.method = method;
 	}
 
 	/**
@@ -263,7 +265,7 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the params
 	 */
 	public ObjectNode getParams() {
-		if (this.params == null){
+		if (this.params == null) {
 			return JOM.createObjectNode();
 		}
 		return this.params;
@@ -278,7 +280,8 @@ public final class JSONRequest extends JSONMessage {
 	 *            the value
 	 */
 	public void putParam(final String name, final Object value) {
-		this.params.set(name, JOM.getInstance().convertValue(value, JsonNode.class));
+		this.params.set(name,
+				MAPPER.createObjectNode().pojoNode(value));
 	}
 
 	/**
@@ -289,9 +292,8 @@ public final class JSONRequest extends JSONMessage {
 	 * @return the param
 	 */
 	public Object getParam(final String name) {
-		final ObjectMapper mapper = JOM.getInstance();
 		if (params.has(name)) {
-			return mapper.convertValue(params.get(name), Object.class);
+			return MAPPER.convertValue(params.get(name), Object.class);
 		}
 		return null;
 	}
@@ -330,10 +332,10 @@ public final class JSONRequest extends JSONMessage {
 
 	@Override
 	@JsonIgnore
-	public boolean isRequest(){
+	public boolean isRequest() {
 		return true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -343,7 +345,7 @@ public final class JSONRequest extends JSONMessage {
 		final ObjectMapper mapper = JOM.getInstance();
 		try {
 			ObjectNode tree = mapper.valueToTree(this);
-			if (tree.get(ID) == null || tree.get(ID).isNull()){
+			if (tree.get(ID) == null || tree.get(ID).isNull()) {
 				tree.remove(ID);
 			}
 			if (tree.get(EXTRA) == null || tree.get(EXTRA).isNull()) {

@@ -4,6 +4,9 @@
  */
 package com.almende.util.callback;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.almende.util.TypeUtil;
 
 /**
@@ -14,10 +17,13 @@ import com.almende.util.TypeUtil;
  */
 public class SyncCallback<T> extends AsyncCallback<T> {
 
-	private T			response	= null;
-	private Exception	exception	= null;
-	private boolean		done		= false;
-	private boolean		waiting		= false;
+	private ReentrantLock	lock		= new ReentrantLock();
+	private Condition		condition	= lock.newCondition();
+
+	private T				response	= null;
+	private Exception		exception	= null;
+	private boolean			done		= false;
+	private boolean			waiting		= false;
 
 	/**
 	 * Instantiates a new sync callback.
@@ -44,7 +50,7 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	public boolean isWaiting() {
 		return waiting;
 	}
-	
+
 	/**
 	 * Checks if is done.
 	 *
@@ -53,7 +59,7 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	public boolean isDone() {
 		return done;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -62,10 +68,10 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	@Override
 	public void onSuccess(final T response) {
 		this.response = response;
-		synchronized (this) {
-			done = true;
-			notifyAll();
-		}
+		lock.lock();
+		done = true;
+		condition.signalAll();
+		lock.unlock();
 	}
 
 	/*
@@ -77,10 +83,10 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	@Override
 	public void onFailure(final Exception exception) {
 		this.exception = exception;
-		synchronized (this) {
-			done = true;
-			notifyAll();
-		}
+		lock.lock();
+		done = true;
+		condition.signalAll();
+		lock.unlock();
 	}
 
 	/**
@@ -93,18 +99,17 @@ public class SyncCallback<T> extends AsyncCallback<T> {
 	 *             the exception
 	 */
 	public T get() throws Exception {
-		synchronized (this) {
-			waiting=true;
-			while (!done) {
-				wait();
-			}
+		lock.lock();
+		waiting = true;
+		while (!done) {
+			condition.await();
 		}
-		waiting=false;
+		lock.unlock();
+		waiting = false;
 		if (exception != null) {
 			throw exception;
 		}
 		return type.inject(response);
 	}
-
 
 };

@@ -4,6 +4,8 @@
  */
 package com.almende.eve.protocol.auth;
 
+import java.net.URI;
+
 /**
  * The Interface Authorizor.
  */
@@ -24,7 +26,7 @@ public interface Authorizor {
 	 * @Access(tag="foobar") annotation on the called method.
 	 *                       ( e.g. add roles to methods )
 	 */
-	boolean onAccess(String senderUrl, String functionTag);
+	boolean onAccess(URI senderUrl, String functionTag);
 	
 	/**
 	 * Internal method, implementing this method allows adding authorization to
@@ -36,7 +38,7 @@ public interface Authorizor {
 	 *            the sender url
 	 * @return true, if successful
 	 */
-	boolean onAccess(String senderUrl);
+	boolean onAccess(URI senderUrl);
 	
 	/**
 	 * This method should check if the sender equals the recipient.
@@ -50,5 +52,5 @@ public interface Authorizor {
 	 *            the sender url
 	 * @return true, if is self
 	 */
-	boolean isSelf(String senderUrl);
+	boolean isSelf(URI senderUrl);
 }

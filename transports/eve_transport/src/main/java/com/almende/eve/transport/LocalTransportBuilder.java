@@ -7,9 +7,9 @@ package com.almende.eve.transport;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> {
 	private static final Logger					LOG			= Logger.getLogger(LocalTransportBuilder.class
 																	.getName());
-	private static final Map<URI, LocalService>	INSTANCES	= new ConcurrentHashMap<URI, LocalService>(
+	private static final Map<URI, LocalService>	INSTANCES	= new HashMap<URI, LocalService>(
 																	10);
 
 	@Override
@@ -39,12 +39,15 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		}
 		final String addr = "local:" + config.getId();
 		final URI address = URIUtil.create(addr);
-		LocalService result = getLocal(address);
-		if (result == null) {
-			result = new LocalService(address, newHandle, getParams());
-			INSTANCES.put(address, result);
-		} else {
-			result.getHandle().update(newHandle);
+		LocalService result = null;
+		synchronized (INSTANCES) {
+			result = getLocal(address);
+			if (result == null) {
+				result = new LocalService(address, newHandle, getParams());
+				INSTANCES.put(address, result);
+			} else {
+				result.getHandle().update(newHandle);
+			}
 		}
 		return result;
 	}
@@ -173,7 +176,9 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 */
 		@Override
 		public void delete(final Transport instance) {
-			INSTANCES.remove(instance.getAddress());
+			synchronized (INSTANCES) {
+				INSTANCES.remove(instance.getAddress());
+			}
 		}
 
 	}

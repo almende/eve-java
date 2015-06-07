@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,13 +27,13 @@ import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
-import com.almende.eve.protocol.jsonrpc.formats.RequestParams;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
 import com.almende.util.Defines;
 import com.almende.util.TypeUtil;
+import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -78,13 +79,13 @@ final public class JSONRpc {
 
 	/**
 	 * Invoke a method on an object.
-	 * 
+	 *
 	 * @param destination
 	 *            the destination
 	 * @param request
 	 *            A request in JSON-RPC format
-	 * @param requestParams
-	 *            Optional request parameters
+	 * @param senderUrl
+	 *            the sender url
 	 * @param auth
 	 *            the auth
 	 * @return the string
@@ -92,13 +93,12 @@ final public class JSONRpc {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String invoke(final Object destination, final String request,
-			final RequestParams requestParams, final Authorizor auth)
-			throws IOException {
+			final URI senderUrl, final Authorizor auth) throws IOException {
 		JSONRequest jsonRequest = null;
 		JSONResponse jsonResponse = null;
 		try {
 			jsonRequest = new JSONRequest(request);
-			jsonResponse = invoke(destination, jsonRequest, requestParams, auth);
+			jsonResponse = invoke(destination, jsonRequest, senderUrl, auth);
 		} catch (final JSONRPCException err) {
 			jsonResponse = new JSONResponse(err);
 		}
@@ -124,19 +124,19 @@ final public class JSONRpc {
 
 	/**
 	 * Invoke a method on an object.
-	 * 
+	 *
 	 * @param destination
 	 *            the destination
 	 * @param request
 	 *            A request in JSON-RPC format
-	 * @param requestParams
-	 *            Optional request parameters
+	 * @param senderUrl
+	 *            the sender url
 	 * @param auth
 	 *            the auth
 	 * @return the jSON response
 	 */
 	public static JSONResponse invoke(final Object destination,
-			final JSONRequest request, final RequestParams requestParams,
+			final JSONRequest request, final URI senderUrl,
 			final Authorizor auth) {
 		final JSONResponse resp = new JSONResponse(request.getId(), null);
 		try {
@@ -145,7 +145,7 @@ final public class JSONRpc {
 
 			final Object realDest = tuple.getDestination();
 			final AnnotatedMethod annotatedMethod = tuple.getMethod();
-			if (!isAvailable(annotatedMethod, realDest, requestParams, auth)) {
+			if (!isAvailable(annotatedMethod, realDest, senderUrl, auth)) {
 				throw new JSONRPCException(
 						JSONRPCException.CODE.METHOD_NOT_FOUND,
 						"Method '"
@@ -161,7 +161,7 @@ final public class JSONRpc {
 			if (Defines.HASMETHODHANDLES) {
 				final Object[] params = castParams(realDest,
 						request.getParams(), annotatedMethod.getParams(),
-						requestParams);
+						senderUrl);
 				if (annotatedMethod.isVoid()) {
 					methodHandle.invokeExact(params);
 				} else {
@@ -169,7 +169,7 @@ final public class JSONRpc {
 				}
 			} else {
 				final Object[] params = castParams(request.getParams(),
-						annotatedMethod.getParams(), requestParams);
+						annotatedMethod.getParams(), senderUrl);
 				result = method.invoke(realDest, params);
 			}
 			if (result == null) {
@@ -221,16 +221,13 @@ final public class JSONRpc {
 	 *
 	 * @param c
 	 *            The class to be described
-	 * @param requestParams
-	 *            Optional request parameters.
 	 * @param namespace
 	 *            the namespace
 	 * @param auth
 	 *            the authorizor
 	 * @return the Map
 	 */
-	public static ObjectNode describe(final Object c,
-			final RequestParams requestParams, String namespace,
+	public static ObjectNode describe(final Object c, String namespace,
 			final Authorizor auth) {
 		final ObjectNode methods = JOM.createObjectNode();
 		try {
@@ -240,7 +237,8 @@ final public class JSONRpc {
 			final AnnotatedClass annotatedClass = AnnotationUtil.get(c
 					.getClass());
 			for (final AnnotatedMethod method : annotatedClass.getMethods()) {
-				if (isAvailable(method, null, requestParams, auth)) {
+				if (isAvailable(method, null, URIUtil.create("local:null"),
+						auth)) {
 					final ObjectNode result = JOM.createObjectNode();
 					result.put("type", "method");
 					result.put("description",
@@ -250,7 +248,7 @@ final public class JSONRpc {
 					// format as JSON
 					final ArrayNode params = JOM.createArrayNode();
 					for (final AnnotatedParam param : method.getParams()) {
-						if (getRequestAnnotation(param, requestParams) == null) {
+						if (param.getAnnotation(Sender.class) == null) {
 							final ObjectNode paramData = JOM.createObjectNode();
 
 							paramData.put("name", getName(param));
@@ -285,7 +283,7 @@ final public class JSONRpc {
 						Namespace.class).value();
 				methods.setAll(describe(
 						method.getActualMethod().invoke(c, (Object[]) null),
-						requestParams, innerNamespace, auth));
+						innerNamespace, auth));
 			}
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to describe class:" + c.toString(),
@@ -353,9 +351,8 @@ final public class JSONRpc {
 	 * @return the Object[]
 	 */
 	private static Object[] castParams(final ObjectNode params,
-			final List<AnnotatedParam> annotatedParams,
-			final RequestParams requestParams) {
-		return castParams(null, params, annotatedParams, requestParams);
+			final List<AnnotatedParam> annotatedParams, final URI senderUrl) {
+		return castParams(null, params, annotatedParams, senderUrl);
 	}
 
 	/**
@@ -371,8 +368,7 @@ final public class JSONRpc {
 	 */
 	private static Object[] castParams(final Object realDest,
 			final ObjectNode params,
-			final List<AnnotatedParam> annotatedParams,
-			final RequestParams requestParams) {
+			final List<AnnotatedParam> annotatedParams, final URI senderUrl) {
 
 		switch (annotatedParams.size()) {
 			case 0:
@@ -383,8 +379,9 @@ final public class JSONRpc {
 				}
 				/* -- Unreachable, explicit no break -- */
 			case 1:
-				if (annotatedParams.get(0).getType().equals(ObjectNode.class)
-						&& annotatedParams.get(0).getAnnotations().size() == 0) {
+				final AnnotatedParam parm = annotatedParams.get(0);
+				if (parm.getType().equals(ObjectNode.class)
+						&& parm.getAnnotations().isEmpty()) {
 					// the method expects one parameter of type JSONObject
 					// feed the params object itself to it.
 					if (realDest != null) {
@@ -407,47 +404,45 @@ final public class JSONRpc {
 				}
 				for (int i = 0; i < annotatedParams.size(); i++) {
 					final AnnotatedParam p = annotatedParams.get(i);
+					final String name = getName(p);
+					if (name == null) {
+						final Annotation a = p.getAnnotation(Sender.class);
 
-					final Annotation a = getRequestAnnotation(p, requestParams);
-					if (a != null) {
-						// this is a systems parameter
-						if (a.annotationType().equals(Sender.class)
-								&& p.getType().equals(String.class)) {
-							LOG.warning("Deprecated parameter usage: @Sender should now by an URI i.s.o. String");
-							objects[i + offset] = requestParams.get(a)
-									.toString();
-						} else {
-							objects[i + offset] = requestParams.get(a);
-						}
-					} else {
-						final String name = getName(p);
-						if (name != null) {
-							// this is a named parameter
-							if (paramsObject.has(name)) {
-								objects[i + offset] = TypeUtil.inject(
-										paramsObject.get(name),
-										p.getGenericType());
+						if (a != null) {
+							// this is a systems parameter
+							if (a.annotationType().equals(Sender.class)
+									&& p.getType().equals(String.class)) {
+								LOG.warning("Deprecated parameter usage: @Sender should now by an URI i.s.o. String");
+								objects[i + offset] = senderUrl.toString();
 							} else {
-								if (isRequired(p)) {
-									throw new ClassCastException(
-											"Required parameter '" + name
-													+ "' missing.");
-								} else if (p.getType().isPrimitive()) {
-									// TODO: should this test be moved to
-									// isAvailable()?
-									throw new ClassCastException("Parameter '"
-											+ name
-											+ "' cannot be both optional and "
-											+ "a primitive type ("
-											+ p.getType().getSimpleName() + ")");
-								} else {
-									objects[i + offset] = null;
-								}
+								objects[i + offset] = senderUrl;
 							}
 						} else {
 							// this is a problem
 							throw new ClassCastException("Name of parameter "
 									+ i + " not defined");
+						}
+					} else {
+						// this is a named parameter
+						if (paramsObject.has(name)) {
+							objects[i + offset] = TypeUtil.inject(
+									paramsObject.get(name), p.getGenericType());
+						} else {
+							if (isRequired(p)) {
+								throw new ClassCastException(
+										"Required parameter '" + name
+												+ "' missing.");
+							} else if (p.getType().isPrimitive()) {
+								// TODO: should this test be moved to
+								// isAvailable()?
+								throw new ClassCastException("Parameter '"
+										+ name
+										+ "' cannot be both optional and "
+										+ "a primitive type ("
+										+ p.getType().getSimpleName() + ")");
+							} else {
+								objects[i + offset] = null;
+							}
 						}
 					}
 				}
@@ -471,47 +466,46 @@ final public class JSONRpc {
 	 * @return available
 	 */
 	private static boolean isAvailable(final AnnotatedMethod method,
-			final Object destination, final RequestParams requestParams,
-			final Authorizor auth) {
+			final Object destination, final URI senderUrl, final Authorizor auth) {
 
 		if (method == null) {
 			return false;
 		}
-		Access methodAccess = method.getAnnotation(Access.class);
 		if (destination != null
 				&& !method.getActualMethod().getDeclaringClass()
 						.isAssignableFrom(destination.getClass())) {
 			return false;
 		}
 		final int mod = method.getActualMethod().getModifiers();
-		if (!(Modifier.isPublic(mod) && hasNamedParams(method, requestParams))) {
+		if (!(Modifier.isPublic(mod) && hasNamedParams(method))) {
 			return false;
 		}
 
-		final Access classAccess = AnnotationUtil.get(
-				destination != null ? destination.getClass() : method
-						.getActualMethod().getDeclaringClass()).getAnnotation(
-				Access.class);
+		Access methodAccess = method.getAnnotation(Access.class);
 		if (methodAccess == null) {
-			methodAccess = classAccess;
+			methodAccess = AnnotationUtil.get(
+					destination != null ? destination.getClass() : method
+							.getActualMethod().getDeclaringClass())
+					.getAnnotation(Access.class);
 		}
 		if (methodAccess == null) {
-			// New default: UNAVAILABLE!
+			// Default: UNAVAILABLE!
 			return false;
 		}
-		if (methodAccess.value() == AccessType.UNAVAILABLE) {
-			return false;
+		final AccessType value = methodAccess.value();
+		switch (value) {
+			case PUBLIC:
+				return true;
+			case UNAVAILABLE:
+				return false;
+			case PRIVATE:
+				return auth != null ? auth.onAccess(senderUrl,
+						methodAccess.tag()) : false;
+			case SELF:
+				return auth != null ? auth.isSelf(senderUrl) : false;
+			default:
+				return false;
 		}
-
-		if (methodAccess.value() == AccessType.PRIVATE) {
-			return auth != null ? auth.onAccess(requestParams.get(Sender.class)
-					.toString(), methodAccess.tag()) : false;
-		}
-		if (methodAccess.value() == AccessType.SELF) {
-			return auth != null ? auth.isSelf(requestParams.get(Sender.class)
-					.toString()) : false;
-		}
-		return true;
 	}
 
 	/**
@@ -523,22 +517,14 @@ final public class JSONRpc {
 	 *            the request params
 	 * @return hasNamedParams
 	 */
-	private static boolean hasNamedParams(final AnnotatedMethod method,
-			final RequestParams requestParams) {
+	private static boolean hasNamedParams(final AnnotatedMethod method) {
 		for (final AnnotatedParam param : method.getParams()) {
-			boolean found = false;
-			for (final Annotation a : param.getAnnotations()) {
-				if (requestParams != null && requestParams.has(a)) {
-					found = true;
-					break;
-				} else if (a instanceof Name) {
-					found = true;
-					break;
+			Annotation a = param.getAnnotation(Name.class);
+			if (a == null) {
+				a = param.getAnnotation(Sender.class);
+				if (a == null) {
+					return false;
 				}
-			}
-
-			if (!found) {
-				return false;
 			}
 		}
 		return true;
@@ -581,27 +567,6 @@ final public class JSONRpc {
 			name = nameAnnotation.value();
 		}
 		return name;
-	}
-
-	/**
-	 * Find a request annotation in the given parameters Returns null if no
-	 * system annotation is not found.
-	 * 
-	 * @param param
-	 *            the param
-	 * @param requestParams
-	 *            the request params
-	 * @return annotation
-	 */
-	private static Annotation getRequestAnnotation(final AnnotatedParam param,
-			final RequestParams requestParams) {
-		for (Class<?> search : requestParams.keys()) {
-			Annotation annotation = (Annotation) param.getAnnotation(search);
-			if (annotation != null) {
-				return annotation;
-			}
-		}
-		return null;
 	}
 
 }

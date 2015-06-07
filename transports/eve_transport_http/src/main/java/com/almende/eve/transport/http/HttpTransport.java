@@ -25,7 +25,7 @@ import com.almende.eve.transport.TransportService;
 import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ApacheHttpClient;
 import com.almende.util.callback.AsyncCallback;
-import com.almende.util.callback.AsyncCallbackQueue;
+import com.almende.util.callback.AsyncCallbackStore;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.threads.ThreadPool;
 import com.almende.util.uuid.UUID;
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
-	private final AsyncCallbackQueue<String>	callbacks	= new AsyncCallbackQueue<String>();
+	private final AsyncCallbackStore<String>	callbacks	= new AsyncCallbackStore<String>();
 	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
@@ -71,7 +71,7 @@ public class HttpTransport extends AbstractTransport {
 			final String tag) throws IOException {
 		if (tag != null) {
 			if (callbacks != null) {
-				final AsyncCallback<String> callback = callbacks.pull(tag);
+				final AsyncCallback<String> callback = callbacks.get(tag);
 				if (callback != null) {
 					callback.onSuccess(message);
 					return;
@@ -153,7 +153,7 @@ public class HttpTransport extends AbstractTransport {
 			throws IOException {
 		final String tag = new UUID().toString();
 		final SyncCallback<String> callback = new SyncCallback<String>() {};
-		callbacks.push(tag, "(inbound http call:" + body + ")", callback);
+		callbacks.put(tag, "(inbound http call:" + body + ")", callback);
 
 		super.getHandle().get().receive(body, senderUrl, tag);
 		try {

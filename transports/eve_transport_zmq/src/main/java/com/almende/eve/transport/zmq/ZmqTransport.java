@@ -25,7 +25,7 @@ import com.almende.eve.transport.tokens.TokenStore;
 import com.almende.util.ObjectCache;
 import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
-import com.almende.util.callback.AsyncCallbackQueue;
+import com.almende.util.callback.AsyncCallbackStore;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.threads.ThreadPool;
@@ -40,7 +40,7 @@ public class ZmqTransport extends AbstractTransport {
 	private Thread									listeningThread;
 	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
-	private static final AsyncCallbackQueue<String>	CALLBACKS			= new AsyncCallbackQueue<String>();
+	private static final AsyncCallbackStore<String>	CALLBACKS			= new AsyncCallbackStore<String>();
 	private final TokenStore tokenstore = new TokenStore();
 	private final List<String>						protocols			= Arrays.asList("zmq");
 
@@ -266,7 +266,7 @@ public class ZmqTransport extends AbstractTransport {
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
-			final AsyncCallback<String> callback = CALLBACKS.pull(key);
+			final AsyncCallback<String> callback = CALLBACKS.get(key);
 			if (callback != null) {
 				callback.onSuccess(body);
 			} else {
@@ -278,7 +278,7 @@ public class ZmqTransport extends AbstractTransport {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key) && doesAuthentication) {
 				final SyncCallback<String> callback = new SyncCallback<String>(){};
-				CALLBACKS.push(key, "", callback);
+				CALLBACKS.put(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
 						.getTime().getBytes(), null);
 				

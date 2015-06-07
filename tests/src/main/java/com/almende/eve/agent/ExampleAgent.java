@@ -39,6 +39,7 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	 * @return the string
 	 */
 	@Override
+	@Access(AccessType.PUBLIC)
 	public String helloWorld(@Name("message") final String message) {
 		return "You said:" + message;
 	}
