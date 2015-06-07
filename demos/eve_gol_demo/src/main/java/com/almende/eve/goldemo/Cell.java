@@ -185,9 +185,10 @@ public class Cell extends Agent {
 		if (currentCycle != null && currentCycle != 0) {
 			int aliveNeighbors = 0;
 			int knownNeighbors = 0;
+			final String postfix = "_"+(currentCycle -1);
 			for (final String neighbor : neighbors) {
 				final CycleState nState = getState().get(
-						neighbor + "_" + (currentCycle - 1), CYCLESTATETYPE);
+						neighbor + postfix, CYCLESTATETYPE);
 				if (nState == null) {
 					return;
 					// continue;
@@ -201,7 +202,7 @@ public class Cell extends Agent {
 				return;
 			}
 			final CycleState myState = getState().get(
-					"val_" + (currentCycle - 1), CYCLESTATETYPE);
+					"val"  + postfix, CYCLESTATETYPE);
 			CycleState newState = null;
 			if (aliveNeighbors < 2 || aliveNeighbors > 3) {
 				newState = new CycleState(currentCycle, false);
@@ -228,7 +229,7 @@ public class Cell extends Agent {
 					}
 				}
 				for (final String neighbor : neighbors) {
-					getState().remove(neighbor + "_" + (currentCycle - 1));
+					getState().remove(neighbor  + postfix);
 				}
 				calcCycle();
 			}

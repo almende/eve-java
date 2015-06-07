@@ -36,6 +36,7 @@ import com.almende.util.TypeUtil;
 import com.almende.util.URIUtil;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -138,7 +139,11 @@ final public class JSONRpc {
 	public static JSONResponse invoke(final Object destination,
 			final JSONRequest request, final URI senderUrl,
 			final Authorizor auth) {
-		final JSONResponse resp = new JSONResponse(request.getId(), null);
+		JSONResponse resp = null;
+		final JsonNode id = request.getId();
+		if (id != null && !id.isNull()){
+			resp = new JSONResponse(id, null);
+		}
 		try {
 			final CallTuple tuple = NamespaceUtil.get(destination,
 					request.getMethod());
@@ -172,16 +177,22 @@ final public class JSONRpc {
 						annotatedMethod.getParams(), senderUrl);
 				result = method.invoke(realDest, params);
 			}
-			if (result == null) {
-				result = JOM.createNullNode();
+			if (resp != null){
+				if (result == null) {
+					result = JOM.createNullNode();
+				}
+				resp.setResult(result);
 			}
-			resp.setResult(result);
 		} catch (final JSONRPCException err) {
-			resp.setError(err);
+			if (resp != null){
+				resp.setError(err);
+			}
 		} catch (final Throwable err) {
 			final Throwable cause = err.getCause();
 			if (cause instanceof JSONRPCException) {
-				resp.setError((JSONRPCException) cause);
+				if (resp != null){
+					resp.setError((JSONRPCException) cause);
+				}
 			} else {
 				if (err instanceof InvocationTargetException && cause != null) {
 					LOG.log(Level.WARNING,
@@ -192,7 +203,9 @@ final public class JSONRpc {
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(cause), cause);
 					jsonError.setData(cause);
-					resp.setError(jsonError);
+					if (resp != null){
+						resp.setError(jsonError);
+					}
 				} else {
 					LOG.log(Level.WARNING,
 							"Exception raised, returning it as JSONRPCException. Request:"
@@ -202,15 +215,13 @@ final public class JSONRpc {
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(err), err);
 					jsonError.setData(err);
-					resp.setError(jsonError);
+					if (resp != null){
+						resp.setError(jsonError);
+					}
 				}
 			}
 		}
-		if (resp.getId() == null || resp.getId().isNull()) {
-			return null;
-		} else {
-			return resp;
-		}
+		return resp;
 	}
 
 	/**
