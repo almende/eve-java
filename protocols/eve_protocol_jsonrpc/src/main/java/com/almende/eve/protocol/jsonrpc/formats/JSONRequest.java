@@ -15,6 +15,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
+import com.almende.util.AnnotationUtil.CachedAnnotation;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
@@ -140,12 +141,11 @@ public final class JSONRequest extends JSONMessage {
 		for (int i = 0; i < annotatedParams.size(); i++) {
 			final AnnotatedParam annotatedParam = annotatedParams.get(i);
 			if (i < args.length && args[i] != null) {
-				final Name nameAnnotation = annotatedParam
+				final CachedAnnotation nameAnnotation = annotatedParam
 						.getAnnotation(Name.class);
 				if (nameAnnotation != null && nameAnnotation.value() != null) {
-					final String name = nameAnnotation.value();
-					final JsonNode paramValue = MAPPER.valueToTree(
-							args[i]);
+					final String name = (String) nameAnnotation.value();
+					final JsonNode paramValue = MAPPER.valueToTree(args[i]);
 					params.set(name, paramValue);
 				} else {
 					throw new IllegalArgumentException("Parameter " + i
@@ -157,8 +157,9 @@ public final class JSONRequest extends JSONMessage {
 						+ " in method '" + method.getName() + "' is null.");
 			}
 		}
-		if (callback != null){
-			final JsonNode id = MAPPER.createObjectNode().textNode(new UUID().toString());
+		if (callback != null) {
+			final JsonNode id = MAPPER.createObjectNode().textNode(
+					new UUID().toString());
 			init(id, method.getName(), params, callback);
 		} else {
 			init(null, method.getName(), params, null);
@@ -176,10 +177,10 @@ public final class JSONRequest extends JSONMessage {
 	@SuppressWarnings("deprecation")
 	static boolean isRequired(final AnnotatedParam param) {
 		boolean required = true;
-		final com.almende.eve.protocol.jsonrpc.annotation.Required requiredAnnotation = param
+		final CachedAnnotation requiredAnnotation = param
 				.getAnnotation(com.almende.eve.protocol.jsonrpc.annotation.Required.class);
 		if (requiredAnnotation != null) {
-			required = requiredAnnotation.value();
+			required = (boolean) requiredAnnotation.value();
 		}
 		if (param.getAnnotation(Optional.class) != null) {
 			required = false;
@@ -280,8 +281,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the value
 	 */
 	public void putParam(final String name, final Object value) {
-		this.params.set(name,
-				MAPPER.createObjectNode().pojoNode(value));
+		this.params.set(name, MAPPER.createObjectNode().pojoNode(value));
 	}
 
 	/**

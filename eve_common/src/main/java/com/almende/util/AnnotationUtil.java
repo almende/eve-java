@@ -50,6 +50,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -88,6 +89,51 @@ public final class AnnotationUtil {
 			cache.put(clazz.getName(), annotatedClazz);
 		}
 		return annotatedClazz;
+	}
+
+	/**
+	 * The Class CachedAnnotation.
+	 */
+	public static class CachedAnnotation {
+		private Annotation	annotation	= null;
+		private Object		value		= null;
+
+		/**
+		 * Instantiates a new cached annotation.
+		 *
+		 * @param annotation
+		 *            the annotation
+		 */
+		public CachedAnnotation(Annotation annotation) {
+			this.annotation = annotation;
+			try {
+				Method method = annotation.getClass().getMethod("value",
+						new Class<?>[0]);
+				if (method != null) {
+					value = method.invoke(annotation, new Object[0]);
+				}
+			} catch (NoSuchMethodException | SecurityException
+					| IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e) {}
+		}
+
+		/**
+		 * Value.
+		 *
+		 * @return the object
+		 */
+		public Object value() {
+			return value;
+		}
+
+		/**
+		 * Gets the annotation.
+		 *
+		 * @return the annotation
+		 */
+		public Annotation getAnnotation() {
+			return annotation;
+		}
 	}
 
 	/**
@@ -532,10 +578,10 @@ public final class AnnotationUtil {
 	 */
 	public static class AnnotatedThing {
 
-		private final List<Annotation>					annotationList	= new ArrayList<Annotation>();
+		private final List<CachedAnnotation>				annotationList	= new ArrayList<CachedAnnotation>();
 
-		private final Map<Class<?>, List<Annotation>>	annotations		= new HashMap<Class<?>, List<Annotation>>(
-																				1);
+		private final Map<Class<?>, List<CachedAnnotation>>	annotations		= new HashMap<Class<?>, List<CachedAnnotation>>(
+																					1);
 
 		/**
 		 * Instantiates a new annotated thing.
@@ -561,12 +607,12 @@ public final class AnnotationUtil {
 		 * 
 		 * @return annotations
 		 */
-		public List<Annotation> getAnnotations() {
+		public List<CachedAnnotation> getAnnotations() {
 			if (annotations.size() == 1) {
 				return annotations.values().iterator().next();
 			}
-			List<Annotation> res = new ArrayList<Annotation>();
-			for (List<Annotation> sublist : annotations.values()) {
+			List<CachedAnnotation> res = new ArrayList<CachedAnnotation>();
+			for (List<CachedAnnotation> sublist : annotations.values()) {
 				res.addAll(sublist);
 			}
 			return res;
@@ -582,11 +628,11 @@ public final class AnnotationUtil {
 		 *            the type
 		 * @return annotation
 		 */
-		@SuppressWarnings("unchecked")
-		public <T> T getAnnotation(final Class<T> type) {
-			List<Annotation> res = annotations.get(type);
+		public <T extends Annotation> CachedAnnotation getAnnotation(
+				final Class<T> type) {
+			List<CachedAnnotation> res = annotations.get(type);
 			if (res != null && !res.isEmpty()) {
-				return (T) res.get(0);
+				return res.get(0);
 			}
 			return null;
 		}
@@ -601,18 +647,18 @@ public final class AnnotationUtil {
 	 * @param listB
 	 *            the list b
 	 */
-	private static void merge(final List<Annotation> listA,
+	private static void merge(final List<CachedAnnotation> listA,
 			final Annotation[] listB) {
 		for (final Annotation b : listB) {
 			boolean found = false;
-			for (final Annotation a : listA) {
-				if (a.getClass() == b.getClass()) {
+			for (final CachedAnnotation a : listA) {
+				if (a.getAnnotation().getClass() == b.getClass()) {
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				listA.add(b);
+				listA.add(new CachedAnnotation(b));
 			}
 		}
 	}
@@ -621,12 +667,13 @@ public final class AnnotationUtil {
 			final Map<Class<?>, List<AnnotatedField>> fields,
 			final List<AnnotatedField> fieldList) {
 		for (AnnotatedField field : fieldList) {
-			for (Annotation annotation : field.getAnnotations()) {
+			for (CachedAnnotation annotation : field.getAnnotations()) {
 				List<AnnotatedField> list = fields.get(annotation
-						.annotationType());
+						.getAnnotation().annotationType());
 				if (list == null) {
 					list = new ArrayList<AnnotatedField>(1);
-					fields.put(annotation.annotationType(), list);
+					fields.put(annotation.getAnnotation().annotationType(),
+							list);
 				}
 				list.add(field);
 			}
@@ -650,12 +697,13 @@ public final class AnnotationUtil {
 			final Map<Class<?>, List<AnnotatedMethod>> methods,
 			final List<AnnotatedMethod> methodList) {
 		for (AnnotatedMethod method : methodList) {
-			for (Annotation annotation : method.getAnnotations()) {
+			for (CachedAnnotation annotation : method.getAnnotations()) {
 				List<AnnotatedMethod> list = methods.get(annotation
-						.annotationType());
+						.getAnnotation().annotationType());
 				if (list == null) {
 					list = new ArrayList<AnnotatedMethod>(1);
-					methods.put(annotation.annotationType(), list);
+					methods.put(annotation.getAnnotation().annotationType(),
+							list);
 				}
 				list.add(method);
 			}
@@ -663,14 +711,15 @@ public final class AnnotationUtil {
 	}
 
 	private static void convertAnnotations(
-			final Map<Class<?>, List<Annotation>> annotations,
-			final List<Annotation> annotationList) {
-		for (Annotation annotation : annotationList) {
-			List<Annotation> list = annotations
-					.get(annotation.annotationType());
+			final Map<Class<?>, List<CachedAnnotation>> annotations,
+			final List<CachedAnnotation> annotationList) {
+		for (CachedAnnotation annotation : annotationList) {
+			List<CachedAnnotation> list = annotations.get(annotation
+					.getAnnotation().annotationType());
 			if (list == null) {
-				list = new ArrayList<Annotation>(1);
-				annotations.put(annotation.annotationType(), list);
+				list = new ArrayList<CachedAnnotation>(1);
+				annotations.put(annotation.getAnnotation().annotationType(),
+						list);
 			}
 			list.add(annotation);
 		}

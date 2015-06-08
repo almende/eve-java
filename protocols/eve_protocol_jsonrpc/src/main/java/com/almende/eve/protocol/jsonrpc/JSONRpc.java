@@ -5,7 +5,6 @@
 package com.almende.eve.protocol.jsonrpc;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +30,7 @@ import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
+import com.almende.util.AnnotationUtil.CachedAnnotation;
 import com.almende.util.Defines;
 import com.almende.util.TypeUtil;
 import com.almende.util.URIUtil;
@@ -273,14 +273,14 @@ final public class JSONRpc {
 					}
 					result.set("params", params);
 					if (namespace.equals("*")) {
-						namespace = annotatedClass.getAnnotation(
+						namespace = (String) annotatedClass.getAnnotation(
 								Namespace.class).value();
 					}
 
 					String methodName = method.getName();
-					Name anno = method.getAnnotation(Name.class);
+					CachedAnnotation anno = method.getAnnotation(Name.class);
 					if (anno != null) {
-						methodName = anno.value();
+						methodName = (String) anno.value();
 					}
 
 					final String fullName = namespace.equals("") ? methodName
@@ -290,7 +290,7 @@ final public class JSONRpc {
 			}
 			for (final AnnotatedMethod method : annotatedClass
 					.getAnnotatedMethods(Namespace.class)) {
-				final String innerNamespace = method.getAnnotation(
+				final String innerNamespace = (String) method.getAnnotation(
 						Namespace.class).value();
 				methods.setAll(describe(
 						method.getActualMethod().invoke(c, (Object[]) null),
@@ -417,12 +417,10 @@ final public class JSONRpc {
 					final AnnotatedParam p = annotatedParams.get(i);
 					final String name = getName(p);
 					if (name == null) {
-						final Annotation a = p.getAnnotation(Sender.class);
-
+						final CachedAnnotation a = p.getAnnotation(Sender.class);
 						if (a != null) {
 							// this is a systems parameter
-							if (a.annotationType().equals(Sender.class)
-									&& p.getType().equals(String.class)) {
+							if (p.getType().equals(String.class)) {
 								LOG.warning("Deprecated parameter usage: @Sender should now by an URI i.s.o. String");
 								objects[i + offset] = senderUrl.toString();
 							} else {
@@ -492,7 +490,7 @@ final public class JSONRpc {
 			return false;
 		}
 
-		Access methodAccess = method.getAnnotation(Access.class);
+		CachedAnnotation methodAccess = method.getAnnotation(Access.class);
 		if (methodAccess == null) {
 			methodAccess = AnnotationUtil.get(
 					destination != null ? destination.getClass() : method
@@ -503,7 +501,7 @@ final public class JSONRpc {
 			// Default: UNAVAILABLE!
 			return false;
 		}
-		final AccessType value = methodAccess.value();
+		final AccessType value = (AccessType) methodAccess.value();
 		switch (value) {
 			case PUBLIC:
 				return true;
@@ -511,7 +509,7 @@ final public class JSONRpc {
 				return false;
 			case PRIVATE:
 				return auth != null ? auth.onAccess(senderUrl,
-						methodAccess.tag()) : false;
+						((Access)methodAccess.getAnnotation()).tag()) : false;
 			case SELF:
 				return auth != null ? auth.isSelf(senderUrl) : false;
 			default:
@@ -530,7 +528,7 @@ final public class JSONRpc {
 	 */
 	private static boolean hasNamedParams(final AnnotatedMethod method) {
 		for (final AnnotatedParam param : method.getParams()) {
-			Annotation a = param.getAnnotation(Name.class);
+			CachedAnnotation a = param.getAnnotation(Name.class);
 			if (a == null) {
 				a = param.getAnnotation(Sender.class);
 				if (a == null) {
@@ -552,10 +550,10 @@ final public class JSONRpc {
 	@SuppressWarnings("deprecation")
 	static boolean isRequired(final AnnotatedParam param) {
 		boolean required = true;
-		final com.almende.eve.protocol.jsonrpc.annotation.Required requiredAnnotation = param
+		final CachedAnnotation requiredAnnotation = param
 				.getAnnotation(com.almende.eve.protocol.jsonrpc.annotation.Required.class);
 		if (requiredAnnotation != null) {
-			required = requiredAnnotation.value();
+			required = (boolean) requiredAnnotation.value();
 		}
 		if (param.getAnnotation(Optional.class) != null) {
 			required = false;
@@ -573,9 +571,9 @@ final public class JSONRpc {
 	 */
 	static String getName(final AnnotatedParam param) {
 		String name = null;
-		final Name nameAnnotation = param.getAnnotation(Name.class);
+		final CachedAnnotation nameAnnotation = param.getAnnotation(Name.class);
 		if (nameAnnotation != null) {
-			name = nameAnnotation.value();
+			name = (String) nameAnnotation.value();
 		}
 		return name;
 	}

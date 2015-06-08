@@ -14,14 +14,15 @@ import java.lang.annotation.Target;
  * Annotation for parameter names.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.PARAMETER})
+@Target({ ElementType.METHOD, ElementType.PARAMETER })
 @Documented
 public @interface Name {
-	
+
 	/**
 	 * Value.
 	 * 
 	 * @return the string
 	 */
 	String value();
+
 }

@@ -53,7 +53,7 @@ final class NamespaceUtil {
 		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		for (final AnnotatedMethod method : clazz
 				.getAnnotatedMethods(Namespace.class)) {
-			String namespace = method.getAnnotation(Namespace.class).value();
+			String namespace = (String) method.getAnnotation(Namespace.class).value();
 			final Object newDest = method.getActualMethod().invoke(destination,
 					(Object[]) null);
 			if (namespace.equals("*")) {
@@ -61,7 +61,7 @@ final class NamespaceUtil {
 				if (newDest != null) {
 					final AnnotatedClass destClazz = AnnotationUtil.get(newDest
 							.getClass());
-					namespace = destClazz.getAnnotation(Namespace.class)
+					namespace = (String) destClazz.getAnnotation(Namespace.class)
 							.value();
 				} else {
 					continue;
