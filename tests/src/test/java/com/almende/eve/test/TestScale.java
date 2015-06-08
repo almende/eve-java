@@ -79,7 +79,6 @@ public class TestScale extends TestCase {
 
 	}
 
-	
 	private void runTest(final int duration, final int parallel,
 			final String test) {
 		final Thread[] threads = new Thread[parallel];
@@ -244,7 +243,7 @@ public class TestScale extends TestCase {
 		}
 		
 		LOG.warning("RPC direct:");
-		runTest(runTime, 8, "rpcdirect");
+		runTest(runTime, 4, "rpcdirect");
 
 //		LOG.warning("RPC Sync:");
 //		runTest(runTime, 8, "sync");

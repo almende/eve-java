@@ -34,8 +34,7 @@ public class RunnableClock implements Runnable, Clock {
 	protected ScheduledFuture<?>							future		= null;
 
 	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Runnable#run()
+	 * Non locking task scheduling
 	 */
 	@Override
 	public void run() {
@@ -55,6 +54,7 @@ public class RunnableClock implements Runnable, Clock {
 			}
 			final long interval = new Interval(now, ce.getDue())
 					.toDurationMillis();
+			//TODO: 5ms is arbitrary, shouldn't this be different?
 			if (interval <= 5) {
 				break;
 			}
@@ -72,7 +72,7 @@ public class RunnableClock implements Runnable, Clock {
 			RUNNER.execute(run);
 		}
 		if (future == null && !TIMELINE.isEmpty()) {
-			// recurse
+			// recurse, to cover race-condition between TIMELINE.isEmpty() and scheduling
 			run();
 		}
 	}

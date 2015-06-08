@@ -83,6 +83,7 @@ public class SimulationClock extends RunnableClock {
 			}
 		}
 		if (!toRun.isEmpty()) {
+			//Contribute to atomic network support:
 			SimulationInboxProtocol.schedulerOut(toRun.size());
 			for (Runnable run : toRun) {
 				RUNNER.execute(run);
