@@ -1,30 +1,6 @@
-# Hammer.js [![Build Status](http://img.shields.io/travis/EightMedia/hammer.js.svg)](https://travis-ci.org/EightMedia/hammer.js/)
+# Hammer.js 2.0 [![Build Status](https://travis-ci.org/hammerjs/hammer.js.svg)](https://travis-ci.org/hammerjs/hammer.js/)
 
-#### A javascript library for multi-touch gestures
+Visit [hammerjs.github.io](http://hammerjs.github.io) for documentation.
 
-> I told you, homeboy /
-> You *CAN* touch this /
-> Yeah, that's how we living and you know /
-> You *CAN* touch this
-
-## Features
-- Under 3kb minified and gzipped!
-- [Detects Tap, DoubleTap, Swipe, Drag, Pinch, and Rotate gestures](http://rawgithub.com/EightMedia/hammer.js/master/tests/manual/events.html)
-- Triggers DOM Events, so works with almost every event-listener.
-- [Debug plugins](/plugins) to emulate multitouch on desktop and make them visible.
-- Easy to build your own [custom gestures](/src/gestures/README.md).
-- Chainable instance methods
-- AMD/CommonJS support
-- Unit tests
-- Option to disable mouse support, so only for touch and pen input.
-- Sourcemaps
-- Highly configurable
-- [jQuery plugin available here](https://github.com/EightMedia/jquery.hammer.js)
-
-## Getting Started
-See the [Wiki on GitHub](https://github.com/EightMedia/hammer.js/wiki) for documentation.
-
-### Further notes
-Developed by [Jorik Tangelder](http://twitter.com/jorikdelaporik) in his spare time and at [Eight Media](http://www.eight.nl/) in Arnhem, the Netherlands.
-
-It's recommended to listen to [this loop](http://soundcloud.com/eightmedia/hammerhammerhammer) while using hammer.js.
+You can get the pre-build versions from the Hammer.js website, or do this by yourself running 
+`npm install -g grunt-cli && npm install && grunt build`

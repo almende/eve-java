@@ -70,6 +70,7 @@ div {
 		//handle controls
 		var nodes = new vis.DataSet();
 		var edges = new vis.DataSet();
+		var firstTime = true;
 
 		$('#topology').click(function() {
 			nodes.clear();
@@ -89,7 +90,7 @@ div {
 					}
 				})
 			}).done(function() {
-				loadGraph()
+				loadGraph();
 			});
 		});
 		$('#goal').click(function() {
@@ -119,13 +120,18 @@ div {
 		var options = {
 			width : "100%",
 			height : "800px",
-			stabilize : true,
-			hideEdgesOnDrag:true,
-			smoothCurves: false,
-			physics:{barnesHut:{enabled:false}},
+			interaction:{hideEdgesOnDrag:true},
+			physics:{
+			"barnesHut": {
+		      "gravitationalConstant": -4100,
+		      "centralGravity": 0.05,
+		      "springLength": 130,
+		    }},
+			//configure:'physics',
 			edges : {
 				color : "black",
-				width : 2
+				width : 2,
+				smooth:false
 			},
 			groups : {
 				On : {
@@ -143,6 +149,7 @@ div {
 				$("#startLamp").val("lamp"+id);
 			}
 		}
+		console.log("on init", nodes,edges);
 		var graph = new vis.Network(container, {
 			nodes : nodes,
 			edges : edges
@@ -160,6 +167,10 @@ div {
 						agent_data = agent_data.result;
 						nodes.update(agent_data.nodes);
 						edges.update(agent_data.edges);
+						if (firstTime === true) {
+							graph.stabilize();
+						}
+						firstTime = false;
 						$("#on").html(agent_data.on);
 						$("#off").html(agent_data.off);
 						$("#perc").html(
