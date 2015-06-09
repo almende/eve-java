@@ -4,16 +4,10 @@
  */
 package com.almende.eve.demo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 
 import com.almende.eve.agent.Agent;
-import com.almende.eve.capabilities.Config;
-import com.almende.eve.config.YamlReader;
-import com.almende.eve.deploy.Boot;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
@@ -65,22 +59,6 @@ public class MyFirstAgent extends Agent {
 		params.put("returnMessage", returnMessage);
 
 		call(senderUrl, "result", params);
-		
-	}
-	
-	/**
-	 * The main method, this method starts all agents from the configuration file.
-	 * Usage:  java -jar executable.jar  eve.yaml
-	 *
-	 * @param args
-	 *            the arguments
-	 * @throws FileNotFoundException
-	 *             the file not found exception
-	 */
-	public static void main(String[] args) throws FileNotFoundException {
-		final Config configfile = YamlReader.load(
-				new FileInputStream(new File(args[0])));
-		Boot.boot(configfile);
 	}
 
 }
