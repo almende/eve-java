@@ -15,6 +15,7 @@ import java.util.HashMap;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.capabilities.Config;
 import com.almende.eve.config.YamlReader;
+import com.almende.util.threads.ThreadPool;
 
 /**
  * The Class Goldemo.
@@ -92,6 +93,13 @@ public class Goldemo {
 		Boolean annimate = config.get("gol", "annimate");
 		if (annimate == null) {
 			annimate = true;
+		}
+
+		Integer nofCores = config.get("gol", "nofCores");
+		if (nofCores != null) {
+			ThreadPool.setNofCores(nofCores);
+		} else {
+			nofCores = ThreadPool.getNofCores();
 		}
 
 		final ArrayList<Cell> cells = new ArrayList<Cell>(N * M);
@@ -181,6 +189,7 @@ public class Goldemo {
 					final String ESC = "\033[";
 					System.out.print(ESC + "2J");
 				}
+				System.out.println("nofCores:" + nofCores);
 				System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
 				System.out.println(((max_full - 1) * M * N * 8) / (runTime)
 						+ " RPCs/second (" + runTime + " sec)");

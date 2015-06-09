@@ -28,5 +28,6 @@ gol:
   runTime: 50
   columns: 30
   rows: 30
+  nofCores : 4
 #  OddUrl: http://127.0.0.1:8081/agents/
 #  EvenUrl: http://127.0.0.1:8081/agents/

@@ -252,6 +252,6 @@ public class TestScale extends TestCase {
 //		runTest(runTime, 8, "async");
 
 //		LOG.warning("RPC Multi-agent:");
-//		runTest(runTime, 8, "multi");
+//		runTest(runTime, 4, "multi");
 	}
 }

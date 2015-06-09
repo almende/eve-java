@@ -128,4 +128,13 @@ public class ThreadPool {
 		ThreadPool.factory = factory;
 		initPools();
 	}
+
+	/**
+	 * Gets the number of (assumed) CPU cores.
+	 *
+	 * @return the nof cores
+	 */
+	public static Integer getNofCores() {
+		return nofCores;
+	}
 }
