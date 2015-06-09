@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="src/module/|src/graph/|tools/|src/timeline/|test/|src/timeline/component/|docs/lib/prettify/|examples/timeline/requirejs/scripts/|src/|src/timeline/component/item/" kind="src" path=""/>
+	<classpathentry kind="src" path="docs/lib/prettify"/>
+	<classpathentry kind="src" path="examples/timeline/requirejs/scripts"/>
+	<classpathentry excluding="module/|graph/|timeline/|timeline/component/|timeline/component/item/" kind="src" path="src"/>
+	<classpathentry kind="src" path="src/graph"/>
+	<classpathentry kind="src" path="src/module"/>
+	<classpathentry excluding="component/|component/item/" kind="src" path="src/timeline"/>
+	<classpathentry excluding="item/" kind="src" path="src/timeline/component"/>
+	<classpathentry kind="src" path="src/timeline/component/item"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="tools"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
