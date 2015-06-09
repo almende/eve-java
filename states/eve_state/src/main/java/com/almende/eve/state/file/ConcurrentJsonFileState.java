@@ -103,7 +103,7 @@ public class ConcurrentJsonFileState extends AbstractState<JsonNode> {
 		super(agentId, service, params);
 		this.filename = filename;
 		om = JOM.getInstance();
-		writer = om.writerWithType(new TypeUtil<Map<String,JsonNode>>(){}.getJavaType().getRawClass());
+		writer = om.writerFor(new TypeUtil<Map<String,JsonNode>>(){}.getJavaType());
 	}
 	
 	/*

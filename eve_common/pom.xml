@@ -18,7 +18,7 @@
 		<jodah.version>0.3.0</jodah.version>
 		<joda-convert.version>1.6</joda-convert.version>
 		<codec.version>1.9</codec.version>
-		<jackson.version>2.4.1</jackson.version>
+		<jackson.version>2.5.3</jackson.version>
 		<jsonSchema.version>2.5.3</jsonSchema.version>		
 	</properties>
 

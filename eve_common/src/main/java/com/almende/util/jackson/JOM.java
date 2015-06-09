@@ -190,17 +190,20 @@ public final class JOM {
 	 * @throws JsonMappingException
 	 *             the json mapping exception
 	 */
-	public static ObjectNode getTypeSchema(final Type c) throws JsonMappingException{
+	public static ObjectNode getTypeSchema(final Type c)
+			throws JsonMappingException {
 		SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
-		getInstance().acceptJsonFormatVisitor(getInstance().constructType(c), visitor);
+		getInstance().acceptJsonFormatVisitor(getInstance().constructType(c),
+				visitor);
 		JsonSchema jsonSchema = visitor.finalSchema();
 		return getInstance().valueToTree(jsonSchema);
 	}
-	
+
 	/**
 	 * The Class CustomBitSetSerializer.
 	 */
 	public class CustomBitSetSerializer extends StdSerializer<BitSet> {
+		private static final long	serialVersionUID	= 7215238140499196910L;
 
 		/**
 		 * Instantiates a new custom bit set serializer.
