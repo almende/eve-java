@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JSONRpcProtocol implements RpcBasedProtocol {
 	private static final Logger						LOG					= Logger.getLogger(JSONRpcProtocol.class
 																				.getName());
-	private static final TypeUtil<JSONResponse>     JSONRESPONSETYPE	= new TypeUtil<JSONResponse>(){};
+	private static final TypeUtil<JSONResponse>		JSONRESPONSETYPE	= new TypeUtil<JSONResponse>() {};
 	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackStore<JSONResponse>	callbacks			= new AsyncCallbackStore<JSONResponse>();
 	private final Handler<Object>					destination;
@@ -48,7 +48,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	public JSONRpcProtocol(final ObjectNode params, final Handler<Object> handle) {
 		destination = handle;
 		myParams = JSONRpcProtocolConfig.decorate(params);
-		callbacks.setDefTimeout(myParams.getCallbackTimeout());
+		callbacks.setTimeout(myParams.getCallbackTimeout());
 	}
 
 	/**
@@ -135,7 +135,8 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		try {
 			if (jsonMsg.isRequest()) {
 				final JSONRequest request = (JSONRequest) jsonMsg;
-				return JSONRpc.invoke(destination.get(), request, senderUrl, auth);
+				return JSONRpc.invoke(destination.get(), request, senderUrl,
+						auth);
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.get(id);
@@ -183,7 +184,8 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		// Create a callback to retrieve a JSONResponse and extract the result
 		// or error from this. This is double nested, mostly because of the type
 		// conversions required on the result.
-		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>(JSONRESPONSETYPE) {
+		final AsyncCallback<JSONResponse> responseCallback = new AsyncCallback<JSONResponse>(
+				JSONRESPONSETYPE) {
 			@Override
 			public void onSuccess(final JSONResponse response) {
 				final Exception err = response.getError();
@@ -215,8 +217,8 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 		};
 
 		if (callbacks != null) {
-			callbacks.put(((JSONMessage) request).getId(), "Outbound message callback.",
-					responseCallback);
+			callbacks.put(((JSONMessage) request).getId(),
+					"Outbound message callback.", responseCallback);
 		}
 	}
 

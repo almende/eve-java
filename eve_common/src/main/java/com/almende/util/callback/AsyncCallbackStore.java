@@ -6,11 +6,8 @@ package com.almende.util.callback;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.almende.util.threads.ThreadPool;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Store to hold a map with callbacks in progress.
@@ -20,11 +17,113 @@ import com.almende.util.threads.ThreadPool;
  *            the generic type
  */
 public class AsyncCallbackStore<T> {
-	private final Map<Object, CallbackHandler>	store			= new ConcurrentHashMap<Object, CallbackHandler>(
-																		5);
+	private final Map<Object, CallbackHandler>	store		= new ConcurrentHashMap<Object, CallbackHandler>(
+																	5);
+	private final TimeoutHandler				head		= new TimeoutHandler(
+																	null);
+	private TimeoutHandler						tail		= head;
+	private int									growsize	= 10;
+	private final static int					MAXGROWSIZE	= 20000;
 
-	/** timeout in seconds */
-	private int									defTimeout		= 30;
+	/** timeout in milliseconds */
+	private long								timeout		= 30000;
+
+	/**
+	 * Instantiates a new async callback store.
+	 */
+	public AsyncCallbackStore() {
+		new Thread(new Runnable() {
+			public void run() {
+				while (true) {
+					TimeoutHandler handler = tail;
+					while (handler != null) {
+						handler.checkTimeout();
+						handler = handler.prev;
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+				}
+
+			}
+		}, "AsyncCallbackStoreScanner").start();
+
+	}
+
+	private void grow() {
+		synchronized (head) {
+			if (growsize <= MAXGROWSIZE / 2) {
+				growsize *= 2;
+			}
+			for (int i = 0; i < growsize; i++) {
+				tail = new TimeoutHandler(tail);
+			}
+		}
+	}
+
+	private void put(final CallbackHandler handler) {
+		TimeoutHandler spot = head;
+		while (!spot.put(handler)) {
+			if (spot == tail) {
+				grow();
+			}
+			spot = spot.next;
+		}
+	}
+
+	class TimeoutHandler {
+		private TimeoutHandler	next	= null;
+		private TimeoutHandler	prev	= null;
+		private CallbackHandler	handler;
+		private ReentrantLock	lock	= new ReentrantLock();
+
+		public TimeoutHandler(final TimeoutHandler prev) {
+			if (prev != null) {
+				this.prev = prev;
+				prev.next = this;
+			}
+		}
+
+		public boolean put(final CallbackHandler handler) {
+			if (this.handler == null) {
+				if (lock.tryLock()) {
+					if (this.handler == null) {
+						this.handler = handler;
+						handler.parent = this;
+						lock.unlock();
+						return true;
+					}
+					lock.unlock();
+				}
+			}
+			return false;
+		}
+
+		public void checkTimeout() {
+			if (this.handler != null) {
+				lock.lock();
+				if (this.handler != null && this.handler.callback != null
+						&& this.handler.timeout <= System.currentTimeMillis()) {
+					this.handler.callback.onFailure(new TimeoutException(
+							"Timeout occurred for callback with id '"
+									+ this.handler.id + "': "
+									+ this.handler.description));
+					this.handler = null;
+				}
+				lock.unlock();
+			}
+		}
+
+		public void forget() {
+			lock.lock();
+			this.handler = null;
+			lock.unlock();
+		}
+
+		public CallbackHandler get() {
+			return this.handler;
+		}
+	}
 
 	/**
 	 * Place a callback in the store..
@@ -50,35 +149,10 @@ public class AsyncCallbackStore<T> {
 		}
 		final CallbackHandler handler = new CallbackHandler();
 		handler.callback = callback;
-
-		ThreadPool.getPool().execute(new Runnable() {
-			public void run() {
-				if (handler.done) {
-					return;
-				} else {
-					ScheduledFuture<?> timeout = ThreadPool.getScheduledPool()
-							.schedule(new Runnable() {
-								@Override
-								public void run() {
-									final AsyncCallback<T> callback = handler.callback;
-									if (callback != null && !handler.done) {
-										callback.onFailure(new TimeoutException(
-												"Timeout occurred for callback with id '"
-														+ id + "': "
-														+ description));
-
-									}
-								}
-							}, defTimeout, TimeUnit.SECONDS);
-					if (!handler.done) {
-						handler.timeout = timeout;
-					} else {
-						timeout.cancel(true);
-					}
-				}
-
-			};
-		});
+		handler.id = id;
+		handler.description = description;
+		handler.timeout = System.currentTimeMillis() + timeout;
+		put(handler);
 		store.put(id, handler);
 	}
 
@@ -94,12 +168,7 @@ public class AsyncCallbackStore<T> {
 	public AsyncCallback<T> get(final Object id) {
 		final CallbackHandler handler = store.remove(id);
 		if (handler != null) {
-			handler.done = true;
-			// stop the timeout
-			if (handler.timeout != null) {
-				handler.timeout.cancel(true);
-				handler.timeout = null;
-			}
+			handler.parent.forget();
 			return handler.callback;
 		}
 		return null;
@@ -116,9 +185,11 @@ public class AsyncCallbackStore<T> {
 	 * Helper class to store a callback and its timeout task.
 	 */
 	private class CallbackHandler {
-		private boolean				done	= false;
+		private Object				id;
+		private String				description;
 		private AsyncCallback<T>	callback;
-		private ScheduledFuture<?>	timeout	= null;
+		private long				timeout;
+		private TimeoutHandler		parent;
 	}
 
 	/**
@@ -126,18 +197,18 @@ public class AsyncCallbackStore<T> {
 	 * 
 	 * @return the default timeout
 	 */
-	public int getDefTimeout() {
-		return defTimeout;
+	public int getTimeout() {
+		return (int) (timeout / 1000);
 	}
 
 	/**
 	 * Sets the default callback timeout.
-	 * 
-	 * @param defTimeout
-	 *            the new default timeout
+	 *
+	 * @param timeout
+	 *            the new timeout
 	 */
-	public void setDefTimeout(int defTimeout) {
-		this.defTimeout = defTimeout;
+	public void setTimeout(int timeout) {
+		this.timeout = timeout * 1000;
 	}
 
 }

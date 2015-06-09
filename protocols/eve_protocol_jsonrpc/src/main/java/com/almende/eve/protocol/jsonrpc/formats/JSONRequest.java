@@ -34,6 +34,7 @@ public final class JSONRequest extends JSONMessage {
 	private static final long			serialVersionUID	= 1970046457233622444L;
 	private static final ObjectMapper	MAPPER				= JOM.getInstance();
 	private static final ObjectReader	READER				= MAPPER.reader(JSONRequest.class);
+	private static final ObjectNode		OBJECT				= MAPPER.createObjectNode();
 	transient private AsyncCallback<?>	callback			= null;
 
 	private String						method				= null;
@@ -222,7 +223,7 @@ public final class JSONRequest extends JSONMessage {
 	private <T> void init(final JsonNode id, final String method,
 			final ObjectNode params, final AsyncCallback<T> callback) {
 		if (callback != null && (id == null || id.isNull())) {
-			setId(MAPPER.createObjectNode().textNode(new UUID().toString()));
+			setId(OBJECT.textNode(new UUID().toString()));
 		} else {
 			setId(id);
 		}

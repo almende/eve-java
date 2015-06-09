@@ -30,7 +30,8 @@ public class RunQueue extends AbstractExecutorService {
 	private final Queue<Worker>		reserve				= new ConcurrentLinkedQueue<Worker>();
 	private final Queue<Runnable>	tasks				= new ConcurrentLinkedQueue<Runnable>();
 	private final HashSet<Worker>	waiting				= new HashSet<Worker>(8);
-	private final Scanner			scanner				= new Scanner();
+	private final Scanner			scanner				= new Scanner(
+																"RunQueue_Scanner");
 	private static int				maxtasks			= -1;
 	private static final int		MAXTASKSPERWORKER	= 1000;
 	private int						nofCores;
@@ -41,6 +42,11 @@ public class RunQueue extends AbstractExecutorService {
 	private int[]					taskCnt				= new int[1];
 
 	private class Scanner extends Thread {
+
+		public Scanner(final String name) {
+			super(name);
+		}
+
 		@Override
 		public void run() {
 			for (;;) {
