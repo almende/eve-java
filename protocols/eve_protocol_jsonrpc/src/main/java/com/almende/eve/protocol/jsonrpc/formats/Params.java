@@ -13,14 +13,12 @@ import java.util.Set;
 
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Params.
  */
 public class Params extends ObjectNode {
-	private static final ObjectMapper	MAPPER	= JOM.getInstance();
 
 	static class String2JsonNodeArrayMap implements Map<String, JsonNode> {
 		private int			size		= 0;
@@ -133,7 +131,7 @@ public class Params extends ObjectNode {
 				if (key != null) {
 					res.add(key);
 				}
-				if (count++ == size){
+				if (count++ == size) {
 					break;
 				}
 			}
@@ -148,7 +146,7 @@ public class Params extends ObjectNode {
 				if (value != null) {
 					res.add(value);
 				}
-				if (count++ == size){
+				if (count++ == size) {
 					break;
 				}
 			}
@@ -157,24 +155,25 @@ public class Params extends ObjectNode {
 
 		@Override
 		public Set<Entry<String, JsonNode>> entrySet() {
-			final Set<Entry<String,JsonNode>> res = new HashSet<Entry<String,JsonNode>>(size());
-			for (int i = 0; i< size; i++){
+			final Set<Entry<String, JsonNode>> res = new HashSet<Entry<String, JsonNode>>(
+					size());
+			for (int i = 0; i < size; i++) {
 				final int j = i;
 				final String key = keys[i];
-				if (key != null){
-					res.add(new Entry<String,JsonNode>() {
+				if (key != null) {
+					res.add(new Entry<String, JsonNode>() {
 						@Override
 						public JsonNode setValue(JsonNode newval) {
 							final JsonNode value = values[j];
-							values[j]=newval;
+							values[j] = newval;
 							return value;
 						}
-						
+
 						@Override
 						public JsonNode getValue() {
 							return values[j];
 						}
-						
+
 						@Override
 						public String getKey() {
 							return keys[j];
@@ -191,7 +190,7 @@ public class Params extends ObjectNode {
 	 * Instantiates a new config.
 	 */
 	public Params() {
-		super(MAPPER.getNodeFactory(), new String2JsonNodeArrayMap());
+		super(JOM.getInstance().getNodeFactory(), new String2JsonNodeArrayMap());
 	}
 
 	/**
@@ -201,7 +200,7 @@ public class Params extends ObjectNode {
 	 *            the node
 	 */
 	public Params(final ObjectNode node) {
-		super(MAPPER.getNodeFactory(), new String2JsonNodeArrayMap());
+		super(JOM.getInstance().getNodeFactory(), new String2JsonNodeArrayMap());
 		if (node != null) {
 			this.setAll(node);
 		}
@@ -239,7 +238,7 @@ public class Params extends ObjectNode {
 		if (value instanceof JsonNode) {
 			super.set(name, (JsonNode) value);
 		} else {
-			super.set(name, MAPPER.valueToTree(value));
+			super.set(name, JOM.getInstance().valueToTree(value));
 		}
 	}
 

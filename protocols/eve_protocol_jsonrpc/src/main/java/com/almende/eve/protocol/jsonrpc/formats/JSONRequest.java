@@ -32,9 +32,10 @@ public final class JSONRequest extends JSONMessage {
 	private static final Logger			LOG					= Logger.getLogger(JSONRequest.class
 																	.getCanonicalName());
 	private static final long			serialVersionUID	= 1970046457233622444L;
-	private static final ObjectMapper	MAPPER				= JOM.getInstance();
-	private static final ObjectReader	READER				= MAPPER.reader(JSONRequest.class);
-	private static final ObjectNode		OBJECT				= MAPPER.createObjectNode();
+	private static final ObjectReader	READER				= JOM.getInstance()
+																	.reader(JSONRequest.class);
+	private static final ObjectNode		OBJECT				= JOM.getInstance()
+																	.createObjectNode();
 	transient private AsyncCallback<?>	callback			= null;
 
 	private String						method				= null;
@@ -56,7 +57,7 @@ public final class JSONRequest extends JSONMessage {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONRequest(final String json) throws IOException {
-		init(MAPPER.readTree(json));
+		init(JOM.getInstance().readTree(json));
 	}
 
 	/**
@@ -146,7 +147,8 @@ public final class JSONRequest extends JSONMessage {
 						.getAnnotation(Name.class);
 				if (nameAnnotation != null && nameAnnotation.value() != null) {
 					final String name = (String) nameAnnotation.value();
-					final JsonNode paramValue = MAPPER.valueToTree(args[i]);
+					final JsonNode paramValue = JOM.getInstance().valueToTree(
+							args[i]);
 					params.set(name, paramValue);
 				} else {
 					throw new IllegalArgumentException("Parameter " + i
@@ -159,8 +161,7 @@ public final class JSONRequest extends JSONMessage {
 			}
 		}
 		if (callback != null) {
-			final JsonNode id = MAPPER.createObjectNode().textNode(
-					new UUID().toString());
+			final JsonNode id = OBJECT.textNode(new UUID().toString());
 			init(id, method.getName(), params, callback);
 		} else {
 			init(null, method.getName(), params, null);
@@ -282,7 +283,7 @@ public final class JSONRequest extends JSONMessage {
 	 *            the value
 	 */
 	public void putParam(final String name, final Object value) {
-		this.params.set(name, MAPPER.createObjectNode().pojoNode(value));
+		this.params.set(name, OBJECT.pojoNode(value));
 	}
 
 	/**
@@ -294,7 +295,8 @@ public final class JSONRequest extends JSONMessage {
 	 */
 	public Object getParam(final String name) {
 		if (params.has(name)) {
-			return MAPPER.convertValue(params.get(name), Object.class);
+			return JOM.getInstance().convertValue(params.get(name),
+					Object.class);
 		}
 		return null;
 	}

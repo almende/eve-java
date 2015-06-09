@@ -40,11 +40,7 @@ import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
  * The Class JOM.
  */
 public final class JOM {
-	private static final ObjectMapper	MAPPER;
-	private static final JOM			SINGLETON	= new JOM();
-	static {
-		MAPPER = SINGLETON.createInstance();
-	}
+	private static final ObjectMapper	MAPPER	= createInstance();
 
 	/**
 	 * Instantiates a new jom.
@@ -66,7 +62,7 @@ public final class JOM {
 	 * @return the object node
 	 */
 	public static ObjectNode createObjectNode() {
-		return MAPPER.createObjectNode();
+		return getInstance().createObjectNode();
 	}
 
 	/**
@@ -75,7 +71,7 @@ public final class JOM {
 	 * @return the array node
 	 */
 	public static ArrayNode createArrayNode() {
-		return MAPPER.createArrayNode();
+		return getInstance().createArrayNode();
 	}
 
 	/**
@@ -92,7 +88,7 @@ public final class JOM {
 	 * 
 	 * @return the object mapper
 	 */
-	private synchronized ObjectMapper createInstance() {
+	private synchronized static ObjectMapper createInstance() {
 		final ObjectMapper mapper = new ObjectMapper();
 
 		mapper.setNodeFactory(new JsonNodeFactory() {
@@ -135,12 +131,13 @@ public final class JOM {
 				new Version(1, 0, 0, null, null, null));
 		bitSetModule.addSerializer(new CustomBitSetSerializer());
 		bitSetModule.addDeserializer(BitSet.class,
-				new CustomBitSetDeserializer());
+				new JOM().new CustomBitSetDeserializer());
 		mapper.registerModule(bitSetModule);
 
 		SimpleModule uriModule = new SimpleModule("UriModule", new Version(1,
 				0, 0, null, null, null));
-		uriModule.addDeserializer(URI.class, new CustomURIDeserializer());
+		uriModule.addDeserializer(URI.class,
+				new JOM().new CustomURIDeserializer());
 		mapper.registerModule(uriModule);
 
 		return mapper;
@@ -152,7 +149,7 @@ public final class JOM {
 	 * @return the type factory
 	 */
 	public static TypeFactory getTypeFactory() {
-		return MAPPER.getTypeFactory();
+		return getInstance().getTypeFactory();
 	}
 
 	/**
@@ -164,7 +161,7 @@ public final class JOM {
 	 */
 	@Deprecated
 	public static JavaType getVoid() {
-		return MAPPER.getTypeFactory().uncheckedSimpleType(Void.class);
+		return getInstance().getTypeFactory().uncheckedSimpleType(Void.class);
 	}
 
 	/**
@@ -178,7 +175,7 @@ public final class JOM {
 	 */
 	@Deprecated
 	public static JavaType getSimpleType(final Class<?> c) {
-		return MAPPER.getTypeFactory().uncheckedSimpleType(c);
+		return getInstance().getTypeFactory().uncheckedSimpleType(c);
 	}
 
 	/**
@@ -202,7 +199,7 @@ public final class JOM {
 	/**
 	 * The Class CustomBitSetSerializer.
 	 */
-	public class CustomBitSetSerializer extends StdSerializer<BitSet> {
+	public static class CustomBitSetSerializer extends StdSerializer<BitSet> {
 		private static final long	serialVersionUID	= 7215238140499196910L;
 
 		/**

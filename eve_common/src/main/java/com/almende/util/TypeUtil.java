@@ -14,7 +14,6 @@ import org.jodah.typetools.TypeResolver;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class TypeUtil.
@@ -29,7 +28,6 @@ public abstract class TypeUtil<T> {
 	 */
 	static final Logger			LOG		= Logger.getLogger(TypeUtil.class
 												.getName());
-	static final ObjectMapper	MAPPER	= JOM.getInstance();
 	private final JavaType		valueType;
 
 	/**
@@ -261,7 +259,7 @@ public abstract class TypeUtil<T> {
 				return null;
 			}
 			try {
-				return MAPPER.convertValue(value, fullType);
+				return JOM.getInstance().convertValue(value, fullType);
 			} catch (final Exception e) {
 				final ClassCastException cce = new ClassCastException(
 						"Failed to convert value:" + value + " -----> "

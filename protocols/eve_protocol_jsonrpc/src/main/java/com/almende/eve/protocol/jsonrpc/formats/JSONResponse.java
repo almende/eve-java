@@ -20,14 +20,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONResponse.
  */
 public final class JSONResponse extends JSONMessage {
-	private static final long		serialVersionUID	= 12392962249054051L;
-	private static final Logger		LOG					= Logger.getLogger(JSONResponse.class
-																.getName());
-	private static ObjectMapper		MAPPER				= JOM.getInstance();
-	private static JavaType			JSONNODETYPE		= JOM.getTypeFactory().constructType(JsonNode.class);
-	private static ObjectReader		READER				= MAPPER.reader(JSONResponse.class);
-	private JsonNode				result				= null;
-	private JSONRPCException		error				= null;
+	private static final long	serialVersionUID	= 12392962249054051L;
+	private static final Logger	LOG					= Logger.getLogger(JSONResponse.class
+															.getName());
+	private static JavaType		JSONNODETYPE		= JOM.getTypeFactory()
+															.constructType(
+																	JsonNode.class);
+	private static ObjectReader	READER				= JOM.getInstance().reader(
+															JSONResponse.class);
+	private JsonNode			result				= null;
+	private JSONRPCException	error				= null;
 
 	/**
 	 * Instantiates a new jSON response.
@@ -45,7 +47,7 @@ public final class JSONResponse extends JSONMessage {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public JSONResponse(final String json) throws IOException {
-		init(MAPPER.readTree(json));
+		init(JOM.getInstance().readTree(json));
 	}
 
 	/**
@@ -150,7 +152,8 @@ public final class JSONResponse extends JSONMessage {
 	 */
 	public void setResult(final Object result) {
 		if (result != null) {
-			this.result = (JsonNode) MAPPER.convertValue(result,JSONNODETYPE);
+			this.result = (JsonNode) JOM.getInstance().convertValue(result,
+					JSONNODETYPE);
 			setError(null);
 		} else {
 			this.result = null;
