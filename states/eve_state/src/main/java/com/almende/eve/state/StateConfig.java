@@ -27,7 +27,7 @@ public class StateConfig extends Config {
 	 */
 	public static StateConfig decorate(final ObjectNode node) {
 		final StateConfig res = new StateConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 	

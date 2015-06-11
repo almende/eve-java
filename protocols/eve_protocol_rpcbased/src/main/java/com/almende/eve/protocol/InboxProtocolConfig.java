@@ -31,7 +31,7 @@ public class InboxProtocolConfig extends ProtocolConfig {
 	 */
 	public static InboxProtocolConfig decorate(final ObjectNode node) {
 		final InboxProtocolConfig res = new InboxProtocolConfig(true);
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

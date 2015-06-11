@@ -66,6 +66,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	private static final Logger		LOG				= Logger.getLogger(Agent.class
 															.getName());
 	private String					agentId			= null;
+	private ObjectNode				literalConfig	= null;
 	private AgentConfig				config			= null;
 	private InstantiationService	is				= null;
 	private State					state			= null;
@@ -267,6 +268,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 *            the new config
 	 */
 	public void setConfig(final ObjectNode config) {
+		this.literalConfig = config;
 		this.config = AgentConfig.decorate(config);
 		loadConfig();
 		onReady();
@@ -339,7 +341,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 */
 	@JsonIgnore
 	public ObjectNode getLiteralConfig() {
-		return config;
+		return literalConfig;
 	}
 
 	/**
@@ -350,10 +352,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		ObjectNode iscfg = config.getInstantiationService();
 		if (iscfg != null) {
 			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
-			// TODO: this shouldn't be a deepCopy, but a version with the
-			// "extends/XXX" syntax. Problem: that version is not available at
-			// this time.
-			is.register(agentId, config.deepCopy(), this.getClass().getName());
+			is.register(agentId, literalConfig, this.getClass().getName());
 		}
 		if (is != null && config.isCanHibernate()) {
 			setHandler(new HibernationHandler<Configurable>(this, agentId, is));

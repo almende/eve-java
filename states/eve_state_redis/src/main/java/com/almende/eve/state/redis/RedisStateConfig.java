@@ -28,7 +28,7 @@ public class RedisStateConfig extends StateConfig {
 	 */
 	public static RedisStateConfig decorate(final ObjectNode node) {
 		final RedisStateConfig res = new RedisStateConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

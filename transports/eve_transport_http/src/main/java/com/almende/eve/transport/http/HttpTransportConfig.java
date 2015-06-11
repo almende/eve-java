@@ -32,7 +32,7 @@ public class HttpTransportConfig extends TransportConfig {
 	 */
 	public static HttpTransportConfig decorate(final ObjectNode node) {
 		final HttpTransportConfig res = new HttpTransportConfig();
-		res.copy(node);
+		res.extend(node);
 		if (!res.has("class")) {
 			res.setClassName(HttpTransportBuilder.class.getName());
 		}

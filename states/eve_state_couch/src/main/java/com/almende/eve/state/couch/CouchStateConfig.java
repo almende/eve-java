@@ -29,7 +29,7 @@ public class CouchStateConfig extends StateConfig {
 	 */
 	public static CouchStateConfig decorate(final ObjectNode node) {
 		final CouchStateConfig res = new CouchStateConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

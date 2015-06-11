@@ -51,7 +51,7 @@ public class AgentConfig extends Config {
 	 */
 	public static AgentConfig decorate(final ObjectNode node) {
 		final AgentConfig res = new AgentConfig();
-		res.copy(node);
+		res.extend(node);
 		if (!res.has("id")) {
 			res.put("id", new UUID().toString());
 		}

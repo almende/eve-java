@@ -4,9 +4,11 @@
  */
 package com.almende.eve.capabilities;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
@@ -59,23 +61,19 @@ public class Config extends ObjectNode {
 	}
 
 	/**
-	 * Copy.
+	 * Extend this configuration with the other tree, overwriting existing
+	 * fields, adding new ones.
 	 *
 	 * @param node
 	 *            the node
-	 * @return the config
 	 */
-	public Config copy(final ObjectNode node) {
+	public void extend(final ObjectNode node) {
 		if (node != null) {
-			if (node == this){
-				//Can't use equals!
-				return this;
+			this.setAll(node);
+			if (node instanceof Config) {
+				this.pointers.addAll(((Config) node).pointers);
 			}
-			Config other = Config.decorate(node);
-			this.pointers.addAll(other.pointers);
-			this.pointers.add(other);
 		}
-		return this;
 	}
 
 	/**
@@ -119,19 +117,6 @@ public class Config extends ObjectNode {
 	}
 
 	/**
-	 * Extend this configuration with the other tree, overwriting existing
-	 * fields, adding new ones.
-	 * 
-	 * @param other
-	 *            the other
-	 * @return the config
-	 */
-	public Config extend(final ObjectNode other) {
-		this.setAll(other);
-		return this;
-	}
-
-	/**
 	 * Sets the class path. (Required)
 	 * 
 	 * @param className
@@ -169,7 +154,25 @@ public class Config extends ObjectNode {
 		}
 		return node;
 	}
-
+	
+	@Override
+	public Iterator<Entry<String,JsonNode>> fields(){
+		final LinkedHashMap<String,JsonNode> fields = new LinkedHashMap<String,JsonNode>();
+		final Iterator<Entry<String,JsonNode>> supr = super.fields();
+		while (supr.hasNext()){
+			Entry<String,JsonNode> item = supr.next();
+			fields.put(item.getKey(), item.getValue());
+		}
+		for (Config other : getPointers()) {
+			final Iterator<Entry<String,JsonNode>> othr = other.fields();
+			while (othr.hasNext()){
+				Entry<String,JsonNode> item = othr.next();
+				fields.put(item.getKey(), item.getValue());
+			}			
+		}
+		return fields.entrySet().iterator();
+	}
+	
 	@Override
 	public JsonNode get(final String key) {
 		JsonNode res = super.get(key);
@@ -229,15 +232,15 @@ public class Config extends ObjectNode {
 	}
 
 	@Override
-	public ObjectNode deepCopy(){
+	public ObjectNode deepCopy() {
 		final ObjectNode result = JOM.createObjectNode();
-		for (Config other : pointers){
+		for (Config other : pointers) {
 			result.setAll(other.deepCopy());
 		}
 		result.setAll(super.deepCopy());
 		return result;
 	}
-	
+
 	/**
 	 * Setup extends.
 	 */

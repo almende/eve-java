@@ -32,7 +32,7 @@ public class PersistentSchedulerConfig extends SimpleSchedulerConfig {
 	public static PersistentSchedulerConfig decorate(final ObjectNode node) {
 		final PersistentSchedulerConfig res = new PersistentSchedulerConfig(
 				true);
-		res.copy(node);
+		res.extend(node);
 		if (!res.has("class")) {
 			res.setClassName(PersistentSchedulerBuilder.class.getName());
 		}

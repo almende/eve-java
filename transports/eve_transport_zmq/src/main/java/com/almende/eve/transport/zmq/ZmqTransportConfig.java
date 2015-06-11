@@ -35,7 +35,7 @@ public class ZmqTransportConfig extends TransportConfig {
 	 */
 	public static ZmqTransportConfig decorate(final ObjectNode node) {
 		final ZmqTransportConfig res = new ZmqTransportConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

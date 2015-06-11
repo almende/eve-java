@@ -32,7 +32,7 @@ public class SimpleSchedulerConfig extends Config {
 	 */
 	public static SimpleSchedulerConfig decorate(final ObjectNode node) {
 		final SimpleSchedulerConfig res = new SimpleSchedulerConfig(true);
-		res.copy(node);
+		res.extend(node);
 		if (!res.has("class")) {
 			res.setClassName(SimpleSchedulerBuilder.class.getName());
 		}

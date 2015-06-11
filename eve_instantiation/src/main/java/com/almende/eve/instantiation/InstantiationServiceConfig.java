@@ -26,7 +26,7 @@ public class InstantiationServiceConfig extends Config {
 	 */
 	public static InstantiationServiceConfig decorate(final ObjectNode node) {
 		final InstantiationServiceConfig res = new InstantiationServiceConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 
 		

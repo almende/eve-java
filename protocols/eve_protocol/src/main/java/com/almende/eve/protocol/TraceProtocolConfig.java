@@ -49,7 +49,7 @@ public class TraceProtocolConfig extends ProtocolConfig {
 	 */
 	public static TraceProtocolConfig decorate(final ObjectNode node) {
 		final TraceProtocolConfig res = new TraceProtocolConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

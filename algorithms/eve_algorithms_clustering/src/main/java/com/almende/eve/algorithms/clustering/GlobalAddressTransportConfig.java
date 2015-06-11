@@ -28,7 +28,7 @@ public class GlobalAddressTransportConfig extends TransportConfig {
 	 */
 	public static GlobalAddressTransportConfig decorate(final ObjectNode node) {
 		final GlobalAddressTransportConfig res = new GlobalAddressTransportConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

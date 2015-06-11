@@ -40,7 +40,7 @@ public class SimulationTimeProtocolConfig extends ProtocolConfig {
 	public static SimulationTimeProtocolConfig decorate(final ObjectNode node) {
 		final SimulationTimeProtocolConfig res = new SimulationTimeProtocolConfig(
 				true);
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

@@ -33,7 +33,7 @@ public class SimulationInboxProtocolConfig extends InboxProtocolConfig {
 	public static SimulationInboxProtocolConfig decorate(final ObjectNode node) {
 		final SimulationInboxProtocolConfig res = new SimulationInboxProtocolConfig(
 				true);
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

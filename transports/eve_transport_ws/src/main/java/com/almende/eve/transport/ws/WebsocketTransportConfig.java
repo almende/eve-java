@@ -28,7 +28,7 @@ public class WebsocketTransportConfig extends TransportConfig {
 	 */
 	public static WebsocketTransportConfig decorate(final ObjectNode node) {
 		final WebsocketTransportConfig res = new WebsocketTransportConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

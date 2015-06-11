@@ -29,7 +29,7 @@ public class ProtocolConfig extends Config {
 	 */
 	public static ProtocolConfig decorate(final ObjectNode node) {
 		final ProtocolConfig res = new ProtocolConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

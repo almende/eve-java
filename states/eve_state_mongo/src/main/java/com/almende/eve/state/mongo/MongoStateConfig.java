@@ -29,7 +29,7 @@ public class MongoStateConfig extends StateConfig {
 	 */
 	public static MongoStateConfig decorate(final ObjectNode node) {
 		final MongoStateConfig res = new MongoStateConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 	

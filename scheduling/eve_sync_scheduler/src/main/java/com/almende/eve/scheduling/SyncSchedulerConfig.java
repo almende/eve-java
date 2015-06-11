@@ -31,7 +31,7 @@ public class SyncSchedulerConfig extends SimpleSchedulerConfig {
 	 */
 	public static SyncSchedulerConfig decorate(final ObjectNode node) {
 		final SyncSchedulerConfig res = new SyncSchedulerConfig(true);
-		res.copy(node);
+		res.extend(node);
 		if (!res.has("class")) {
 			res.setClassName(SyncSchedulerBuilder.class.getName());
 		}

@@ -38,7 +38,7 @@ public class GlobalAddressProtocolConfig extends ProtocolConfig {
 	 */
 	public static GlobalAddressProtocolConfig decorate(final ObjectNode node) {
 		final GlobalAddressProtocolConfig res = new GlobalAddressProtocolConfig(true);
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

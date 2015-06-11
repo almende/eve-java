@@ -35,7 +35,7 @@ public class XmppTransportConfig extends TransportConfig {
 	 */
 	public static XmppTransportConfig decorate(final ObjectNode node) {
 		final XmppTransportConfig res = new XmppTransportConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 

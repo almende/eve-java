@@ -28,7 +28,7 @@ public class SimulationSchedulerConfig extends SimpleSchedulerConfig {
 	 */
 	public static SimulationSchedulerConfig decorate(final ObjectNode node) {
 		final SimulationSchedulerConfig res = new SimulationSchedulerConfig();
-		res.copy(node);
+		res.extend(node);
 		return res;
 	}
 
