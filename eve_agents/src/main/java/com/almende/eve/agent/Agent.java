@@ -21,6 +21,7 @@ import com.almende.eve.instantiation.Configurable;
 import com.almende.eve.instantiation.HibernationHandler;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
+import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.Protocol;
 import com.almende.eve.protocol.ProtocolBuilder;
 import com.almende.eve.protocol.ProtocolConfig;
@@ -332,6 +333,16 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	}
 
 	/**
+	 * Gets the literal, unextended, unexpanded config.
+	 *
+	 * @return the literal config
+	 */
+	@JsonIgnore
+	public ObjectNode getLiteralConfig() {
+		return config;
+	}
+
+	/**
 	 * Load config.
 	 */
 	private void loadConfig() {
@@ -339,6 +350,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		ObjectNode iscfg = config.getInstantiationService();
 		if (iscfg != null) {
 			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
+			// TODO: this shouldn't be a deepCopy, but a version with the
+			// "extends/XXX" syntax. Problem: that version is not available at
+			// this time.
 			is.register(agentId, config.deepCopy(), this.getClass().getName());
 		}
 		if (is != null && config.isCanHibernate()) {
@@ -808,18 +822,16 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 		public <T> void call(final URI url, final JSONMessage message,
 				final String tag) throws IOException {
 
-			if (protocolStack.outbound(message, url, tag)) {
-				transport.send(url, message, tag);
+			final Meta wrapper = protocolStack.outbound(message, url, tag);
+			if (wrapper != null) {
+				transport.send(wrapper.getPeer(), wrapper.getMsg(), tag);
 			}
 		}
 
 		@Override
 		public <T> void call(final URI url, final JSONMessage message)
 				throws IOException {
-
-			if (protocolStack.outbound(message, url, null)) {
-				transport.send(url, message, null);
-			}
+			call(url, message, null);
 		}
 
 		@Override
@@ -837,8 +849,9 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 				throws IOException {
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			if (protocolStack.outbound(message, url, null)) {
-				transport.send(url, message, null);
+			final Meta wrapper = protocolStack.outbound(message, url, null);
+			if (wrapper != null) {
+				transport.send(wrapper.getPeer(), wrapper.getMsg(), null);
 			}
 		}
 
@@ -884,8 +897,10 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 			final SyncCallback<T> callback = new SyncCallback<T>(type) {};
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			if (protocolStack.outbound(message, url, null)) {
-				transport.send(url, message, null);
+
+			final Meta wrapper = protocolStack.outbound(message, url, null);
+			if (wrapper != null) {
+				transport.send(wrapper.getPeer(), wrapper.getMsg(), null);
 			}
 			try {
 				return callback.get();

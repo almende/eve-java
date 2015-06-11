@@ -25,14 +25,16 @@ public class ProtocolStack {
 	 *            the tag
 	 * @return true, if the entire stack is done.
 	 */
-	public boolean inbound(final Object msg, final URI peerUrl, final String tag) {
+	public Meta inbound(final Object msg, final URI peerUrl, final String tag) {
 		final Iterator<Protocol> iter = stack.iterator();
 		final Meta wrapper = new MetaImpl(msg, peerUrl, tag, iter);
 		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
-			return protocol.inbound(wrapper);
+			if (!protocol.inbound(wrapper)){
+				return null;
+			}
 		}
-		return true;
+		return wrapper;
 	}
 
 	/**
@@ -46,15 +48,17 @@ public class ProtocolStack {
 	 *            the tag
 	 * @return true, if the entire stack is done.
 	 */
-	public boolean outbound(final Object msg, final URI peerUrl,
+	public Meta outbound(final Object msg, final URI peerUrl,
 			final String tag) {
 		final Iterator<Protocol> iter = stack.descendingIterator();
 		final Meta wrapper = new MetaImpl(msg, peerUrl, tag, iter);
 		if (iter.hasNext()) {
 			final Protocol protocol = iter.next();
-			return protocol.outbound(wrapper);
+			if (!protocol.outbound(wrapper)){
+				return null;
+			};
 		}
-		return true;
+		return wrapper;
 	}
 
 	/**
