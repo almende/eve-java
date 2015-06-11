@@ -6,6 +6,7 @@ package com.almende.eve.agent;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -18,6 +19,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
+import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -61,10 +63,10 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	 * @return the string
 	 */
 	@Name("testNamedMethod")
-	public String namedMethod(){
+	public String namedMethod() {
 		return "ok, worked correctly!";
 	}
-	
+
 	/**
 	 * Check thread.
 	 *
@@ -140,6 +142,30 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	public <T> T pubSendSync(final URI url, final String method,
 			final ObjectNode params, final TypeUtil<T> type) throws IOException {
 		return super.callSync(url, method, params, type);
+	}
+
+	/**
+	 * Call other agent.
+	 *
+	 * @param url
+	 *            the url
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @return the string
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws URISyntaxException
+	 *             the URI syntax exception
+	 */
+
+	public String callOtherAgent(@Name("url") final String url,
+			@Name("method") final String method,
+			@Name("params") final ObjectNode params) throws IOException,
+			URISyntaxException {
+		return pubSendSync(URIUtil.parse(url), method, params,
+				new TypeUtil<String>() {});
 	}
 
 	/* Making destroy public */
@@ -221,5 +247,9 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	public String doMore() {
 		LOG.info("Doing more!");
 		return "Some string!";
+	}
+
+	public ObjectNode getLiteralConfig() {
+		return super.getLiteralConfig();
 	}
 }

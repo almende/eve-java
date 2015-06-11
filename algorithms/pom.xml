@@ -18,6 +18,7 @@
 	<modules>
 		<module>eve_algorithms_simple</module>
 		<module>eve_algorithms_simulation</module>
+		<module>eve_algorithms_clustering</module>
 		<module>eve_algorithms_dht</module>
 	</modules>
 

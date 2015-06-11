@@ -6,7 +6,9 @@ templates:
          class: com.almende.eve.state.memory.MemoryStateBuilder
       scheduler:
          class: com.almende.eve.scheduling.SimpleSchedulerBuilder
-      transports:   
+      protocols:
+      -  class: com.almende.eve.algorithms.clustering.GlobalAddressProtocolBuilder
+      transports:
       -  class: com.almende.eve.transport.http.HttpTransportBuilder
          servletUrl: http://localhost:8081/agents/
          servletLauncher: JettyLauncher
@@ -15,6 +17,8 @@ templates:
          doAuthentication: false
          jetty: 
            port: 8081
+      -  class: com.almende.eve.algorithms.clustering.GlobalAddressTransportBuilder
+         realAddressPattern: http://localhost:8081/agents/
       -  class: com.almende.eve.transport.ws.WebsocketTransportBuilder
          address: ws://localhost:8081/ws
          servletLauncher: JettyLauncher
@@ -29,9 +33,11 @@ templates:
          class: com.almende.eve.scheduling.PersistentSchedulerBuilder
 
 agents:
--  id: example
-   extends: templates/defaultAgent
 -  id: another
    extends: templates/specialAgent
-
+-  id: GAMapper
+   class: com.almende.eve.algorithms.clustering.GlobalAddressMapperAgent
+   extends: templates/defaultAgent
+-  id: example
+   extends: templates/defaultAgent
 

@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.capabilities.Config;
@@ -47,14 +48,15 @@ public class TestConfigDOM extends TestCase {
 		config.loadTemplates("templates");
 
 		final ArrayNode agents = (ArrayNode) config.get("agents");
-		ExampleAgent newAgent = null;
-		for (final JsonNode agent : agents) {
-			newAgent = (ExampleAgent) new AgentBuilder().withConfig((ObjectNode) agent)
+		Agent agent = null;
+		for (final JsonNode agentConf : agents) {
+			agent = new AgentBuilder().withConfig((ObjectNode) agentConf)
 					.build();
-			LOG.info("Created agent:" + newAgent.getId());
+			LOG.info("Created agent:" + agent.getId());
 		}
 		final ObjectNode params = JOM.createObjectNode();
 		params.put("message", "Hi There!");
+		ExampleAgent newAgent = (ExampleAgent) agent;
 		newAgent.pubSend(URIUtil.create("local:example"), "helloWorld", params,
 				new AsyncCallback<String>() {
 
@@ -74,15 +76,12 @@ public class TestConfigDOM extends TestCase {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {}
-		
-		
-		LOG.warning("Agent config:"+newAgent.getConfig());
-		
-		
+
+		LOG.warning("Agent config:" + newAgent.getConfig());
+
 		try {
 			Thread.sleep(40000);
 		} catch (InterruptedException e) {}
-		
+
 	}
 }
-
