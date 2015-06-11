@@ -21,6 +21,7 @@ import com.almende.eve.instantiation.Configurable;
 import com.almende.eve.instantiation.HibernationHandler;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
+import com.almende.eve.instantiation.InstantiationServiceConfig;
 import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.Protocol;
 import com.almende.eve.protocol.ProtocolBuilder;
@@ -349,8 +350,15 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	 */
 	private void loadConfig() {
 		agentId = config.getId();
-		ObjectNode iscfg = config.getInstantiationService();
-		if (iscfg != null) {
+		if (config.getInstantiationService() != null) {
+			InstantiationServiceConfig iscfg = InstantiationServiceConfig
+					.decorate(config.getInstantiationService());
+			final StateConfig stateConfig = StateConfig.decorate(iscfg
+					.getState());
+			if (agentId != null && stateConfig.getId() == null) {
+				stateConfig.setId(agentId);
+				iscfg.setState(stateConfig);
+			}
 			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
 			is.register(agentId, literalConfig, this.getClass().getName());
 		}
