@@ -34,7 +34,8 @@ public class JSONRpcProtocolBuilder extends
 	 */
 	@Override
 	public JSONRpcProtocol build() {
-		JSONRpcProtocolConfig config = JSONRpcProtocolConfig.decorate(getParams());
+		JSONRpcProtocolConfig config = JSONRpcProtocolConfig
+				.decorate(getParams());
 		String id = config.getId();
 		if (id == null) {
 			id = new UUID().toString();
@@ -48,20 +49,23 @@ public class JSONRpcProtocolBuilder extends
 			final Handler<Object> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
-			result = new JSONRpcProtocol(getParams(), TYPEUTIL.inject(getHandle()));
+			result = new JSONRpcProtocol(getParams(),
+					TYPEUTIL.inject(getHandle()));
 		}
 		INSTANCES.put(id, result);
 
-		// Add authorizor:
-		try {
-			@SuppressWarnings("unchecked")
-			final Class<Authorizor> clazz = (Class<Authorizor>) Class
-					.forName(config.getAuthorizor());
-			result.setAuth(clazz.newInstance());
-		} catch (ClassNotFoundException | InstantiationException
-				| IllegalAccessException e) {
-			LOG.log(Level.WARNING, "Couldn't instantiate authorizor class:"
-					+ config.getAuthorizor(), e);
+		if (result.getAuth() == null || !result.getAuth().getClass().getName().equals(config.getAuthorizor())) {
+			// Add authorizor:
+			try {
+				@SuppressWarnings("unchecked")
+				final Class<Authorizor> clazz = (Class<Authorizor>) Class
+						.forName(config.getAuthorizor());
+				result.setAuth(clazz.newInstance());
+			} catch (ClassNotFoundException | InstantiationException
+					| IllegalAccessException e) {
+				LOG.log(Level.WARNING, "Couldn't instantiate authorizor class:"
+						+ config.getAuthorizor(), e);
+			}
 		}
 		return result;
 	}
@@ -72,7 +76,7 @@ public class JSONRpcProtocolBuilder extends
 	 * @param id
 	 *            the id
 	 */
-	public static void delete(final String id){
+	public static void delete(final String id) {
 		INSTANCES.remove(id);
 	}
 }
