@@ -52,8 +52,10 @@ public class InstantiationService implements Capability {
 	public InstantiationService(final ObjectNode params, final ClassLoader cl) {
 		this.cl = cl;
 		myParams = params;
+		
+		final InstantiationServiceConfig config = InstantiationServiceConfig.decorate(params);
 		final State state = new StateBuilder().withConfig(
-				(ObjectNode) myParams.get("state")).build();
+				(ObjectNode) config.get("state")).build();
 		stateService = state.getService();
 		myId = state.getId();
 		InstantiationServiceBuilder.getServices().put(myId, this);
