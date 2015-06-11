@@ -141,7 +141,7 @@ final public class JSONRpc {
 			final Authorizor auth) {
 		JSONResponse resp = null;
 		final JsonNode id = request.getId();
-		if (id != null && !id.isNull()){
+		if (id != null && !id.isNull()) {
 			resp = new JSONResponse(id, null);
 		}
 		try {
@@ -177,20 +177,20 @@ final public class JSONRpc {
 						annotatedMethod.getParams(), senderUrl);
 				result = method.invoke(realDest, params);
 			}
-			if (resp != null){
+			if (resp != null) {
 				if (result == null) {
 					result = JOM.createNullNode();
 				}
 				resp.setResult(result);
 			}
 		} catch (final JSONRPCException err) {
-			if (resp != null){
+			if (resp != null) {
 				resp.setError(err);
 			}
 		} catch (final Throwable err) {
 			final Throwable cause = err.getCause();
 			if (cause instanceof JSONRPCException) {
-				if (resp != null){
+				if (resp != null) {
 					resp.setError((JSONRPCException) cause);
 				}
 			} else {
@@ -203,7 +203,7 @@ final public class JSONRpc {
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(cause), cause);
 					jsonError.setData(cause);
-					if (resp != null){
+					if (resp != null) {
 						resp.setError(jsonError);
 					}
 				} else {
@@ -215,7 +215,7 @@ final public class JSONRpc {
 							JSONRPCException.CODE.INTERNAL_ERROR,
 							getMessage(err), err);
 					jsonError.setData(err);
-					if (resp != null){
+					if (resp != null) {
 						resp.setError(jsonError);
 					}
 				}
@@ -417,7 +417,8 @@ final public class JSONRpc {
 					final AnnotatedParam p = annotatedParams.get(i);
 					final String name = getName(p);
 					if (name == null) {
-						final CachedAnnotation a = p.getAnnotation(Sender.class);
+						final CachedAnnotation a = p
+								.getAnnotation(Sender.class);
 						if (a != null) {
 							// this is a systems parameter
 							if (p.getType().equals(String.class)) {
@@ -509,7 +510,7 @@ final public class JSONRpc {
 				return false;
 			case PRIVATE:
 				return auth != null ? auth.onAccess(senderUrl,
-						((Access)methodAccess.getAnnotation()).tag()) : false;
+						((Access) methodAccess.getAnnotation()).tag()) : false;
 			case SELF:
 				return auth != null ? auth.isSelf(senderUrl) : false;
 			default:

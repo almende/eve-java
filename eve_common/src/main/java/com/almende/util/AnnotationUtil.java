@@ -214,11 +214,7 @@ public final class AnnotationUtil {
 		 * @return methods
 		 */
 		public List<AnnotatedMethod> getMethods() {
-			final List<AnnotatedMethod> res = new ArrayList<AnnotatedMethod>();
-			for (List<AnnotatedMethod> sublist : methods.values()) {
-				res.addAll(sublist);
-			}
-			return res;
+			return methodList;
 		}
 
 		/**
