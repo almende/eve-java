@@ -12,8 +12,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
-import com.almende.util.jackson.JOM;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
 
 /**
  * The Class MyFirstAgent.  This class extends Agent to obtain agent capabilities. 
@@ -55,7 +54,7 @@ public class MyFirstAgent extends Agent {
 			@Sender URI senderUrl) throws IOException {
 		
 		String returnMessage = "You said:" + message;
-		ObjectNode params = JOM.createObjectNode();
+		final Params params = new Params();
 		params.put("returnMessage", returnMessage);
 
 		call(senderUrl, "result", params);

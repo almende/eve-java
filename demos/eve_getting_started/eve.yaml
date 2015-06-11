@@ -1,7 +1,7 @@
 
 #Some empty comment
 
-template:
+templates:
    defaultAgent:
         scheduler:
            class: com.almende.eve.scheduling.SimpleSchedulerBuilder
@@ -19,10 +19,8 @@ template:
 agents:
 -   id: helloWorld
     class: com.almende.eve.demo.MyFirstAgent
-    extends: template/defaultAgent
+    extends: templates/defaultAgent
 -   id: helloWorld2
     class: com.almende.eve.demo.MySecondAgent
-    extends: template/defaultAgent
--   id: tips
-    class: com.almende.eve.demo.TipsNTricksAgent
-    extends: template/defaultAgent
+    extends: templates/defaultAgent
+
