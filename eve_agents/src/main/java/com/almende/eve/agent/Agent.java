@@ -824,7 +824,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 			final Meta wrapper = protocolStack.outbound(message, url, tag);
 			if (wrapper != null) {
-				transport.send(wrapper.getPeer(), wrapper.getMsg(), tag);
+				transport.send(wrapper.getPeer(), wrapper.getMsg(),
+						wrapper.getTag());
 			}
 		}
 
@@ -851,7 +852,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 					callback);
 			final Meta wrapper = protocolStack.outbound(message, url, null);
 			if (wrapper != null) {
-				transport.send(wrapper.getPeer(), wrapper.getMsg(), null);
+				transport.send(wrapper.getPeer(), wrapper.getMsg(),
+						wrapper.getTag());
 			}
 		}
 
@@ -900,7 +902,8 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 
 			final Meta wrapper = protocolStack.outbound(message, url, null);
 			if (wrapper != null) {
-				transport.send(wrapper.getPeer(), wrapper.getMsg(), null);
+				transport.send(wrapper.getPeer(), wrapper.getMsg(),
+						wrapper.getTag());
 			}
 			try {
 				return callback.get();
