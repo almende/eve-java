@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 /**
  * An annotation that indicates that this method or all void methods in the
  * class may be called as a notification, asynchronously, not expecting a reply.
+ * 
+ * This is primarily used in the AgentProxy to indicate if a SyncCallback needs to be generated. 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE })

@@ -22,12 +22,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public interface Caller {
 
 	/**
-	 * Gets the sender addresses known to this caller.
+	 * Gets this sender's addresses known to this caller.
 	 * 
 	 * @return the urls
 	 */
 	List<URI> getSenderUrls();
 
+	
+	/**
+	 * Gets this sender's address for given scheme.
+	 *
+	 * @param scheme
+	 *            the scheme
+	 * @return the sender url by scheme
+	 */
+	URI getSenderUrlByScheme(final String scheme);
+	
 	/**
 	 * Send async, expecting a response through the given callback.
 	 * 

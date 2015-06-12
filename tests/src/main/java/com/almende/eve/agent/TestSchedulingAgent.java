@@ -59,8 +59,7 @@ public class TestSchedulingAgent extends Agent {
 	 */
 	public void scheduleTask() throws IOException {
 		if (!stop) {
-			getScheduler().schedule(new JSONRequest("scheduleTask", null),
-					600000);
+			schedule(new JSONRequest("scheduleTask", null), 600000);
 			doTask();
 		}
 	}
@@ -75,15 +74,14 @@ public class TestSchedulingAgent extends Agent {
 		final Params param = new Params();
 		final URI other = URIUtil.create(remote);
 		param.add("other", other);
-		getScheduler().schedule(new JSONRequest("scheduleRemoteTask", param),
-				600000);
+		schedule(new JSONRequest("scheduleRemoteTask", param), 600000);
 	}
 
 	/**
 	 * Start local.
 	 */
 	public void startLocal() {
-		getScheduler().schedule(new JSONRequest("scheduleTask", null), 600000);
+		schedule(new JSONRequest("scheduleTask", null), 600000);
 	}
 
 	/**
@@ -99,8 +97,7 @@ public class TestSchedulingAgent extends Agent {
 		if (!stop) {
 			final Params param = new Params();
 			param.add("other", other);
-			getScheduler().schedule(
-					new JSONRequest("scheduleRemoteTask", param), 600000);
+			schedule(new JSONRequest("scheduleRemoteTask", param), 600000);
 			call(other, "doTaskWithReply", null, new AsyncCallback<String>() {
 
 				@Override
@@ -149,7 +146,7 @@ public class TestSchedulingAgent extends Agent {
 	 *            the stop delay
 	 */
 	public void scheduleStop(final long stopDelay) {
-		getScheduler().schedule(new JSONRequest("doStop", null), stopDelay);
+		schedule(new JSONRequest("doStop", null), stopDelay);
 	}
 
 	@Namespace("scheduler")

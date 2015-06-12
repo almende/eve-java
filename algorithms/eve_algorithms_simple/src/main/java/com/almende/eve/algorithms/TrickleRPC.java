@@ -83,19 +83,19 @@ public class TrickleRPC {
 		if (intervals != null && intervals[0] >= 0 && intervals[1] >= 0) {
 			final DateTime nextSend = DateTime.now().plus(intervals[0]);
 			final DateTime nextInterval = DateTime.now().plus(intervals[1]);
-			
+
 			final String oldSendTaskId = sendTaskId;
 			if (oldSendTaskId != null) {
 				scheduler.cancel(oldSendTaskId);
 			}
-			sendTaskId = scheduler.schedule(requests.get(namespace + "send"),
-					nextSend);
-			
+			sendTaskId = scheduler.schedule(null,
+					requests.get(namespace + "send"), nextSend);
+
 			final String oldIntTaskId = intTaskId;
 			if (oldIntTaskId != null) {
 				scheduler.cancel(oldIntTaskId);
 			}
-			intTaskId = scheduler.schedule(
+			intTaskId = scheduler.schedule(null,
 					requests.get(namespace + "nextInterval"), nextInterval);
 		}
 	}

@@ -202,6 +202,17 @@ public class Router implements Transport {
 		return new ArrayList<URI>(result);
 	}
 
+	/**
+	 * Gets the addresses by scheme.
+	 *
+	 * @param scheme
+	 *            the scheme
+	 * @return the addresses by scheme
+	 */
+	public URI getAddressByScheme(String scheme) {
+		return transports.get(scheme).getAddress();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.transport.Transport#getProtocols()

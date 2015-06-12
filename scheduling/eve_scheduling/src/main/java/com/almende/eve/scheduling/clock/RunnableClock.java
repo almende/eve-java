@@ -58,8 +58,7 @@ public class RunnableClock implements Runnable, Clock {
 			if (interval <= 5) {
 				break;
 			}
-			if (future == null
-					|| future.getDelay(TimeUnit.MILLISECONDS) > interval) {
+			if (future == null || future.isDone() || future.getDelay(TimeUnit.MILLISECONDS) > interval) {
 				if (future != null) {
 					future.cancel(false);
 				}
@@ -71,7 +70,7 @@ public class RunnableClock implements Runnable, Clock {
 		for (Runnable run : toRun) {
 			RUNNER.execute(run);
 		}
-		if (future == null && !TIMELINE.isEmpty()) {
+		if ((future == null || future.isDone()) && !TIMELINE.isEmpty()) {
 			// recurse, to cover race-condition between TIMELINE.isEmpty() and scheduling
 			run();
 		}

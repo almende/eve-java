@@ -46,9 +46,9 @@ public class TestScheduling extends TestCase {
 				.withHandle(new SimpleHandler<Receiver>(new MyReceiver()))
 				.build();
 
-		test.schedule("Hi there!", DateTime.now());
+		test.schedule(null, "Hi there!", DateTime.now());
 
-		test.schedule("Hi there!", DateTime.now().plusSeconds(10));
+		test.schedule(null, "Hi there!", DateTime.now().plusSeconds(10));
 
 		try {
 			Thread.sleep(11000);

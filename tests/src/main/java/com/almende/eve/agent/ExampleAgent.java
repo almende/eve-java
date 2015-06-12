@@ -248,8 +248,21 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 		LOG.info("Doing more!");
 		return "Some string!";
 	}
-
-	public ObjectNode getLiteralConfig() {
-		return super.getLiteralConfig();
+	
+	/**
+	 * Test scheduling.
+	 *
+	 * @throws InterruptedException
+	 *             the interrupted exception
+	 */
+	public void testScheduling() throws InterruptedException{
+		String id = scheduleInterval("doSomething",null,1000);
+		
+		Thread.sleep(4500);
+		
+		cancel(id);
+		
+		Thread.sleep(1000);
+		
 	}
 }

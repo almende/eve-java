@@ -74,8 +74,8 @@ public class SyncScheduler extends SimpleScheduler {
 	}
 
 	@Override
-	public String schedule(final Object msg, final DateTime due) {
-		final String uuid = new UUID().toString();
+	public String schedule(final String id, final Object msg, final DateTime due) {
+		final String uuid = id != null ? id : new UUID().toString();
 		getClock().requestTrigger(uuid, due.minus(offset), new Runnable() {
 
 			@Override
@@ -88,8 +88,8 @@ public class SyncScheduler extends SimpleScheduler {
 	}
 
 	@Override
-	public String schedule(Object msg, int delay) {
-		return schedule(msg, new DateTime(now()).plus(delay));
+	public String schedule(final String id, final Object msg, final int delay) {
+		return schedule(id, msg, new DateTime(now()).plus(delay));
 	}
 
 	/**

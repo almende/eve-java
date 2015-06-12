@@ -4,6 +4,8 @@
  */
 package com.almende.eve.scheduling;
 
+import java.net.URI;
+
 import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.Capability;
@@ -21,7 +23,7 @@ public interface Scheduler extends Capability {
 	 * @return the long
 	 */
 	long now();
-	
+
 	/**
 	 * Returns a (virtual) DateTime representation of the current time. For
 	 * real-time this maps to Unixtime, for simulated time this can be offset,
@@ -33,36 +35,45 @@ public interface Scheduler extends Capability {
 
 	/**
 	 * Schedule.
-	 * 
+	 *
+	 * @param id
+	 *            The id for this task, optional, leave null to generate UUID in
+	 *            scheduler
 	 * @param msg
 	 *            the msg
 	 * @param due
 	 *            the due
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
-	String schedule(Object msg, final DateTime due);
+	String schedule(final String id, Object msg, final DateTime due);
 
 	/**
 	 * Schedule.
-	 * 
+	 *
+	 * @param id
+	 *            The id for this task, optional, leave null to generate UUID in
+	 *            scheduler
 	 * @param msg
 	 *            the msg
 	 * @param delay
 	 *            the delay
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
-	String schedule(Object msg, final int delay);
+	String schedule(final String id, final Object msg, final int delay);
 
 	/**
 	 * Schedule.
-	 * 
+	 *
+	 * @param id
+	 *            The id for this task, optional, leave null to generate UUID in
+	 *            scheduler
 	 * @param msg
 	 *            the msg
 	 * @param delay
 	 *            the delay
 	 * @return the scheduled id, can be used to cancel the schedule
 	 */
-	String schedule(Object msg, final long delay);
+	String schedule(final String id, final Object msg, final long delay);
 
 	/**
 	 * Cancel task with given id.
@@ -77,4 +88,10 @@ public interface Scheduler extends Capability {
 	 */
 	void clear();
 
+	/**
+	 * Gets the scheduler url.
+	 *
+	 * @return the scheduler url
+	 */
+	URI getSchedulerUrl();
 }

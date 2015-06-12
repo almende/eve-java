@@ -97,10 +97,10 @@ public class PersistentScheduler extends SimpleScheduler {
 	 * org.joda.time.DateTime)
 	 */
 	@Override
-	public String schedule(final Object msg, final DateTime due) {
-
-		final TaskEntry entry = new TaskEntry(due, JOM.getInstance()
-				.valueToTree(msg));
+	public String schedule(final String id, final Object msg, final DateTime due) {
+		final TaskEntry entry = new TaskEntry((id != null ? id
+				: new UUID().toString()), due, JOM.getInstance().valueToTree(
+				msg));
 		if (state != null) {
 			state.put(entry.getTaskId(), entry);
 		}
@@ -158,14 +158,16 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 
 	/**
 	 * Instantiates a new task entry.
-	 * 
+	 *
+	 * @param id
+	 *            the id
 	 * @param due
 	 *            the due
 	 * @param message
 	 *            the message
 	 */
-	public TaskEntry(final DateTime due, final JsonNode message) {
-		taskId = new UUID().toString();
+	public TaskEntry(final String id, final DateTime due, final JsonNode message) {
+		taskId = id;
 		setMessage(message);
 		this.due = due;
 	}

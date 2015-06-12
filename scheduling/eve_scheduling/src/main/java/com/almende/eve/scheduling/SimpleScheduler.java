@@ -66,11 +66,13 @@ public class SimpleScheduler implements Scheduler {
 	 * org.joda.time.DateTime)
 	 */
 	@Override
-	public String schedule(final Object msg, final DateTime due) {
+	public String schedule(final String triggerId, final Object msg,
+			final DateTime due) {
 		if (clock == null) {
 			clock = new RunnableClock();
 		}
-		final String uuid = new UUID().toString();
+		final String uuid = triggerId != null ? triggerId : new UUID()
+				.toString();
 		clock.requestTrigger(uuid, due, new Runnable() {
 
 			@Override
@@ -153,13 +155,13 @@ public class SimpleScheduler implements Scheduler {
 	}
 
 	@Override
-	public String schedule(Object msg, int delay) {
-		return schedule(msg, nowDateTime().plus(delay));
+	public String schedule(final String id, final Object msg, final int delay) {
+		return schedule(id, msg, nowDateTime().plus(delay));
 	}
 
 	@Override
-	public String schedule(Object msg, long delay) {
-		return schedule(msg, nowDateTime().plus(delay));
+	public String schedule(final String id, final Object msg, final long delay) {
+		return schedule(id, msg, nowDateTime().plus(delay));
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
+import com.almende.eve.protocol.jsonrpc.annotation.RequestId;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
@@ -157,7 +158,6 @@ final public class JSONRpc {
 								+ request.getMethod()
 								+ "' not found. The method does not exist or you are not authorized.");
 			}
-
 			final MethodHandle methodHandle = annotatedMethod.getMethodHandle();
 			final Method method = annotatedMethod.getActualMethod();
 
@@ -166,7 +166,7 @@ final public class JSONRpc {
 			if (Defines.HASMETHODHANDLES) {
 				final Object[] params = castParams(realDest,
 						request.getParams(), annotatedMethod.getParams(),
-						senderUrl);
+						senderUrl, request.getId());
 				if (annotatedMethod.isVoid()) {
 					methodHandle.invokeExact(params);
 				} else {
@@ -174,7 +174,7 @@ final public class JSONRpc {
 				}
 			} else {
 				final Object[] params = castParams(request.getParams(),
-						annotatedMethod.getParams(), senderUrl);
+						annotatedMethod.getParams(), senderUrl, request.getId());
 				result = method.invoke(realDest, params);
 			}
 			if (resp != null) {
@@ -259,7 +259,8 @@ final public class JSONRpc {
 					// format as JSON
 					final ArrayNode params = JOM.createArrayNode();
 					for (final AnnotatedParam param : method.getParams()) {
-						if (param.getAnnotation(Sender.class) == null) {
+						if (param.getAnnotation(Sender.class) == null
+								&& param.getAnnotation(RequestId.class) == null) {
 							final ObjectNode paramData = JOM.createObjectNode();
 
 							paramData.put("name", getName(param));
@@ -362,8 +363,9 @@ final public class JSONRpc {
 	 * @return the Object[]
 	 */
 	private static Object[] castParams(final ObjectNode params,
-			final List<AnnotatedParam> annotatedParams, final URI senderUrl) {
-		return castParams(null, params, annotatedParams, senderUrl);
+			final List<AnnotatedParam> annotatedParams, final URI senderUrl,
+			final JsonNode requestId) {
+		return castParams(null, params, annotatedParams, senderUrl, requestId);
 	}
 
 	/**
@@ -379,7 +381,8 @@ final public class JSONRpc {
 	 */
 	private static Object[] castParams(final Object realDest,
 			final ObjectNode params,
-			final List<AnnotatedParam> annotatedParams, final URI senderUrl) {
+			final List<AnnotatedParam> annotatedParams, final URI senderUrl,
+			final JsonNode requestId) {
 
 		switch (annotatedParams.size()) {
 			case 0:
@@ -417,8 +420,7 @@ final public class JSONRpc {
 					final AnnotatedParam p = annotatedParams.get(i);
 					final String name = getName(p);
 					if (name == null) {
-						final CachedAnnotation a = p
-								.getAnnotation(Sender.class);
+						CachedAnnotation a = p.getAnnotation(Sender.class);
 						if (a != null) {
 							// this is a systems parameter
 							if (p.getType().equals(String.class)) {
@@ -428,9 +430,15 @@ final public class JSONRpc {
 								objects[i + offset] = senderUrl;
 							}
 						} else {
-							// this is a problem
-							throw new ClassCastException("Name of parameter "
-									+ i + " not defined");
+							a = p.getAnnotation(RequestId.class);
+							if (a != null) {
+								objects[i + offset] = requestId;
+							} else {
+								// this is a problem
+								throw new ClassCastException(
+										"Name of parameter " + i
+												+ " not defined");
+							}
 						}
 					} else {
 						// this is a named parameter
@@ -533,7 +541,10 @@ final public class JSONRpc {
 			if (a == null) {
 				a = param.getAnnotation(Sender.class);
 				if (a == null) {
-					return false;
+					a = param.getAnnotation(RequestId.class);
+					if (a == null) {
+						return false;
+					}
 				}
 			}
 		}

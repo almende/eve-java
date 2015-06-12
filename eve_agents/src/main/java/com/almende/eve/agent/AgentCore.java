@@ -335,6 +335,7 @@ public class AgentCore implements Receiver, Configurable {
 	 * @return the literal config
 	 */
 	@JsonIgnore
+	@Access(AccessType.PUBLIC)
 	public ObjectNode getLiteralConfig() {
 		return literalConfig;
 	}
@@ -580,9 +581,12 @@ public class AgentCore implements Receiver, Configurable {
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final JSONRequest request, final DateTime due) {
 		final Scheduler scheduler = this.scheduler;
-		if (scheduler == null)
+		if (scheduler == null || request == null) {
 			return "";
-		return scheduler.schedule(request, due);
+		}
+		final JsonNode id = request.getId();
+		return scheduler.schedule(id != null ? id.toString() : null, request,
+				due);
 	}
 
 	/**
@@ -713,6 +717,11 @@ public class AgentCore implements Receiver, Configurable {
 		@Override
 		public List<URI> getSenderUrls() {
 			return transport.getAddresses();
+		}
+
+		@Override
+		public URI getSenderUrlByScheme(final String scheme) {
+			return transport.getAddressByScheme(scheme);
 		}
 	}
 }

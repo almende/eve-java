@@ -15,11 +15,19 @@ import org.joda.time.DateTime;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Optional;
+import com.almende.eve.protocol.jsonrpc.annotation.RequestId;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
+import com.almende.eve.protocol.jsonrpc.formats.Params;
+import com.almende.eve.scheduling.Scheduler;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
+import com.almende.util.jackson.JOM;
+import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -27,7 +35,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.UNAVAILABLE)
 public class Agent extends AgentCore implements AgentInterface {
-
 	/**
 	 * Instantiates a new agent.
 	 */
@@ -85,11 +92,12 @@ public class Agent extends AgentCore implements AgentInterface {
 	 * Creates a proxy for given URL and interface, with this agent as sender.
 	 * 
 	 * @param <T>
-	 *            the generic type
+	 *            the type represented by the given interface, of which the
+	 *            generated proxy is an instance.
 	 * @param url
-	 *            the url
+	 *            the address of the remote agent
 	 * @param agentInterface
-	 *            the agent interface
+	 *            the interface that the remote agent implements
 	 * @return the t
 	 */
 	@Access(AccessType.UNAVAILABLE)
@@ -99,14 +107,42 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
-	 * Schedule an RPC call at a specified due time.
+	 * Schedule a local RPC call after the specified delay in milliseconds.
+	 *
+	 * @param request
+	 *            the RPC request
+	 * @param delay
+	 *            the delay
+	 * @return the triggerId of this scheduled task (for cancelling)
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String schedule(final JSONRequest request, final long delay) {
+		return schedule(request, getScheduler().nowDateTime().plus(delay));
+	}
+
+	/**
+	 * Schedule a local RPC call after the specified delay in milliseconds.
+	 *
+	 * @param request
+	 *            the RPC request
+	 * @param delay
+	 *            the delay
+	 * @return the triggerId of this scheduled task (for cancelling)
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String schedule(final JSONRequest request, final int delay) {
+		return schedule(request, getScheduler().nowDateTime().plus(delay));
+	}
+
+	/**
+	 * Schedule an local RPC call at a specified due time.
 	 * 
 	 * @param method
-	 *            the method
+	 *            the local RPC method
 	 * @param params
-	 *            the params
+	 *            the local RPC method's params
 	 * @param due
-	 *            the due
+	 *            the due time
 	 * @return the string
 	 */
 	@Access(AccessType.UNAVAILABLE)
@@ -116,12 +152,12 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
-	 * Schedule an RPC call after the specified delay in milliseconds.
+	 * Schedule a local RPC call after the specified delay in milliseconds.
 	 * 
 	 * @param method
-	 *            the method
+	 *            the local RPC method
 	 * @param params
-	 *            the params
+	 *            the local RPC method's params
 	 * @param delay
 	 *            the delay
 	 * @return the triggerId of this scheduled task (for cancelling)
@@ -134,12 +170,12 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
-	 * Schedule an RPC call after the specified delay in milliseconds.
+	 * Schedule a local RPC call after the specified delay in milliseconds.
 	 * 
 	 * @param method
-	 *            the method
+	 *            the local RPC method
 	 * @param params
-	 *            the params
+	 *            the local RPC method's params
 	 * @param delay
 	 *            the delay
 	 * @return the triggerId of this scheduled task (for cancelling)
@@ -149,6 +185,134 @@ public class Agent extends AgentCore implements AgentInterface {
 			final long delay) {
 		return schedule(new JSONRequest(method, params), getScheduler()
 				.nowDateTime().plus(delay));
+	}
+
+	/**
+	 * _schedule next.
+	 *
+	 * @param request
+	 *            the request
+	 * @param interval
+	 *            the interval
+	 * @param type
+	 *            the type
+	 * @param timestamp
+	 *            the timestamp
+	 * @param id
+	 *            the id
+	 */
+	@Access(AccessType.SELF)
+	public void _scheduleNext(final @Name("request") JSONRequest request,
+			final @Name("interval") long interval,
+			final @Name("type") String type,
+			final @Optional @Name("timestamp") DateTime timestamp,
+			@RequestId JsonNode id) {
+		final Scheduler scheduler = getScheduler();
+		if (scheduler == null) {
+			return;
+		}
+		DateTime nextDue = scheduler.nowDateTime().plus(interval);
+		final Params params = new Params();
+		params.add("request", request);
+		params.add("interval", interval);
+		params.add("type", type);
+		if (timestamp != null) {
+			nextDue = timestamp.plus(interval);
+			params.add("timestamp", nextDue);
+		}
+		switch (type) {
+			case "sequential":
+				receive(request, scheduler.getSchedulerUrl(), null);
+				schedule(new JSONRequest(id, "_scheduleNext", params, null),
+						nextDue);
+				break;
+			default:
+				schedule(new JSONRequest(id, "_scheduleNext", params, null),
+						nextDue);
+				receive(request, scheduler.getSchedulerUrl(), null);
+		}
+	}
+
+	private String scheduleInt(final String method, final ObjectNode params,
+			final long interval, final String type) {
+		final Params parms = new Params();
+		parms.add("request", new JSONRequest(method, params));
+		parms.add("interval", interval);
+		parms.add("type", type);
+		return schedule(
+				new JSONRequest(JOM.createObjectNode().textNode(
+						new UUID().toString()), "_scheduleNext", parms, null),
+				getScheduler().nowDateTime().plus(interval));
+	}
+
+	/**
+	 * Repetitive schedule a local RPC call at the specified interval in
+	 * milliseconds.
+	 *
+	 * @param method
+	 *            the local RPC method
+	 * @param params
+	 *            the local RPC method's params
+	 * @param interval
+	 *            the interval in milliseconds
+	 * @return the triggerID for cancellation
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String scheduleInterval(final String method,
+			final ObjectNode params, final long interval) {
+		return scheduleInt(method, params, interval, "parallel");
+	}
+
+	/**
+	 * Repetitive schedule a local RPC call at the specified interval in
+	 * milliseconds. This version only schedules the next interval after the
+	 * earlier run has
+	 * finished, preventing overlap between calls.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param interval
+	 *            the interval
+	 * @return the triggerID for cancellation
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String scheduleIntervalSequential(final String method,
+			final ObjectNode params, final long interval) {
+		return scheduleInt(method, params, interval, "sequential");
+	}
+
+	/**
+	 * Repetitive schedule a local RPC call at the specified interval in
+	 * milliseconds.
+	 * This version schedules the next interval without allowing drift, the next
+	 * scheduled due time is an exact interval after the former.
+	 * <b>If the start timestamp is further in the past than one interval, this
+	 * will run for each interval, quickly after each other to catch up!</b>
+	 *
+	 * @param method
+	 *            the method
+	 * @param params
+	 *            the params
+	 * @param interval
+	 *            the interval
+	 * @param start
+	 *            the start timestamp, on which the first interval is based.
+	 * @return the triggerID for cancellation
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected String scheduleIntervalPrecize(final String method,
+			final ObjectNode params, final long interval, final DateTime start) {
+		final Params parms = new Params();
+		parms.add("request", new JSONRequest(method, params));
+		parms.add("interval", interval);
+		parms.add("timestamp", start);
+		parms.add("type", "precize");
+		return schedule(
+				new JSONRequest(JOM.createObjectNode().textNode(
+						new UUID().toString()), "_scheduleNext", parms, null),
+				getScheduler().nowDateTime().plus(interval));
 	}
 
 	/**
@@ -178,7 +342,8 @@ public class Agent extends AgentCore implements AgentInterface {
 	 * Send async, expecting a response through the given callback.
 	 * 
 	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil injector.
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
 	 *            the address of the other agent
 	 * @param method

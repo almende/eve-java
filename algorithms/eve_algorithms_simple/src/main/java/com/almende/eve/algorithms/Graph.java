@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,13 +30,15 @@ import com.almende.util.callback.AsyncCallback;
 import com.almende.util.callback.SyncCallback;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * The Class Graph, contains storage, logic and communication for maintaining a
  * graph, potentially existing of tagged subgraphs, with edges that can carry a
  * Comparable Weight.
  * Among management tooling, the class also contains a Scale-Free-Network
- * generator algorithm (based on: http://arxiv.org/pdf/1105.3347.pdf) and some graph search tools. <br>
+ * generator algorithm (based on: http://arxiv.org/pdf/1105.3347.pdf) and some
+ * graph search tools. <br>
  * API:<br>
  * <br>
  * graph.addEdge({"edge":{"node":-URI-,"tag":-tag-,"weight":-object-}}); //Add
@@ -197,6 +200,70 @@ public class Graph {
 					null));
 			caller.call(node, "graph.addEdge", params);
 		}
+	}
+
+	// LinkedList
+	private Map<String, Comparable<ObjectNode>>	comparators	= new HashMap<String, Comparable<ObjectNode>>();
+	private ReentrantLock						ll_lock		= new ReentrantLock();
+	class Links {
+		private Boolean	done	= false;
+		private URI		prev	= null;
+		private URI		next	= null;
+		public Links(){}
+		public Boolean getDone() {
+			return done;
+		}
+		public void setDone(Boolean done) {
+			this.done = done;
+		}
+		public URI getPrev() {
+			return prev;
+		}
+		public void setPrev(URI prev) {
+			this.prev = prev;
+		}
+		public URI getNext() {
+			return next;
+		}
+		public void setNext(URI next) {
+			this.next = next;
+		};
+	}
+
+	/**
+	 * Sets the comparator, an object that implements this agents side of
+	 * comparable<ObjectNode>
+	 *
+	 * @param tag
+	 *            the tag
+	 * @param comparator
+	 *            the comparator used to order the LinkedList.
+	 */
+	public void llComparator(final String tag,
+			final Comparable<ObjectNode> comparator) {
+		this.comparators.put(tag, comparator);
+	}
+
+	/**
+	 * Llrequest.
+	 *
+	 * @param tag
+	 *            the tag
+	 * @param request
+	 *            the request
+	 * @param sender
+	 *            the sender
+	 * @return the links
+	 */
+	@Access(AccessType.PUBLIC)
+	public Links llrequest(@Name("tag") String tag, @Name("request") Links request, @Sender URI sender){
+		final Links res = new Links();
+		if (!ll_lock.tryLock()) {
+			return res;
+		}
+		//TODO!
+		ll_lock.unlock();
+		return res;
 	}
 
 	// ScaleFreeNetwork

@@ -92,8 +92,8 @@ public class EventBus {
 	 *            the expiry age
 	 */
 	public void sendEvent(JSONRequest message, long expiryAge) {
-		if (expiryAge > 0 && expiryAge < expiryInterval){
-			//speed up expiry after next run.
+		if (expiryAge > 0 && expiryAge < expiryInterval) {
+			// speed up expiry after next run.
 			expiryInterval = expiryAge;
 		}
 		final Event event = new Event(DateTime.now().plus(expiryAge)
@@ -110,7 +110,8 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleExpiry() {
 		doExpiry();
-		scheduler.schedule(EXPIRYREQUEST, DateTime.now().plus(expiryInterval));
+		scheduler.schedule(EXPIRYREQUEST.getId().asText(), EXPIRYREQUEST,
+				DateTime.now().plus(expiryInterval));
 	}
 
 	/**
@@ -142,7 +143,8 @@ public class EventBus {
 	@Access(AccessType.PUBLIC)
 	public void scheduleTrigger() {
 		doTriggers();
-		scheduler.schedule(TRIGGERREQUEST, DateTime.now().plus(5000));
+		scheduler.schedule(TRIGGERREQUEST.getId().asText(), TRIGGERREQUEST,
+				DateTime.now().plus(5000));
 	}
 
 	/**
@@ -169,7 +171,7 @@ public class EventBus {
 				return;
 			}
 		}
-		scheduler.schedule(event.getMessage(), 0);
+		scheduler.schedule(null, event.getMessage(), 0);
 	}
 
 	private void setupGossip() {
