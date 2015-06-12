@@ -18,7 +18,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class AgentConfig.
+ * The Class AgentConfig, containing a java bean representation of the various
+ * JSON items that can be configured for each agent.
  */
 public class AgentConfig extends Config {
 	private static final Logger	LOG	= Logger.getLogger(AgentConfig.class

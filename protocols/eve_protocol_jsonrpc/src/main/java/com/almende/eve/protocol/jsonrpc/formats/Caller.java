@@ -21,27 +21,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public interface Caller {
 
-
 	/**
-	 * Gets the sender addresses known to this caller. 
+	 * Gets the sender addresses known to this caller.
 	 * 
 	 * @return the urls
 	 */
-	List<URI> getSenderUrls() ;
+	List<URI> getSenderUrls();
 
 	/**
-	 * Send async.
+	 * Send async, expecting a response through the given callback.
 	 * 
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param callback
-	 *            the callback
+	 *            A callback with the expected result type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -49,18 +49,19 @@ public interface Caller {
 			final AsyncCallback<T> callback) throws IOException;
 
 	/**
-	 * Send async for usage in proxies.
+	 * Send async, expecting a response through the given callback.
 	 * 
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param callback
-	 *            the callback
+	 *            A callback with the expected result type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -68,85 +69,77 @@ public interface Caller {
 			final AsyncCallback<T> callback) throws IOException;
 
 	/**
-	 * Send async.
+	 * Send JSON-RPC notification, expecting no response.
 	 * 
-	 * @param <T>
-	 *            the generic type
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final String method, final ObjectNode params)
+	void call(final URI url, final String method, final ObjectNode params)
 			throws IOException;
 
 	/**
-	 * Call.
-	 *
-	 * @param <T>
-	 *            the generic type
+	 * Send JSON-RPC notification, expecting no response.
+	 * 
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final Method method, final Object[] params)
+	void call(final URI url, final Method method, final Object[] params)
 			throws IOException;
 
 	/**
-	 * Send async.
-	 *
-	 * @param <T>
-	 *            the generic type
+	 * Send JSON-RPC Message, could be a request, notification or a reponse.
+	 * 
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param request
-	 *            the request
+	 *            the JSONRequest to be send to the other agent
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void call(final URI url, final JSONMessage request)
-			throws IOException;
+	void call(final URI url, final JSONMessage request) throws IOException;
 
 	/**
-	 * Send async.
-	 *
-	 * @param <T>
-	 *            the generic type
+	 * Send JSON-RPC Message, could be a request, notification or a response.
+	 * 
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param request
-	 *            the request
+	 *            the JSONMessage to be send to the other agent
 	 * @param tag
-	 *            the tag
+	 *            the tag for mapping this call to an earlier inbound call
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	<T> void call(final URI url, final JSONMessage request, final String tag)
 			throws IOException;
-	
+
 	/**
-	 * Call sync.
+	 * Send synchronous request, waiting for a response.
 	 *
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param clazz
-	 *            the clazz
-	 * @return the t
+	 *            the expected result type, in the form of a class.
+	 * @return the result, cast/converted to the given type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -154,19 +147,20 @@ public interface Caller {
 			final Class<T> clazz) throws IOException;
 
 	/**
-	 * Call sync.
+	 * Send synchronous request, waiting for a response.
 	 *
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param type
-	 *            the type
-	 * @return the t
+	 *            the expected result type, in the form of a TypeUtil injector.
+	 * @return the result, cast/converted to the given type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -174,19 +168,20 @@ public interface Caller {
 			final TypeUtil<T> type) throws IOException;
 
 	/**
-	 * Call sync.
+	 * Send synchronous request, waiting for a response.
 	 *
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param type
-	 *            the type
-	 * @return the t
+	 *            the expected result type, in the form of a Jackson JavaType.
+	 * @return the result, cast/converted to the given type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
@@ -194,19 +189,20 @@ public interface Caller {
 			throws IOException;
 
 	/**
-	 * Call sync.
+	 * Send synchronous request, waiting for a response.
 	 *
 	 * @param <T>
-	 *            the generic type
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
 	 * @param url
-	 *            the url
+	 *            the address of the other agent
 	 * @param method
-	 *            the method
+	 *            the remote RPC method
 	 * @param params
-	 *            the params
+	 *            the remote RPC method's params
 	 * @param type
-	 *            the type
-	 * @return the t
+	 *            the expected result type, in the form of a Java Type.
+	 * @return the result, cast/converted to the given type.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */

@@ -21,9 +21,9 @@ public interface AgentInterface {
 	String getId();
 
 	/**
-	 * Retrieve the agents type (its simple class name).
+	 * Gets the runtime class type of this agent.
 	 * 
-	 * @return version
+	 * @return the type
 	 */
 	String getType();
 
@@ -42,12 +42,5 @@ public interface AgentInterface {
 	 * @return urls
 	 */
 	List<URI> getUrls();
-
-	/**
-	 * Gets the config of this Agent, expanded, with no external references.
-	 * 
-	 * @return the config
-	 */
-	ObjectNode getConfig();
 
 }
