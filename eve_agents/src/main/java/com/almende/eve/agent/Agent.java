@@ -107,6 +107,161 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
+	 * Send async, expecting a response through the given callback.
+	 * 
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param callback
+	 *            A callback with the expected result type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> void call(final URI url, final String method,
+			final ObjectNode params, final AsyncCallback<T> callback)
+			throws IOException {
+		caller.call(url, method, params, callback);
+	}
+
+	/**
+	 * Send async, expecting a response through the given callback.
+	 * 
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param callback
+	 *            A callback with the expected result type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> void call(final URI url, final Method method,
+			final Object[] params, final AsyncCallback<T> callback)
+			throws IOException {
+		caller.call(url, method, params, callback);
+	}
+
+	/**
+	 * Send JSON-RPC notification, expecting no response.
+	 *
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected void call(final URI url, final String method,
+			final ObjectNode params) throws IOException {
+		caller.call(url, method, params);
+	}
+
+	/**
+	 * Send synchronous request, waiting for a response.
+	 *
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param type
+	 *            the expected result type, in the form of a Java Type.
+	 * @return the result, cast/converted to the given type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final Type type) throws IOException {
+		return caller.callSync(url, method, params, type);
+	}
+
+	/**
+	 * Send synchronous request, waiting for a response.
+	 *
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param type
+	 *            the expected result type, in the form of a Jackson JavaType.
+	 * @return the result, cast/converted to the given type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final JavaType type) throws IOException {
+		return caller.callSync(url, method, params, type);
+	}
+
+	/**
+	 * Send synchronous request, waiting for a response.
+	 *
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param clazz
+	 *            the expected result type, in the form of a class.
+	 * @return the result, cast/converted to the given type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final Class<T> clazz) throws IOException {
+		return caller.callSync(url, method, params, clazz);
+	}
+
+	/**
+	 * Send synchronous request, waiting for a response.
+	 *
+	 * @param <T>
+	 *            the generic type of the result, controlled by the TypeUtil
+	 *            injector.
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @param type
+	 *            the expected result type, in the form of a TypeUtil injector.
+	 * @return the result, cast/converted to the given type.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> T callSync(final URI url, final String method,
+			final ObjectNode params, final TypeUtil<T> type) throws IOException {
+		return caller.callSync(url, method, params, type);
+	}
+
+	/**
 	 * Schedule a local RPC call after the specified delay in milliseconds.
 	 *
 	 * @param request
@@ -315,158 +470,4 @@ public class Agent extends AgentCore implements AgentInterface {
 				getScheduler().nowDateTime().plus(interval));
 	}
 
-	/**
-	 * Send async, expecting a response through the given callback.
-	 * 
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param callback
-	 *            A callback with the expected result type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> void call(final URI url, final String method,
-			final ObjectNode params, final AsyncCallback<T> callback)
-			throws IOException {
-		caller.call(url, method, params, callback);
-	}
-
-	/**
-	 * Send async, expecting a response through the given callback.
-	 * 
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param callback
-	 *            A callback with the expected result type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> void call(final URI url, final Method method,
-			final Object[] params, final AsyncCallback<T> callback)
-			throws IOException {
-		caller.call(url, method, params, callback);
-	}
-
-	/**
-	 * Send JSON-RPC notification, expecting no response.
-	 *
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected void call(final URI url, final String method,
-			final ObjectNode params) throws IOException {
-		caller.call(url, method, params);
-	}
-
-	/**
-	 * Send synchronous request, waiting for a response.
-	 *
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param type
-	 *            the expected result type, in the form of a Java Type.
-	 * @return the result, cast/converted to the given type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params, final Type type) throws IOException {
-		return caller.callSync(url, method, params, type);
-	}
-
-	/**
-	 * Send synchronous request, waiting for a response.
-	 *
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param type
-	 *            the expected result type, in the form of a Jackson JavaType.
-	 * @return the result, cast/converted to the given type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params, final JavaType type) throws IOException {
-		return caller.callSync(url, method, params, type);
-	}
-
-	/**
-	 * Send synchronous request, waiting for a response.
-	 *
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param clazz
-	 *            the expected result type, in the form of a class.
-	 * @return the result, cast/converted to the given type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params, final Class<T> clazz) throws IOException {
-		return caller.callSync(url, method, params, clazz);
-	}
-
-	/**
-	 * Send synchronous request, waiting for a response.
-	 *
-	 * @param <T>
-	 *            the generic type of the result, controlled by the TypeUtil
-	 *            injector.
-	 * @param url
-	 *            the address of the other agent
-	 * @param method
-	 *            the remote RPC method
-	 * @param params
-	 *            the remote RPC method's params
-	 * @param type
-	 *            the expected result type, in the form of a TypeUtil injector.
-	 * @return the result, cast/converted to the given type.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	protected <T> T callSync(final URI url, final String method,
-			final ObjectNode params, final TypeUtil<T> type) throws IOException {
-		return caller.callSync(url, method, params, type);
-	}
 }

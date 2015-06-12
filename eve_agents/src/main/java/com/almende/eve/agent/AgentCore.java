@@ -195,112 +195,6 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Gets the instantiationService.
-	 *
-	 * @return the checks if is
-	 */
-	public InstantiationService getInstantiationService() {
-		return is;
-	}
-
-	/**
-	 * Gets the protocol stack.
-	 *
-	 * @return the protocol stack
-	 */
-	public ProtocolStack getProtocolStack() {
-		return protocolStack;
-	}
-
-	/**
-	 * Gets the caller.
-	 *
-	 * @return the caller
-	 */
-	public Caller getCaller() {
-		return caller;
-	}
-
-	/**
-	 * Sets the receiver.
-	 *
-	 * @param receiver
-	 *            the receiver to set
-	 */
-	protected void setReceiver(Handler<Receiver> receiver) {
-		this.receiver = receiver;
-	}
-
-	/**
-	 * Gets the receiver.
-	 *
-	 * @return the receiver
-	 */
-	@JsonIgnore
-	protected Handler<Receiver> getReceiver() {
-		return receiver;
-	}
-
-	/**
-	 * Sets the handler.
-	 *
-	 * @param handler
-	 *            the new handler
-	 */
-	protected void setHandler(Handler<Configurable> handler) {
-		this.handler = handler;
-	}
-
-	/**
-	 * Gets the handler.
-	 *
-	 * @return the receiver
-	 */
-	@JsonIgnore
-	public Handler<Configurable> getHandler() {
-		return handler;
-	}
-
-	/**
-	 * Sets the sender.
-	 *
-	 * @param sender
-	 *            the new sender
-	 */
-	protected void setSender(Handler<Caller> sender) {
-		this.sender = sender;
-	}
-
-	/**
-	 * Gets the sender.
-	 *
-	 * @return the sender
-	 */
-	@JsonIgnore
-	protected Handler<Caller> getSender() {
-		return sender;
-	}
-
-	/**
-	 * Gets the transport.
-	 * 
-	 * @return the transport
-	 */
-	protected Router getTransport() {
-		return transport;
-	}
-
-	/**
-	 * Sets the transport.
-	 * 
-	 * @param transport
-	 *            the new transport
-	 */
-	protected void setTransport(Router transport) {
-		this.transport = transport;
-	}
-
-	/**
 	 * Sets the config.
 	 * 
 	 * @param config
@@ -345,18 +239,7 @@ public class AgentCore implements Receiver, Configurable {
 	 */
 	private void loadConfig() {
 		agentId = config.getId();
-		if (config.getInstantiationService() != null) {
-			InstantiationServiceConfig iscfg = InstantiationServiceConfig
-					.decorate(config.getInstantiationService());
-			final StateConfig stateConfig = StateConfig.decorate(iscfg
-					.getState());
-			if (agentId != null && stateConfig.getId() == null) {
-				stateConfig.setId(agentId);
-				iscfg.setState(stateConfig);
-			}
-			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
-			is.register(agentId, literalConfig, this.getClass().getName());
-		}
+		loadInstantiationService(config.getInstantiationService());
 		if (is != null && config.isCanHibernate()) {
 			setHandler(new HibernationHandler<Configurable>(this, agentId, is));
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
@@ -366,6 +249,141 @@ public class AgentCore implements Receiver, Configurable {
 		loadProtocols(config.getProtocols());
 		loadTransports(config.getTransports());
 		loadScheduler(config.getScheduler());
+	}
+
+	/**
+	 * Sets the receiver.
+	 *
+	 * @param receiver
+	 *            the receiver to set
+	 */
+	protected void setReceiver(Handler<Receiver> receiver) {
+		this.receiver = receiver;
+	}
+
+	/**
+	 * Gets the receiver.
+	 *
+	 * @return the receiver
+	 */
+	@JsonIgnore
+	protected Handler<Receiver> getReceiver() {
+		return receiver;
+	}
+
+	/**
+	 * Sets the handler.
+	 *
+	 * @param handler
+	 *            the new handler
+	 */
+	protected void setHandler(Handler<Configurable> handler) {
+		this.handler = handler;
+	}
+
+	/**
+	 * Gets the handler.
+	 *
+	 * @return the receiver
+	 */
+	@JsonIgnore
+	public Handler<Configurable> getHandler() {
+		return handler;
+	}
+
+	/**
+	 * Connect all transports.
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public void connect() throws IOException {
+		transport.connect();
+	}
+
+	/**
+	 * Disconnect all transports.
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	public void disconnect() {
+		transport.disconnect();
+	}
+
+	/**
+	 * Gets the caller.
+	 *
+	 * @return the caller
+	 */
+	@JsonIgnore
+	public Caller getCaller() {
+		return caller;
+	}
+
+	/**
+	 * Sets the sender.
+	 *
+	 * @param sender
+	 *            the new sender
+	 */
+	protected void setSender(Handler<Caller> sender) {
+		this.sender = sender;
+	}
+
+	/**
+	 * Gets the sender.
+	 *
+	 * @return the sender
+	 */
+	@JsonIgnore
+	protected Handler<Caller> getSender() {
+		return sender;
+	}
+
+	
+	@Access(AccessType.UNAVAILABLE)
+	@Override
+	public void receive(final Object msg, final URI senderUrl, final String tag) {
+		if (protocolStack == null) {
+			// E.g. during destroy()!
+			return;
+		}
+		protocolStack.inbound(msg, senderUrl, tag);
+	}
+
+	/**
+	 * Gets the instantiationService.
+	 *
+	 * @return the checks if is
+	 */
+	@JsonIgnore
+	public InstantiationService getInstantiationService() {
+		return is;
+	}
+
+	private void loadInstantiationService(final ObjectNode config) {
+		if (config != null) {
+			InstantiationServiceConfig iscfg = InstantiationServiceConfig
+					.decorate(config);
+			final StateConfig stateConfig = StateConfig.decorate(iscfg
+					.getState());
+			if (agentId != null && stateConfig.getId() == null) {
+				stateConfig.setId(agentId);
+				iscfg.setState(stateConfig);
+			}
+			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
+			is.register(agentId, literalConfig, this.getClass().getName());
+		}
+	}
+
+	/**
+	 * Gets the protocol stack.
+	 *
+	 * @return the protocol stack
+	 */
+	@JsonIgnore
+	public ProtocolStack getProtocolStack() {
+		return protocolStack;
 	}
 
 	/**
@@ -412,164 +430,6 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the scheduler.
-	 * 
-	 * @param scheduler
-	 *            the new scheduler
-	 */
-	@JsonIgnore
-	protected void setScheduler(final Scheduler scheduler) {
-		if (this.scheduler != null) {
-			this.scheduler.clear();
-		}
-		this.scheduler = scheduler;
-		config.set("scheduler", scheduler.getParams());
-	}
-
-	/**
-	 * Load scheduler.
-	 * 
-	 * @param schedulerConfig
-	 *            the scheduler config
-	 */
-	private void loadScheduler(final ObjectNode params) {
-		final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
-				.decorate(params);
-		if (schedulerConfig != null) {
-			if (agentId != null && schedulerConfig.has("state")) {
-				final StateConfig stateConfig = StateConfig
-						.decorate((ObjectNode) schedulerConfig.get("state"));
-
-				if (stateConfig.getId() == null) {
-					stateConfig.setId("scheduler_" + agentId);
-					schedulerConfig.set("state", stateConfig);
-				}
-			}
-			if (agentId != null && schedulerConfig.getId() == null) {
-				schedulerConfig.setId(agentId);
-			}
-			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
-					.withHandle(receiver).build();
-		}
-	}
-
-	/**
-	 * Gets the scheduler.
-	 * 
-	 * @return the scheduler
-	 */
-	@JsonIgnore
-	protected Scheduler getScheduler() {
-		return scheduler;
-	}
-
-	/**
-	 * Sets the state.
-	 * 
-	 * @param state
-	 *            the new state
-	 */
-	@JsonIgnore
-	protected void setState(final State state) {
-		this.state = state;
-		config.set("state", state.getParams());
-	}
-
-	/**
-	 * Load state.
-	 * 
-	 * @param sc
-	 *            the sc
-	 */
-	private void loadState(final ObjectNode sc) {
-		if (sc != null) {
-			final StateConfig stateConfig = StateConfig.decorate(sc);
-			if (agentId != null && stateConfig.getId() == null) {
-				stateConfig.setId(agentId);
-			}
-			state = new StateBuilder().withConfig(stateConfig).build();
-		}
-	}
-
-	/**
-	 * Gets the state.
-	 * 
-	 * @return the state
-	 */
-	@Access(AccessType.UNAVAILABLE)
-	@JsonIgnore
-	protected State getState() {
-		return state;
-	}
-
-	/**
-	 * Adds the transport.
-	 *
-	 * @param transport
-	 *            the transport
-	 */
-	public void addTransport(final Transport transport) {
-		this.transport.register(transport);
-		this.config.addTransport(transport.getParams());
-	}
-
-	/**
-	 * Adds the transport.
-	 *
-	 * @param transconfig
-	 *            the transconfig
-	 */
-	protected void addTransport(final ObjectNode transconfig) {
-		// TODO: Somewhat ugly, not every transport requires an id.
-		TransportConfig transconf = TransportConfig.decorate(transconfig);
-		if (transconf.get("id") == null) {
-			transconf.put("id", agentId);
-		}
-		final Transport transport = new TransportBuilder()
-				.withConfig(transconf).withHandle(receiver).build();
-
-		this.transport.register(transport);
-	}
-
-	/**
-	 * Load transport.
-	 *
-	 * @param transportConfig
-	 *            the transport config
-	 */
-	private void loadTransports(final ArrayNode transportConfig) {
-		if (transportConfig != null) {
-			final Iterator<JsonNode> iter = transportConfig.iterator();
-			while (iter.hasNext()) {
-				addTransport((ObjectNode) iter.next());
-			}
-		}
-		// All agents have a local transport
-		this.transport.register(new LocalTransportBuilder()
-				.withConfig(new LocalTransportConfig(agentId))
-				.withHandle(receiver).build());
-	}
-
-	/**
-	 * Connect all transports.
-	 * 
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	@Access(AccessType.UNAVAILABLE)
-	public void connect() throws IOException {
-		transport.connect();
-	}
-
-	/**
-	 * Disconnect all transports.
-	 */
-	@Access(AccessType.UNAVAILABLE)
-	public void disconnect() {
-		transport.disconnect();
-	}
-
-	/**
 	 * Schedule an RPC call at a specified due time.
 	 *
 	 * @param request
@@ -603,19 +463,163 @@ public class AgentCore implements Receiver, Configurable {
 		scheduler.cancel(taskId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
-	 * java.net.URI, java.lang.String)
+	/**
+	 * Sets the scheduler.
+	 * 
+	 * @param scheduler
+	 *            the new scheduler
+	 */
+	@JsonIgnore
+	protected void setScheduler(final Scheduler scheduler) {
+		if (this.scheduler != null) {
+			this.scheduler.clear();
+		}
+		this.scheduler = scheduler;
+		config.set("scheduler", scheduler.getParams());
+	}
+
+	/**
+	 * Gets the scheduler.
+	 * 
+	 * @return the scheduler
+	 */
+	@JsonIgnore
+	protected Scheduler getScheduler() {
+		return scheduler;
+	}
+
+	/**
+	 * Load scheduler.
+	 * 
+	 * @param schedulerConfig
+	 *            the scheduler config
+	 */
+	private void loadScheduler(final ObjectNode params) {
+		final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
+				.decorate(params);
+		if (schedulerConfig != null) {
+			if (agentId != null && schedulerConfig.has("state")) {
+				final StateConfig stateConfig = StateConfig
+						.decorate((ObjectNode) schedulerConfig.get("state"));
+
+				if (stateConfig.getId() == null) {
+					stateConfig.setId("scheduler_" + agentId);
+					schedulerConfig.set("state", stateConfig);
+				}
+			}
+			if (agentId != null && schedulerConfig.getId() == null) {
+				schedulerConfig.setId(agentId);
+			}
+			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
+					.withHandle(receiver).build();
+		}
+	}
+
+	/**
+	 * Sets the state.
+	 * 
+	 * @param state
+	 *            the new state
+	 */
+	@JsonIgnore
+	protected void setState(final State state) {
+		this.state = state;
+		config.set("state", state.getParams());
+	}
+
+	/**
+	 * Gets the state.
+	 * 
+	 * @return the state
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	@Override
-	public void receive(final Object msg, final URI senderUrl, final String tag) {
-		if (protocolStack == null) {
-			// E.g. during destroy()!
-			return;
+	@JsonIgnore
+	protected State getState() {
+		return state;
+	}
+
+	/**
+	 * Load state.
+	 * 
+	 * @param sc
+	 *            the sc
+	 */
+	private void loadState(final ObjectNode sc) {
+		if (sc != null) {
+			final StateConfig stateConfig = StateConfig.decorate(sc);
+			if (agentId != null && stateConfig.getId() == null) {
+				stateConfig.setId(agentId);
+			}
+			state = new StateBuilder().withConfig(stateConfig).build();
 		}
-		protocolStack.inbound(msg, senderUrl, tag);
+	}
+
+	/**
+	 * Sets the transport router
+	 * 
+	 * @param transport
+	 *            the new transport router
+	 */
+	protected void setTransport(Router transport) {
+		this.transport = transport;
+	}
+
+	/**
+	 * Adds a new transport to this router/array.
+	 *
+	 * @param transport
+	 *            the transport router
+	 */
+	protected void addTransport(final Transport transport) {
+		this.transport.register(transport);
+		this.config.addTransport(transport.getParams());
+	}
+
+	/**
+	 * Gets the transport router.
+	 * 
+	 * @return the transport
+	 */
+	@JsonIgnore
+	protected Router getTransport() {
+		return transport;
+	}
+
+	/**
+	 * Adds the transport.
+	 *
+	 * @param transconfig
+	 *            the transconfig
+	 */
+	private void addTransport(final ObjectNode transconfig) {
+		// TODO: Somewhat ugly, not every transport requires an id.
+		TransportConfig transconf = TransportConfig.decorate(transconfig);
+		if (transconf.get("id") == null) {
+			transconf.put("id", agentId);
+		}
+		final Transport transport = new TransportBuilder()
+				.withConfig(transconf).withHandle(receiver).build();
+
+		this.transport.register(transport);
+	}
+
+	/**
+	 * Load transport.
+	 *
+	 * @param transportConfig
+	 *            the transport config
+	 */
+	private void loadTransports(final ArrayNode transportConfig) {
+		if (transportConfig != null) {
+			final Iterator<JsonNode> iter = transportConfig.iterator();
+			while (iter.hasNext()) {
+				addTransport((ObjectNode) iter.next());
+			}
+		}
+		// All agents have a local transport
+		this.transport.register(new LocalTransportBuilder()
+				.withConfig(new LocalTransportConfig(agentId))
+				.withHandle(receiver).build());
 	}
 
 	private class DefaultCaller implements Caller {
