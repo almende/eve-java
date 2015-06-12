@@ -332,7 +332,7 @@ public class Agent implements Receiver, Configurable, AgentInterface {
 	@Access(AccessType.PUBLIC)
 	@Override
 	public ObjectNode getConfig() {
-		return config.deepCopy();
+		return config;
 	}
 
 	/**

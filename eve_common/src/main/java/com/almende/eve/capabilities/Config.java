@@ -4,11 +4,14 @@
  */
 package com.almende.eve.capabilities;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
@@ -21,25 +24,167 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Config.
  */
 public class Config extends ObjectNode {
-	private static Config	global		= new Config();
-
-	private List<Config>	pointers	= new LinkedList<Config>();
-	private boolean			configured	= false;
+	private static Config	global	= new Config();
 
 	/**
 	 * Instantiates a new config.
 	 */
 	public Config() {
-		super(JOM.getInstance().getNodeFactory(),
-				new LinkedHashMap<String, JsonNode>(2));
+		super(JOM.getInstance().getNodeFactory(), new MyKids(2));
 	}
 
 	private Config(final ObjectNode node) {
-		super(JOM.getInstance().getNodeFactory(),
-				new LinkedHashMap<String, JsonNode>(node != null ? node.size()
-						: 2));
+		super(JOM.getInstance().getNodeFactory(), new MyKids(
+				node != null ? node.size() : 2));
 		if (node != null) {
 			this.setAll(node);
+		}
+	}
+
+	static class MyKids extends LinkedHashMap<String, JsonNode> {
+		private static final long	serialVersionUID	= 7450473642684901780L;
+		public List<Config>			pointers			= new LinkedList<Config>();
+		private boolean				configured			= false;
+
+		public MyKids(int capacity) {
+			super(capacity);
+		}
+
+		@Override
+		public Set<Entry<String, JsonNode>> entrySet() {
+			Set<Entry<String, JsonNode>> result = new HashSet<Entry<String, JsonNode>>();
+			for (Config other : pointers) {
+				result.addAll(other.getKids().entrySet());
+			}
+			result.addAll(super.entrySet());
+			return result;
+		}
+
+		@Override
+		public Collection<JsonNode> values() {
+			Collection<JsonNode> result = new ArrayList<JsonNode>();
+			for (Entry<String, JsonNode> entry : entrySet()) {
+				result.add(entry.getValue());
+			}
+			return result;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			Set<String> result = new HashSet<String>();
+			for (Entry<String, JsonNode> entry : entrySet()) {
+				result.add(entry.getKey());
+			}
+			return result;
+		}
+
+		@Override
+		public void clear() {
+			super.clear();
+			pointers.clear();
+		}
+
+		@Override
+		public JsonNode get(final Object key) {
+			if (!(key instanceof String)) {
+				return null;
+			}
+			final String strKey = (String) key;
+			JsonNode res = super.get(key);
+			if ((res != null && !res.isObject()) || "extends".equals(key)) {
+				return res;
+			}
+			if (!configured && this.containsKey("extends")) {
+				setupExtend();
+			}
+			JsonNode otherres = null;
+			Config result = null;
+			for (Config other : pointers) {
+				JsonNode val = other.get(strKey);
+				if (val == null) {
+					continue;
+				}
+				if (val.isArray()) {
+					final ArrayNode array = JOM.createArrayNode();
+					for (JsonNode elem : val) {
+						final Config item = new Config();
+						item.getKids().pointers.add(Config
+								.decorate((ObjectNode) elem));
+						array.add(item);
+					}
+					super.put(strKey, array);
+					otherres = array;
+				} else if (!val.isObject()) {
+					otherres = val;
+				} else {
+					if (result == null) {
+						result = Config.decorate((ObjectNode) res);
+					}
+					result.getPointers().add(Config.decorate((ObjectNode) val));
+				}
+			}
+			if (otherres != null) {
+				return otherres;
+			}
+			if (result != null) {
+				return result;
+			}
+			return res;
+		}
+
+		private JsonNode lget(final String... keys) {
+			if (keys == null || keys.length == 0) {
+				return null;
+			}
+			JsonNode node = this.get(keys[0]);
+			if (node == null){
+				return null;
+			}
+			for (int i = 1; i < keys.length; i++) {
+				node = node.get(keys[i]);
+				if (node == null) {
+					break;
+				}
+			}
+			if (node == null) {
+				return null;
+			}
+			return node;
+		}
+
+		/**
+		 * Setup extends.
+		 */
+		public void setupExtend() {
+			configured = true;
+			final JsonNode extNode = this.get("extends");
+			if (extNode == null || extNode.isNull()) {
+				return;
+			}
+			JsonNode reference = null;
+			boolean found = false;
+			final String path = extNode.textValue();
+			if (path != null && !path.equals("")) {
+				reference = this.lget(path.split("/"));
+				if (reference == null || reference.isNull()) {
+					reference = global.lget(path.split("/"));
+					found = true;
+				}
+			}
+			if (reference != null) {
+				Config refConf = null;
+				if (reference instanceof Config) {
+					refConf = (Config) reference;
+				} else {
+					refConf = new Config((ObjectNode) reference);
+				}
+
+				if (!found) {
+					String ref = new UUID().toString();
+					global.set(ref, refConf);
+				}
+				pointers.add(refConf);
+			}
 		}
 	}
 
@@ -60,6 +205,10 @@ public class Config extends ObjectNode {
 		return res;
 	}
 
+	private MyKids getKids() {
+		return (MyKids) this._children;
+	}
+
 	/**
 	 * Extend this configuration with the other tree, overwriting existing
 	 * fields, adding new ones.
@@ -71,7 +220,7 @@ public class Config extends ObjectNode {
 		if (node != null) {
 			this.setAll(node);
 			if (node instanceof Config) {
-				this.pointers.addAll(((Config) node).pointers);
+				getKids().pointers.addAll(((Config) node).getKids().pointers);
 			}
 		}
 	}
@@ -91,7 +240,7 @@ public class Config extends ObjectNode {
 	 * @return the pointers
 	 */
 	public List<Config> getPointers() {
-		return pointers;
+		return getKids().pointers;
 	}
 
 	/**
@@ -101,7 +250,7 @@ public class Config extends ObjectNode {
 	 *            the new pointers
 	 */
 	public void setPointers(List<Config> pointers) {
-		this.pointers = pointers;
+		getKids().pointers = pointers;
 	}
 
 	/**
@@ -154,67 +303,6 @@ public class Config extends ObjectNode {
 		}
 		return node;
 	}
-	
-	@Override
-	public Iterator<Entry<String,JsonNode>> fields(){
-		final LinkedHashMap<String,JsonNode> fields = new LinkedHashMap<String,JsonNode>();
-		final Iterator<Entry<String,JsonNode>> supr = super.fields();
-		while (supr.hasNext()){
-			Entry<String,JsonNode> item = supr.next();
-			fields.put(item.getKey(), item.getValue());
-		}
-		for (Config other : getPointers()) {
-			final Iterator<Entry<String,JsonNode>> othr = other.fields();
-			while (othr.hasNext()){
-				Entry<String,JsonNode> item = othr.next();
-				fields.put(item.getKey(), item.getValue());
-			}			
-		}
-		return fields.entrySet().iterator();
-	}
-	
-	@Override
-	public JsonNode get(final String key) {
-		JsonNode res = super.get(key);
-		if ((res != null && !res.isObject()) || "extends".equals(key)) {
-			return res;
-		}
-		if (!configured && this.has("extends")) {
-			setupExtend();
-		}
-		JsonNode otherres = null;
-		Config result = null;
-		for (Config other : getPointers()) {
-			JsonNode val = other.get(key);
-			if (val == null) {
-				continue;
-			}
-			if (val.isArray()) {
-				final ArrayNode array = JOM.createArrayNode();
-				for (JsonNode elem : val) {
-					final Config item = new Config();
-					item.pointers.add(Config.decorate((ObjectNode) elem));
-					array.add(item);
-				}
-				this.set(key, array);
-				otherres = array;
-			} else if (!val.isObject()) {
-				otherres = val;
-			} else {
-				if (result == null) {
-					result = Config.decorate((ObjectNode) res);
-				}
-				result.getPointers().add(Config.decorate((ObjectNode) val));
-			}
-		}
-		if (otherres != null) {
-			return otherres;
-		}
-		if (result != null) {
-			return result;
-		}
-		return res;
-	}
 
 	/**
 	 * Gets the.
@@ -234,45 +322,10 @@ public class Config extends ObjectNode {
 	@Override
 	public ObjectNode deepCopy() {
 		final ObjectNode result = JOM.createObjectNode();
-		for (Config other : pointers) {
+		for (Config other : getKids().pointers) {
 			result.setAll(other.deepCopy());
 		}
 		result.setAll(super.deepCopy());
 		return result;
-	}
-
-	/**
-	 * Setup extends.
-	 */
-	public void setupExtend() {
-		configured = true;
-		final JsonNode extNode = this.get("extends");
-		if (extNode == null || extNode.isNull()) {
-			return;
-		}
-		ObjectNode reference = null;
-		boolean found = false;
-		final String path = extNode.textValue();
-		if (path != null && !path.equals("")) {
-			reference = (ObjectNode) this.lget(path.split("/"));
-			if (reference == null || reference.isNull()) {
-				reference = (ObjectNode) global.lget(path.split("/"));
-				found = true;
-			}
-		}
-		if (reference != null && !reference.isNull()) {
-			Config refConf = null;
-			if (reference instanceof Config) {
-				refConf = (Config) reference;
-			} else {
-				refConf = new Config((ObjectNode) reference);
-			}
-
-			if (!found) {
-				String ref = new UUID().toString();
-				global.set(ref, refConf);
-			}
-			getPointers().add(refConf);
-		}
 	}
 }
