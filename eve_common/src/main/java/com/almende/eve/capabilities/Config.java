@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -48,6 +49,21 @@ public class Config extends ObjectNode {
 
 		public MyKids(int capacity) {
 			super(capacity);
+		}
+
+		@Override
+		public int size() {
+			return entrySet().size();
+		}
+
+		@SuppressWarnings("unchecked")
+		public Map<String, JsonNode> getParentMap() {
+			return (Map<String, JsonNode>) super.clone();
+		}
+
+		public void putAll(MyKids map) {
+			super.putAll(map.getParentMap());
+			pointers.addAll(map.pointers);
 		}
 
 		@Override
@@ -137,7 +153,7 @@ public class Config extends ObjectNode {
 				return null;
 			}
 			JsonNode node = this.get(keys[0]);
-			if (node == null){
+			if (node == null) {
 				return null;
 			}
 			for (int i = 1; i < keys.length; i++) {
