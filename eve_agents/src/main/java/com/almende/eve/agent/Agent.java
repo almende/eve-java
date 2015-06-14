@@ -347,7 +347,13 @@ public class Agent extends AgentCore implements AgentInterface {
 	/**
 	 * Send synchronous request to multiple agents, waiting for a response from
 	 * each. This method returns with a map of results, after the final agent
-	 * return or timeouts.
+	 * return or timeouts. <br>
+	 * <br>
+	 * <i>Note: this method will block the calling thread, in such a way that
+	 * protocols that depend on single threaded agents (e.g. inbox
+	 * protocol and Simulation inbox protocol) will not be able to detect this.
+	 * In those cases you will have to sequentially run multiple synchronous
+	 * calls in some loop, this method will not work in that case.</i>
 	 *
 	 * @param <T>
 	 *            the generic type of the result, controlled by the return
