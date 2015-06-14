@@ -8,7 +8,12 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
 
@@ -23,6 +28,7 @@ import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.eve.scheduling.Scheduler;
 import com.almende.util.TypeUtil;
 import com.almende.util.callback.AsyncCallback;
+import com.almende.util.callback.SyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,6 +41,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Access(AccessType.UNAVAILABLE)
 public class Agent extends AgentCore implements AgentInterface {
+	private static final Logger	LOG	= Logger.getLogger(Agent.class.getName());
+
 	/**
 	 * Instantiates a new agent.
 	 */
@@ -107,6 +115,38 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
+	 * Send JSON-RPC notification, expecting no response.
+	 *
+	 * @param url
+	 *            the address of the other agent
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected void call(final URI url, final String method,
+			final ObjectNode params) throws IOException {
+		caller.call(url, method, params);
+	}
+
+	/**
+	 * Send JSON-RPC notification, expecting no response.
+	 *
+	 * @param url
+	 *            the address of the other agent
+	 * @param request
+	 *            the actual RPC request
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected void call(final URI url, final JSONRequest request)
+			throws IOException {
+		caller.call(url, request);
+	}
+
+	/**
 	 * Send async, expecting a response through the given callback.
 	 * 
 	 * @param <T>
@@ -153,20 +193,63 @@ public class Agent extends AgentCore implements AgentInterface {
 	}
 
 	/**
-	 * Send JSON-RPC notification, expecting no response.
+	 * Send an asynchronous request to multiple agents. This method calls the
+	 * given callback with a map of results, after the final agent
+	 * return or timeouts.
 	 *
-	 * @param url
-	 *            the address of the other agent
+	 * @param <T>
+	 *            the generic type of the result, controlled by the return
+	 *            value.
+	 * @param urls
+	 *            the addresses of the other agents
 	 * @param method
 	 *            the remote RPC method
 	 * @param params
 	 *            the remote RPC method's params
+	 * @param callback
+	 *            After the final request returns, the callback's onSuccess is
+	 *            called with an unmodifiable map, mapping the remote address to
+	 *            its results. Failure to get a result from a peer will lead to
+	 *            null values for that peer.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	protected void call(final URI url, final String method,
-			final ObjectNode params) throws IOException {
-		caller.call(url, method, params);
+	protected <T> void callMulti(final List<URI> urls, final String method,
+			final ObjectNode params, final AsyncCallback<Map<URI, T>> callback)
+			throws IOException {
+		final Map<URI, T> result = new ConcurrentHashMap<URI, T>(urls.size());
+		final Boolean[] done = new Boolean[] { false };
+		for (final URI peer : urls) {
+			final JSONRequest request = new JSONRequest(method, params,
+					new AsyncCallback<T>() {
+						private void checkRes() {
+							synchronized (done) {
+								if (!done[0] && result.size() == urls.size()) {
+									callback.onSuccess(Collections
+											.unmodifiableMap(result));
+									done[0] = true;
+								}
+							}
+						}
+
+						@Override
+						public void onSuccess(T res) {
+							result.put(peer, res);
+							checkRes();
+						}
+
+						@Override
+						public void onFailure(Exception exception) {
+							LOG.log(Level.WARNING,
+									"CallMulti: Failed to call peer:" + peer,
+									exception);
+							result.put(peer, null);
+							checkRes();
+						}
+
+					});
+			caller.call(peer, request);
+		}
 	}
 
 	/**
@@ -259,6 +342,37 @@ public class Agent extends AgentCore implements AgentInterface {
 	protected <T> T callSync(final URI url, final String method,
 			final ObjectNode params, final TypeUtil<T> type) throws IOException {
 		return caller.callSync(url, method, params, type);
+	}
+
+	/**
+	 * Send synchronous request to multiple agents, waiting for a response from
+	 * each. This method returns with a map of results, after the final agent
+	 * return or timeouts.
+	 *
+	 * @param <T>
+	 *            the generic type of the result, controlled by the return
+	 *            value.
+	 * @param urls
+	 *            the addresses of the other agents
+	 * @param method
+	 *            the remote RPC method
+	 * @param params
+	 *            the remote RPC method's params
+	 * @return An unmodifiable map, mapping the remote address to its results.
+	 *         Failure to get a result will lead to null values for the given
+	 *         peer.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	protected <T> Map<URI, T> callMultiSync(final List<URI> urls,
+			final String method, final ObjectNode params) throws IOException {
+		final SyncCallback<Map<URI, T>> callback = new SyncCallback<Map<URI, T>>();
+		callMulti(urls, method, params, callback);
+		try {
+			return callback.get();
+		} catch (final Exception e) {
+			throw new IOException(e);
+		}
 	}
 
 	/**

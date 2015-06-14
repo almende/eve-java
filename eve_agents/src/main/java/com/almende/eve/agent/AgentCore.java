@@ -214,7 +214,7 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Gets the config.
+	 * Gets the runtime configuration of this agent
 	 *
 	 * @return the config
 	 */
@@ -224,7 +224,8 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Gets the literal, unextended, unexpanded config.
+	 * Gets the literal, unextended, unexpanded config, as given during
+	 * initiation.
 	 *
 	 * @return the literal config
 	 */
@@ -234,9 +235,6 @@ public class AgentCore implements Receiver, Configurable {
 		return literalConfig;
 	}
 
-	/**
-	 * Load config.
-	 */
 	private void loadConfig() {
 		agentId = config.getId();
 		loadInstantiationService(config.getInstantiationService());
@@ -252,7 +250,10 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the receiver.
+	 * Override default configuration and set the provided inbound message
+	 * receiver.
+	 * <b>This is meant to extend the agent with new low level behavior, handle
+	 * with care</b>
 	 *
 	 * @param receiver
 	 *            the receiver to set
@@ -262,7 +263,7 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Gets the receiver.
+	 * Get the current message receiver.
 	 *
 	 * @return the receiver
 	 */
@@ -272,10 +273,12 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the handler.
-	 *
+	 * Override configuration and set the provided inbound RPC target handler
+	 * <b>This is meant to extend the agent with new low level behavior, handle
+	 * with care</b>
+	 * 
 	 * @param handler
-	 *            the new handler
+	 *            the new RPC target handler
 	 */
 	protected void setHandler(Handler<Configurable> handler) {
 		this.handler = handler;
@@ -316,12 +319,14 @@ public class AgentCore implements Receiver, Configurable {
 	 * @return the caller
 	 */
 	@JsonIgnore
-	public Caller getCaller() {
+	protected Caller getCaller() {
 		return caller;
 	}
 
 	/**
-	 * Sets the sender.
+	 * Override default configuration and set the send handler.
+	 * <b>This is meant to extend the agent with new low level behavior, handle
+	 * with care</b>
 	 *
 	 * @param sender
 	 *            the new sender
@@ -331,7 +336,7 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Gets the sender.
+	 * Gets the sender handler.
 	 *
 	 * @return the sender
 	 */
@@ -340,7 +345,6 @@ public class AgentCore implements Receiver, Configurable {
 		return sender;
 	}
 
-	
 	@Access(AccessType.UNAVAILABLE)
 	@Override
 	public void receive(final Object msg, final URI senderUrl, final String tag) {
@@ -357,7 +361,7 @@ public class AgentCore implements Receiver, Configurable {
 	 * @return the checks if is
 	 */
 	@JsonIgnore
-	public InstantiationService getInstantiationService() {
+	protected InstantiationService getInstantiationService() {
 		return is;
 	}
 
@@ -382,16 +386,10 @@ public class AgentCore implements Receiver, Configurable {
 	 * @return the protocol stack
 	 */
 	@JsonIgnore
-	public ProtocolStack getProtocolStack() {
+	protected ProtocolStack getProtocolStack() {
 		return protocolStack;
 	}
 
-	/**
-	 * Load protocol stack.
-	 *
-	 * @param config
-	 *            the config
-	 */
 	private void loadProtocols(final ArrayNode config) {
 		boolean found = false;
 		if (config != null) {
@@ -435,8 +433,8 @@ public class AgentCore implements Receiver, Configurable {
 	 * @param request
 	 *            the request
 	 * @param due
-	 *            the due
-	 * @return the string
+	 *            the due time
+	 * @return the task id of this scheduled task, for cancellation.
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected String schedule(final JSONRequest request, final DateTime due) {
@@ -450,7 +448,7 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Cancel.
+	 * Cancel the given scheduled task.
 	 * 
 	 * @param taskId
 	 *            the task id
@@ -464,7 +462,8 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the scheduler.
+	 * Sets the scheduler, updates the agent's configuration in the process.
+	 * <b>Note: this does not update the literal config</b>
 	 * 
 	 * @param scheduler
 	 *            the new scheduler
@@ -488,12 +487,6 @@ public class AgentCore implements Receiver, Configurable {
 		return scheduler;
 	}
 
-	/**
-	 * Load scheduler.
-	 * 
-	 * @param schedulerConfig
-	 *            the scheduler config
-	 */
 	private void loadScheduler(final ObjectNode params) {
 		final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
 				.decorate(params);
@@ -516,7 +509,8 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the state.
+	 * Sets the state, updates the agent's runtime configuration in the process.
+	 * <b>Note: this does not update the literal config</b>
 	 * 
 	 * @param state
 	 *            the new state
@@ -538,12 +532,6 @@ public class AgentCore implements Receiver, Configurable {
 		return state;
 	}
 
-	/**
-	 * Load state.
-	 * 
-	 * @param sc
-	 *            the sc
-	 */
 	private void loadState(final ObjectNode sc) {
 		if (sc != null) {
 			final StateConfig stateConfig = StateConfig.decorate(sc);
@@ -555,7 +543,10 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Sets the transport router
+	 * Override configuration and set the transport router
+	 * <b>Caution: this will replace the router, which will drop all earlier
+	 * configured outbound transports! This should be called before any
+	 * transports are set and all transports should be disconnected.</b>
 	 * 
 	 * @param transport
 	 *            the new transport router
@@ -565,7 +556,9 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	/**
-	 * Adds a new transport to this router/array.
+	 * Adds a new transport to this router/array, updates the agent's
+	 * configuration in the process.
+	 * <b>Note: this does not update the literal config</b>
 	 *
 	 * @param transport
 	 *            the transport router
@@ -585,12 +578,6 @@ public class AgentCore implements Receiver, Configurable {
 		return transport;
 	}
 
-	/**
-	 * Adds the transport.
-	 *
-	 * @param transconfig
-	 *            the transconfig
-	 */
 	private void addTransport(final ObjectNode transconfig) {
 		// TODO: Somewhat ugly, not every transport requires an id.
 		TransportConfig transconf = TransportConfig.decorate(transconfig);
@@ -603,12 +590,6 @@ public class AgentCore implements Receiver, Configurable {
 		this.transport.register(transport);
 	}
 
-	/**
-	 * Load transport.
-	 *
-	 * @param transportConfig
-	 *            the transport config
-	 */
 	private void loadTransports(final ArrayNode transportConfig) {
 		if (transportConfig != null) {
 			final Iterator<JsonNode> iter = transportConfig.iterator();
