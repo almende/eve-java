@@ -4,6 +4,7 @@
  */
 package com.almende.eve.config;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
@@ -25,7 +27,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class Config.
  */
 public class Config extends ObjectNode {
-	private static Config	global	= new Config();
+	private static final Logger	LOG		= Logger.getLogger(Config.class
+												.getName());
+	private static Config		global	= new Config();
 
 	/**
 	 * Instantiates a new config.
@@ -201,6 +205,30 @@ public class Config extends ObjectNode {
 				}
 				pointers.add(refConf);
 			}
+		}
+	}
+
+	/**
+	 * Load a configuration file.
+	 *
+	 * @param type
+	 *            the type, one of: ["yaml","xml","json"]
+	 * @param is
+	 *            the inputStream from the config file
+	 * @return the config
+	 */
+	public static Config load(final String type, final InputStream is) {
+		switch (type) {
+			case "yaml":
+				return YamlReader.load(is);
+			case "xml":
+				return XmlReader.load(is);
+			case "json":
+				return JsonReader.load(is);
+			default:
+				LOG.warning("Unknown file type given for configuration:'"
+						+ type + "' Trying to read Yaml format.");
+				return YamlReader.load(is);
 		}
 	}
 

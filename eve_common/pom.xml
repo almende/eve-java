@@ -19,7 +19,8 @@
 		<joda-convert.version>1.6</joda-convert.version>
 		<codec.version>1.9</codec.version>
 		<jackson.version>2.5.3</jackson.version>
-		<jsonSchema.version>2.5.3</jsonSchema.version>		
+		<jsonSchema.version>2.5.3</jsonSchema.version>
+		<woodstox.version>4.4.1</woodstox.version>
 	</properties>
 
 	<dependencies>
@@ -57,6 +58,16 @@
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-jsonSchema</artifactId>
 			<version>${jsonSchema.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-asl</artifactId>
+			<version>${woodstox.version}</version>
 		</dependency>
 	</dependencies>
 </project>

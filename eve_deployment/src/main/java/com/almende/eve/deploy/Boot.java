@@ -8,13 +8,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.config.Config;
-import com.almende.eve.config.YamlReader;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;
 import com.almende.eve.instantiation.InstantiationServiceConfig;
@@ -76,7 +76,7 @@ public final class Boot {
 		String configFileName = args[0];
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
-			boot(is, cl);
+			boot(getType(configFileName),is, cl);
 
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
@@ -87,24 +87,36 @@ public final class Boot {
 	}
 
 	/**
+	 * Poor man's file extension interpreter.
+	 * @param filename
+	 * @return
+	 */
+	private static String getType(final String filename){
+		return filename.substring(filename.lastIndexOf('.')).toLowerCase(Locale.ENGLISH);		
+	}
+	
+	/**
 	 * Boot.
 	 *
+	 * @param type
+	 *            the type of the configuration file, one of
+	 *            ["yaml","xml","json"]
 	 * @param is
-	 *            the is
-	 * @return the object node
+	 *            The inputStream of the configuration file
+	 * @return the actual configuration
 	 */
-	public static ObjectNode boot(final InputStream is) {
-		return boot(is, null);
+	public static Config boot(final String type, final InputStream is) {
+		return boot(type, is, null);
 	}
 
 	/**
 	 * Boot.
 	 *
 	 * @param config
-	 *            the config
-	 * @return the object node
+	 *            A JSON DOM containing the configuration
+	 * @return the actual configuration
 	 */
-	public static ObjectNode boot(final ObjectNode config) {
+	public static Config boot(final ObjectNode config) {
 		return boot(config, null);
 	}
 
@@ -112,12 +124,12 @@ public final class Boot {
 	 * Boot.
 	 *
 	 * @param config
-	 *            the config
+	 *            A JSON DOM containing the configuration
 	 * @param cl
-	 *            the cl
-	 * @return the object node
+	 *            the class loader to use.
+	 * @return the actual configuration
 	 */
-	public static ObjectNode boot(final ObjectNode config, final ClassLoader cl) {
+	public static Config boot(final ObjectNode config, final ClassLoader cl) {
 		final Config conf = Config.decorate(config);
 		return boot(conf, null);
 	}
@@ -125,14 +137,18 @@ public final class Boot {
 	/**
 	 * Boot.
 	 *
+	 * @param type
+	 *            the type of the configuration file, one of
+	 *            ["yaml","xml","json"]
 	 * @param is
-	 *            the is
+	 *            the inputStream of the configuration file
 	 * @param cl
-	 *            the cl
-	 * @return the object node
+	 *            the class loader to use.
+	 * @return the actual configuration
 	 */
-	public static ObjectNode boot(final InputStream is, final ClassLoader cl) {
-		final Config config = YamlReader.load(is);
+	public static Config boot(final String type, final InputStream is,
+			final ClassLoader cl) {
+		final Config config = Config.load(type, is);
 		return boot(config, cl);
 	}
 
@@ -143,9 +159,9 @@ public final class Boot {
 	 *            the config
 	 * @param cl
 	 *            the cl
-	 * @return the object node
+	 * @return the actual configuration
 	 */
-	public static ObjectNode boot(final Config config, final ClassLoader cl) {
+	public static Config boot(final Config config, final ClassLoader cl) {
 		if (config.has("templates")) {
 			config.loadTemplates("templates");
 		}
