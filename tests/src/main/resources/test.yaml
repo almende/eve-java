@@ -25,12 +25,14 @@ templates:
          server: true
          doShortcut: true
          doAuthentication: false
-         jetty: 
+         jetty:
            port: 8081
    specialAgent:
       extends: templates/defaultAgent
-      scheduler: 
+      scheduler:
          class: com.almende.eve.scheduling.PersistentSchedulerBuilder
+         state:
+             class: com.almende.eve.state.memory.MemoryStateBuilder
 
 agents:
 -  id: another
