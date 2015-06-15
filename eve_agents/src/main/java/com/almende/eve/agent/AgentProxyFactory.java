@@ -45,7 +45,7 @@ public final class AgentProxyFactory {
 	 * @return the t
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T genProxy(final Agent sender, final URI receiverUrl,
+	public static <T> T genProxy(final AgentCore sender, final URI receiverUrl,
 			final Class<T> proxyInterface) {
 		// http://docs.oracle.com/javase/1.4.2/docs/guide/reflection/proxy.html
 		final T proxy = (T) Proxy.newProxyInstance(
@@ -85,7 +85,8 @@ public final class AgentProxyFactory {
 							callback = new SyncCallback<JsonNode>(JSONNODETYPE) {};
 						}
 						try {
-							sender.call(receiverUrl, method, args, callback);
+							sender.caller.call(receiverUrl, method, args,
+									callback);
 						} catch (final IOException e) {
 							throw new JSONRPCException(CODE.REMOTE_EXCEPTION, e
 									.getLocalizedMessage(), e);

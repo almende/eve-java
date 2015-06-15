@@ -156,6 +156,24 @@ public class AgentCore implements Receiver, Configurable {
 	protected void onBoot() {}
 
 	/**
+	 * Creates a proxy for given URL and interface, with this agent as sender.
+	 * 
+	 * @param <T>
+	 *            the type represented by the given interface, of which the
+	 *            generated proxy is an instance.
+	 * @param url
+	 *            the address of the remote agent
+	 * @param agentInterface
+	 *            the interface that the remote agent implements
+	 * @return the t
+	 */
+	@Access(AccessType.UNAVAILABLE)
+	protected final <T> T createAgentProxy(final URI url,
+			final Class<T> agentInterface) {
+		return AgentProxyFactory.genProxy(this, url, agentInterface);
+	}
+
+	/**
 	 * Destroy the agent.
 	 */
 	@Access(AccessType.UNAVAILABLE)
