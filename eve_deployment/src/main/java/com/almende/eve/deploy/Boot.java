@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,16 +30,17 @@ public final class Boot {
 	private Boot() {}
 
 	/**
-	 * The default agent booter. It takes an EVE yaml file and creates all
+	 * The default agent booter. It takes an EVE config file and creates all
 	 * agents mentioned in the "agents" section.
 	 * 
 	 * @param args
-	 *            Single argument: args[0] -> Eve yaml
+	 *            Single argument: args[0] -> Eve config file (either json, yaml
+	 *            or XML
 	 */
 	public static void main(final String[] args) {
 		if (args.length == 0) {
-			LOG.warning("Missing argument pointing to yaml file:");
-			LOG.warning("Usage: java -jar <jarfile> eve.yaml");
+			LOG.warning("Missing argument pointing to config file:");
+			LOG.warning("Usage: java -jar <jarfile> config");
 			return;
 		}
 		final ClassLoader cl = new ClassLoader() {
@@ -76,7 +76,7 @@ public final class Boot {
 		String configFileName = args[0];
 		try {
 			InputStream is = new FileInputStream(new File(configFileName));
-			boot(getType(configFileName),is, cl);
+			boot(Config.getType(configFileName), is, cl);
 
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.WARNING,
@@ -86,15 +86,6 @@ public final class Boot {
 
 	}
 
-	/**
-	 * Poor man's file extension interpreter.
-	 * @param filename
-	 * @return
-	 */
-	private static String getType(final String filename){
-		return filename.substring(filename.lastIndexOf('.')).toLowerCase(Locale.ENGLISH);		
-	}
-	
 	/**
 	 * Boot.
 	 *

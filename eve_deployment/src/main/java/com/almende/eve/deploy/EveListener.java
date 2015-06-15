@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.almende.eve.config.Config;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -38,7 +39,7 @@ public class EveListener implements ServletContextListener {
 				return;
 			}
 
-			myConfig = Boot.boot(is);
+			myConfig = Boot.boot(Config.getType(fullname), is);
 		}
 
 	}

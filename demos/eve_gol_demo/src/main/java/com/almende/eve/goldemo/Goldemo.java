@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.almende.eve.agent.AgentConfig;
-import com.almende.eve.capabilities.Config;
-import com.almende.eve.config.YamlReader;
+import com.almende.eve.config.Config;
 import com.almende.util.threads.ThreadPool;
 
 /**
@@ -55,11 +54,12 @@ public class Goldemo {
 
 		if (args.length == 0) {
 			System.err
-					.println("Missing yaml file! Usage: java -jar gol.jar <yamlpath> < <startup_file>");
+					.println("Missing yaml file! Usage: java -jar gol.jar <configPath> < <startup_file>");
 			return;
 		}
-		final Config config = YamlReader.load(new FileInputStream(new File(
-				args[0])));
+		final String configFileName = args[0];
+		final Config config = Config.load(Config.getType(configFileName),
+				new FileInputStream(new File(configFileName)));
 
 		final Integer runTime = config.get("gol", "runTime");
 		final Integer N = config.get("gol", "columns");

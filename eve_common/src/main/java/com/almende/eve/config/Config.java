@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -230,6 +231,18 @@ public class Config extends ObjectNode {
 						+ type + "' Trying to read Yaml format.");
 				return YamlReader.load(is);
 		}
+	}
+
+	/**
+	 * Poor man's file extension interpreter.
+	 *
+	 * @param filename
+	 *            the filename
+	 * @return the type
+	 */
+	public static String getType(final String filename) {
+		return filename.substring(filename.lastIndexOf('.')).toLowerCase(
+				Locale.ENGLISH);
 	}
 
 	/**
