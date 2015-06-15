@@ -54,13 +54,14 @@ public class Goldemo {
 
 		if (args.length == 0) {
 			System.err
-					.println("Missing yaml file! Usage: java -jar gol.jar <configPath> < <startup_file>");
+					.println("Missing configuration file! Usage: java -jar gol.jar <configPath> < <startup_file>");
 			return;
 		}
 		final String configFileName = args[0];
 		final Config config = Config.load(Config.getType(configFileName),
 				new FileInputStream(new File(configFileName)));
 
+		System.out.println("Config:"+config);
 		final Integer runTime = config.get("gol", "runTime");
 		final Integer N = config.get("gol", "columns");
 		final Integer M = config.get("gol", "rows");
@@ -75,7 +76,7 @@ public class Goldemo {
 		}
 
 		if (runTime == null || N == null || M == null) {
-			System.err.println("Configuration missing in yaml.");
+			System.err.println("Configuration missing in configFile.");
 			return;
 
 		}

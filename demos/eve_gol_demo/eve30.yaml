@@ -1,16 +1,20 @@
 # Eve configuration
 
-#transport:
-#    class: com.almende.eve.transport.http.HttpTransportBuilder
-#    servletUrl: http://127.0.0.1:8081/agents/
-#    servletLauncher: JettyLauncher
-#    doShortcut: false
-#    doAuthentication: false
-#    jetty: 
-#        port: 8081
+transports:
+-   class: com.almende.eve.transport.http.HttpTransportBuilder
+    servletUrl: http://127.0.0.1:8881/agents/
+    servletLauncher: JettyLauncher
+    doShortcut: false
+    doAuthentication: false
+    jetty: 
+        port: 8881
 
 state:
   class: com.almende.eve.state.memory.MemoryStateBuilder
+
+#protocols:
+#-  class: com.almende.eve.protocol.TraceProtocolBuilder
+#   filename: .traces_
 
 #state:
 #   class: com.almende.eve.state.file.FileStateBuilder
@@ -25,9 +29,9 @@ state:
 
 
 gol:
-  runTime: 50
+  runTime: 10
   columns: 30
   rows: 30
-  nofCores : 4
-#  OddUrl: http://127.0.0.1:8081/agents/
-#  EvenUrl: http://127.0.0.1:8081/agents/
+#  nofCores : 4
+  OddUrl: http://127.0.0.1:8881/agents/
+  EvenUrl: http://127.0.0.1:8881/agents/

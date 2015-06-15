@@ -34,8 +34,8 @@ public final class Boot {
 	 * agents mentioned in the "agents" section.
 	 * 
 	 * @param args
-	 *            Single argument: args[0] -> Eve config file (either json, yaml
-	 *            or XML
+	 *            Single argument: args[0] -> Eve config file (either json or
+	 *            yaml)
 	 */
 	public static void main(final String[] args) {
 		if (args.length == 0) {

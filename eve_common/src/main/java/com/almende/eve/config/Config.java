@@ -213,7 +213,7 @@ public class Config extends ObjectNode {
 	 * Load a configuration file.
 	 *
 	 * @param type
-	 *            the type, one of: ["yaml","xml","json"]
+	 *            the type, one of: ["yaml","json"]
 	 * @param is
 	 *            the inputStream from the config file
 	 * @return the config
@@ -222,8 +222,6 @@ public class Config extends ObjectNode {
 		switch (type) {
 			case "yaml":
 				return YamlReader.load(is);
-			case "xml":
-				return XmlReader.load(is);
 			case "json":
 				return JsonReader.load(is);
 			default:
@@ -241,7 +239,7 @@ public class Config extends ObjectNode {
 	 * @return the type
 	 */
 	public static String getType(final String filename) {
-		return filename.substring(filename.lastIndexOf('.')).toLowerCase(
+		return filename.substring(filename.lastIndexOf('.')+1).toLowerCase(
 				Locale.ENGLISH);
 	}
 
