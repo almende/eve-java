@@ -65,6 +65,7 @@ public class Agent extends AgentCore implements AgentInterface {
 	/**
 	 * Instantiates a new agent, with given id and configuration.
 	 * 
+	 * @see AgentConfig
 	 * @param agentId
 	 *            the new agent id
 	 * @param config
@@ -195,7 +196,7 @@ public class Agent extends AgentCore implements AgentInterface {
 	/**
 	 * Send an asynchronous request to multiple agents. This method calls the
 	 * given callback with a map of results, after the final agent
-	 * return or timeouts.
+	 * returns or reaches its timeout.
 	 *
 	 * @param <T>
 	 *            the generic type of the result, controlled by the return

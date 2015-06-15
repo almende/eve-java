@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class AgentConfig, containing a java bean representation of the various
+ * The Class AgentConfig, containing a java bean and Jackson JSON DOM representation of the various
  * JSON items that can be configured for each agent.
  */
 public class AgentConfig extends Config {
@@ -26,17 +26,17 @@ public class AgentConfig extends Config {
 											.getName());
 
 	/**
-	 * Instantiates a new config.
+	 * Instantiates a new agent config.
 	 */
 	public AgentConfig() {
 		super();
 	}
 
 	/**
-	 * Instantiates a new config.
+	 * Instantiates a new agent config, with given agentId
 	 * 
 	 * @param id
-	 *            the id
+	 *            the agentId
 	 */
 	public AgentConfig(final String id) {
 		super();
@@ -44,7 +44,7 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Decorate.
+	 * Converts a normal Jackson JSON DOM node into an AgentConfig. 
 	 *
 	 * @param node
 	 *            the node
@@ -104,7 +104,7 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the transport config.
+	 * Sets the list of transport configurations.
 	 * 
 	 * @param transports
 	 *            the new transport config
@@ -114,7 +114,7 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Adds the transport.
+	 * Adds a transport to the list of transport configurations.
 	 *
 	 * @param transport
 	 *            the transport
@@ -127,7 +127,7 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the transport.
+	 * Sets the transport
 	 *
 	 * @deprecated Please use setTransports(transport[]) or
 	 *             addTransport(transport) instead
@@ -148,9 +148,9 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Gets the transport config.
+	 * Gets the transport configurations.
 	 * 
-	 * @return the transport config
+	 * @return the transport configurations.
 	 */
 	public ArrayNode getTransports() {
 		final JsonNode res = this.get("transports");
@@ -175,20 +175,19 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the state config.
+	 * Sets the state configuration
 	 * 
 	 * @param state
-	 *            config
-	 *            the new state config
+	 *            the new state configuration
 	 */
 	public void setState(final ObjectNode state) {
 		this.set("state", state);
 	}
 
 	/**
-	 * Gets the state config.
+	 * Gets the state configuration.
 	 * 
-	 * @return the state config
+	 * @return the state configuration.
 	 */
 	public ObjectNode getState() {
 		if (this.has("state")) {
@@ -198,20 +197,19 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the scheduler config.
+	 * Sets the scheduler configuration.
 	 * 
 	 * @param scheduler
-	 *            config
-	 *            the new scheduler config
+	 *            the new scheduler configuration
 	 */
 	public void setScheduler(final ObjectNode scheduler) {
 		this.set("scheduler", scheduler);
 	}
 
 	/**
-	 * Gets the scheduler config.
+	 * Gets the scheduler configuration.
 	 * 
-	 * @return the schedule configr
+	 * @return the scheduler configuration.
 	 */
 	public ObjectNode getScheduler() {
 		if (this.has("scheduler")) {
@@ -221,21 +219,20 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the protocols config. The agent will also add a JSONRpcProtocol to
-	 * the
-	 * stack.
+	 * Sets the protocol stack configuration. The agent will also automatically add a JSONRpcProtocol to
+	 * the stack if this is not given in this configuration.
 	 *
 	 * @param protocols
-	 *            the new protocols
+	 *            the new protocols stack configuration.
 	 */
 	public void setProtocols(final ArrayNode protocols) {
 		this.set("protocols", protocols);
 	}
 
 	/**
-	 * Gets the protocols.
+	 * Gets the protocol stack configuration.
 	 *
-	 * @return the protocols
+	 * @return the protocol stack configuration.
 	 */
 	public ArrayNode getProtocols() {
 		if (this.has("protocols")) {
