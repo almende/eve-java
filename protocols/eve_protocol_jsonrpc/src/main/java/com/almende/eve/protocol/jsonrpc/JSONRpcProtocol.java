@@ -32,7 +32,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 																				.getName());
 	private static final TypeUtil<JSONResponse>		JSONRESPONSETYPE	= new TypeUtil<JSONResponse>() {};
 	private Authorizor								auth				= new DefaultAuthorizor();
-	private final AsyncCallbackStore<JSONResponse>	callbacks			= new AsyncCallbackStore<JSONResponse>();
+	private final AsyncCallbackStore<JSONResponse>	callbacks;
 	private final Handler<Object>					destination;
 	private Handler<Caller>							caller				= null;
 	private JSONRpcProtocolConfig					myParams;
@@ -48,6 +48,8 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	public JSONRpcProtocol(final ObjectNode params, final Handler<Object> handle) {
 		destination = handle;
 		myParams = JSONRpcProtocolConfig.decorate(params);
+		callbacks = new AsyncCallbackStore<JSONResponse>("Rpc_"
+				+ myParams.getId());
 		callbacks.setTimeout(myParams.getCallbackTimeout());
 	}
 

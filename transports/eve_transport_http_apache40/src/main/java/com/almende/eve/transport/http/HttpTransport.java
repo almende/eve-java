@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
-	private final AsyncCallbackStore<String>	callbacks	= new AsyncCallbackStore<String>();
+	private final AsyncCallbackStore<String>	callbacks;
 	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
@@ -59,6 +59,7 @@ public class HttpTransport extends AbstractTransport {
 	public HttpTransport(final URI address, final Handler<Receiver> handle,
 			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
+		callbacks = new AsyncCallbackStore<String>("HttpTags_" + address);
 	}
 	
 	/**

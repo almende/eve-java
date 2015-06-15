@@ -21,6 +21,8 @@ public class AsyncCallbackStore<T> {
 																	5);
 	private final TimeoutHandler				head		= new TimeoutHandler(
 																	null);
+	private final Thread						scanner;
+	private boolean								started		= false;
 	private TimeoutHandler						tail		= head;
 	private int									growsize	= 10;
 	private final static int					MAXGROWSIZE	= 20000;
@@ -30,9 +32,12 @@ public class AsyncCallbackStore<T> {
 
 	/**
 	 * Instantiates a new async callback store.
+	 *
+	 * @param id
+	 *            the id
 	 */
-	public AsyncCallbackStore() {
-		new Thread(new Runnable() {
+	public AsyncCallbackStore(String id) {
+		scanner = new Thread(new Runnable() {
 			public void run() {
 				while (true) {
 					TimeoutHandler handler = tail;
@@ -46,8 +51,19 @@ public class AsyncCallbackStore<T> {
 				}
 
 			}
-		}, "AsyncCallbackStoreScanner").start();
+		}, "AsyncCBScanner:" + id);
 
+	}
+
+	private void startScanner() {
+		if (!started) {
+			synchronized (scanner) {
+				if (!started) {
+					scanner.start();
+					started = true;
+				}
+			}
+		}
 	}
 
 	private void grow() {
@@ -143,6 +159,7 @@ public class AsyncCallbackStore<T> {
 	 */
 	public void put(final Object id, final String description,
 			final AsyncCallback<T> callback) {
+		startScanner();
 		if (store.containsKey(id)) {
 			throw new IllegalStateException("Callback with id '" + id
 					+ "' already in queue");

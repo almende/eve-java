@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +39,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
-	private final AsyncCallbackStore<String>	callbacks	= new AsyncCallbackStore<String>();
+	private final AsyncCallbackStore<String>	callbacks;
+	private static final Executor				runner		= Executors
+																	.newCachedThreadPool(ThreadPool
+																			.getFactory());
 	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
@@ -59,6 +64,7 @@ public class HttpTransport extends AbstractTransport {
 	public HttpTransport(final URI address, final Handler<Receiver> handle,
 			final TransportService service, final ObjectNode params) {
 		super(address, handle, service, params);
+		callbacks = new AsyncCallbackStore<String>("HttpTags_" + address);
 	}
 
 	/*
@@ -90,7 +96,9 @@ public class HttpTransport extends AbstractTransport {
 		}
 		final String senderUrl = super.getAddress().toASCIIString();
 		final Handler<Receiver> handle = super.getHandle();
-		ThreadPool.getPool().execute(new Runnable() {
+		// Use fresh Executor instead of the RunQueue, as this thread will sleep
+		// most of it's run.
+		runner.execute(new Runnable() {
 			@Override
 			public void run() {
 				HttpPost httpPost = null;
@@ -112,8 +120,14 @@ public class HttpTransport extends AbstractTransport {
 								+ webResp.getStatusLine().getStatusCode() + ":"
 								+ webResp.getStatusLine().getReasonPhrase());
 						LOG.warning(result);
+						// TODO: should we send back a JSONRPCException? (Which
+						// is not a known type at this point!)
 					} else {
-						handle.get().receive(result, receiverUri, null);
+						ThreadPool.getPool().execute(new Runnable() {
+							public void run() {
+								handle.get().receive(result, receiverUri, null);
+							}
+						});
 					}
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING,
@@ -153,7 +167,7 @@ public class HttpTransport extends AbstractTransport {
 			throws IOException {
 		final String tag = new UUID().toString();
 		final SyncCallback<String> callback = new SyncCallback<String>() {};
-		callbacks.put(tag, "(inbound http call:" + body + ")", callback);
+		callbacks.put(tag, "inbound http call", callback);
 
 		super.getHandle().get().receive(body, senderUrl, tag);
 		try {

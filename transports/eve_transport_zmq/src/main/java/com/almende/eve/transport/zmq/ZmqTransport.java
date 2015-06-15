@@ -40,11 +40,11 @@ public class ZmqTransport extends AbstractTransport {
 	private Thread									listeningThread;
 	private boolean									doesAuthentication	= false;
 	private boolean									doDisconnect		= false;
-	private static final AsyncCallbackStore<String>	CALLBACKS			= new AsyncCallbackStore<String>();
-	private final TokenStore tokenstore = new TokenStore();
+	private static final AsyncCallbackStore<String>	CALLBACKS			= new AsyncCallbackStore<String>(
+																				"ZMQ");
+	private final TokenStore						tokenstore			= new TokenStore();
 	private final List<String>						protocols			= Arrays.asList("zmq");
 
-	
 	/**
 	 * Instantiates a new zmq transport.
 	 * 
@@ -61,7 +61,7 @@ public class ZmqTransport extends AbstractTransport {
 		zmqUrl = super.getAddress().toString().replaceFirst("^zmq:/?/?", "");
 		doesAuthentication = config.getDoAuthentication();
 	}
-	
+
 	/**
 	 * Send async.
 	 * 
@@ -91,7 +91,7 @@ public class ZmqTransport extends AbstractTransport {
 					socket.send(senderUrl, org.zeromq.ZMQ.SNDMORE);
 					socket.send(token, org.zeromq.ZMQ.SNDMORE);
 					socket.send(message, 0);
-					
+
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
 				}
@@ -101,10 +101,9 @@ public class ZmqTransport extends AbstractTransport {
 			}
 		});
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI,
 	 * java.lang.String, java.lang.String)
 	 */
@@ -118,10 +117,9 @@ public class ZmqTransport extends AbstractTransport {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message.getBytes(), tag);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[],
 	 * java.lang.String)
 	 */
@@ -134,10 +132,9 @@ public class ZmqTransport extends AbstractTransport {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message, tag);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#connect()
 	 */
 	@Override
@@ -147,10 +144,9 @@ public class ZmqTransport extends AbstractTransport {
 		}
 		listen();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#disconnect()
 	 */
 	@Override
@@ -158,17 +154,16 @@ public class ZmqTransport extends AbstractTransport {
 		doDisconnect = true;
 		listeningThread.interrupt();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.transport.Transport#getProtocols()
 	 */
 	@Override
 	public List<String> getProtocols() {
 		return protocols;
 	}
-	
+
 	/**
 	 * Gets the request.
 	 * 
@@ -186,14 +181,13 @@ public class ZmqTransport extends AbstractTransport {
 			result[3] = ByteBuffer.wrap(socket.recv());
 		}
 		return result;
-		
+
 	}
-	
+
 	/**
 	 * process an incoming zmq message.
 	 * If the message contains a valid JSON-RPC request or response,
 	 * the message will be processed.
-	 * 
 	 */
 	public void listen() {
 		listeningThread = new Thread(new Runnable() {
@@ -204,7 +198,7 @@ public class ZmqTransport extends AbstractTransport {
 				while (true) {
 					try {
 						final ByteBuffer[] msg = getRequest(socket);
-						
+
 						if (msg[0] != null) {
 							handleMsg(msg);
 							continue;
@@ -222,7 +216,7 @@ public class ZmqTransport extends AbstractTransport {
 		});
 		listeningThread.start();
 	}
-	
+
 	/**
 	 * Handle msg.
 	 * 
@@ -246,18 +240,18 @@ public class ZmqTransport extends AbstractTransport {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InvocationTargetException,
 			NoSuchMethodException, IOException, URISyntaxException {
-		
+
 		// Receive
 		// ZMQ.NORMAL|senderUrl|tokenJson|body
 		// ZMQ.HANDSHAKE|senderUrl|tokenJson|timestamp
 		// ZMQ.HANDSHAKE_RESPONSE|senderUrl|tokenJson|null
-		
+
 		final URI senderUrl = URIUtil.parse(new String(msg[1].array()));
 		final TokenRet token = JOM.getInstance().readValue(msg[2].array(),
 				TokenRet.class);
 		final String body = new String(msg[3].array());
 		final String key = senderUrl + ":" + token.getToken();
-		
+
 		if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE)) {
 			// Reply token corresponding to timestamp.
 			final String res = tokenstore.get(body);
@@ -277,16 +271,15 @@ public class ZmqTransport extends AbstractTransport {
 		} else {
 			final ObjectCache sessionCache = ObjectCache.get("ZMQSessions");
 			if (!sessionCache.containsKey(key) && doesAuthentication) {
-				final SyncCallback<String> callback = new SyncCallback<String>(){};
+				final SyncCallback<String> callback = new SyncCallback<String>() {};
 				CALLBACKS.put(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
 						.getTime().getBytes(), null);
-				
+
 				String retToken = null;
 				try {
 					retToken = callback.get();
-				} catch (final Exception e) {
-				}
+				} catch (final Exception e) {}
 				if (token.getToken().equals(retToken)) {
 					sessionCache.put(key, true);
 				} else {
@@ -295,10 +288,10 @@ public class ZmqTransport extends AbstractTransport {
 				}
 			}
 		}
-		
+
 		if (body != null) {
 			super.getHandle().get().receive(body, senderUrl, null);
 		}
 	}
-	
+
 }
