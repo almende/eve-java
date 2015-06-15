@@ -7,6 +7,7 @@ package com.almende.eve.config;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -73,12 +74,16 @@ public class Config extends ObjectNode {
 
 		@Override
 		public Set<Entry<String, JsonNode>> entrySet() {
-			Set<Entry<String, JsonNode>> result = new HashSet<Entry<String, JsonNode>>();
+			final Map<String, Entry<String, JsonNode>> map = new HashMap<String, Entry<String, JsonNode>>();
 			for (Config other : pointers) {
-				result.addAll(other.getKids().entrySet());
+				for (Entry<String, JsonNode> entry : other.getKids().entrySet()) {
+					map.put(entry.getKey(), entry);
+				}
 			}
-			result.addAll(super.entrySet());
-			return result;
+			for (Entry<String, JsonNode> entry : super.entrySet()) {
+				map.put(entry.getKey(), entry);
+			}
+			return new HashSet<Entry<String, JsonNode>>(map.values());
 		}
 
 		@Override
@@ -144,11 +149,18 @@ public class Config extends ObjectNode {
 					result.getPointers().add(Config.decorate((ObjectNode) val));
 				}
 			}
-			if (otherres != null) {
+			if (res == null && otherres != null) {
 				return otherres;
 			}
 			if (result != null) {
-				return result;
+				if (res != null && res.isObject()) {
+					// Merge the results
+					result.setAll((ObjectNode) res);
+					return result;
+				}
+				if (res == null) {
+					return result;
+				}
 			}
 			return res;
 		}
@@ -239,7 +251,7 @@ public class Config extends ObjectNode {
 	 * @return the type
 	 */
 	public static String getType(final String filename) {
-		return filename.substring(filename.lastIndexOf('.')+1).toLowerCase(
+		return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase(
 				Locale.ENGLISH);
 	}
 
