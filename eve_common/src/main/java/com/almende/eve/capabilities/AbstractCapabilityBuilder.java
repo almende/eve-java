@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.config.Config;
 import com.almende.util.ClassUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

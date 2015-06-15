@@ -4,7 +4,7 @@
  */
 package com.almende.eve.instantiation;
 
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.config.Config;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**

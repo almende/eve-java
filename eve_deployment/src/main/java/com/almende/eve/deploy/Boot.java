@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.config.Config;
 import com.almende.eve.config.YamlReader;
 import com.almende.eve.instantiation.InstantiationService;
 import com.almende.eve.instantiation.InstantiationServiceBuilder;

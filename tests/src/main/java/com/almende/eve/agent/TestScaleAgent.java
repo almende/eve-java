@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.config.Config;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;

@@ -7,7 +7,7 @@ package com.almende.eve.agent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.config.Config;
 import com.almende.eve.instantiation.CanHibernate;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;

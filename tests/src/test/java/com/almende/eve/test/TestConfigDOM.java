@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.almende.eve.agent.Agent;
 import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.ExampleAgent;
-import com.almende.eve.capabilities.Config;
+import com.almende.eve.config.Config;
 import com.almende.eve.config.YamlReader;
 import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
