@@ -205,8 +205,7 @@ public final class JSONResponse extends JSONMessage {
 			final ObjectNode tree = mapper.valueToTree(this);
 			if (tree.get(ERROR) == null || tree.get(ERROR).isNull()) {
 				tree.remove(ERROR);
-			}
-			if (tree.get(RESULT) == null || tree.get(RESULT).isNull()) {
+			} else if (tree.get(RESULT) == null || tree.get(RESULT).isNull()) {
 				tree.remove(RESULT);
 			}
 			if (tree.get(EXTRA) == null || tree.get(EXTRA).isNull()) {
