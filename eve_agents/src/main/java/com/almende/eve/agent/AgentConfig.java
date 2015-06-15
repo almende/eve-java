@@ -18,7 +18,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class AgentConfig, containing a java bean and Jackson JSON DOM representation of the various
+ * The Class AgentConfig, containing a java bean and Jackson JSON DOM
+ * representation of the various
  * JSON items that can be configured for each agent.
  */
 public class AgentConfig extends Config {
@@ -44,7 +45,7 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Converts a normal Jackson JSON DOM node into an AgentConfig. 
+	 * Converts a normal Jackson JSON DOM node into an AgentConfig.
 	 *
 	 * @param node
 	 *            the node
@@ -78,7 +79,10 @@ public class AgentConfig extends Config {
 		if (this.has("id")) {
 			return this.get("id").asText();
 		}
-		return null;
+		String id = new UUID().toString();
+		LOG.warning("Agents require an id, generated an UUID:" + id);
+		setId(id);
+		return id;
 	}
 
 	/**
@@ -219,7 +223,8 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the protocol stack configuration. The agent will also automatically add a JSONRpcProtocol to
+	 * Sets the protocol stack configuration. The agent will also automatically
+	 * add a JSONRpcProtocol to
 	 * the stack if this is not given in this configuration.
 	 *
 	 * @param protocols
