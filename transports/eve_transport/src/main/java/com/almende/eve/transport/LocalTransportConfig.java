@@ -10,20 +10,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class LocalTransportConfig.
  */
 public class LocalTransportConfig extends TransportConfig {
+	private static final String	BUILDER	= LocalTransportBuilder.class.getName();
 
 	/**
 	 * Instantiates a new local transport config.
 	 */
-	public LocalTransportConfig() {
+	protected LocalTransportConfig() {
 		super();
-		setClassName(LocalTransportBuilder.class.getName());
 	}
 
 	/**
 	 * Instantiates a new local transport config.
-	 * 
+	 *
+	 * @return the local transport config
+	 */
+	public static LocalTransportConfig create() {
+		final LocalTransportConfig res = new LocalTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new local transport config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the local transport config
 	 */
 	public static LocalTransportConfig decorate(final ObjectNode node) {
 		final LocalTransportConfig res = new LocalTransportConfig();

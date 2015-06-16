@@ -11,20 +11,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WebsocketTransportConfig.
  */
 public class WebsocketTransportConfig extends TransportConfig {
+	private static final String	BUILDER	= WebsocketTransportBuilder.class
+												.getName();
 
 	/**
 	 * Instantiates a new websocket transport config.
 	 */
-	public WebsocketTransportConfig() {
+	protected WebsocketTransportConfig() {
 		super();
-		setClassName(WebsocketTransportBuilder.class.getName());
 	}
 
 	/**
 	 * Instantiates a new websocket transport config.
-	 * 
+	 *
+	 * @return the websocket transport config
+	 */
+	public static WebsocketTransportConfig create() {
+		final WebsocketTransportConfig res = new WebsocketTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new websocket transport config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the websocket transport config
 	 */
 	public static WebsocketTransportConfig decorate(final ObjectNode node) {
 		final WebsocketTransportConfig res = new WebsocketTransportConfig();

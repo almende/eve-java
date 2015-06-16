@@ -71,7 +71,7 @@ public class TestGraph extends TestCase {
 		// Generate X agent scalefree network:
 		// add M connections per step
 		// start at random node, do the algo
-		AgentConfig config = new AgentConfig();
+		AgentConfig config = AgentConfig.create();
 		config.setClassName(NodeAgent.class.getName());
 
 		List<NodeAgent> agents = new ArrayList<NodeAgent>(nofNodes);

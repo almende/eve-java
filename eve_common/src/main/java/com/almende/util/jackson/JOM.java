@@ -108,7 +108,7 @@ public final class JOM {
 				DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, false);
 		mapper.getFactory().configure(
 				JsonFactory.Feature.CANONICALIZE_FIELD_NAMES, false);
-
+		
 		// Needed for o.a. JsonFileState
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
@@ -130,7 +130,7 @@ public final class JOM {
 			}
 		};
 		mapper.registerModule(throwableModule);
-
+	
 		SimpleModule bitSetModule = new SimpleModule("BitSetModule",
 				new Version(1, 0, 0, null, null, null));
 		bitSetModule.addSerializer(new CustomBitSetSerializer());

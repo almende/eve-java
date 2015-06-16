@@ -11,20 +11,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class HttpTransportConfig.
  */
 public class HttpTransportConfig extends TransportConfig {
+	private static final String	BUILDER	= HttpTransportBuilder.class.getName();
 
 	/**
 	 * Instantiates a new http transport config.
 	 */
-	public HttpTransportConfig() {
+	protected HttpTransportConfig() {
 		super();
-		setClassName(HttpTransportBuilder.class.getName());
 	}
 
 	/**
 	 * Instantiates a new http transport config.
-	 * 
+	 *
+	 * @return the http transport config
+	 */
+	public static HttpTransportConfig create() {
+		final HttpTransportConfig res = new HttpTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new http transport config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the http transport config
 	 */
 	public static HttpTransportConfig decorate(final ObjectNode node) {
 		final HttpTransportConfig res = new HttpTransportConfig();

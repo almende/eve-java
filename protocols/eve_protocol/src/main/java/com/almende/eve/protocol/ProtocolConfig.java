@@ -16,7 +16,7 @@ public class ProtocolConfig extends Config {
 	/**
 	 * Instantiates a new protocol config.
 	 */
-	public ProtocolConfig() {
+	protected ProtocolConfig() {
 		super();
 	}
 
@@ -76,5 +76,4 @@ public class ProtocolConfig extends Config {
 		}
 		return null;
 	}
-
 }

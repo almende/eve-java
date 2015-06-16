@@ -29,19 +29,30 @@ public class AgentConfig extends Config {
 	/**
 	 * Instantiates a new agent config.
 	 */
-	public AgentConfig() {
+	protected AgentConfig() {
 		super();
 	}
 
 	/**
-	 * Instantiates a new agent config, with given agentId
-	 * 
+	 * Instantiates a new agent config.
+	 *
+	 * @return the agent config
+	 */
+	public static AgentConfig create() {
+		return new AgentConfig();
+	}
+
+	/**
+	 * Instantiates a new agent config, with given agentId.
+	 *
 	 * @param id
 	 *            the agentId
+	 * @return the agent config
 	 */
-	public AgentConfig(final String id) {
-		super();
-		setId(id);
+	public static AgentConfig create(final String id) {
+		final AgentConfig res = new AgentConfig();
+		res.setId(id);
+		return res;
 	}
 
 	/**
@@ -131,12 +142,12 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the transport
+	 * Sets the transport.
 	 *
-	 * @deprecated Please use setTransports(transport[]) or
-	 *             addTransport(transport) instead
 	 * @param transport
 	 *            the new transport
+	 * @deprecated Please use setTransports(transport[]) or
+	 *             addTransport(transport) instead
 	 */
 	@Deprecated
 	public void setTransport(final JsonNode transport) {
@@ -179,8 +190,8 @@ public class AgentConfig extends Config {
 	}
 
 	/**
-	 * Sets the state configuration
-	 * 
+	 * Sets the state configuration.
+	 *
 	 * @param state
 	 *            the new state configuration
 	 */

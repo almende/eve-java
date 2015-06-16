@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TestHttp extends TestCase {
 	private static final Logger	LOG	= Logger.getLogger(TestHttp.class.getName());
-	
+
 	/**
 	 * Test http.
 	 * 
@@ -35,55 +35,53 @@ public class TestHttp extends TestCase {
 	 */
 	@Test
 	public void testHttp() throws IOException {
-		final HttpTransportConfig config = new HttpTransportConfig();
+		final HttpTransportConfig config = HttpTransportConfig.create();
 		config.setServletUrl("http://localhost:8080/agents/");
 		config.setId("testAgent");
-		
+
 		config.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		config.set("jetty", jettyParms);
-		
+
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new myReceiver()).build();
-		
-		transport.send(URIUtil.create("http://localhost:8080/agents/testAgent"),
+
+		transport.send(
+				URIUtil.create("http://localhost:8080/agents/testAgent"),
 				"Hello World", null);
 	}
-	
+
 	/**
 	 * The Class myReceiver.
 	 */
 	public class myReceiver implements Receiver, Handler<Receiver> {
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.transport.Receiver#receive(java.lang.Object,
 		 * java.net.URI, java.lang.String)
 		 */
 		@Override
 		public void receive(final Object msg, final URI senderUrl,
 				final String tag) {
-			
+
 			LOG.warning("Received msg:'" + msg + "' from: "
 					+ senderUrl.toASCIIString());
-			
+
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#get()
 		 */
 		@Override
 		public Receiver get() {
 			return this;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see
 		 * com.almende.eve.capabilities.handler.Handler#update(com.almende.eve
 		 * .capabilities.handler.Handler)
@@ -92,10 +90,9 @@ public class TestHttp extends TestCase {
 		public void update(final Handler<Receiver> newHandler) {
 			// Not used, data should be the same.
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see com.almende.eve.capabilities.handler.Handler#getKey()
 		 */
 		@Override
@@ -108,6 +105,6 @@ public class TestHttp extends TestCase {
 		public Receiver getNoWait() {
 			return this;
 		}
-		
+
 	}
 }

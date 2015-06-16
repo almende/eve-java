@@ -28,7 +28,7 @@ public class MyAgent extends Agent {
 	 *            the id
 	 */
 	public MyAgent(final String id) {
-		super(new AgentConfig(id));
+		super(AgentConfig.create(id));
 	}
 
 	/**

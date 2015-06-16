@@ -12,27 +12,36 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class MongoStateConfig.
  */
 public class MongoStateConfig extends StateConfig {
-	
-	/**
-	 * Instantiates a new memory state config.
-	 */
-	public MongoStateConfig() {
+	private static final String	BUILDER	= MongoStateBuilder.class.getName();
+
+	protected MongoStateConfig() {
 		super();
-		setClassName(MongoStateBuilder.class.getName());
 	}
-	
+
 	/**
-	 * Instantiates a new memory state config.
-	 * 
+	 * Instantiates a new mongoDB state config.
+	 *
+	 * @return the mongo state config
+	 */
+	public static MongoStateConfig create() {
+		final MongoStateConfig res = new MongoStateConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new mongoDB state config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the mongo state config
 	 */
 	public static MongoStateConfig decorate(final ObjectNode node) {
 		final MongoStateConfig res = new MongoStateConfig();
 		res.extend(node);
 		return res;
 	}
-	
+
 	/**
 	 * Gets the key.
 	 * 
@@ -43,7 +52,7 @@ public class MongoStateConfig extends StateConfig {
 		return getHost() + ":" + getPort() + "/" + getDatabase() + "#"
 				+ getCollection();
 	}
-	
+
 	/**
 	 * Sets the host.
 	 * 
@@ -53,7 +62,7 @@ public class MongoStateConfig extends StateConfig {
 	public void setHost(final String host) {
 		this.put("host", host);
 	}
-	
+
 	/**
 	 * Gets the url.
 	 * 
@@ -65,7 +74,7 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return "localhost";
 	}
-	
+
 	/**
 	 * Sets the port.
 	 * 
@@ -75,7 +84,7 @@ public class MongoStateConfig extends StateConfig {
 	public void setPort(final int port) {
 		this.put("port", port);
 	}
-	
+
 	/**
 	 * Gets the port.
 	 * 
@@ -87,7 +96,7 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return 27017;
 	}
-	
+
 	/**
 	 * Sets the database.
 	 * 
@@ -97,7 +106,7 @@ public class MongoStateConfig extends StateConfig {
 	public void setDatabase(final String database) {
 		this.put("database", database);
 	}
-	
+
 	/**
 	 * Gets the database.
 	 * 
@@ -109,7 +118,7 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return "eve";
 	}
-	
+
 	/**
 	 * Sets the collection.
 	 * 
@@ -119,7 +128,7 @@ public class MongoStateConfig extends StateConfig {
 	public void setCollection(final String collection) {
 		this.put("collection", collection);
 	}
-	
+
 	/**
 	 * Gets the collection.
 	 * 

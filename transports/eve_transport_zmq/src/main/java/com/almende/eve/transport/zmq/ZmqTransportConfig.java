@@ -16,22 +16,34 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class ZmqTransportConfig.
  */
 public class ZmqTransportConfig extends TransportConfig {
-	private static final Logger	LOG	= Logger.getLogger(ZmqTransportConfig.class
-											.getName());
+	private static final Logger	LOG		= Logger.getLogger(ZmqTransportConfig.class
+												.getName());
+	private static final String	BUILDER	= ZmqTransportBuilder.class.getName();
 
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
-	public ZmqTransportConfig() {
+	protected ZmqTransportConfig() {
 		super();
-		setClassName(ZmqTransportBuilder.class.getName());
 	}
 
 	/**
-	 * Instantiates a new xmpp transport config.
-	 * 
+	 * Instantiates a new ZMQ transport config.
+	 *
+	 * @return the zmq transport config
+	 */
+	public static ZmqTransportConfig create() {
+		final ZmqTransportConfig res = new ZmqTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new ZMQ transport config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the zmq transport config
 	 */
 	public static ZmqTransportConfig decorate(final ObjectNode node) {
 		final ZmqTransportConfig res = new ZmqTransportConfig();

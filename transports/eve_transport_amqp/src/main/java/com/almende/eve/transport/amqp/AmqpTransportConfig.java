@@ -15,22 +15,34 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class XmppTransportConfig.
  */
 public class AmqpTransportConfig extends TransportConfig {
-	private static final Logger	LOG	= Logger.getLogger(AmqpTransportConfig.class
-											.getName());
+	private static final Logger	LOG		= Logger.getLogger(AmqpTransportConfig.class
+												.getName());
+	private static final String	BUILDER	= AmqpTransportBuilder.class.getName();
 
 	/**
 	 * Instantiates a new xmpp transport config.
 	 */
-	public AmqpTransportConfig() {
+	protected AmqpTransportConfig() {
 		super();
-		setClassName(AmqpTransportBuilder.class.getName());
 	}
 
 	/**
-	 * Instantiates a new xmpp transport config.
-	 * 
+	 * Instantiates a new AMQ transport config.
+	 *
+	 * @return the amqp transport config
+	 */
+	public static AmqpTransportConfig create() {
+		final AmqpTransportConfig res = new AmqpTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new AMQ transport config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the amqp transport config
 	 */
 	public static AmqpTransportConfig decorate(final ObjectNode node) {
 		final AmqpTransportConfig res = new AmqpTransportConfig();

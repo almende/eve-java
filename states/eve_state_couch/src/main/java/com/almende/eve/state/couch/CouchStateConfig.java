@@ -12,13 +12,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class CouchStateConfig.
  */
 public class CouchStateConfig extends StateConfig {
+	private static final String	BUILDER	= CouchStateBuilder.class.getName();
 
 	/**
 	 * Instantiates a new couch state config.
 	 */
-	public CouchStateConfig() {
+	protected CouchStateConfig() {
 		super();
-		setClassName(CouchStateBuilder.class.getName());
+	}
+
+	/**
+	 * Instantiates a new couch state config.
+	 *
+	 * @return the couch state config
+	 */
+	public static CouchStateConfig create() {
+		final CouchStateConfig res = new CouchStateConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
 
 	/**

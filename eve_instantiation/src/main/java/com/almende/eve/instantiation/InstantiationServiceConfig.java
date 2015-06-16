@@ -11,15 +11,26 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeServiceConfig.
  */
 public class InstantiationServiceConfig extends Config {
-	/**
-	 * Instantiates a new memory state config.
-	 */
-	public InstantiationServiceConfig() {
+	private static final String	BUILDER	= InstantiationServiceBuilder.class
+												.getName();
+
+	protected InstantiationServiceConfig() {
 		super();
 	}
 
 	/**
-	 * Instantiates a new memory state config.
+	 * Instantiates a new Instantiation service config.
+	 *
+	 * @return the instantiation service config
+	 */
+	public static InstantiationServiceConfig create() {
+		final InstantiationServiceConfig res = new InstantiationServiceConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new Instantiation service config.
 	 * 
 	 * @param node
 	 *            the node
@@ -29,7 +40,6 @@ public class InstantiationServiceConfig extends Config {
 		res.extend(node);
 		return res;
 
-		
 	}
 
 	/**

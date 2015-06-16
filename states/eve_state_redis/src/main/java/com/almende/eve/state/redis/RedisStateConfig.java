@@ -11,20 +11,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class MemoryStateConfig.
  */
 public class RedisStateConfig extends StateConfig {
+	private static final String	BUILDER	= RedisStateBuilder.class.getName();
 
 	/**
 	 * Instantiates a new memory state config.
 	 */
-	public RedisStateConfig() {
+	protected RedisStateConfig() {
 		super();
-		setClassName(RedisStateBuilder.class.getName());
 	}
 
 	/**
-	 * Instantiates a new memory state config.
-	 * 
+	 * Instantiates a new redis state config.
+	 *
+	 * @return the redis state config
+	 */
+	public static RedisStateConfig create() {
+		final RedisStateConfig res = new RedisStateConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new redis state config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the redis state config
 	 */
 	public static RedisStateConfig decorate(final ObjectNode node) {
 		final RedisStateConfig res = new RedisStateConfig();

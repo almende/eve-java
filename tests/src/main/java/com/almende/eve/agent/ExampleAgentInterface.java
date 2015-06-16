@@ -10,7 +10,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.NoReply;
 /**
  * The Interface ExampleAgentInterface.
  */
-@NoReply
+//@NoReply
 public interface ExampleAgentInterface {
 
 	/**

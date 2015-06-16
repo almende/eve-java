@@ -11,19 +11,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimpleSchedulerConfig.
  */
 public class SimpleSchedulerConfig extends Config {
+	private static final String	BUILDER	= SimpleSchedulerBuilder.class
+												.getName();
 
 	/**
 	 * Instantiates a new simple scheduler config.
 	 */
-	public SimpleSchedulerConfig() {
+	protected SimpleSchedulerConfig() {
 		super();
-		setClassName(SimpleSchedulerBuilder.class.getName());
 	}
 	
-	private SimpleSchedulerConfig(boolean local){
-		super();
+	/**
+	 * Creates the.
+	 *
+	 * @return the simple scheduler config
+	 */
+	public static SimpleSchedulerConfig create(){
+		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
-
+	
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
@@ -31,11 +39,8 @@ public class SimpleSchedulerConfig extends Config {
 	 *            the node
 	 */
 	public static SimpleSchedulerConfig decorate(final ObjectNode node) {
-		final SimpleSchedulerConfig res = new SimpleSchedulerConfig(true);
+		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
 		res.extend(node);
-		if (!res.has("class")) {
-			res.setClassName(SimpleSchedulerBuilder.class.getName());
-		}
 		return res;
 	}
 
@@ -80,6 +85,6 @@ public class SimpleSchedulerConfig extends Config {
 		if (this.has("senderUrl")) {
 			return this.get("senderUrl").asText();
 		}
-		return "local:scheduler_"+getId();
+		return "local:scheduler_" + getId();
 	}
 }

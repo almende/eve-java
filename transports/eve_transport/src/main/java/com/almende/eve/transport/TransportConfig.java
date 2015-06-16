@@ -15,7 +15,7 @@ public class TransportConfig extends Config {
 	/**
 	 * Instantiates a new transport config.
 	 */
-	public TransportConfig() {
+	protected TransportConfig() {
 		super();
 	}
 	

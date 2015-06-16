@@ -11,15 +11,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class PersistentSchedulerConfig.
  */
 public class SimulationSchedulerConfig extends SimpleSchedulerConfig {
+	private static final String	BUILDER	= SimulationSchedulerBuilder.class
+												.getName();
 
 	/**
 	 * Instantiates a new simple scheduler config.
 	 */
-	public SimulationSchedulerConfig() {
+	protected SimulationSchedulerConfig() {
 		super();
-		setClassName(SimulationSchedulerBuilder.class.getName());
 	}
 
+	public static SimulationSchedulerConfig create(){
+		final SimulationSchedulerConfig res = new SimulationSchedulerConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
@@ -31,7 +37,7 @@ public class SimulationSchedulerConfig extends SimpleSchedulerConfig {
 		res.extend(node);
 		return res;
 	}
-
+	
 	/**
 	 * Sets the strong consistency.
 	 *

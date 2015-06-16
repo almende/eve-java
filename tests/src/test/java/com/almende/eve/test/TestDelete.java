@@ -38,7 +38,7 @@ public class TestDelete extends TestCase {
 	public void testDelete() throws IOException, URISyntaxException,
 			InterruptedException {
 
-		HttpTransportConfig transportConfig = new HttpTransportConfig();
+		HttpTransportConfig transportConfig = HttpTransportConfig.create();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 
 		transportConfig.setServletLauncher("JettyLauncher");
@@ -46,12 +46,12 @@ public class TestDelete extends TestCase {
 		jettyParms.put("port", 8080);
 		transportConfig.set("jetty", jettyParms);
 
-		AgentConfig config = new AgentConfig("example");
+		AgentConfig config = AgentConfig.create("example");
 		config.addTransport(transportConfig);
 
 		ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
-		
+
 		transportConfig = null;
 		config = null;
 
@@ -69,9 +69,9 @@ public class TestDelete extends TestCase {
 
 		assertNull(test.get());
 
-//		LOG.warning("Sleeping for profiler connection.");
-//		try {
-//			Thread.sleep(20000);
-//		} catch (final InterruptedException e) {}
+		// LOG.warning("Sleeping for profiler connection.");
+		// try {
+		// Thread.sleep(20000);
+		// } catch (final InterruptedException e) {}
 	}
 }

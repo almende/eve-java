@@ -11,31 +11,35 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class MemoryStateConfig.
  */
 public class MemoryStateConfig extends StateConfig {
+	private static final String	BUILDER	= MemoryStateBuilder.class.getName();
 
 	/**
 	 * Instantiates a new memory state config.
 	 */
-	public MemoryStateConfig() {
-		super();
-		setClassName(MemoryStateBuilder.class.getName());
-	}
-
-	private MemoryStateConfig(boolean local) {
+	protected MemoryStateConfig() {
 		super();
 	}
 
 	/**
 	 * Instantiates a new memory state config.
+	 *
+	 * @return the memory state config
+	 */
+	public static MemoryStateConfig create() {
+		final MemoryStateConfig res = new MemoryStateConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Clone the given ObjectNode to this Config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
 	public static MemoryStateConfig decorate(final ObjectNode node) {
-		final MemoryStateConfig res = new MemoryStateConfig(true);
+		final MemoryStateConfig res = new MemoryStateConfig();
 		res.extend(node);
-		if (!res.has("class")) {
-			res.setClassName(MemoryStateBuilder.class.getName());
-		}
 		return res;
 	}
 

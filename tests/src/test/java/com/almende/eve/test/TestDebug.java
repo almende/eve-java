@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestAgents.
  */
 public class TestDebug extends TestCase {
-	
+
 	/**
 	 * Test agents.
 	 * 
@@ -36,31 +36,32 @@ public class TestDebug extends TestCase {
 	@Test
 	public void testDebug() throws IOException, URISyntaxException,
 			InterruptedException {
-		
-		final HttpTransportConfig transportConfig = new HttpTransportConfig();
+
+		final HttpTransportConfig transportConfig = HttpTransportConfig
+				.create();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 		transportConfig
 				.setServletClass("com.almende.eve.transport.http.DebugServlet");
 		transportConfig.setDoAuthentication(false);
-		
+
 		transportConfig.setServletLauncher("JettyLauncher");
 		final ObjectNode jettyParms = JOM.createObjectNode();
 		jettyParms.put("port", 8080);
 		transportConfig.set("jetty", jettyParms);
-		
-		final AgentConfig config = new AgentConfig("example");
+
+		final AgentConfig config = AgentConfig.create("example");
 		config.addTransport(transportConfig);
-		
+
 		final ExampleAgent agent = new ExampleAgent();
 		agent.setConfig(config);
-		
-		final AgentConfig config2 = new AgentConfig("calc");
+
+		final AgentConfig config2 = AgentConfig.create("calc");
 		config2.addTransport(transportConfig);
-		
+
 		final CalcAgent agent2 = new CalcAgent();
 		agent2.setConfig(config2);
-		
+
 		Thread.sleep(10000);
 	}
-	
+
 }

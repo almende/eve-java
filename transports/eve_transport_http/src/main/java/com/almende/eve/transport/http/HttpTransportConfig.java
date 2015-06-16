@@ -13,17 +13,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class HttpTransportConfig.
  */
 public class HttpTransportConfig extends TransportConfig {
-	private static final Logger	LOG	= Logger.getLogger(HttpTransportConfig.class
-											.getName());
+	private static final Logger	LOG		= Logger.getLogger(HttpTransportConfig.class
+												.getName());
+	private static final String	BUILDER	= HttpTransportBuilder.class.getName();
+
+	protected HttpTransportConfig() {
+		super();
+	}
 
 	/**
 	 * Instantiates a new http transport config.
+	 * 
+	 * @return the http transport config
 	 */
-	public HttpTransportConfig() {
-		super();
-		setClassName(HttpTransportBuilder.class.getName());
+	public static HttpTransportConfig create(){
+		final HttpTransportConfig res = new HttpTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
-
+	
 	/**
 	 * Instantiates a new http transport config.
 	 * 
@@ -33,9 +41,6 @@ public class HttpTransportConfig extends TransportConfig {
 	public static HttpTransportConfig decorate(final ObjectNode node) {
 		final HttpTransportConfig res = new HttpTransportConfig();
 		res.extend(node);
-		if (!res.has("class")) {
-			res.setClassName(HttpTransportBuilder.class.getName());
-		}
 		return res;
 	}
 

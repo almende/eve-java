@@ -30,7 +30,7 @@ public class DHTAgent extends Agent {
 	 *            the id
 	 */
 	public DHTAgent(final String id){
-		super(new AgentConfig(id));
+		super(AgentConfig.create(id));
 	}
 	
 	/**

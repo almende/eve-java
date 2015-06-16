@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class TestState.
  */
 public class TestState extends TestCase {
-	
+
 	/**
 	 * Run test.
 	 * 
@@ -42,28 +42,29 @@ public class TestState extends TestCase {
 		myState.put("msg", "Hi There!");
 		assertEquals("Hi There!", myState.get("msg", String.class));
 		assertEquals("Hi There!", myState2.get("msg", String.class));
-		
+
 		myState.delete();
 		assertNull(myState.get("msg", String.class));
 	}
-	
+
 	/**
 	 * Test me.
 	 */
 	@Test
 	public void testState() {
-		final MemoryStateConfig params = new MemoryStateConfig();
+		final MemoryStateConfig params = MemoryStateConfig.create();
 		params.setId("TestAgent");
-		
-		State myState = new CapabilityBuilder<State>().withConfig(params).build();
+
+		State myState = new CapabilityBuilder<State>().withConfig(params)
+				.build();
 		State myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
-		
+
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
-	
+
 	/**
 	 * Test file state.
 	 */
@@ -73,71 +74,76 @@ public class TestState extends TestCase {
 		params.put("class", FileStateBuilder.class.getName());
 		params.put("json", false);
 		params.put("id", "TestAgent");
-		
-		State myState = new CapabilityBuilder<State>().withConfig(params).build();
-		State myState2 = new StateBuilder().withConfig(params).build();		
+
+		State myState = new CapabilityBuilder<State>().withConfig(params)
+				.build();
+		State myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
-		
+
 		params = params.deepCopy();
 		params.put("json", true);
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
-		
+
 	}
-	
-	
+
 	/**
 	 * Test file state.
 	 */
 	@Test
 	public void testRedisState() {
-		RedisStateConfig params = new RedisStateConfig();
+		RedisStateConfig params = RedisStateConfig.create();
 		params.setDbId(2);
 		params.setId("TestAgent");
-		
-		State myState = new CapabilityBuilder<State>().withConfig(params).build();
-		State myState2 = new StateBuilder().withConfig(params).build();		
+
+		State myState = new CapabilityBuilder<State>().withConfig(params)
+				.build();
+		State myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
-		
+
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new StateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
-	
+
 	/**
 	 * Test me.
 	 */
 	@Test
 	public void testMongoState() {
-		final MongoStateConfig params = new MongoStateConfig();
+		final MongoStateConfig params = MongoStateConfig.create();
 		params.setId("TestAgent");
-		
-		State myState = new CapabilityBuilder<State>().withConfig(params).build();
-		MongoState myState2 = new MongoStateBuilder().withConfig(params).build();
+
+		State myState = new CapabilityBuilder<State>().withConfig(params)
+				.build();
+		MongoState myState2 = new MongoStateBuilder().withConfig(params)
+				.build();
 		runTest(myState, myState2);
-		
+
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new MongoStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);
 	}
-	
+
 	/**
 	 * Test me.
 	 */
 	@Test
 	public void testCouchState() {
-		final CouchStateConfig params = new CouchStateConfig();
+		final CouchStateConfig params = CouchStateConfig.create();
 		params.setId("TestAgent");
 		params.setUrl("http://localhost:5984");
-		
-		State myState = new CapabilityBuilder<State>().withConfig(params).build();
-		CouchState myState2 = new CouchStateBuilder().withConfig(params).build();
+
+		State myState = new CapabilityBuilder<State>().withConfig(params)
+				.build();
+		CouchState myState2 = new CouchStateBuilder().withConfig(params)
+				.build();
 		runTest(myState, myState2);
-		
+
 		myState = new CapabilityBuilder<State>().withConfig(params).build();
 		myState2 = new CouchStateBuilder().withConfig(params).build();
 		runTest(myState, myState2);

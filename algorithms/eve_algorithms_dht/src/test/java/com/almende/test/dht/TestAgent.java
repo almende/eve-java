@@ -36,7 +36,7 @@ public class TestAgent extends TestCase {
 	public void testAgent() throws IOException, URISyntaxException,
 			InterruptedException {
 		
-		final HttpTransportConfig transportConfig = new HttpTransportConfig();
+		final HttpTransportConfig transportConfig = HttpTransportConfig.create();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 		transportConfig.setServletClass(DebugServlet.class.getName());
 		
@@ -45,7 +45,7 @@ public class TestAgent extends TestCase {
 		jettyParms.put("port", 8080);
 		transportConfig.set("jetty", jettyParms);
 		
-		final AgentConfig config = new AgentConfig("example");
+		final AgentConfig config = AgentConfig.create("example");
 		config.addTransport(transportConfig);
 		
 		DHTAgent agent = new DHTAgent();

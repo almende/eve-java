@@ -60,8 +60,7 @@ public class Goldemo {
 		final String configFileName = args[0];
 		final Config config = Config.load(Config.getType(configFileName),
 				new FileInputStream(new File(configFileName)));
-
-		System.out.println("Config:"+config);
+		
 		final Integer runTime = config.get("gol", "runTime");
 		final Integer N = config.get("gol", "columns");
 		final Integer M = config.get("gol", "rows");

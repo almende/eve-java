@@ -11,20 +11,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRpcProtocolConfig.
  */
 public class JSONRpcProtocolConfig extends ProtocolConfig {
+	private static final String	BUILDER	= JSONRpcProtocolBuilder.class
+												.getName();
 
 	/**
 	 * Instantiates a new JSON rpc protocol config.
 	 */
-	public JSONRpcProtocolConfig() {
+	protected JSONRpcProtocolConfig() {
 		super();
-		setClassName(JSONRpcProtocolBuilder.class.getName());
 	}
 
 	/**
 	 * Instantiates a new JSON rpc protocol config.
-	 * 
+	 *
+	 * @return the JSON rpc protocol config
+	 */
+	public static JSONRpcProtocolConfig create() {
+		final JSONRpcProtocolConfig res = new JSONRpcProtocolConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new JSON rpc protocol config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the JSON rpc protocol config
 	 */
 	public static JSONRpcProtocolConfig decorate(final ObjectNode node) {
 		final JSONRpcProtocolConfig res = new JSONRpcProtocolConfig();

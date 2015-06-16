@@ -72,7 +72,7 @@ public abstract class AbstractCapabilityBuilder<T extends Capability>
 	 */
 	public T build() {
 		final Config params = Config.decorate(parameters);
-		final String className = params.getClassName();
+		final String className = params.getBuilder();
 		if (className != null) {
 			try {
 				final Class<?> clazz = Class.forName(className, true, cl);
@@ -84,9 +84,8 @@ public abstract class AbstractCapabilityBuilder<T extends Capability>
 					return instance.withClassLoader(cl).withConfig(parameters)
 							.withHandle(handle).build();
 				} else {
-					LOG.log(Level.WARNING, className
+					throw new Error(className
 							+ " is not a CapabilityBuilder, which is required.");
-					throw new Error();
 				}
 			} catch (final ClassNotFoundException e) {
 				LOG.log(Level.WARNING, "Couldn't find class:" + className, e);

@@ -28,21 +28,22 @@ public class TestBoot extends TestCase {
 	 */
 	@Test
 	public void testBoot() {
-		
-		//This configuration normally comes from eve.yaml:
+
+		// This configuration normally comes from eve.yaml:
 		final ObjectNode config = JOM.createObjectNode();
-		final InstantiationServiceConfig instantiationConfig = new InstantiationServiceConfig();
-		final FileStateConfig state = new FileStateConfig();
+		final InstantiationServiceConfig instantiationConfig = InstantiationServiceConfig
+				.create();
+		final FileStateConfig state = FileStateConfig.create();
 		state.setPath(".wakeservices");
 		state.setId("testWakeService");
 		instantiationConfig.setState(state);
 		final ArrayNode services = JOM.createArrayNode();
 		services.add(instantiationConfig);
 		config.set("instantiationServices", services);
-		
-		//Basic boot action:
+
+		// Basic boot action:
 		Boot.boot(config);
-		
+
 		LOG.warning("Sleep for 20 seconds, allowing external XMPP call.");
 		try {
 			Thread.sleep(20000);

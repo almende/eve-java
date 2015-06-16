@@ -10,27 +10,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRpcProtocolConfig.
  */
 public class InboxProtocolConfig extends ProtocolConfig {
+	private static final String	BUILDER	= InboxProtocolBuilder.class.getName();
+
+	protected InboxProtocolConfig() {
+		super();
+	}
 
 	/**
-	 * Instantiates a new JSON rpc protocol config.
+	 * Instantiates a new Inbox protocol config.
+	 *
+	 * @return the inbox protocol config
 	 */
-	public InboxProtocolConfig() {
-		super();
-		setClassName(InboxProtocolBuilder.class.getName());
-	}
-
-	private InboxProtocolConfig(boolean skipClass) {
-		super();
+	public static InboxProtocolConfig create() {
+		final InboxProtocolConfig res = new InboxProtocolConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
 
 	/**
-	 * Instantiates a new JSON rpc protocol config.
-	 * 
+	 * Instantiates a new Inbox protocol config.
+	 *
 	 * @param node
 	 *            the node
+	 * @return the inbox protocol config
 	 */
 	public static InboxProtocolConfig decorate(final ObjectNode node) {
-		final InboxProtocolConfig res = new InboxProtocolConfig(true);
+		final InboxProtocolConfig res = new InboxProtocolConfig();
 		res.extend(node);
 		return res;
 	}

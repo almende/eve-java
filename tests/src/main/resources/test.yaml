@@ -3,13 +3,13 @@ templates:
    defaultAgent:
       class: com.almende.eve.agent.ExampleAgent
       state:
-         class: com.almende.eve.state.memory.MemoryStateBuilder
+         builder: com.almende.eve.state.memory.MemoryStateBuilder
       scheduler:
-         class: com.almende.eve.scheduling.SimpleSchedulerBuilder
+         builder: com.almende.eve.scheduling.SimpleSchedulerBuilder
       protocols:
-      -  class: com.almende.eve.algorithms.clustering.GlobalAddressProtocolBuilder
+      -  builder: com.almende.eve.algorithms.clustering.GlobalAddressProtocolBuilder
       transports:
-      -  class: com.almende.eve.transport.http.HttpTransportBuilder
+      -  builder: com.almende.eve.transport.http.HttpTransportBuilder
          servletUrl: http://localhost:8081/agents/
          servletLauncher: JettyLauncher
          servletClass: com.almende.eve.transport.http.DebugServlet
@@ -17,9 +17,9 @@ templates:
          doAuthentication: false
          jetty: 
            port: 8081
-      -  class: com.almende.eve.algorithms.clustering.GlobalAddressTransportBuilder
+      -  builder: com.almende.eve.algorithms.clustering.GlobalAddressTransportBuilder
          realAddressPattern: http://localhost:8081/agents/
-      -  class: com.almende.eve.transport.ws.WebsocketTransportBuilder
+      -  builder: com.almende.eve.transport.ws.WebsocketTransportBuilder
          address: ws://localhost:8081/ws
          servletLauncher: JettyLauncher
          server: true
@@ -30,9 +30,9 @@ templates:
    specialAgent:
       extends: templates/defaultAgent
       scheduler:
-         class: com.almende.eve.scheduling.PersistentSchedulerBuilder
+         builder: com.almende.eve.scheduling.PersistentSchedulerBuilder
          state:
-             class: com.almende.eve.state.memory.MemoryStateBuilder
+             builder: com.almende.eve.state.memory.MemoryStateBuilder
 
 agents:
 -  id: another

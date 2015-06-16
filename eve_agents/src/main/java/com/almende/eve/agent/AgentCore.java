@@ -434,7 +434,7 @@ public class AgentCore implements Receiver, Configurable {
 		}
 		if (config == null || !found) {
 			// each agent has at least a JSONRPC protocol handler
-			final JSONRpcProtocolConfig conf = new JSONRpcProtocolConfig();
+			final JSONRpcProtocolConfig conf = JSONRpcProtocolConfig.create();
 			if (agentId != null && conf.getId() == null) {
 				conf.setId(agentId);
 			}

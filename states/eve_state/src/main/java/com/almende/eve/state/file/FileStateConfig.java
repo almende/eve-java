@@ -13,19 +13,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class FileStateConfig.
  */
 public class FileStateConfig extends StateConfig {
-	private static final Logger	LOG	= Logger.getLogger(FileStateConfig.class
-											.getSimpleName());
+	private static final Logger	LOG		= Logger.getLogger(FileStateConfig.class
+												.getSimpleName());
+	private static final String	BUILDER	= FileStateBuilder.class.getName();
+
+	protected FileStateConfig() {
+		super();
+	}
 
 	/**
 	 * Instantiates a new file state config.
+	 *
+	 * @return the file state config
 	 */
-	public FileStateConfig() {
-		super();
-		setClassName(FileStateBuilder.class.getName());
-	}
-
-	private FileStateConfig(boolean local) {
-		super();
+	public static FileStateConfig create() {
+		final FileStateConfig res = new FileStateConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
 
 	/**
@@ -35,11 +39,8 @@ public class FileStateConfig extends StateConfig {
 	 *            the node
 	 */
 	public static FileStateConfig decorate(final ObjectNode node) {
-		final FileStateConfig res = new FileStateConfig(true);
+		final FileStateConfig res = new FileStateConfig();
 		res.extend(node);
-		if (!res.has("class")) {
-			res.setClassName(FileStateBuilder.class.getName());
-		}
 		return res;
 	}
 

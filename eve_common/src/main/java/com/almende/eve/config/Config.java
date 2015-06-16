@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,6 +29,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Config.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS,
+		include = JsonTypeInfo.As.PROPERTY,
+		property = "class")
 public class Config extends ObjectNode {
 	private static final Logger	LOG		= Logger.getLogger(Config.class
 												.getName());
@@ -36,7 +40,7 @@ public class Config extends ObjectNode {
 	/**
 	 * Instantiates a new config.
 	 */
-	public Config() {
+	protected Config() {
 		super(JOM.getInstance().getNodeFactory(), new MyKids(2));
 	}
 
@@ -333,7 +337,7 @@ public class Config extends ObjectNode {
 	}
 
 	/**
-	 * Sets the class path. (Required)
+	 * Sets the class path.
 	 * 
 	 * @param className
 	 *            the new class
@@ -352,6 +356,30 @@ public class Config extends ObjectNode {
 			return this.get("class").asText();
 		}
 		return null;
+	}
+
+	/**
+	 * Gets the classname of the builder for this type.
+	 *
+	 * @param className
+	 *            the classname of the builder
+	 */
+	public void setBuilder(final String className) {
+		this.put("builder", className);
+	}
+
+	/**
+	 * Gets the builder className for this type.
+	 *
+	 * @return the classname of the builder
+	 */
+	public String getBuilder() {
+		if (this.has("builder")) {
+			return this.get("builder").asText();
+		} else {
+			LOG.warning("Couldn't find 'builder' field, falling back to the backwards compatibility 'class' field.");
+			return getClassName();
+		}
 	}
 
 	private JsonNode lget(final String... keys) {

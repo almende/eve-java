@@ -11,28 +11,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRpcProtocolConfig.
  */
 public class SimulationInboxProtocolConfig extends InboxProtocolConfig {
+	private static final String	BUILDER	= SimulationInboxProtocolBuilder.class
+												.getName();
+
+	protected SimulationInboxProtocolConfig() {
+		super();
+	}
 
 	/**
-	 * Instantiates a new JSON rpc protocol config.
+	 * Instantiates a new Simulation inbox protocol config.
+	 * 
+	 * @return the simulation inbox protocol config
 	 */
-	public SimulationInboxProtocolConfig() {
-		super();
-		setClassName(SimulationInboxProtocolBuilder.class.getName());
-	}
-
-	private SimulationInboxProtocolConfig(final boolean skipClass) {
-		super();
+	public static SimulationInboxProtocolConfig create() {
+		final SimulationInboxProtocolConfig res = new SimulationInboxProtocolConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
 
 	/**
-	 * Instantiates a new JSON rpc protocol config.
+	 * Instantiates a new Simulation inbox protocol config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
 	public static SimulationInboxProtocolConfig decorate(final ObjectNode node) {
-		final SimulationInboxProtocolConfig res = new SimulationInboxProtocolConfig(
-				true);
+		final SimulationInboxProtocolConfig res = new SimulationInboxProtocolConfig();
 		res.extend(node);
 		return res;
 	}
@@ -43,20 +47,20 @@ public class SimulationInboxProtocolConfig extends InboxProtocolConfig {
 	 * @param atomicNetwork
 	 *            the new atomic network
 	 */
-	public void setAtomicNetwork(final boolean atomicNetwork){
+	public void setAtomicNetwork(final boolean atomicNetwork) {
 		this.put("atomicNetwork", atomicNetwork);
 	}
-	
+
 	/**
 	 * Should the network become atomic, zero-time duration transfers?
 	 *
 	 * @return true, if is atomic network
 	 */
 	public boolean isAtomicNetwork() {
-		if (this.has("atomicNetwork")){
+		if (this.has("atomicNetwork")) {
 			return this.get("atomicNetwork").asBoolean();
 		}
 		return false;
 	}
-	
+
 }

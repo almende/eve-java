@@ -15,7 +15,7 @@ public class StateConfig extends Config {
 	/**
 	 * Instantiates a new state config.
 	 */
-	public StateConfig() {
+	protected StateConfig() {
 		super();
 	}
 	

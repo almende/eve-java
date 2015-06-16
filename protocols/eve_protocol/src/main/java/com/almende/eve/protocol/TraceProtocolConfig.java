@@ -10,13 +10,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRpcProtocolConfig.
  */
 public class TraceProtocolConfig extends ProtocolConfig {
+	private static final String	BUILDER	= TraceProtocolBuilder.class.getName();
+
+	protected TraceProtocolConfig() {
+		super();
+	}
 
 	/**
-	 * Instantiates a new JSON rpc protocol config.
+	 * Instantiates a new Trace protocol config.
+	 *
+	 * @return the trace protocol config
 	 */
-	public TraceProtocolConfig() {
-		super();
-		setClassName(TraceProtocolBuilder.class.getName());
+	public static TraceProtocolConfig create() {
+		final TraceProtocolConfig res = new TraceProtocolConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new Trace protocol config.
+	 * 
+	 * @param node
+	 *            the node
+	 */
+	public static TraceProtocolConfig decorate(final ObjectNode node) {
+		final TraceProtocolConfig res = new TraceProtocolConfig();
+		res.extend(node);
+		return res;
 	}
 
 	/**
@@ -39,18 +59,6 @@ public class TraceProtocolConfig extends ProtocolConfig {
 			return this.get("filename").asText();
 		}
 		return null;
-	}
-
-	/**
-	 * Instantiates a new JSON rpc protocol config.
-	 * 
-	 * @param node
-	 *            the node
-	 */
-	public static TraceProtocolConfig decorate(final ObjectNode node) {
-		final TraceProtocolConfig res = new TraceProtocolConfig();
-		res.extend(node);
-		return res;
 	}
 
 	/**

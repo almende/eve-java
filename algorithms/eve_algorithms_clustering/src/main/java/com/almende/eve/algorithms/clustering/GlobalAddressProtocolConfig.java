@@ -11,33 +11,32 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class JSONRpcProtocolConfig.
  */
 public class GlobalAddressProtocolConfig extends ProtocolConfig {
+	private static final String	BUILDER	= GlobalAddressProtocolBuilder.class
+												.getName();
 
-	/**
-	 * Instantiates a new JSON rpc protocol config.
-	 */
-	public GlobalAddressProtocolConfig() {
+	protected GlobalAddressProtocolConfig() {
 		super();
-		setClassName(GlobalAddressProtocolBuilder.class.getName());
 	}
 
 	/**
-	 * Instantiates a new global address protocol config.
+	 * Instantiates a new GlobalAddress protocol config.
 	 *
-	 * @param setClass
-	 *            the set class
+	 * @return the global address protocol config
 	 */
-	public GlobalAddressProtocolConfig(boolean setClass){
-		super();
+	public static GlobalAddressProtocolConfig create() {
+		final GlobalAddressProtocolConfig res = new GlobalAddressProtocolConfig();
+		res.setBuilder(BUILDER);
+		return res;
 	}
-	
+
 	/**
-	 * Instantiates a new JSON rpc protocol config.
+	 * Instantiates a new GlobalAddress protocol config.
 	 * 
 	 * @param node
 	 *            the node
 	 */
 	public static GlobalAddressProtocolConfig decorate(final ObjectNode node) {
-		final GlobalAddressProtocolConfig res = new GlobalAddressProtocolConfig(true);
+		final GlobalAddressProtocolConfig res = new GlobalAddressProtocolConfig();
 		res.extend(node);
 		return res;
 	}

@@ -11,17 +11,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class LocalTransportConfig.
  */
 public class GlobalAddressTransportConfig extends TransportConfig {
+	private static final String	BUILDER	= GlobalAddressTransportBuilder.class
+												.getName();
 
 	/**
 	 * Instantiates a new local transport config.
 	 */
-	public GlobalAddressTransportConfig() {
+	protected GlobalAddressTransportConfig() {
 		super();
-		setClassName(GlobalAddressTransportBuilder.class.getName());
 	}
 
 	/**
-	 * Instantiates a new local transport config.
+	 * Instantiates a new GlobalAddress transport config.
+	 *
+	 * @return the global address transport config
+	 */
+	public static GlobalAddressTransportConfig create() {
+		final GlobalAddressTransportConfig res = new GlobalAddressTransportConfig();
+		res.setBuilder(BUILDER);
+		return res;
+	}
+
+	/**
+	 * Instantiates a new GlobalAddress transport config.
 	 * 
 	 * @param node
 	 *            the node
@@ -64,7 +76,7 @@ public class GlobalAddressTransportConfig extends TransportConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the actual address this virtual address maps to.
 	 *

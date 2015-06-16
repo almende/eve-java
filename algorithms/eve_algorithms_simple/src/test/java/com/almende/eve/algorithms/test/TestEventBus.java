@@ -36,9 +36,9 @@ public class TestEventBus extends TestCase {
 		LOG.warning("Starting with:" + nofAgents + " agents");
 		DateTime timestamp = DateTime.now();
 
-		final AgentConfig config = new AgentConfig();
+		final AgentConfig config = AgentConfig.create();
 		config.setClassName(EventAgent.class.getName());
-		config.setState(new MemoryStateConfig());
+		config.setState(MemoryStateConfig.create());
 
 		final List<EventAgent> agents = new ArrayList<EventAgent>(nofAgents);
 		for (int i = 0; i < nofAgents; i++) {

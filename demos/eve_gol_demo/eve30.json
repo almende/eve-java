@@ -1,39 +1,23 @@
-# Eve configuration
-{"transports":[
-{"class": "com.almende.eve.transport.http.HttpTransportBuilder",
-"servletUrl": "http://127.0.0.1:8881/agents/",
-"servletLauncher":"JettyLauncher",
-"doShortcut": false,
-"doAuthentication": false,
-"jetty":{"port": 8881}
-}],
-
-"state":{
-  "class": "com.almende.eve.state.memory.MemoryStateBuilder"
-},
-
-#protocols:
-#-  class: com.almende.eve.protocol.TraceProtocolBuilder
-#   filename: .traces_
-
-#state:
-#   class: com.almende.eve.state.file.FileStateBuilder
-#   json: true
-#   path: .eveagents_gol_demo
-
-#state:
-#    class: com.almende.eve.state.mongo.MongoStateBuilder
-
-#state:
-#    class: com.almende.eve.state.couch.CouchStateBuilder
-
-
-"gol":{
-  "runTime": 10,
-  "columns": 30,
-  "rows": 30,
-#  "nofCores" : 4,
-  "OddUrl": "http://127.0.0.1:8881/agents/",
-  "EvenUrl": "http://127.0.0.1:8881/agents/"
+{
+	"transports":[{
+		"builder": "com.almende.eve.transport.http.HttpTransportBuilder",
+		"servletUrl": "http://127.0.0.1:8881/agents/",
+		"servletLauncher":"JettyLauncher",
+		"doShortcut": false,
+		"doAuthentication": false,
+		"jetty":{
+			"port": 8881
+		}
+	}],
+	"state":{
+		"builder": "com.almende.eve.state.memory.MemoryStateBuilder"
+	},
+	"gol":{
+		"runTime": 10,
+		"columns": 30,
+		"rows": 30,
+		"OddUrl": "http://127.0.0.1:8881/agents/",
+		"EvenUrl": "http://127.0.0.1:8881/agents/"
+	}
 }
-}
+

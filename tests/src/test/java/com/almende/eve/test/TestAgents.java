@@ -42,13 +42,13 @@ public class TestAgents extends TestCase {
 	@Test
 	public void testAgent() throws IOException, InterruptedException {
 
-		final InstantiationServiceConfig isconfig = new InstantiationServiceConfig();
-		final FileStateConfig state = new FileStateConfig();
+		final InstantiationServiceConfig isconfig = InstantiationServiceConfig.create();
+		final FileStateConfig state = FileStateConfig.create();
 		state.setPath(".wakeservices");
 		state.setId("testAgents");
 		isconfig.setState(state);
 
-		final HttpTransportConfig transportConfig = new HttpTransportConfig();
+		final HttpTransportConfig transportConfig = HttpTransportConfig.create();
 		transportConfig.setServletUrl("http://localhost:8080/agents/");
 
 		transportConfig.setServletLauncher("JettyLauncher");
@@ -56,7 +56,7 @@ public class TestAgents extends TestCase {
 		jettyParms.put("port", 8080);
 		transportConfig.set("jetty", jettyParms);
 
-		final AgentConfig config = new AgentConfig("example");
+		final AgentConfig config = AgentConfig.create("example");
 		config.addTransport(transportConfig);
 		config.setInstantiationService(isconfig);
 
@@ -92,7 +92,7 @@ public class TestAgents extends TestCase {
 		System.gc();
 		System.gc();
 
-		final AgentConfig ac = new AgentConfig("tester");
+		final AgentConfig ac = AgentConfig.create("tester");
 		ac.addTransport(transportConfig);
 		final ExampleAgent tester = new ExampleAgent() {};
 		tester.setConfig(ac);

@@ -35,41 +35,46 @@ public class TestSimulationScheduling extends TestCase {
 	public void testSchedulingStrong() throws IOException {
 		final boolean supportSyncCalls = true;
 		final boolean atomicNetwork = true;
-		
-		
-		final SimulationSchedulerConfig params = new SimulationSchedulerConfig();
+
+		final SimulationSchedulerConfig params = SimulationSchedulerConfig
+				.create();
 		params.setSenderUrl("local:testSim1s");
 
-		final AgentConfig config = new AgentConfig();
+		final AgentConfig config = AgentConfig.create();
 		config.setClassName(TestSchedulingAgent.class.getName());
 		config.put("id", "testSim1s");
 
 		final ArrayNode protocols = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot = new SimulationTimeProtocolConfig();
-		final SimulationInboxProtocolConfig simInprot = new SimulationInboxProtocolConfig();
+		final SimulationTimeProtocolConfig simprot = SimulationTimeProtocolConfig
+				.create();
+		final SimulationInboxProtocolConfig simInprot = SimulationInboxProtocolConfig
+				.create();
 		simInprot.setSupportSynccalls(supportSyncCalls);
 		simInprot.setAtomicNetwork(atomicNetwork);
 
-		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
+		final TraceProtocolConfig traceprot = TraceProtocolConfig.create();
 		traceprot.setFileName(".");
 		protocols.add(simprot);
 		protocols.add(simInprot);
 		config.setProtocols(protocols);
 		config.setScheduler(params);
 
-		final AgentConfig config2 = new AgentConfig();
+		final AgentConfig config2 = AgentConfig.create();
 		config2.setClassName(TestSchedulingAgent.class.getName());
 		config2.put("id", "testSim2s");
-		final SimulationSchedulerConfig params2 = new SimulationSchedulerConfig();
+		final SimulationSchedulerConfig params2 = SimulationSchedulerConfig
+				.create();
 		params2.setSenderUrl("local:testSim2s");
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot2 = new SimulationTimeProtocolConfig();
-		final SimulationInboxProtocolConfig simInprot2 = new SimulationInboxProtocolConfig();
+		final SimulationTimeProtocolConfig simprot2 = SimulationTimeProtocolConfig
+				.create();
+		final SimulationInboxProtocolConfig simInprot2 = SimulationInboxProtocolConfig
+				.create();
 		simInprot2.setSupportSynccalls(supportSyncCalls);
 		simInprot2.setAtomicNetwork(atomicNetwork);
 
-		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
+		final TraceProtocolConfig traceprot2 = TraceProtocolConfig.create();
 		traceprot2.setFileName(".");
 		protocols2.add(simprot2);
 		protocols2.add(simInprot2);
@@ -101,35 +106,39 @@ public class TestSimulationScheduling extends TestCase {
 	 */
 	@Test
 	public void testSchedulingWeak() throws IOException {
-		final SimulationSchedulerConfig params = new SimulationSchedulerConfig();
+		final SimulationSchedulerConfig params = SimulationSchedulerConfig
+				.create();
 		params.setSenderUrl("local:testSim1w");
 		params.setStrongConsistency(false);
 
-		final AgentConfig config = new AgentConfig();
+		final AgentConfig config = AgentConfig.create();
 		config.setClassName(TestSchedulingAgent.class.getName());
 		config.put("id", "testSim1w");
 
 		final ArrayNode protocols = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot = new SimulationTimeProtocolConfig();
+		final SimulationTimeProtocolConfig simprot = SimulationTimeProtocolConfig
+				.create();
 
-		final TraceProtocolConfig traceprot = new TraceProtocolConfig();
+		final TraceProtocolConfig traceprot = TraceProtocolConfig.create();
 		traceprot.setFileName(".");
 		protocols.add(simprot);
 
 		config.setProtocols(protocols);
 		config.setScheduler(params);
 
-		final AgentConfig config2 = new AgentConfig();
+		final AgentConfig config2 = AgentConfig.create();
 		config2.setClassName(TestSchedulingAgent.class.getName());
 		config2.put("id", "testSim2w");
-		final SimulationSchedulerConfig params2 = new SimulationSchedulerConfig();
+		final SimulationSchedulerConfig params2 = SimulationSchedulerConfig
+				.create();
 		params2.setSenderUrl("local:testSim2w");
 		params2.setStrongConsistency(false);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot2 = new SimulationTimeProtocolConfig();
+		final SimulationTimeProtocolConfig simprot2 = SimulationTimeProtocolConfig
+				.create();
 
-		final TraceProtocolConfig traceprot2 = new TraceProtocolConfig();
+		final TraceProtocolConfig traceprot2 = TraceProtocolConfig.create();
 		traceprot2.setFileName(".");
 		protocols2.add(simprot2);
 

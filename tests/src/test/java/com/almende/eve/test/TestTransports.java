@@ -42,7 +42,7 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testXmpp() throws IOException {
-		final XmppTransportConfig params = new XmppTransportConfig();
+		final XmppTransportConfig params = XmppTransportConfig.create();
 		params.setAddress("xmpp://alex@openid.almende.org/test");
 		params.setPassword("alex");
 
@@ -66,15 +66,15 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testZmq() throws IOException {
-		final ZmqTransportConfig config = new ZmqTransportConfig();
+		final ZmqTransportConfig config = ZmqTransportConfig.create();
 		config.setAddress("zmq://tcp://127.0.0.1:5678");
 
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
 		transport.connect();
 
-		transport.send(URIUtil.create("zmq://tcp://127.0.0.1:5678"), "Hello World",
-				null);
+		transport.send(URIUtil.create("zmq://tcp://127.0.0.1:5678"),
+				"Hello World", null);
 	}
 
 	/**
@@ -101,7 +101,8 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testWs() throws IOException {
-		final WebsocketTransportConfig serverConfig = new WebsocketTransportConfig();
+		final WebsocketTransportConfig serverConfig = WebsocketTransportConfig
+				.create();
 		serverConfig.setAddress("ws://localhost:8082/ws/testServer");
 		serverConfig.setServer(true);
 		serverConfig.setServletLauncher("JettyLauncher");
@@ -112,7 +113,8 @@ public class TestTransports extends TestCase {
 		final Transport server = new TransportBuilder()
 				.withConfig(serverConfig).withHandle(new MyReceiver()).build();
 
-		final WebsocketTransportConfig clientConfig = new WebsocketTransportConfig();
+		final WebsocketTransportConfig clientConfig = WebsocketTransportConfig
+				.create();
 		clientConfig.setId("testClient");
 		clientConfig.setServerUrl("ws://localhost:8082/ws/testServer");
 

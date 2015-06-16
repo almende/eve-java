@@ -48,8 +48,8 @@ public class TestScale extends TestCase {
 	@Test
 	public void testScale() throws IOException, URISyntaxException,
 			InterruptedException {
-		AgentConfig config = new AgentConfig();
-		FileStateConfig filestateconfig = new FileStateConfig();
+		AgentConfig config = AgentConfig.create();
+		FileStateConfig filestateconfig = FileStateConfig.create();
 		filestateconfig.setPath(".scaleTest");
 		config.setState(filestateconfig);
 		TestScaleAgent top = new TestScaleAgent("top", config, null,
@@ -217,7 +217,7 @@ public class TestScale extends TestCase {
 	private int	count	= 0;
 
 	private ExampleAgent genAgent() {
-		AgentConfig config = new AgentConfig();
+		AgentConfig config = AgentConfig.create();
 		config.setId(new Integer(count++).toString());
 		config.setClassName(ExampleAgent.class.getName());
 

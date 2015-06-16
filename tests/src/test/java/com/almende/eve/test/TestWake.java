@@ -39,20 +39,21 @@ public class TestWake extends TestCase {
 	@Test
 	public void testWake() {
 
-		final AgentConfig config = new AgentConfig("testWakeAgent");
+		final AgentConfig config = AgentConfig.create("testWakeAgent");
 
 		// First we need to setup the WakeService: (Either keep a global pointer
 		// to the wake service, or obtain it again through the same
 		// configuration)
-		final InstantiationServiceConfig isConfig = new InstantiationServiceConfig();
-		final FileStateConfig stateconfig = new FileStateConfig();
+		final InstantiationServiceConfig isConfig = InstantiationServiceConfig
+				.create();
+		final FileStateConfig stateconfig = FileStateConfig.create();
 		stateconfig.setPath(".wakeservices");
 		stateconfig.setId("testWakeService");
 		isConfig.setState(stateconfig);
 
 		config.setInstantiationService(isConfig);
 
-		final HttpTransportConfig transConfig = new HttpTransportConfig();
+		final HttpTransportConfig transConfig = HttpTransportConfig.create();
 		transConfig.setServletUrl("http://localhost:8080/agents/");
 		transConfig.setServletLauncher("JettyLauncher");
 		transConfig.setServletClass(DebugServlet.class.getName());
