@@ -56,18 +56,18 @@
 	</developers>
 
 	<modules>
-		<module>../eve_common</module>
-		<module>../states</module>
-		<module>../transports</module>
-		<module>../protocols</module>
-		<module>../scheduling</module>
-		<module>../eve_instantiation</module>
-		<module>../eve_agents</module>
-		<module>../eve_deployment</module>
-		<module>../algorithms</module>
-		<module>../tests</module>
-		<module>../tests/web</module>
-		<module>../bundles</module>
+		<module>eve_common</module>
+		<module>states</module>
+		<module>transports</module>
+		<module>protocols</module>
+		<module>scheduling</module>
+		<module>eve_instantiation</module>
+		<module>eve_agents</module>
+		<module>eve_deployment</module>
+		<module>algorithms</module>
+		<module>tests</module>
+		<module>tests/web</module>
+		<module>bundles</module>
 		<module>transition</module>
 	</modules>
 
@@ -87,6 +87,7 @@
 		<gpg.version>1.5</gpg.version>
 		<junit.version>4.11</junit.version>
 		<java.version>1.7</java.version>
+		<doclava.version>1.0.6</doclava.version>
 	</properties>
 
 	<dependencies>
@@ -238,6 +239,27 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>${maven-javadoc-plugin.version}</version>
+						<configuration>
+							<docletArtifact>
+								<groupId>com.google.doclava</groupId>
+								<artifactId>doclava</artifactId>
+								<version>${doclava.version}</version>
+							</docletArtifact>
+							<doclet>com.google.doclava.Doclava</doclet>
+							<!-- | bootclasspath required by Sun's JVM -->
+							<bootclasspath>${sun.boot.class.path}</bootclasspath>
+							<additionalparam>
+								-quiet
+								-federate JDK http://download.oracle.com/javase/7/docs/api/index.html?
+								-federationxml JDK
+								http://doclava.googlecode.com/svn/static/api/openjdk-7.xml
+								-hdf project.name "${project.name}"
+								-d ${project.build.directory}/apidocs
+							</additionalparam>
+							<useStandardDocletOptions>false</useStandardDocletOptions>
+							<!-- | Apple's JVM sometimes requires more memory -->
+							<additionalJOption>-J-Xmx1024m</additionalJOption>
+						</configuration>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
