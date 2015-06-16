@@ -422,7 +422,7 @@ public class AgentCore implements Receiver, Configurable {
 						.withConfig((ObjectNode) conf).withHandle(handler)
 						.build();
 				if (JSONRpcProtocolBuilder.class.getName().equals(
-						conf.getClassName())) {
+						conf.getBuilder())) {
 					found = true;
 				}
 				if (protocol instanceof RpcBasedProtocol) {

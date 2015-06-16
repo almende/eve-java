@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import com.almende.util.TypeUtil;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,9 +28,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Config.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS,
-		include = JsonTypeInfo.As.PROPERTY,
-		property = "class")
 public class Config extends ObjectNode {
 	private static final Logger	LOG		= Logger.getLogger(Config.class
 												.getName());
