@@ -1,6 +1,0 @@
-You can compile Eve through Maven:
-
-#From working copy base:
-cd eve_parent
-mvn install
-
