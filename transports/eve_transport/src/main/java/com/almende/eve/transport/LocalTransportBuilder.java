@@ -105,7 +105,10 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		@Override
 		public void send(final URI receiverUri, final String message,
 				final String tag) throws IOException {
-			sendLocal(receiverUri, message);
+			if (!sendLocal(receiverUri, message)) {
+				throw new IOException("No local agent found at:"
+						+ receiverUri.toASCIIString());
+			}
 		}
 
 		/*
@@ -116,7 +119,10 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		@Override
 		public void send(final URI receiverUri, final byte[] message,
 				final String tag) throws IOException {
-			sendLocal(receiverUri, message);
+			if (!sendLocal(receiverUri, message)) {
+				throw new IOException("No local agent found at:"
+						+ receiverUri.toASCIIString());
+			}
 		}
 
 		/*
@@ -127,7 +133,10 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		@Override
 		public void send(final URI receiverUri, final Object message,
 				final String tag) throws IOException {
-			sendLocal(receiverUri, message);
+			if (!sendLocal(receiverUri, message)) {
+				throw new IOException("No local agent found at:"
+						+ receiverUri.toASCIIString());
+			}
 		}
 
 		/*
