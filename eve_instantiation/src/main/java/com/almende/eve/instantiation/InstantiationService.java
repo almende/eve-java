@@ -38,7 +38,7 @@ public class InstantiationService implements Capability {
 	/**
 	 * Instantiates a new wake service.
 	 */
-	public InstantiationService() {};
+	public InstantiationService() {}
 
 	/**
 	 * Instantiates a new InstantiationService.

@@ -11,13 +11,12 @@ import java.io.InputStream;
  * The Class StringUtil.
  */
 public final class StringUtil {
-	
+
 	/**
 	 * Instantiates a new string util.
 	 */
-	private StringUtil() {
-	};
-	
+	private StringUtil() {}
+
 	/**
 	 * Convert a stream to a string.
 	 * 

@@ -19,7 +19,7 @@ public class MyAgent extends Agent {
 	/**
 	 * Instantiates a new my agent.
 	 */
-	public MyAgent() {};
+	public MyAgent() {}
 
 	/**
 	 * Instantiates a new my agent.

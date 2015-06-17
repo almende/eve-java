@@ -180,10 +180,12 @@ public final class Key implements Comparable<Key> {
 		if (o == null) {
 			return false;
 		}
-		if (!(o instanceof Key))
+		if (!(o instanceof Key)) {
 			return false;
-		if (o == this)
+		}
+		if (o == this) {
 			return true;
+		}
 		final Key other = (Key) o;
 		return (val.equals(other.val));
 	}
@@ -213,8 +215,9 @@ public final class Key implements Comparable<Key> {
 	// From: http://stackoverflow.com/a/140861
 	private static byte[] hexToBytes(String s) {
 		int len = s.length();
-		if (len %2 == 1){
-			throw new IllegalArgumentException("HexString uneven length:'"+s+"'");
+		if (len % 2 == 1) {
+			throw new IllegalArgumentException("HexString uneven length:'" + s
+					+ "'");
 		}
 		byte[] data = new byte[len / 2];
 		for (int i = 0; i < len; i += 2) {
@@ -230,12 +233,15 @@ public final class Key implements Comparable<Key> {
 	 */
 	@Override
 	public int compareTo(Key o) {
-		if (this.equals(o))
+		if (this.equals(o)) {
 			return 0;
-		if (rank() > o.rank())
+		}
+		if (rank() > o.rank()) {
 			return 1;
-		if (rank() < o.rank())
+		}
+		if (rank() < o.rank()) {
 			return -1;
+		}
 		int index = dist(o).rank() - 1;
 		return val.get(index) ? 1 : -1;
 	}

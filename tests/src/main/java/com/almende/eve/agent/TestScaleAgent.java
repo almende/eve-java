@@ -42,7 +42,7 @@ public class TestScaleAgent extends Agent {
 		super(id, config);
 		this.parent = parent;
 		getState().put("key", "value");
-		if (nofChildren.size() > 0) {
+		if (!nofChildren.isEmpty()) {
 			for (int i = 0; i < nofChildren.get(0); i++) {
 				Agent newAgent = new TestScaleAgent(id + "_" + i, config,
 						getUrls().get(0), nofChildren.subList(1,
@@ -94,7 +94,7 @@ public class TestScaleAgent extends Agent {
 		}
 		getState().get("key", String.class);
 		resCount[0] = children.size();
-		if (children.size() > 0) {
+		if (!children.isEmpty()) {
 			for (URI child : children) {
 				caller.call(child, "requestLeafs", null);
 			}
@@ -119,7 +119,7 @@ public class TestScaleAgent extends Agent {
 	public List<URI> getAllLeafs() throws IOException {
 		result.clear();
 		resCount[0] = children.size();
-		if (children.size() > 0) {
+		if (!children.isEmpty()) {
 			for (URI child : children) {
 				caller.call(child, "requestLeafs", null);
 			}

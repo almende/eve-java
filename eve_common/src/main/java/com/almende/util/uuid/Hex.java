@@ -1,12 +1,9 @@
 /*
  * Hex.java
- * 
  * Created 04.07.2003.
- * 
  * eaio: UUID - an implementation of the UUID specification Copyright (c)
  * 2003-2013 Johann Burkard (jb@eaio.com)
  * http://eaio.com.
- * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated
  * documentation files (the "Software"), to deal in the Software without
@@ -15,11 +12,9 @@
  * sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to the
  * following conditions:
- * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the
  * Software.
- * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE
  * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,17 +36,16 @@ import java.io.IOException;
  * @see <a href="http://johannburkard.de/software/uuid/">UUID</a>
  */
 public final class Hex {
-	
+
 	/**
 	 * Instantiates a new hex.
 	 */
-	private Hex() {
-	};
-	
+	private Hex() {}
+
 	/** The Constant DIGITS. */
 	private static final char[]	DIGITS	= { '0', '1', '2', '3', '4', '5', '6',
 			'7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-	
+
 	/**
 	 * Turns a <code>short</code> into hex octets.
 	 * 
@@ -64,7 +58,7 @@ public final class Hex {
 	public static Appendable append(final Appendable a, final short in) {
 		return append(a, (long) in, 4);
 	}
-	
+
 	/**
 	 * Turns a <code>short</code> into hex octets.
 	 * 
@@ -80,7 +74,7 @@ public final class Hex {
 			final int length) {
 		return append(a, (long) in, length);
 	}
-	
+
 	/**
 	 * Turns an <code>int</code> into hex octets.
 	 * 
@@ -93,7 +87,7 @@ public final class Hex {
 	public static Appendable append(final Appendable a, final int in) {
 		return append(a, (long) in, 8);
 	}
-	
+
 	/**
 	 * Turns an <code>int</code> into hex octets.
 	 * 
@@ -109,7 +103,7 @@ public final class Hex {
 			final int length) {
 		return append(a, (long) in, length);
 	}
-	
+
 	/**
 	 * Turns a <code>long</code> into hex octets.
 	 * 
@@ -122,7 +116,7 @@ public final class Hex {
 	public static Appendable append(final Appendable a, final long in) {
 		return append(a, in, 16);
 	}
-	
+
 	/**
 	 * Turns a <code>long</code> into hex octets.
 	 * 
@@ -147,7 +141,7 @@ public final class Hex {
 		}
 		return a;
 	}
-	
+
 	/**
 	 * Turns a <code>byte</code> array into hex octets.
 	 * 
@@ -168,7 +162,7 @@ public final class Hex {
 		}
 		return a;
 	}
-	
+
 	/**
 	 * Parses a <code>long</code> from a hex encoded number. This method will
 	 * skip all characters that are not 0-9,
@@ -204,7 +198,7 @@ public final class Hex {
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Parses a <code>short</code> from a hex encoded number. This method will
 	 * skip all characters that are not 0-9,
@@ -240,5 +234,5 @@ public final class Hex {
 		}
 		return out;
 	}
-	
+
 }

@@ -31,7 +31,7 @@ final class NamespaceUtil {
 	/**
 	 * Instantiates a new namespace util.
 	 */
-	private NamespaceUtil() {};
+	private NamespaceUtil() {}
 
 	/**
 	 * Populate cache.

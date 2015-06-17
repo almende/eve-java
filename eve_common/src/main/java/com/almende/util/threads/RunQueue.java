@@ -204,8 +204,7 @@ public class RunQueue extends AbstractExecutorService {
 	@Override
 	public boolean isTerminated() {
 		return isShutdown
-				&& (running.size() == 0 && waiting.size() == 0 && reserve
-						.size() == 0);
+				&& (running.isEmpty() && waiting.isEmpty() && reserve.isEmpty());
 	}
 
 	@Override
@@ -213,11 +212,11 @@ public class RunQueue extends AbstractExecutorService {
 			throws InterruptedException {
 		final long sleepTime = TimeUnit.MILLISECONDS.convert(timeout, unit);
 		synchronized (terminationLock) {
-			while (!(running.size() == 0 && waiting.size() == 0)) {
+			while (!(running.isEmpty() && waiting.isEmpty())) {
 				terminationLock.wait(sleepTime);
 			}
 		}
-		return (running.size() == 0 && waiting.size() == 0 && reserve.size() == 0);
+		return (running.isEmpty() && waiting.isEmpty() && reserve.isEmpty());
 	}
 
 	private boolean addTask(final Runnable command) {
@@ -403,7 +402,7 @@ public class RunQueue extends AbstractExecutorService {
 				interval = interval > 1 ? interval / 2 : 1;
 			}
 		}
-		while (tasks.size() > 0) {
+		while (!tasks.isEmpty()) {
 			Worker thread = getFreeThread();
 			if (thread != null) {
 				threadDone(thread);

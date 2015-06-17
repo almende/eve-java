@@ -39,7 +39,7 @@ public class JSONMessage implements Serializable {
 	/**
 	 * Instantiates a new JSON message.
 	 */
-	public JSONMessage() {};
+	public JSONMessage() {}
 
 	/**
 	 * Instantiates a new JSON message.

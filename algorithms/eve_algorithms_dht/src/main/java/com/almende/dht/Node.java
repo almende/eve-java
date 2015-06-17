@@ -10,17 +10,16 @@ import java.net.URI;
 /**
  * The Class Node.
  */
-public class Node implements Serializable, Comparable<Node>{
-	private static final long serialVersionUID = 941011043741195069L;
-	private Key key;
-	private URI uri;
+public class Node implements Serializable, Comparable<Node> {
+	private static final long	serialVersionUID	= 941011043741195069L;
+	private Key					key;
+	private URI					uri;
 
 	/**
 	 * Instantiates a new node.
 	 */
-	public Node() {
-	};
-	
+	public Node() {}
+
 	/**
 	 * Instantiates a new node.
 	 *
@@ -29,9 +28,9 @@ public class Node implements Serializable, Comparable<Node>{
 	 * @param uri
 	 *            the uri
 	 */
-	public Node(final Key key, final URI uri){
-		this.key=key;
-		this.uri=uri;
+	public Node(final Key key, final URI uri) {
+		this.key = key;
+		this.uri = uri;
 	}
 
 	/**
@@ -71,33 +70,37 @@ public class Node implements Serializable, Comparable<Node>{
 	public void setUri(URI uri) {
 		this.uri = uri;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-	public String toString(){
-		return key+":"+uri.toASCIIString();
+	public String toString() {
+		return key + ":" + uri.toASCIIString();
 	}
 
 	@Override
 	public int compareTo(Node o) {
 		return key.compareTo(o.getKey());
 	}
-	
+
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return key.hashCode();
 	}
+
 	@Override
-	public boolean equals(Object o){
+	public boolean equals(Object o) {
 		if (o == null) {
 			return false;
 		}
-		if (!(o instanceof Node))
+		if (!(o instanceof Node)) {
 			return false;
-		if (o == this)
+		}
+		if (o == this) {
 			return true;
+		}
 		final Node other = (Node) o;
 		return key.equals(other.getKey());
 	}

@@ -33,13 +33,12 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	private String					revision	= null;
 	private Map<String, JsonNode>	properties	= new ConcurrentHashMap<String, JsonNode>();
 	private CouchDbConnector		db			= null;
-	
+
 	/**
 	 * Instantiates a new couch state.
 	 */
-	public CouchState() {
-	}
-	
+	public CouchState() {}
+
 	/**
 	 * Instantiates a new couch state.
 	 * 
@@ -57,7 +56,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		super(id, service, params);
 		this.db = db;
 	}
-	
+
 	/**
 	 * Read.
 	 */
@@ -71,13 +70,11 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 					properties.putAll(state.properties);
 				}
 			}
-		} catch (final org.ektorp.DocumentNotFoundException e) {
-		}
+		} catch (final org.ektorp.DocumentNotFoundException e) {}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
 	 * com.fasterxml.jackson.databind.JsonNode)
 	 */
@@ -96,13 +93,12 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to store property", e);
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * com.almende.eve.state.AbstractState#locPutIfUnchanged(java.lang.String,
 	 * com.fasterxml.jackson.databind.JsonNode,
@@ -121,7 +117,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 			if (oldVal == null) {
 				oldVal = NullNode.getInstance();
 			}
-			
+
 			// Poor mans equality as some Numbers are compared incorrectly: e.g.
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
@@ -137,19 +133,18 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.State#remove(java.lang.String)
 	 */
 	@Override
 	public Object remove(final String key) {
 		final String ckey = couchify(key);
-		
+
 		Object result = null;
 		try {
 			synchronized (properties) {
@@ -161,10 +156,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.State#containsKey(java.lang.String)
 	 */
 	@Override
@@ -182,10 +176,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.State#keySet()
 	 */
 	@Override
@@ -202,10 +195,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.State#clear()
 	 */
 	@Override
@@ -219,10 +211,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 			LOG.log(Level.WARNING, "Failed clearing state", e);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.State#size()
 	 */
 	@Override
@@ -235,10 +226,9 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.almende.eve.state.AbstractState#get(java.lang.String)
 	 */
 	@Override
@@ -251,13 +241,13 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 				read();
 				result = properties.get(key);
 			}
-			
+
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "", e);
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -267,8 +257,8 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	@JsonProperty("_id")
 	public String getId() {
 		return super.getId();
-	};
-	
+	}
+
 	/**
 	 * Sets the id.
 	 * 
@@ -280,7 +270,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public void setId(final String id) {
 		super.setId(id);
 	}
-	
+
 	/**
 	 * Gets the revision.
 	 * 
@@ -291,7 +281,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public String getRevision() {
 		return revision;
 	}
-	
+
 	/**
 	 * Sets the revision.
 	 * 
@@ -302,7 +292,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public void setRevision(final String revision) {
 		this.revision = revision;
 	}
-	
+
 	/**
 	 * Gets the properties.
 	 * 
@@ -311,7 +301,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public Map<String, JsonNode> getProperties() {
 		return properties;
 	}
-	
+
 	/**
 	 * Sets the properties.
 	 * 
@@ -321,7 +311,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public void setProperties(final Map<String, JsonNode> properties) {
 		this.properties = properties;
 	}
-	
+
 	/**
 	 * Sets the db.
 	 * 
@@ -331,7 +321,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 	public void setDb(final CouchDbConnector db) {
 		this.db = db;
 	}
-	
+
 	/**
 	 * Check the key if it starts with a _
 	 * Add a prefix if this is the case, because _ properties are reserved.
@@ -344,10 +334,10 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		if (key.startsWith("_")) {
 			return "cdb" + key;
 		}
-		
+
 		return key;
 	}
-	
+
 	/**
 	 * Check the key if it starts with a _
 	 * Add a prefix if this is the case, because _ properties are reserved.
@@ -360,7 +350,7 @@ public class CouchState extends AbstractState<JsonNode> implements State {
 		if (key.startsWith("cdb_")) {
 			return key.replaceFirst("cdb_", "_");
 		}
-		
+
 		return key;
 	}
 }

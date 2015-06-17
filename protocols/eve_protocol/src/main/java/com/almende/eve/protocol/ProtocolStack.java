@@ -56,7 +56,7 @@ public class ProtocolStack {
 			final Protocol protocol = iter.next();
 			if (!protocol.outbound(wrapper)){
 				return null;
-			};
+			}
 		}
 		return wrapper;
 	}

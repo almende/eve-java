@@ -71,7 +71,7 @@ public final class AnnotationUtil {
 																.getName());
 	private static Map<String, AnnotatedClass>	cache	= new ConcurrentHashMap<String, AnnotatedClass>();
 
-	private AnnotationUtil() {};
+	private AnnotationUtil() {}
 
 	/**
 	 * Get all annotations of a class, methods, and parameters.

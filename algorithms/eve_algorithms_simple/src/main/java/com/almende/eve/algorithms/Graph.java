@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -61,12 +62,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class Graph {
 	private static final Logger								LOG			= Logger.getLogger(Graph.class
 																				.getName());
+	private static final Map<String, AsyncCallback<URI>>	CALLBACKS	= new HashMap<String, AsyncCallback<URI>>();
 	private Caller											caller		= null;
 	private double											probSFN		= Math.random();
-	private static final Map<String, AsyncCallback<URI>>	callbacks	= new HashMap<String, AsyncCallback<URI>>();
 
 	private Edge[]											edges		= new Edge[0];
-	transient private TreeSet<Edge>							set			= null;
+	private transient SortedSet<Edge>						set			= null;
+
+	// LinkedList
+	private Map<String, Comparable<ObjectNode>>				comparators	= new HashMap<String, Comparable<ObjectNode>>();
+	private ReentrantLock									lllock		= new ReentrantLock();
 
 	/**
 	 * Instantiates a new network rpc.
@@ -118,7 +123,7 @@ public class Graph {
 	 * @return the tree set
 	 */
 	@JsonIgnore
-	public synchronized TreeSet<Edge> getTreeSet() {
+	public synchronized SortedSet<Edge> getSortedSet() {
 		if (set == null) {
 			set = new TreeSet<Edge>();
 			set.addAll(Arrays.asList(edges));
@@ -135,7 +140,7 @@ public class Graph {
 	 */
 	@JsonIgnore
 	public synchronized Edge[] getTopX(final int x) {
-		Edge[] tree = getTreeSet().toArray(new Edge[0]);
+		Edge[] tree = getSortedSet().toArray(new Edge[0]);
 		List<Edge> res = new ArrayList<Edge>(x);
 		for (int i = 0; i < x && i < tree.length; i++) {
 			res.add(tree[i]);
@@ -203,31 +208,36 @@ public class Graph {
 	}
 
 	// LinkedList
-	private Map<String, Comparable<ObjectNode>>	comparators	= new HashMap<String, Comparable<ObjectNode>>();
-	private ReentrantLock						ll_lock		= new ReentrantLock();
 	class Links {
 		private Boolean	done	= false;
 		private URI		prev	= null;
 		private URI		next	= null;
-		public Links(){}
+
+		public Links() {}
+
 		public Boolean getDone() {
 			return done;
 		}
+
 		public void setDone(Boolean done) {
 			this.done = done;
 		}
+
 		public URI getPrev() {
 			return prev;
 		}
+
 		public void setPrev(URI prev) {
 			this.prev = prev;
 		}
+
 		public URI getNext() {
 			return next;
 		}
+
 		public void setNext(URI next) {
 			this.next = next;
-		};
+		}
 	}
 
 	/**
@@ -256,13 +266,14 @@ public class Graph {
 	 * @return the links
 	 */
 	@Access(AccessType.PUBLIC)
-	public Links llrequest(@Name("tag") String tag, @Name("request") Links request, @Sender URI sender){
+	public Links llrequest(@Name("tag") String tag,
+			@Name("request") Links request, @Sender URI sender) {
 		final Links res = new Links();
-		if (!ll_lock.tryLock()) {
+		if (!lllock.tryLock()) {
 			return res;
 		}
-		//TODO!
-		ll_lock.unlock();
+		// TODO!
+		lllock.unlock();
 		return res;
 	}
 
@@ -278,15 +289,13 @@ public class Graph {
 	 *            the tag
 	 * @param m
 	 *            the number of new edges to attach
-	 * @param l
-	 *            the length of the initial randomWalk.
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.PUBLIC)
 	public void addNode2SFN(final @Name("start") URI start,
-			final @Name("tag") String tag, final @Name("nofEdges") int m,
-			final @Optional @Name("initialWalk") Integer l) throws IOException {
+			final @Name("tag") String tag, final @Name("nofEdges") int m)
+			throws IOException {
 		final Set<URI> others = new HashSet<URI>(m);
 		Params params = new Params();
 		params.add("tag", tag);
@@ -319,14 +328,14 @@ public class Graph {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Access(AccessType.PUBLIC)
-	public URI doRandomWalk(@Name("tag") String tag,
+	public URI doRandomWalk(final @Name("tag") String tag,
 			@Optional @Name("steps") Integer steps) throws IOException {
 		if (steps == null) {
 			steps = Math.random() > probSFN ? 2 : 1;
 		}
 		SyncCallback<URI> callback = new SyncCallback<URI>();
 		String runId = new UUID().toString();
-		callbacks.put(runId, callback);
+		CALLBACKS.put(runId, callback);
 		randomWalk(tag, steps, caller.getSenderUrls().get(0), runId);
 		try {
 			return callback.get();
@@ -385,7 +394,7 @@ public class Graph {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void reportRandomWalk(@Sender URI other, @Name("runId") String runId) {
-		AsyncCallback<URI> callback = callbacks.remove(runId);
+		AsyncCallback<URI> callback = CALLBACKS.remove(runId);
 		callback.onSuccess(other);
 	}
 }

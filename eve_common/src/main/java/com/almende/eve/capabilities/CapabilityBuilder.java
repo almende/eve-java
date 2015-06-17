@@ -4,12 +4,12 @@
  */
 package com.almende.eve.capabilities;
 
-
 /**
  * The Class CapabilityBuilder.
  *
- * @param <T> the generic type
+ * @param <T>
+ *            the generic type
  */
-public final class CapabilityBuilder<T extends Capability> extends AbstractCapabilityBuilder<T> {
-
+public final class CapabilityBuilder<T extends Capability> extends
+		AbstractCapabilityBuilder<T> {
 }

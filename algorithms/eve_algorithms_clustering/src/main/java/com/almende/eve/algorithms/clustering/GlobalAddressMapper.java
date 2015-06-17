@@ -16,7 +16,7 @@ public final class GlobalAddressMapper {
 	private static final GlobalAddressMapper	INSTANCE	= new GlobalAddressMapper();
 	private Map<String, URI>					map			= new HashMap<String, URI>();
 
-	private GlobalAddressMapper() {};
+	private GlobalAddressMapper() {}
 
 	/**
 	 * Sets the map, allowing different map storage strategies.

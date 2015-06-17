@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,7 +87,7 @@ public final class JOM {
 	 * 
 	 * @return the object mapper
 	 */
-	private synchronized static ObjectMapper createInstance() {
+	private static synchronized ObjectMapper createInstance() {
 		final ObjectMapper mapper = new ObjectMapper();
 
 		mapper.setNodeFactory(new JsonNodeFactory() {
@@ -108,7 +107,7 @@ public final class JOM {
 				DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, false);
 		mapper.getFactory().configure(
 				JsonFactory.Feature.CANONICALIZE_FIELD_NAMES, false);
-		
+
 		// Needed for o.a. JsonFileState
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
@@ -130,7 +129,7 @@ public final class JOM {
 			}
 		};
 		mapper.registerModule(throwableModule);
-	
+
 		SimpleModule bitSetModule = new SimpleModule("BitSetModule",
 				new Version(1, 0, 0, null, null, null));
 		bitSetModule.addSerializer(new CustomBitSetSerializer());
@@ -154,32 +153,6 @@ public final class JOM {
 	 */
 	public static TypeFactory getTypeFactory() {
 		return getInstance().getTypeFactory();
-	}
-
-	/**
-	 * Gets the void.
-	 * 
-	 * @return the void
-	 * @deprecated This method is no longer needed, you can directly use
-	 *             Void.class
-	 */
-	@Deprecated
-	public static JavaType getVoid() {
-		return getInstance().getTypeFactory().uncheckedSimpleType(Void.class);
-	}
-
-	/**
-	 * Gets the simple type.
-	 * 
-	 * @param c
-	 *            the c
-	 * @return the simple type
-	 * @deprecated This method is no longer needed, you can directly use
-	 *             <Class>.class, e.g. String.class
-	 */
-	@Deprecated
-	public static JavaType getSimpleType(final Class<?> c) {
-		return getInstance().getTypeFactory().uncheckedSimpleType(c);
 	}
 
 	/**
@@ -293,14 +266,14 @@ public final class JOM {
 	}
 
 	// From: http://stackoverflow.com/a/9855338
-	final private static char[]	hexArray	= "0123456789ABCDEF".toCharArray();
+	private static final char[]	HEXARRAY	= "0123456789ABCDEF".toCharArray();
 
 	private static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
 		for (int j = 0; j < bytes.length; j++) {
 			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+			hexChars[j * 2] = HEXARRAY[v >>> 4];
+			hexChars[j * 2 + 1] = HEXARRAY[v & 0x0F];
 		}
 		return new String(hexChars);
 	}

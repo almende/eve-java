@@ -39,7 +39,7 @@ public final class EncryptionUtil {
 	 * Instantiates a new encryption util.
 	 */
 	private EncryptionUtil() {
-	};
+	}
 	
 	/**
 	 * master password:

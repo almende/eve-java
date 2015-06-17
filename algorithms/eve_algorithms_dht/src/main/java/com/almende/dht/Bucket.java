@@ -76,7 +76,7 @@ public class Bucket {
 	/**
 	 * Instantiates a new bucket.
 	 */
-	public Bucket(){};
+	public Bucket(){}
 	
 	/**
 	 * Instantiates a new bucket.
@@ -87,7 +87,7 @@ public class Bucket {
 	public Bucket(final int rank) {
 		this.meta.setRank(rank);
 		this.nodes = new LinkedHashMap<Key, Node>(Constants.K,(float) 0.75,true);
-	};
+	}
 
 	
 	/**

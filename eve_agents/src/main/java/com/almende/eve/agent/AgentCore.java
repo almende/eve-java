@@ -474,8 +474,9 @@ public class AgentCore implements Receiver, Configurable {
 	@Access(AccessType.UNAVAILABLE)
 	protected void cancel(final String taskId) {
 		final Scheduler scheduler = this.scheduler;
-		if (scheduler == null)
+		if (scheduler == null) {
 			return;
+		}
 		scheduler.cancel(taskId);
 	}
 

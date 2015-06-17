@@ -60,7 +60,7 @@ public final class UUIDGen {
 	 * Instantiates a new uUID gen.
 	 */
 	private UUIDGen() {
-	};
+	}
 	
 	/**
 	 * The last time value. Used to remove duplicate UUIDs.
@@ -160,6 +160,7 @@ public final class UUIDGen {
 						p.getErrorStream().close();
 						p.getOutputStream().close();
 					} catch (final Exception e) {
+						//ignore it
 					}
 					p.destroy();
 				}
@@ -295,6 +296,7 @@ public final class UUIDGen {
 					p.getErrorStream().close();
 					p.getOutputStream().close();
 				} catch (final Exception e) {
+					//ignore it
 				}
 				p.destroy();
 			}

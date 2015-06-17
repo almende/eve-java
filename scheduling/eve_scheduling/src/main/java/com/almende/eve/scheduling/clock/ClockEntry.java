@@ -19,7 +19,7 @@ public class ClockEntry implements Comparable<ClockEntry> {
 	/**
 	 * Instantiates a new clock entry.
 	 */
-	public ClockEntry() {};
+	public ClockEntry() {}
 
 	/**
 	 * Instantiates a new clock entry.

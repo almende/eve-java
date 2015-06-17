@@ -33,7 +33,6 @@ public class NodeAgent extends Agent implements NodeAgentInterface {
 	// http://arxiv.org/pdf/1105.3347.pdf
 	private static final int	INITNODEMAX			= 10;
 	private static final int	NOFEDGESPERNODE		= 3;
-	private static final int	INITIALWALKLENGTH	= 7;
 
 	public void addNode2SFN(final String tag) {
 		if (initialNodeCount[0] < 10) {
@@ -74,8 +73,7 @@ public class NodeAgent extends Agent implements NodeAgentInterface {
 			}
 		}
 		try {
-			getGraph().addNode2SFN(initialNodes[0], tag, NOFEDGESPERNODE,
-					INITIALWALKLENGTH);
+			getGraph().addNode2SFN(initialNodes[0], tag, NOFEDGESPERNODE);
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Couldn't join SFN!", e);
 		}

@@ -20,16 +20,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimulationInboxProtocol.
  */
 public class SimulationInboxProtocol extends InboxProtocol {
-	private final static Boolean[]			isWork			= new Boolean[] { false };
+	private final static Boolean[]			ISWORK			= new Boolean[] { false };
 
-	private final static Integer[]			inboxCnt		= new Integer[] { 0 };
-	private final static Integer[]			latch			= new Integer[] { 0 };
+	private final static Integer[]			INBOXCNT		= new Integer[] { 0 };
+	private final static Integer[]			LATCH			= new Integer[] { 0 };
 	private BlockingQueue<Meta>				outbox			= new PriorityBlockingQueue<Meta>();
 	private SimulationInboxProtocolConfig	params			= null;
 
 	private boolean							isAtomicNetwork	= false;
-	private final static Integer[]			msgInCnt		= new Integer[] { 0 };
-	private final static Integer[]			msgOutCnt		= new Integer[] { 0 };
+	private final static Integer[]			MSGINCNT		= new Integer[] { 0 };
+	private final static Integer[]			MSGOUTCNT		= new Integer[] { 0 };
 
 	/**
 	 * Instantiates a new simulation inbox protocol.
@@ -43,8 +43,8 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		super(params, handle, false);
 		this.params = SimulationInboxProtocolConfig.decorate(params);
 		isAtomicNetwork = this.params.isAtomicNetwork();
-		synchronized (inboxCnt) {
-			inboxCnt[0]++;
+		synchronized (INBOXCNT) {
+			INBOXCNT[0]++;
 		}
 		initLooper();
 	}
@@ -57,8 +57,8 @@ public class SimulationInboxProtocol extends InboxProtocol {
 	 */
 	public static void schedulerOut(final int count) {
 		inWork();
-		synchronized (msgOutCnt) {
-			msgOutCnt[0] += count;
+		synchronized (MSGOUTCNT) {
+			MSGOUTCNT[0] += count;
 		}
 	}
 
@@ -78,10 +78,10 @@ public class SimulationInboxProtocol extends InboxProtocol {
 					}
 				}
 			}
-			synchronized (msgOutCnt) {
+			synchronized (MSGOUTCNT) {
 				res = super.outbound(msg);
 				if (res) {
-					msgOutCnt[0]++;
+					MSGOUTCNT[0]++;
 				}
 			}
 		} else {
@@ -119,13 +119,13 @@ public class SimulationInboxProtocol extends InboxProtocol {
 					return res;
 				}
 			}
-			synchronized (msgInCnt) {
-				msgInCnt[0]++;
-				synchronized (msgOutCnt) {
-					if (msgInCnt[0] == msgOutCnt[0]) {
-						msgInCnt[0] = 0;
-						msgOutCnt[0] = 0;
-						msgInCnt.notifyAll();
+			synchronized (MSGINCNT) {
+				MSGINCNT[0]++;
+				synchronized (MSGOUTCNT) {
+					if (MSGINCNT[0] == MSGOUTCNT[0]) {
+						MSGINCNT[0] = 0;
+						MSGOUTCNT[0] = 0;
+						MSGINCNT.notifyAll();
 					}
 				}
 			}
@@ -134,41 +134,41 @@ public class SimulationInboxProtocol extends InboxProtocol {
 	}
 
 	private static void inWork() {
-		if (!isWork[0]) {
-			synchronized (isWork) {
-				isWork[0] = true;
-				isWork.notifyAll();
+		if (!ISWORK[0]) {
+			synchronized (ISWORK) {
+				ISWORK[0] = true;
+				ISWORK.notifyAll();
 			}
 		}
 	}
 
 	private static void outOfWork() {
-		if (isWork[0]) {
-			synchronized (isWork) {
-				isWork[0] = false;
+		if (ISWORK[0]) {
+			synchronized (ISWORK) {
+				ISWORK[0] = false;
 			}
 		}
 	}
 
 	private void waitForWork() {
-		synchronized (isWork) {
-			while (!isWork[0]) {
+		synchronized (ISWORK) {
+			while (!ISWORK[0]) {
 				try {
-					isWork.wait();
+					ISWORK.wait();
 				} catch (InterruptedException e) {}
 			}
 		}
 	}
 
 	private void waitForNetwork() {
-		synchronized (msgInCnt) {
+		synchronized (MSGINCNT) {
 			boolean wait = false;
-			synchronized (msgOutCnt) {
-				wait = msgInCnt[0] != msgOutCnt[0];
+			synchronized (MSGOUTCNT) {
+				wait = MSGINCNT[0] != MSGOUTCNT[0];
 			}
 			if (wait) {
 				try {
-					msgInCnt.wait();
+					MSGINCNT.wait();
 				} catch (InterruptedException e) {}
 			}
 		}
@@ -176,14 +176,14 @@ public class SimulationInboxProtocol extends InboxProtocol {
 
 	private void waitForHeartBeat() {
 		waitForWork();
-		synchronized (latch) {
-			latch[0]++;
-			if (latch[0] == inboxCnt[0]) {
-				latch[0] = 0;
-				latch.notifyAll();
+		synchronized (LATCH) {
+			LATCH[0]++;
+			if (LATCH[0] == INBOXCNT[0]) {
+				LATCH[0] = 0;
+				LATCH.notifyAll();
 			} else {
 				try {
-					latch.wait();
+					LATCH.wait();
 				} catch (InterruptedException e) {}
 			}
 		}
@@ -200,8 +200,9 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		if (outbox.isEmpty()) {
 			outOfWork();
 		}
-	};
+	}
 
+	@Override
 	public Meta getNext(BlockingQueue<Meta> inbox) throws InterruptedException {
 		if (!inbox.isEmpty()) {
 			return super.getNext(inbox);

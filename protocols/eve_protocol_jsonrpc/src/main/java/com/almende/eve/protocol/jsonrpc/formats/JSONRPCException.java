@@ -47,7 +47,7 @@ public class JSONRPCException extends RuntimeException {
 		NOT_FOUND,
 		/** The unauthorized. */
 		UNAUTHORIZED
-	};
+	}
 
 	/**
 	 * Instantiates a new jSONRPC exception.

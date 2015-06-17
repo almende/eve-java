@@ -59,11 +59,13 @@ public class QueueEntry implements Comparable<QueueEntry>, Meta {
 	public int compareTo(QueueEntry o) {
 		if (this.equals(o))
 			return 0;
-		if (meta == null || meta.getPeer() == null || id == null)
+		if (meta == null || meta.getPeer() == null || id == null) {
 			return -1;
+		}
 		if (o == null || o.meta == null || o.meta.getPeer() == null
-				|| o.id == null)
+				|| o.id == null) {
 			return 1;
+		}
 		int res = meta.getPeer().compareTo(o.meta.getPeer());
 		if (res == 0) {
 			res = id.compareTo(o.id);

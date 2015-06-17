@@ -140,7 +140,7 @@ public class DHT {
 			TimedValue tv = new TimedValue(value);
 
 			current.remove(tv);
-			if (current.size() > 0) {
+			if (!current.isEmpty()) {
 				values.put(key, current);
 			}
 		}
@@ -540,7 +540,7 @@ public class DHT {
 	 * @return true, if successful
 	 */
 	public boolean hasValues(){
-		return values.size()>0;
+		return !values.isEmpty();
 	}
 
 }

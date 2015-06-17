@@ -107,33 +107,52 @@ public class Edge implements Comparable<Edge> {
 		}
 		return 1;
 	}
-	
+
 	@Override
-	public boolean equals(Object o){
-		if (o == null){
+	public boolean equals(Object o) {
+		if (o == null) {
 			return false;
 		}
-		if (o == this){
+		if (o == this) {
 			return true;
 		}
-		if (!(o instanceof Edge)){
+		if (!(o instanceof Edge)) {
 			return false;
 		}
-		Edge other = (Edge)o;
-		if ( address == null && other.address != null) return false;
-		if ( address != null && !address.equals(other.address)) return false;
-		if ( tag == null && other.tag != null) return false;
-		if ( tag != null && !tag.equals(other.tag)) return false;
-		if ( weight == null && other.weight != null) return false;
-		if ( weight != null && !weight.equals(other.weight)) return false;
+		Edge other = (Edge) o;
+		if (address == null && other.address != null) {
+			return false;
+		}
+		if (address != null && !address.equals(other.address)) {
+			return false;
+		}
+		if (tag == null && other.tag != null) {
+			return false;
+		}
+		if (tag != null && !tag.equals(other.tag)) {
+			return false;
+		}
+		if (weight == null && other.weight != null) {
+			return false;
+		}
+		if (weight != null && !weight.equals(other.weight)) {
+			return false;
+		}
 		return true;
 	}
+
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		int res = Integer.MAX_VALUE;
-		if (address != null ) res ^= address.hashCode();
-		if (tag != null) res ^= tag.hashCode();
-		if (weight != null) res ^= weight.hashCode();
+		if (address != null) {
+			res ^= address.hashCode();
+		}
+		if (tag != null) {
+			res ^= tag.hashCode();
+		}
+		if (weight != null) {
+			res ^= weight.hashCode();
+		}
 		return res;
 	}
 }

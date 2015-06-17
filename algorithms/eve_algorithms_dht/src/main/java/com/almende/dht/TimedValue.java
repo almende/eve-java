@@ -26,11 +26,12 @@ public class TimedValue implements Comparable<TimedValue> {
 	 * @param value
 	 *            the value
 	 */
-	public TimedValue(ObjectNode value){
-		this.value=value;
+	public TimedValue(ObjectNode value) {
+		this.value = value;
 		this.storedTime = System.currentTimeMillis();
 		this.expirationDuration = Constants.EXPIRE;
 	}
+
 	/**
 	 * Gets the value.
 	 *
@@ -100,47 +101,50 @@ public class TimedValue implements Comparable<TimedValue> {
 		this.storedTime = storedTime;
 		this.value = value;
 	}
-	
+
 	/**
 	 * Store.
 	 *
 	 * @param value
 	 *            the value
 	 */
-	public void store(final ObjectNode value){
-		store(value,System.currentTimeMillis());
+	public void store(final ObjectNode value) {
+		store(value, System.currentTimeMillis());
 	}
-	
+
 	/**
 	 * Get remaining expire duration.
 	 *
 	 * @return the amount of ms until this value is expired.
 	 */
-	public long getTtl(){
-		return this.storedTime + this.expirationDuration - System.currentTimeMillis();
+	public long getTtl() {
+		return this.storedTime + this.expirationDuration
+				- System.currentTimeMillis();
 	}
 
 	@Override
-	public boolean equals(final Object o){
-		if (o == null) return false;
-		if (!(o instanceof TimedValue)){
+	public boolean equals(final Object o) {
+		if (o == null) {
 			return false;
 		}
-		TimedValue other = (TimedValue)o;
-		if (this.value.equals(other.value)){
+		if (!(o instanceof TimedValue)) {
+			return false;
+		}
+		TimedValue other = (TimedValue) o;
+		if (this.value.equals(other.value)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return this.value.hashCode();
 	}
-	
+
 	@Override
-	//Newest first 
+	// Newest first
 	public int compareTo(TimedValue o) {
 		return ((storedTime == o.storedTime) ? 0
 				: (storedTime < o.storedTime ? 1 : -1));

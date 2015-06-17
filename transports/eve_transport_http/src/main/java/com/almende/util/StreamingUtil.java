@@ -35,13 +35,12 @@ public final class StreamingUtil {
 		mimeTypes.put("basic", "audio/basic");
 		mimeTypes.put("wav", "audio/wav");
 	}
-	
+
 	/**
 	 * Instantiates a new streaming util.
 	 */
-	private StreamingUtil() {
-	};
-	
+	private StreamingUtil() {}
+
 	/**
 	 * Stream an input stream to a servlet response.
 	 * 
@@ -68,12 +67,10 @@ public final class StreamingUtil {
 			}
 		}
 	}
-	
+
 	/*
 	 * Retrieve the mimetype for a file extension
-	 * 
 	 * @param String extension xml or JPG etc.
-	 * 
 	 * @return String MIMEtype, for example "image/jpeg" or "application/pdf"
 	 */
 	/**
@@ -86,5 +83,5 @@ public final class StreamingUtil {
 	public static String getMimeType(final String format) {
 		return mimeTypes.get(format.toLowerCase());
 	}
-	
+
 }

@@ -14,7 +14,7 @@ public final class ClassUtil {
 	 * Instantiates a new class util.
 	 */
 	private ClassUtil() {
-	};
+	}
 	
 	/**
 	 * Check if checkClass has implemented interfaceClass.

@@ -154,8 +154,8 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	/**
 	 * Instantiates a new task entry.
 	 */
-	public TaskEntry() {};
-
+	public TaskEntry() {}
+	
 	/**
 	 * Instantiates a new task entry.
 	 *
