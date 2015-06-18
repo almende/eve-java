@@ -47,14 +47,12 @@ public class Trickle {
 	 *         the next interval
 	 */
 	public long[] next() {
-
 		currentInterval = Math.min(intervalMax, currentInterval * 2);
 		counter = 0;
-		final long[] result = {
+		return new long[] {
 				currentInterval
 						- Math.round(Math.random() * (currentInterval / 2)),
 				currentInterval };
-		return result;
 	}
 
 	/**
@@ -81,9 +79,9 @@ public class Trickle {
 	public long[] reset() {
 		if (currentInterval <= intervalMin) {
 			currentInterval = intervalMin;
-			return null;
+			return new long[0];
 		} else {
-			currentInterval = intervalMin/2;
+			currentInterval = intervalMin / 2;
 			return next();
 		}
 	}

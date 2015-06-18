@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class JSONRPC.
  */
-final public class JSONRpc {
+public final class JSONRpc {
 	private static final Logger	LOG	= Logger.getLogger(JSONRpc.class.getName());
 
 	static {
@@ -273,7 +273,7 @@ final public class JSONRpc {
 						}
 					}
 					result.set("params", params);
-					if (namespace.equals("*")) {
+					if ("*".equals(namespace)) {
 						namespace = (String) annotatedClass.getAnnotation(
 								Namespace.class).value();
 					}
@@ -284,7 +284,7 @@ final public class JSONRpc {
 						methodName = (String) anno.value();
 					}
 
-					final String fullName = namespace.equals("") ? methodName
+					final String fullName = namespace.isEmpty() ? methodName
 							: namespace + "." + methodName;
 					methods.set(fullName, result);
 				}

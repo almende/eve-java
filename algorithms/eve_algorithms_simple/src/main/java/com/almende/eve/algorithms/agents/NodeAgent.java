@@ -34,6 +34,31 @@ public class NodeAgent extends Agent implements NodeAgentInterface {
 	private static final int	INITNODEMAX			= 10;
 	private static final int	NOFEDGESPERNODE		= 3;
 
+
+	/**
+	 * Instantiates a new node agent.
+	 *
+	 * @param id
+	 *            the id
+	 * @param config
+	 *            the config
+	 */
+	public NodeAgent(String id, ObjectNode config) {
+		super(id, config);
+	}
+
+	/**
+	 * Instantiates a new node agent.
+	 */
+	public NodeAgent() {
+		super();
+	}
+
+	@Namespace("graph")
+	public Graph getGraph() {
+		return graph;
+	}
+	
 	public void addNode2SFN(final String tag) {
 		if (initialNodeCount[0] < 10) {
 			synchronized (initialNodeCount) {
@@ -77,29 +102,5 @@ public class NodeAgent extends Agent implements NodeAgentInterface {
 		} catch (IOException e) {
 			LOG.log(Level.WARNING, "Couldn't join SFN!", e);
 		}
-	}
-
-	/**
-	 * Instantiates a new node agent.
-	 *
-	 * @param id
-	 *            the id
-	 * @param config
-	 *            the config
-	 */
-	public NodeAgent(String id, ObjectNode config) {
-		super(id, config);
-	}
-
-	/**
-	 * Instantiates a new node agent.
-	 */
-	public NodeAgent() {
-		super();
-	}
-
-	@Namespace("graph")
-	public Graph getGraph() {
-		return graph;
 	}
 }

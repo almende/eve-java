@@ -32,7 +32,7 @@ public class MyFirstAgent extends Agent {
 	/**
 	 * Echo, this method answers the echo request directly.
 	 *
-	 * @param message
+	 * @param message 
 	 *            the message
 	 * @return the string
 	 */

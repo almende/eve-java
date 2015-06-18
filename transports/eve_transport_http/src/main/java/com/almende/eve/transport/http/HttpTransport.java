@@ -39,10 +39,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpTransport extends AbstractTransport {
 	private static final Logger					LOG			= Logger.getLogger(HttpTransport.class
 																	.getName());
-	private final AsyncCallbackStore<String>	callbacks;
-	private static final Executor				runner		= Executors
+	private static final Executor				RUNNER		= Executors
 																	.newCachedThreadPool(ThreadPool
 																			.getFactory());
+	private final AsyncCallbackStore<String>	callbacks;
 	private final TokenStore					tokenstore	= new TokenStore();
 	private final List<String>					protocols	= Arrays.asList(
 																	"http",
@@ -98,7 +98,7 @@ public class HttpTransport extends AbstractTransport {
 		final Handler<Receiver> handle = super.getHandle();
 		// Use fresh Executor instead of the RunQueue, as this thread will sleep
 		// most of it's run.
-		runner.execute(new Runnable() {
+		RUNNER.execute(new Runnable() {
 			@Override
 			public void run() {
 				HttpPost httpPost = null;

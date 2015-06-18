@@ -46,7 +46,7 @@ public class HttpService implements TransportService {
 
 		String servletLauncher = myParams.getServletLauncher();
 		if (servletLauncher != null) {
-			if (servletLauncher.equals("JettyLauncher")) {
+			if ("JettyLauncher".equals(servletLauncher)) {
 				servletLauncher = "com.almende.eve.transport.http.embed.JettyLauncher";
 			}
 			try {
@@ -208,8 +208,6 @@ public class HttpService implements TransportService {
 		}
 		if (transports.containsKey(address)) {
 			return transports.get(address);
-		} else {
-			// TODO: check for other HttpServices with this address?
 		}
 		return null;
 	}

@@ -27,13 +27,12 @@ public class DebugServlet extends EveServlet {
 	private static final String	RESOURCES			= "/com/almende/eve/resources/";
 	private static final Logger	LOG					= Logger.getLogger(DebugServlet.class
 															.getSimpleName());
-	
+
 	/**
 	 * Instantiates a new eve servlet.
 	 */
-	public DebugServlet() {
-	}
-	
+	public DebugServlet() {}
+
 	/**
 	 * Instantiates a new eve servlet.
 	 * 
@@ -43,7 +42,7 @@ public class DebugServlet extends EveServlet {
 	public DebugServlet(final URI servletUrl) {
 		super(servletUrl);
 	}
-	
+
 	private String getResource(final String url) {
 		String id = "";
 		if (myUrl != null) {
@@ -54,10 +53,9 @@ public class DebugServlet extends EveServlet {
 		}
 		return id.indexOf('/') < 0 ? null : id.substring(id.indexOf('/') + 1);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -66,7 +64,7 @@ public class DebugServlet extends EveServlet {
 	public void doPost(final HttpServletRequest req,
 			final HttpServletResponse resp) throws IOException,
 			ServletException {
-		
+
 		if (!handleSession(req, resp)) {
 			if (!resp.isCommitted()) {
 				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -74,20 +72,20 @@ public class DebugServlet extends EveServlet {
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		// retrieve the url and the request body
 		final String body = StringUtil.streamToString(req.getInputStream());
 		final String url = req.getRequestURI();
 		final String id = getId(url);
-		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
+		if (id == null || id.isEmpty() || id.equals(myUrl.toASCIIString())) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"Couldn't parse URL, missing 'id'");
 			resp.flushBuffer();
 			return;
 		}
-		
+
 		String sender = req.getHeader("X-Eve-SenderUrl");
-		if (sender == null || sender.equals("")) {
+		if (sender == null || sender.isEmpty()) {
 			sender = "web://" + req.getRemoteUser() + "@" + req.getRemoteAddr();
 		}
 		URI senderUrl = null;
@@ -108,7 +106,7 @@ public class DebugServlet extends EveServlet {
 			} catch (final IOException e) {
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Receiver raised exception:" + e.getMessage());
-				LOG.log(Level.WARNING,"Receiver raised exception:",e);
+				LOG.log(Level.WARNING, "Receiver raised exception:", e);
 			}
 		} else {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -116,20 +114,20 @@ public class DebugServlet extends EveServlet {
 		}
 		resp.flushBuffer();
 	}
-	
+
 	@Override
 	protected void doGet(final HttpServletRequest req,
 			final HttpServletResponse resp) throws ServletException,
 			IOException {
-		
+
 		// If this is a handshake request, handle it.
 		if (handleHandShake(req, resp)) {
 			return;
 		}
-		
+
 		final String url = req.getRequestURI();
 		final String id = getId(url);
-		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
+		if (id == null || id.isEmpty() || id.equals(myUrl.toASCIIString())) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"Couldn't parse URL, missing 'id'");
 			resp.flushBuffer();
@@ -139,9 +137,9 @@ public class DebugServlet extends EveServlet {
 			final HttpTransport transport = HttpService.get(myUrl, id);
 			if (transport != null) {
 				// get the resource name from the end of the url
-				
+
 				String resource = getResource(url);
-				if (resource == null || resource.equals("")) {
+				if (resource == null || resource.isEmpty()) {
 					if (!url.endsWith("/") && !resp.isCommitted()) {
 						final String redirect = url + "/";
 						resp.sendRedirect(redirect);
@@ -153,7 +151,7 @@ public class DebugServlet extends EveServlet {
 						.lastIndexOf('.') + 1);
 				// load the resource
 				final String mimetype = StreamingUtil.getMimeType(extension);
-				
+
 				final String filename = RESOURCES + resource;
 				final InputStream is = this.getClass().getResourceAsStream(
 						filename);

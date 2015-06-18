@@ -143,7 +143,7 @@ public class EveServlet extends HttpServlet {
 
 		try {
 			final String senderUrl = req.getHeader("X-Eve-SenderUrl");
-			if (senderUrl != null && !senderUrl.equals("")) {
+			if (senderUrl != null && !senderUrl.isEmpty()) {
 				final ObjectNode tokenObj = (ObjectNode) JOM.getInstance()
 						.readTree(tokenTupple);
 				final HttpGet httpGet = new HttpGet(senderUrl);
@@ -204,10 +204,8 @@ public class EveServlet extends HttpServlet {
 					return false;
 				}
 
-				if (hs.equals(Handshake.NAK)) {
-					if (!req.authenticate(res)) {
-						return false;
-					}
+				if (hs.equals(Handshake.NAK) && !req.authenticate(res)) {
+					return false;
 				}
 			}
 
@@ -256,7 +254,7 @@ public class EveServlet extends HttpServlet {
 		final String body = StringUtil.streamToString(req.getInputStream());
 		final String url = req.getRequestURI();
 		final String id = getId(url);
-		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
+		if (id == null || id.isEmpty() || id.equals(myUrl.toASCIIString())) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"Couldn't parse URL, missing 'id'");
 			resp.flushBuffer();
@@ -264,7 +262,7 @@ public class EveServlet extends HttpServlet {
 		}
 
 		String sender = req.getHeader("X-Eve-SenderUrl");
-		if (sender == null || sender.equals("")) {
+		if (sender == null || sender.isEmpty()) {
 			sender = "web://" + req.getRemoteUser() + "@" + req.getRemoteAddr();
 		}
 		URI senderUrl = null;
@@ -305,7 +303,7 @@ public class EveServlet extends HttpServlet {
 
 		final String url = req.getRequestURI();
 		final String id = getId(url);
-		if (id == null || id.equals("") || id.equals(myUrl.toASCIIString())) {
+		if (id == null || id.isEmpty() || id.equals(myUrl.toASCIIString())) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"Couldn't parse URL, missing 'id'");
 			resp.flushBuffer();

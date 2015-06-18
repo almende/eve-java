@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Namespace("trickle")
 public class TrickleRPC {
+	private static final Map<String, JSONRequest>	REQUESTS	= new HashMap<String, JSONRequest>();
 	private String									namespace	= "trickle.";
 	private Trickle									trickle		= null;
 	private String									intTaskId	= null;
@@ -34,8 +35,6 @@ public class TrickleRPC {
 																		.getPool();
 	private long[]									next		= new long[] {
 			0, 0												};
-
-	private static final Map<String, JSONRequest>	requests	= new HashMap<String, JSONRequest>();
 
 	/**
 	 * Instantiates a new trickle rpc.
@@ -71,16 +70,17 @@ public class TrickleRPC {
 		if (config.has("namespace")) {
 			namespace = config.get("namespace").asText() + namespace;
 		}
-		requests.put(namespace + "send", new JSONRequest(namespace + "send",
+		REQUESTS.put(namespace + "send", new JSONRequest(namespace + "send",
 				null));
-		requests.put(namespace + "nextInterval", new JSONRequest(namespace
+		REQUESTS.put(namespace + "nextInterval", new JSONRequest(namespace
 				+ "nextInterval", null));
 		trickle = new Trickle(intervalMin, intervalFactor, redundancyFactor);
 		reschedule(trickle.next());
 	}
 
 	private void reschedule(final long[] intervals) {
-		if (intervals != null && intervals[0] >= 0 && intervals[1] >= 0) {
+		if (intervals != null && intervals.length > 0 && intervals[0] >= 0
+				&& intervals[1] >= 0) {
 			final DateTime nextSend = DateTime.now().plus(intervals[0]);
 			final DateTime nextInterval = DateTime.now().plus(intervals[1]);
 
@@ -89,14 +89,14 @@ public class TrickleRPC {
 				scheduler.cancel(oldSendTaskId);
 			}
 			sendTaskId = scheduler.schedule(null,
-					requests.get(namespace + "send"), nextSend);
+					REQUESTS.get(namespace + "send"), nextSend);
 
 			final String oldIntTaskId = intTaskId;
 			if (oldIntTaskId != null) {
 				scheduler.cancel(oldIntTaskId);
 			}
 			intTaskId = scheduler.schedule(null,
-					requests.get(namespace + "nextInterval"), nextInterval);
+					REQUESTS.get(namespace + "nextInterval"), nextInterval);
 		}
 	}
 
