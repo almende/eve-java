@@ -7,7 +7,9 @@ package com.almende.dht;
 /**
  * The Class Constants.
  */
-public class Constants {
+public final class Constants {
+
+	private Constants() {};
 
 	/** The Constant BITLENGTH. */
 	public static final int		BITLENGTH	= 160;
@@ -19,9 +21,15 @@ public class Constants {
 	public static final int		A			= 5;
 
 	/** The Constant EXPIRE. */
-	public static final long	EXPIRE		= 24 * 60 * 60 * 1000 + ((int)Math.floor(Math.random()*1000));
+	public static final long	EXPIRE		= 24
+													* 60
+													* 60
+													* 1000
+													+ ((int) Math.floor(Math
+															.random() * 1000));
 
 	/** The Constant REFRESH. */
-	public static final long	REFRESH		= 60 * 60 * 1000 - ((int)Math.floor(Math.random()*1000));
+	public static final long	REFRESH		= 60 * 60 * 1000 - ((int) Math
+													.floor(Math.random() * 1000));
 
 }
