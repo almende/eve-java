@@ -13,11 +13,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class WakeEntry.
  */
 public class InstantiationEntry {
-	private String					wakeKey		= null;
-	private String					className	= null;
-	private ObjectNode				params		= null;
-	private Handler<Configurable>	handler		= null;
-	private State					state		= null;
+	private String			wakeKey		= null;
+	private String			className	= null;
+	private ObjectNode		params		= null;
+	private Handler<Object>	handler		= null;
+	private State			state		= null;
 
 	/**
 	 * Instantiates a new entry.
@@ -104,7 +104,7 @@ public class InstantiationEntry {
 	 * @return the handler
 	 */
 	@JsonIgnore
-	public Handler<Configurable> getHandler() {
+	public Handler<Object> getHandler() {
 		return handler;
 	}
 
@@ -115,7 +115,7 @@ public class InstantiationEntry {
 	 *            the new handler
 	 */
 	@JsonIgnore
-	public void setHandler(Handler<Configurable> handler) {
+	public void setHandler(Handler<Object> handler) {
 		this.handler = handler;
 	}
 

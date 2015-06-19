@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.auth.DefaultAuthorizor;
@@ -31,10 +32,11 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	private static final Logger						LOG					= Logger.getLogger(JSONRpcProtocol.class
 																				.getName());
 	private static final TypeUtil<JSONResponse>		JSONRESPONSETYPE	= new TypeUtil<JSONResponse>() {};
-	private Authorizor								auth				= new DefaultAuthorizor();
 	private final AsyncCallbackStore<JSONResponse>	callbacks;
 	private final Handler<Object>					destination;
 	private Handler<Caller>							caller				= null;
+	private Handler<Authorizor>						auth				= new SimpleHandler<Authorizor>(
+																				new DefaultAuthorizor());
 	private JSONRpcProtocolConfig					myParams;
 
 	/**
@@ -105,7 +107,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	 * @return the auth
 	 */
 	public Authorizor getAuth() {
-		return auth;
+		return auth.get();
 	}
 
 	/**
@@ -114,7 +116,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	 * @param auth
 	 *            the new auth
 	 */
-	public void setAuth(final Authorizor auth) {
+	public void setAuth(final Handler<Authorizor> auth) {
 		this.auth = auth;
 	}
 
@@ -138,7 +140,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 			if (jsonMsg.isRequest()) {
 				final JSONRequest request = (JSONRequest) jsonMsg;
 				return JSONRpc.invoke(destination.get(), request, senderUrl,
-						auth);
+						auth.get());
 			} else if (jsonMsg.isResponse() && callbacks != null && id != null
 					&& !id.isNull()) {
 				final AsyncCallback<JSONResponse> callback = callbacks.get(id);
@@ -173,7 +175,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	 * @return the methods
 	 */
 	public ObjectNode getMethods() {
-		return JSONRpc.describe(getHandle().get(), "", auth);
+		return JSONRpc.describe(getHandle().get(), "", auth.get());
 	}
 
 	private <T> void addCallback(final JSONRequest request,

@@ -10,7 +10,7 @@ import java.net.URI;
  * The Class DefaultAuthorizor.
  */
 public class DefaultAuthorizor implements Authorizor {
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.almende.eve.auth.Authorizor#onAccess(java.lang.String,

@@ -150,9 +150,12 @@ public class InstantiationService implements Capability {
 		if (entry != null) {
 			final String className = entry.getClassName();
 			Configurable instance = null;
-			Handler<Configurable> oldHandler = entry.getHandler();
+			Handler<Object> oldHandler = entry.getHandler();
 			if (oldHandler != null) {
-				instance = oldHandler.getNoWait();
+				final Object object = oldHandler.getNoWait();
+				if (object != null && object instanceof Configurable) {
+					instance = (Configurable) object;
+				}
 			}
 			if (instance == null) {
 				try {

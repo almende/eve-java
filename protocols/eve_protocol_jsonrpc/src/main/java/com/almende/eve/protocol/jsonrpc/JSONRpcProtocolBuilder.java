@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
@@ -20,10 +21,11 @@ import com.almende.util.uuid.UUID;
  */
 public class JSONRpcProtocolBuilder extends
 		AbstractCapabilityBuilder<JSONRpcProtocol> {
-	private static final Logger							LOG			= Logger.getLogger(JSONRpcProtocolBuilder.class
-																			.getName());
-	private static final TypeUtil<Handler<Object>>		TYPEUTIL	= new TypeUtil<Handler<Object>>() {};
-	private static final Map<String, JSONRpcProtocol>	INSTANCES	= new HashMap<String, JSONRpcProtocol>();
+	private static final Logger							LOG				= Logger.getLogger(JSONRpcProtocolBuilder.class
+																				.getName());
+	private static final TypeUtil<Handler<Object>>		TYPEUTIL		= new TypeUtil<Handler<Object>>() {};
+	private static final TypeUtil<Handler<Authorizor>>	TYPEUTILAUTH	= new TypeUtil<Handler<Authorizor>>() {};
+	private static final Map<String, JSONRpcProtocol>	INSTANCES		= new HashMap<String, JSONRpcProtocol>();
 
 	/*
 	 * (non-Javadoc)
@@ -54,17 +56,26 @@ public class JSONRpcProtocolBuilder extends
 		}
 		INSTANCES.put(id, result);
 
-		if (result.getAuth() == null || !result.getAuth().getClass().getName().equals(config.getAuthorizor())) {
+		if (result.getAuth() == null
+				|| !result.getAuth().getClass().getName()
+						.equals(config.getAuthorizor())) {
 			// Add authorizor:
-			try {
-				@SuppressWarnings("unchecked")
-				final Class<Authorizor> clazz = (Class<Authorizor>) Class
-						.forName(config.getAuthorizor());
-				result.setAuth(clazz.newInstance());
-			} catch (ClassNotFoundException | InstantiationException
-					| IllegalAccessException e) {
-				LOG.log(Level.WARNING, "Couldn't instantiate authorizor class:"
-						+ config.getAuthorizor(), e);
+			if (getHandle().get().getClass().getName()
+					.equals(config.getAuthorizor())) {
+				result.setAuth(TYPEUTILAUTH.inject(getHandle()));
+			} else {
+				try {
+					@SuppressWarnings("unchecked")
+					final Class<Authorizor> clazz = (Class<Authorizor>) Class
+							.forName(config.getAuthorizor());
+					result.setAuth(new SimpleHandler<Authorizor>(clazz
+							.newInstance()));
+				} catch (ClassNotFoundException | InstantiationException
+						| IllegalAccessException e) {
+					LOG.log(Level.WARNING,
+							"Couldn't instantiate authorizor class:"
+									+ config.getAuthorizor(), e);
+				}
 			}
 		}
 		return result;

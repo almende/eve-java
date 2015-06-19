@@ -77,7 +77,7 @@ public class AgentCore implements Receiver, Configurable {
 	private ProtocolStack			protocolStack	= new ProtocolStack();
 	private Handler<Receiver>		receiver		= new SimpleHandler<Receiver>(
 															this);
-	private Handler<Configurable>	handler			= new SimpleHandler<Configurable>(
+	private Handler<Object>			handler			= new SimpleHandler<Object>(
 															this);
 
 	protected Caller				caller			= new DefaultCaller();
@@ -257,7 +257,7 @@ public class AgentCore implements Receiver, Configurable {
 		agentId = config.getId();
 		loadInstantiationService(config.getInstantiationService());
 		if (is != null && config.isCanHibernate()) {
-			setHandler(new HibernationHandler<Configurable>(this, agentId, is));
+			setHandler(new HibernationHandler<Object>(this, agentId, is));
 			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
 			setSender(new HibernationHandler<Caller>(caller, agentId, is));
 		}
@@ -298,7 +298,7 @@ public class AgentCore implements Receiver, Configurable {
 	 * @param handler
 	 *            the new RPC target handler
 	 */
-	protected void setHandler(Handler<Configurable> handler) {
+	protected void setHandler(Handler<Object> handler) {
 		this.handler = handler;
 	}
 
@@ -308,7 +308,7 @@ public class AgentCore implements Receiver, Configurable {
 	 * @return the receiver
 	 */
 	@JsonIgnore
-	public Handler<Configurable> getHandler() {
+	public Handler<Object> getHandler() {
 		return handler;
 	}
 

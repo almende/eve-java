@@ -26,5 +26,5 @@ public interface Configurable {
 	 *
 	 * @return The Handle
 	 */
-	Handler<Configurable> getHandler();
+	Handler<Object> getHandler();
 }
