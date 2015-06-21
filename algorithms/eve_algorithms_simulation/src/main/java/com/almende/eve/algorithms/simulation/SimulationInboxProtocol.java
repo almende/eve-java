@@ -49,19 +49,6 @@ public class SimulationInboxProtocol extends InboxProtocol {
 		initLooper();
 	}
 
-	/**
-	 * Scheduler out reporting.
-	 *
-	 * @param count
-	 *            the count
-	 */
-	public static void schedulerOut(final int count) {
-		inWork();
-		synchronized (MSGOUTCNT) {
-			MSGOUTCNT[0] += count;
-		}
-	}
-
 	@Override
 	public boolean outbound(Meta msg) {
 		inWork();

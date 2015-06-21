@@ -4,18 +4,17 @@
  */
 package com.almende.eve.scheduling;
 
+import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.scheduling.clock.Clock;
 import com.almende.eve.scheduling.clock.RunnableClock;
-import com.almende.eve.transport.Receiver;
-import com.almende.util.URIUtil;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -23,12 +22,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SimpleScheduler.
  */
 public class SimpleScheduler implements Scheduler {
-	private static final Logger	LOG				= Logger.getLogger(SimpleScheduler.class
-														.getName());
-	protected URI				schedulerUrl	= null;
-	protected Handler<Receiver>	handle			= null;
-	protected Clock				clock			= null;
-	protected ObjectNode		myParams		= null;
+	private static final Logger	LOG			= Logger.getLogger(SimpleScheduler.class
+													.getName());
+	protected URI				myUrl		= null;
+	protected Handler<Caller>	handle		= null;
+	protected Clock				clock		= null;
+	protected ObjectNode		myParams	= null;
 
 	/**
 	 * Instantiates a new abstract scheduler.
@@ -38,26 +37,19 @@ public class SimpleScheduler implements Scheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public SimpleScheduler(final ObjectNode params,
-			final Handler<Receiver> handle) {
-		if (params.has("senderUrl")) {
-			try {
-				schedulerUrl = URIUtil.parse(params.get("senderUrl").asText());
-			} catch (final URISyntaxException e) {
-				LOG.log(Level.WARNING,
-						"Couldn't parse scheduler senderUrl from parameters.",
-						e);
-			}
-		}
-		if (schedulerUrl == null) {
-			schedulerUrl = URIUtil.create("local:unnamed_scheduler");
-		}
+	public SimpleScheduler(final ObjectNode params, final Handler<Caller> handle) {
 		this.handle = handle;
+		myUrl = handle.get().getSenderUrlByScheme("local");
 		myParams = params;
 	}
 
 	protected void handleTrigger(final Object msg, final String triggerId) {
-		handle.get().receive(msg, schedulerUrl, null);
+		try {
+			handle.get().call(myUrl, msg);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING,
+					"Scheduler got IOException, couldn't send request", e);
+		}
 	}
 
 	/*
@@ -111,20 +103,11 @@ public class SimpleScheduler implements Scheduler {
 	}
 
 	/**
-	 * Gets the scheduler url.
-	 * 
-	 * @return the scheduler url
-	 */
-	public URI getSchedulerUrl() {
-		return schedulerUrl;
-	}
-
-	/**
 	 * Gets the handle.
 	 * 
 	 * @return the handle
 	 */
-	public Handler<Receiver> getHandle() {
+	public Handler<Caller> getHandle() {
 		return handle;
 	}
 

@@ -4,8 +4,6 @@
  */
 package com.almende.eve.scheduling;
 
-import java.net.URI;
-
 import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.Capability;
@@ -88,10 +86,4 @@ public interface Scheduler extends Capability {
 	 */
 	void clear();
 
-	/**
-	 * Gets the scheduler url.
-	 *
-	 * @return the scheduler url
-	 */
-	URI getSchedulerUrl();
 }

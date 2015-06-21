@@ -48,7 +48,7 @@ public class TraceProtocol implements Protocol {
 				if (this.params.isFlat()) {
 					handler.setFormatter(new MyFormatter());
 				}
-
+				LOG.warning("Started tracelog:"+filename);
 			} catch (IOException e) {
 				LOG.log(Level.WARNING, "Couldn't open outputfile for tracing:"
 						+ filename, e);

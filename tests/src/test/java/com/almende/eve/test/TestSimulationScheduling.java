@@ -14,8 +14,8 @@ import com.almende.eve.agent.AgentBuilder;
 import com.almende.eve.agent.AgentConfig;
 import com.almende.eve.agent.TestSchedulingAgent;
 import com.almende.eve.algorithms.simulation.SimulationInboxProtocolConfig;
-import com.almende.eve.algorithms.simulation.SimulationTimeProtocolConfig;
 import com.almende.eve.algorithms.simulation.SimulationSchedulerConfig;
+import com.almende.eve.algorithms.simulation.SimulationTimeProtocolConfig;
 import com.almende.eve.protocol.TraceProtocolConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -25,24 +25,17 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class TestSimulationScheduling extends TestCase {
 
-	/**
-	 * Test scheduling.
-	 *
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	@Test
-	public void testSchedulingStrong() throws IOException {
-		final boolean supportSyncCalls = true;
-		final boolean atomicNetwork = true;
+	private void run(boolean strong, String names) {
+		final boolean supportSyncCalls = strong;
+		final boolean atomicNetwork = strong;
 
 		final SimulationSchedulerConfig params = SimulationSchedulerConfig
 				.create();
-		params.setSenderUrl("local:testSim1s");
+		params.setStrongConsistency(strong);
 
 		final AgentConfig config = AgentConfig.create();
 		config.setClassName(TestSchedulingAgent.class.getName());
-		config.put("id", "testSim1s");
+		config.put("id", names + "1");
 
 		final ArrayNode protocols = JOM.createArrayNode();
 		final SimulationTimeProtocolConfig simprot = SimulationTimeProtocolConfig
@@ -54,6 +47,7 @@ public class TestSimulationScheduling extends TestCase {
 
 		final TraceProtocolConfig traceprot = TraceProtocolConfig.create();
 		traceprot.setFileName(".");
+		protocols.add(traceprot);
 		protocols.add(simprot);
 		protocols.add(simInprot);
 		config.setProtocols(protocols);
@@ -61,10 +55,10 @@ public class TestSimulationScheduling extends TestCase {
 
 		final AgentConfig config2 = AgentConfig.create();
 		config2.setClassName(TestSchedulingAgent.class.getName());
-		config2.put("id", "testSim2s");
+		config2.put("id", names + "2");
 		final SimulationSchedulerConfig params2 = SimulationSchedulerConfig
 				.create();
-		params2.setSenderUrl("local:testSim2s");
+		params2.setStrongConsistency(strong);
 
 		final ArrayNode protocols2 = JOM.createArrayNode();
 		final SimulationTimeProtocolConfig simprot2 = SimulationTimeProtocolConfig
@@ -76,6 +70,8 @@ public class TestSimulationScheduling extends TestCase {
 
 		final TraceProtocolConfig traceprot2 = TraceProtocolConfig.create();
 		traceprot2.setFileName(".");
+
+		protocols2.add(traceprot2);
 		protocols2.add(simprot2);
 		protocols2.add(simInprot2);
 
@@ -86,7 +82,7 @@ public class TestSimulationScheduling extends TestCase {
 		TestSchedulingAgent agent = (TestSchedulingAgent) new AgentBuilder()
 				.withConfig(config).build();
 		agent.startLocal();
-		agent.startRemote("local:testSim2s");
+		agent.startRemote("local:" + names + "2");
 
 		agent.scheduleStop(6000000);
 		agent.start();
@@ -105,59 +101,18 @@ public class TestSimulationScheduling extends TestCase {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	@Test
+	public void testSchedulingStrong() throws IOException {
+		run(true, "testStrong");
+	}
+
+	/**
+	 * Test scheduling.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
 	public void testSchedulingWeak() throws IOException {
-		final SimulationSchedulerConfig params = SimulationSchedulerConfig
-				.create();
-		params.setSenderUrl("local:testSim1w");
-		params.setStrongConsistency(false);
-
-		final AgentConfig config = AgentConfig.create();
-		config.setClassName(TestSchedulingAgent.class.getName());
-		config.put("id", "testSim1w");
-
-		final ArrayNode protocols = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot = SimulationTimeProtocolConfig
-				.create();
-
-		final TraceProtocolConfig traceprot = TraceProtocolConfig.create();
-		traceprot.setFileName(".");
-		protocols.add(simprot);
-
-		config.setProtocols(protocols);
-		config.setScheduler(params);
-
-		final AgentConfig config2 = AgentConfig.create();
-		config2.setClassName(TestSchedulingAgent.class.getName());
-		config2.put("id", "testSim2w");
-		final SimulationSchedulerConfig params2 = SimulationSchedulerConfig
-				.create();
-		params2.setSenderUrl("local:testSim2w");
-		params2.setStrongConsistency(false);
-
-		final ArrayNode protocols2 = JOM.createArrayNode();
-		final SimulationTimeProtocolConfig simprot2 = SimulationTimeProtocolConfig
-				.create();
-
-		final TraceProtocolConfig traceprot2 = TraceProtocolConfig.create();
-		traceprot2.setFileName(".");
-		protocols2.add(simprot2);
-
-		config2.setProtocols(protocols2);
-		config2.setScheduler(params2);
-		new AgentBuilder().withConfig(config2).build();
-
-		TestSchedulingAgent agent = (TestSchedulingAgent) new AgentBuilder()
-				.withConfig(config).build();
-		agent.startLocal();
-		agent.startRemote("local:testSim2w");
-
-		agent.scheduleStop(6000000);
-		agent.start();
-
-		try {
-			Thread.sleep(5000);
-		} catch (final InterruptedException e) {}
-
-		assertTrue(agent.isStop());
+		run(true, "testWeak");
 	}
 }

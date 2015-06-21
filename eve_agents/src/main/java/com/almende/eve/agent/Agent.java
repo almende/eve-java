@@ -23,6 +23,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.annotation.RequestId;
+import com.almende.eve.protocol.jsonrpc.annotation.Sender;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.eve.scheduling.Scheduler;
@@ -458,13 +459,15 @@ public class Agent extends AgentCore implements AgentInterface {
 	 *            the timestamp
 	 * @param id
 	 *            the id
+	 * @param senderUrl
+	 *            the sender url
 	 */
 	@Access(AccessType.SELF)
 	public void _scheduleNext(final @Name("request") JSONRequest request,
 			final @Name("interval") long interval,
 			final @Name("type") String type,
 			final @Optional @Name("timestamp") DateTime timestamp,
-			@RequestId JsonNode id) {
+			@RequestId JsonNode id, @Sender URI senderUrl) {
 		final Scheduler scheduler = getScheduler();
 		if (scheduler == null) {
 			return;
@@ -480,14 +483,14 @@ public class Agent extends AgentCore implements AgentInterface {
 		}
 		switch (type) {
 			case "sequential":
-				receive(request, scheduler.getSchedulerUrl(), null);
+				receive(request, senderUrl, null);
 				schedule(new JSONRequest(id, "_scheduleNext", params, null),
 						nextDue);
 				break;
 			default:
 				schedule(new JSONRequest(id, "_scheduleNext", params, null),
 						nextDue);
-				receive(request, scheduler.getSchedulerUrl(), null);
+				receive(request, senderUrl, null);
 		}
 	}
 

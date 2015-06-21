@@ -21,7 +21,6 @@ import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.scheduling.clock.RunnableClock;
-import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -80,7 +79,7 @@ public class SyncScheduler extends SimpleScheduler {
 
 			@Override
 			public void run() {
-				getHandle().get().receive(msg, getSchedulerUrl(), null);
+				handleTrigger(msg, id);
 			}
 
 		});
@@ -100,7 +99,7 @@ public class SyncScheduler extends SimpleScheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public SyncScheduler(final ObjectNode params, final Handler<Receiver> handle) {
+	public SyncScheduler(final ObjectNode params, final Handler<Caller> handle) {
 		super(params, handle);
 		if (getClock() == null) {
 			setClock(new RunnableClock());

@@ -13,6 +13,7 @@ import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.capabilities.handler.SimpleHandler;
 import com.almende.eve.protocol.auth.Authorizor;
+import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
 
@@ -57,24 +58,32 @@ public class JSONRpcProtocolBuilder extends
 		INSTANCES.put(id, result);
 
 		if (result.getAuth() == null
+				|| config.getAuthorizor() == null
 				|| !result.getAuth().getClass().getName()
 						.equals(config.getAuthorizor())) {
-			// Add authorizor:
-			if (getHandle().get().getClass().getName()
-					.equals(config.getAuthorizor())) {
+			// Add authorizor, defaulting to the destination if that is an
+			// Authorizer.
+			if (getHandle().get() instanceof Authorizor) {
 				result.setAuth(TYPEUTILAUTH.inject(getHandle()));
 			} else {
-				try {
-					@SuppressWarnings("unchecked")
-					final Class<Authorizor> clazz = (Class<Authorizor>) Class
-							.forName(config.getAuthorizor());
-					result.setAuth(new SimpleHandler<Authorizor>(clazz
-							.newInstance()));
-				} catch (ClassNotFoundException | InstantiationException
-						| IllegalAccessException e) {
-					LOG.log(Level.WARNING,
-							"Couldn't instantiate authorizor class:"
-									+ config.getAuthorizor(), e);
+				if (config.getAuthorizor() != null) {
+					try {
+						@SuppressWarnings("unchecked")
+						final Class<Authorizor> clazz = (Class<Authorizor>) Class
+								.forName(config.getAuthorizor());
+						result.setAuth(new SimpleHandler<Authorizor>(clazz
+								.newInstance()));
+					} catch (ClassNotFoundException | InstantiationException
+							| IllegalAccessException e) {
+						LOG.log(Level.WARNING,
+								"Couldn't instantiate authorizor class:"
+										+ config.getAuthorizor(), e);
+						result.setAuth(new SimpleHandler<Authorizor>(
+								new DefaultAuthorizor()));
+					}
+				} else {
+					result.setAuth(new SimpleHandler<Authorizor>(
+							new DefaultAuthorizor()));
 				}
 			}
 		}

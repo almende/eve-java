@@ -4,16 +4,18 @@
  */
 package com.almende.eve.algorithms.simulation;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.protocol.jsonrpc.formats.JSONMessage;
 import com.almende.eve.scheduling.SimpleScheduler;
 import com.almende.eve.scheduling.clock.Clock;
-import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -33,7 +35,7 @@ public class SimulationScheduler extends SimpleScheduler {
 	 * @param handle
 	 *            the handle
 	 */
-	public SimulationScheduler(ObjectNode params, Handler<Receiver> handle) {
+	public SimulationScheduler(ObjectNode params, Handler<Caller> handle) {
 		super(params, handle);
 		if (sharedClock == null) {
 			sharedClock = new SimulationClock(0);
@@ -61,7 +63,7 @@ public class SimulationScheduler extends SimpleScheduler {
 
 	private Tracer createTracer() {
 		final Tracer tracer = new Tracer();
-		tracer.setOwner(schedulerUrl);
+		tracer.setOwner(myUrl);
 		return tracer;
 	}
 
@@ -78,10 +80,20 @@ public class SimulationScheduler extends SimpleScheduler {
 			} else {
 				message.getExtra().setAll(extra);
 			}
-			handle.get().receive(message, schedulerUrl, null);
+			try {
+				handle.get().call(myUrl, msg);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING,
+						"Scheduler got IOException, couldn't send request", e);
+			}
 		} else {
 			LOG.warning("Scheduler tries to send Non-JSON-RPC message, doesn't work with SimulationScheduler.");
-			handle.get().receive(msg, schedulerUrl, null);
+			try {
+				handle.get().call(myUrl, msg);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING,
+						"Scheduler got IOException, couldn't send request", e);
+			}
 		}
 
 	}

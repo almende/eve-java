@@ -32,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>eve-transport-common</artifactId>
+			<artifactId>eve-protocol-jsonrpc</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>

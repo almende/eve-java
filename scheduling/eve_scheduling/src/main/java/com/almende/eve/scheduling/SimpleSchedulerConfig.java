@@ -20,18 +20,18 @@ public class SimpleSchedulerConfig extends Config {
 	protected SimpleSchedulerConfig() {
 		super();
 	}
-	
+
 	/**
 	 * Creates the.
 	 *
 	 * @return the simple scheduler config
 	 */
-	public static SimpleSchedulerConfig create(){
+	public static SimpleSchedulerConfig create() {
 		final SimpleSchedulerConfig res = new SimpleSchedulerConfig();
 		res.setBuilder(BUILDER);
 		return res;
 	}
-	
+
 	/**
 	 * Instantiates a new simple scheduler config.
 	 * 
@@ -64,27 +64,5 @@ public class SimpleSchedulerConfig extends Config {
 			return this.get("id").asText();
 		}
 		return null;
-	}
-
-	/**
-	 * Sets the sender url.
-	 * 
-	 * @param senderUrl
-	 *            the new sender url
-	 */
-	public void setSenderUrl(String senderUrl) {
-		this.put("senderUrl", senderUrl);
-	}
-
-	/**
-	 * Gets the sender url.
-	 * 
-	 * @return the sender url
-	 */
-	public String getSenderUrl() {
-		if (this.has("senderUrl")) {
-			return this.get("senderUrl").asText();
-		}
-		return "local:scheduler_" + getId();
 	}
 }

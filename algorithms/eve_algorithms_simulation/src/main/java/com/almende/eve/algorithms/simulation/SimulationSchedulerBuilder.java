@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.transport.Receiver;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.util.TypeUtil;
 import com.almende.util.uuid.UUID;
 
@@ -21,7 +21,7 @@ public class SimulationSchedulerBuilder extends
 		AbstractCapabilityBuilder<SimulationScheduler> {
 	private static final Logger								LOG			= Logger.getLogger(SimulationSchedulerBuilder.class
 																				.getName());
-	private static final TypeUtil<Handler<Receiver>>		TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
+	private static final TypeUtil<Handler<Caller>>			TYPEUTIL	= new TypeUtil<Handler<Caller>>() {};
 	private static final Map<String, SimulationScheduler>	INSTANCES	= new HashMap<String, SimulationScheduler>();
 
 	/*
@@ -45,7 +45,7 @@ public class SimulationSchedulerBuilder extends
 		SimulationScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
 			result = (SimulationScheduler) INSTANCES.get(id);
-			final Handler<Receiver> oldHandle = result.getHandle();
+			final Handler<Caller> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
 			result = new SimulationScheduler(config,

@@ -28,7 +28,6 @@ public interface Caller {
 	 */
 	List<URI> getSenderUrls();
 
-	
 	/**
 	 * Gets this sender's address for given scheme.
 	 *
@@ -37,7 +36,20 @@ public interface Caller {
 	 * @return the sender url by scheme
 	 */
 	URI getSenderUrlByScheme(final String scheme);
-	
+
+	/**
+	 * Basic raw call method, sending the given message to the URL.
+	 *
+	 * @param url
+	 *            the address of the other agent
+	 * @param message
+	 *            the message to send the other agent (in many cases a JSONRpc
+	 *            message)
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	void call(final URI url, final Object message) throws IOException;
+
 	/**
 	 * Send async, expecting a response through the given callback.
 	 * 

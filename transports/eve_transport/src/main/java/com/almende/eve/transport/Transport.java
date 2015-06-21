@@ -16,13 +16,12 @@ import com.almende.util.TypeUtil;
  * The Interface Transport.
  */
 public interface Transport extends Capability {
-	
+
 	/**
 	 * The Constant TYPEUTIL.
 	 */
-	TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {
-													};
-	
+	TypeUtil<Handler<Receiver>>	TYPEUTIL	= new TypeUtil<Handler<Receiver>>() {};
+
 	/**
 	 * Send a message to an other agent.
 	 * 
@@ -38,7 +37,7 @@ public interface Transport extends Capability {
 	 */
 	void send(final URI receiverUri, final String message, final String tag)
 			throws IOException;
-	
+
 	/**
 	 * Send bytes to an other agent. String based transports
 	 * may need to encode these bytes to base64. (e.g. through
@@ -71,9 +70,9 @@ public interface Transport extends Capability {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	void send(final URI receiverUri, final Object message, final String tag) throws IOException;
+	void send(final URI receiverUri, final Object message, final String tag)
+			throws IOException;
 
-	
 	/**
 	 * (re)Connect this url (if applicable for this transport type).
 	 * 
@@ -81,26 +80,26 @@ public interface Transport extends Capability {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	void connect() throws IOException;
-	
+
 	/**
 	 * Disconnect transport.
 	 */
 	void disconnect();
-	
+
 	/**
 	 * Gets the receive handler.
 	 * 
 	 * @return the handler
 	 */
 	Handler<Receiver> getHandle();
-	
+
 	/**
 	 * Gets the address of this transport instance.
 	 * 
 	 * @return the address
 	 */
 	URI getAddress();
-	
+
 	/**
 	 * Get the outbound protocols supported by this transport.
 	 * 

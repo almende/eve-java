@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 import org.joda.time.DateTime;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.eve.scheduling.clock.RunnableClock;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateBuilder;
-import com.almende.eve.transport.Receiver;
 import com.almende.util.jackson.JOM;
 import com.almende.util.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,7 +49,7 @@ public class PersistentScheduler extends SimpleScheduler {
 	 *            the handle
 	 */
 	public PersistentScheduler(final ObjectNode params,
-			final Handler<Receiver> handle) {
+			final Handler<Caller> handle) {
 		super(params, handle);
 		final PersistentSchedulerConfig config = PersistentSchedulerConfig
 				.decorate(params);
@@ -83,8 +83,7 @@ public class PersistentScheduler extends SimpleScheduler {
 							if (state != null) {
 								state.remove(entry.getTaskId());
 							}
-							getHandle().get().receive(entry.getMessage(),
-									getSchedulerUrl(), null);
+							handleTrigger(entry.getMessage(), entry.getTaskId());
 						}
 					});
 		}
@@ -155,7 +154,7 @@ class TaskEntry implements Comparable<TaskEntry>, Serializable {
 	 * Instantiates a new task entry.
 	 */
 	public TaskEntry() {}
-	
+
 	/**
 	 * Instantiates a new task entry.
 	 *

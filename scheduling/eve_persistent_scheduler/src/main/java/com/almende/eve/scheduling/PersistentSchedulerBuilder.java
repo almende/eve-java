@@ -7,7 +7,7 @@ package com.almende.eve.scheduling;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.transport.Receiver;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.util.uuid.UUID;
 
 /**
@@ -37,7 +37,7 @@ public class PersistentSchedulerBuilder extends SimpleSchedulerBuilder {
 		PersistentScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
 			result = (PersistentScheduler) INSTANCES.get(id);
-			final Handler<Receiver> oldHandle = result.getHandle();
+			final Handler<Caller> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
 			result = new PersistentScheduler(config,

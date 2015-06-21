@@ -27,6 +27,7 @@ import com.almende.eve.protocol.Protocol;
 import com.almende.eve.protocol.ProtocolBuilder;
 import com.almende.eve.protocol.ProtocolConfig;
 import com.almende.eve.protocol.ProtocolStack;
+import com.almende.eve.protocol.auth.Authorizor;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocol;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolBuilder;
 import com.almende.eve.protocol.jsonrpc.JSONRpcProtocolConfig;
@@ -64,7 +65,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Single Scheduler, Transports, ProtocolStack and Configuration management.
  */
 @Access(AccessType.UNAVAILABLE)
-public class AgentCore implements Receiver, Configurable {
+public class AgentCore implements Receiver, Configurable, Authorizor {
 	private static final Logger		LOG				= Logger.getLogger(AgentCore.class
 															.getName());
 	private String					agentId			= null;
@@ -154,6 +155,22 @@ public class AgentCore implements Receiver, Configurable {
 	 */
 	@Deprecated
 	protected void onBoot() {}
+
+	@Override
+	public boolean onAccess(URI senderUrl, String functionTag) {
+		return true;
+	}
+
+	@Override
+	public boolean onAccess(URI senderUrl) {
+		return true;
+	}
+
+	@Override
+	public boolean isSelf(URI senderUrl) {
+		// TODO: check for scheduler URL?
+		return (caller.getSenderUrls().contains(senderUrl));
+	}
 
 	/**
 	 * Creates a proxy for given URL and interface, with this agent as sender.
@@ -523,7 +540,7 @@ public class AgentCore implements Receiver, Configurable {
 				schedulerConfig.setId(agentId);
 			}
 			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
-					.withHandle(receiver).build();
+					.withHandle(sender).build();
 		}
 	}
 
@@ -623,6 +640,17 @@ public class AgentCore implements Receiver, Configurable {
 	}
 
 	private class DefaultCaller implements Caller {
+
+		@Override
+		public void call(final URI url, final Object message)
+				throws IOException {
+
+			final Meta wrapper = protocolStack.outbound(message, url, null);
+			if (wrapper != null) {
+				transport.send(wrapper.getPeer(), wrapper.getMsg(),
+						wrapper.getTag());
+			}
+		}
 
 		@Override
 		public <T> void call(final URI url, final JSONMessage message,

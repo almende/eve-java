@@ -7,16 +7,15 @@ package com.almende.eve.scheduling;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
-import com.almende.eve.transport.Receiver;
+import com.almende.eve.protocol.jsonrpc.formats.Caller;
 import com.almende.util.uuid.UUID;
 
 /**
  * The Class PersistentSchedulerService.
  */
-public class SyncSchedulerBuilder extends
-		SimpleSchedulerBuilder {
-	private static final Logger							LOG			= Logger.getLogger(SyncSchedulerBuilder.class
-																			.getName());
+public class SyncSchedulerBuilder extends SimpleSchedulerBuilder {
+	private static final Logger	LOG	= Logger.getLogger(SyncSchedulerBuilder.class
+											.getName());
 
 	/*
 	 * (non-Javadoc)
@@ -39,7 +38,7 @@ public class SyncSchedulerBuilder extends
 		SyncScheduler result = null;
 		if (INSTANCES.containsKey(id)) {
 			result = (SyncScheduler) INSTANCES.get(id);
-			final Handler<Receiver> oldHandle = result.getHandle();
+			final Handler<Caller> oldHandle = result.getHandle();
 			oldHandle.update(TYPEUTIL.inject(getHandle()));
 		} else {
 			result = new SyncScheduler(config, TYPEUTIL.inject(getHandle()));

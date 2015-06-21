@@ -5,7 +5,6 @@
 package com.almende.eve.protocol;
 
 import com.almende.eve.config.Config;
-import com.almende.eve.protocol.auth.DefaultAuthorizor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -42,7 +41,7 @@ public class ProtocolConfig extends Config {
 		if (this.has("authorizor")) {
 			return this.get("authorizor").asText();
 		}
-		return DefaultAuthorizor.class.getName();
+		return null;
 	}
 
 	/**
