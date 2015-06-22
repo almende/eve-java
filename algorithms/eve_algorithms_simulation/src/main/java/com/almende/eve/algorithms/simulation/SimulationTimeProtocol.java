@@ -87,14 +87,20 @@ public class SimulationTimeProtocol implements RpcBasedProtocol {
 	}
 
 	private boolean doTracer() {
-		return !inboundRequests.isEmpty();
+		synchronized (inboundRequests) {
+			return !inboundRequests.isEmpty();
+		}
 	}
 
 	private Collection<Tracer> checkTracers() {
-		if (outboundTracers.isEmpty() && inboundRequests.isEmpty()) {
-			return inboundTracers;
+		synchronized (outboundTracers) {
+			synchronized (inboundRequests) {
+				if (outboundTracers.isEmpty() && inboundRequests.isEmpty()) {
+					return inboundTracers;
+				}
+				return null;
+			}
 		}
-		return null;
 	}
 
 	private Tracer createTracer() {
@@ -140,55 +146,87 @@ public class SimulationTimeProtocol implements RpcBasedProtocol {
 		}
 	}
 
+	private boolean handleReport(final JsonNode report,
+			final JSONMessage message, final URI peer) {
+		final Tracer tracer = TRACER.inject(report);
+		synchronized (outboundTracers) {
+			if (outboundTracers.contains(tracer)) {
+				receiveTracerReport(tracer);
+				sendReports(checkTracers(), null, peer);
+				if (message.isRequest()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void pullTracer(final JSONRequest message) {
+		final ObjectNode extra = message.getExtra();
+		final Object tracerObj = extra.remove("@simtracer");
+		if (tracerObj != null) {
+			synchronized (inboundRequests) {
+				Tracer tracer = TRACER.inject(tracerObj);
+				storeInboundTracer(tracer);
+				if (message.getId() != null && !message.getId().isNull()) {
+					inboundRequests.put(message.getId().asText(), false);
+				} else {
+					message.setId(JOM.getInstance().valueToTree(tracer.getId()));
+					inboundRequests.put(message.getId().asText(), true);
+				}
+			}
+		}
+	}
+
+	private void addTracer(final JSONRequest message) {
+		final Tracer tracer = createTracer();
+		final ObjectNode extra = JOM.createObjectNode();
+		extra.set("@simtracer", JOM.getInstance().valueToTree(tracer));
+		if (message.getExtra() == null) {
+			message.setExtra(extra);
+		} else {
+			message.getExtra().setAll(extra);
+		}
+		storeOutboundTracer(tracer);
+	}
+
+	private boolean handleReplies(final JSONResponse response,
+			final String tag, final URI peer) {
+		Boolean drop = null;
+		synchronized (inboundRequests) {
+			drop = inboundRequests.remove(response.getId().textValue());
+			if (drop != null && drop && (tag == null || tag.isEmpty())) {
+				sendReports(checkTracers(), null, peer);
+				// skip forwarding
+				return false;
+			} else {
+				sendReports(checkTracers(), response, peer);
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public boolean inbound(final Meta msg) {
+		// Parse inbound message, check for tracers and/or reports
 		JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
 		if (message != null) {
-			// Parse inbound message, check for tracer.
+			// Don't parse multiple times.
 			msg.setMsg(message);
 			if (message.getExtra() != null) {
 				final ObjectNode extra = message.getExtra();
 				if (message.isRequest()) {
-					// If tracer found, make sure we have id, if not add one.
-					// Store tracer
 					final JSONRequest request = (JSONRequest) message;
 					if (!"scheduler.receiveTracerReport".equals(request
 							.getMethod())) {
-						final Object tracerObj = extra.remove("@simtracer");
-						if (tracerObj != null) {
-							synchronized (inboundRequests) {
-								Tracer tracer = TRACER.inject(tracerObj);
-								storeInboundTracer(tracer);
-								if (request.getId() != null
-										&& !request.getId().isNull()) {
-									inboundRequests.put(request.getId()
-											.asText(), false);
-								} else {
-									request.setId(JOM.getInstance()
-											.valueToTree(tracer.getId()));
-									inboundRequests.put(request.getId()
-											.asText(), true);
-								}
-							}
-
-						}
+						pullTracer(request);
 					}
 				}
 				final JsonNode report = extra.remove("@simtracerreport");
 				if (report != null) {
-					final Tracer tracer = TRACER.inject(report);
-					synchronized (outboundTracers) {
-						if (outboundTracers.contains(tracer)) {
-							receiveTracerReport(tracer);
-							sendReports(checkTracers(), null, msg.getPeer());
-							if (message.isRequest()) {
-								return false;
-							}
-						} else if (message.isRequest()) {
-							// skip counting for strong consistency This one
-							// may always proceed
-							return msg.nextIn();
-						}
+					if (!handleReport(report, message, msg.getPeer())) {
+						// Not forwarding this (swallowing report)
+						return false;
 					}
 				}
 			}
@@ -201,34 +239,22 @@ public class SimulationTimeProtocol implements RpcBasedProtocol {
 		if (doTracer()) {
 			final JSONMessage message = JSONMessage.jsonConvert(msg.getMsg());
 			if (message != null) {
+				// Don't parse multiple times.
+				msg.setMsg(message);
+
 				if (message.isRequest()) {
 					final JSONRequest request = (JSONRequest) message;
 					if (!"scheduler.receiveTracerReport".equals(request
-							.getMethod())) {
-						final Tracer tracer = createTracer();
-						final ObjectNode extra = JOM.createObjectNode();
-						extra.set("@simtracer",
-								JOM.getInstance().valueToTree(tracer));
-						if (message.getExtra() == null) {
-							message.setExtra(extra);
-						} else {
-							message.getExtra().setAll(extra);
-						}
-						storeOutboundTracer(tracer);
+							.getMethod())
+							&& (request.getExtra() == null || !request
+									.getExtra().has("@simtracer"))) {
+						addTracer(request);
 					}
 				} else {
 					final JSONResponse response = (JSONResponse) message;
-					Boolean drop = null;
-					synchronized (inboundRequests) {
-						drop = inboundRequests.remove(response.getId()
-								.textValue());
-						if (drop != null && drop && msg.getTag() == null) {
-							sendReports(checkTracers(), null, msg.getPeer());
-							// skip forwarding
-							return false;
-						} else {
-							sendReports(checkTracers(), response, msg.getPeer());
-						}
+					if (!handleReplies(response, msg.getTag(), msg.getPeer())) {
+						// skip forwarding, swallowing reply
+						return false;
 					}
 				}
 			}

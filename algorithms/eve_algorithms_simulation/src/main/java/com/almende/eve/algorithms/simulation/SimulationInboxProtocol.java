@@ -163,10 +163,15 @@ public class SimulationInboxProtocol extends InboxProtocol {
 
 	private void waitForHeartBeat() {
 		waitForWork();
+		if (isAtomicNetwork) {
+			// Make sure all outstanding messages have arrived.
+			waitForNetwork();
+		}
 		synchronized (LATCH) {
 			LATCH[0]++;
 			if (LATCH[0] == INBOXCNT[0]) {
 				LATCH[0] = 0;
+				outOfWork();
 				LATCH.notifyAll();
 			} else {
 				try {
@@ -174,18 +179,10 @@ public class SimulationInboxProtocol extends InboxProtocol {
 				} catch (InterruptedException e) {}
 			}
 		}
-
-		if (isAtomicNetwork) {
-			// Make sure all outstanding messages have arrived.
-			waitForNetwork();
-		}
 		// Copy inbox to -currentSendBox
 		synchronized (getInbox()) {
 			outbox.addAll(getInbox());
 			getInbox().clear();
-		}
-		if (outbox.isEmpty()) {
-			outOfWork();
 		}
 	}
 

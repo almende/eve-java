@@ -47,9 +47,12 @@ public class TestSimulationScheduling extends TestCase {
 
 		final TraceProtocolConfig traceprot = TraceProtocolConfig.create();
 		traceprot.setFileName(".");
-		protocols.add(traceprot);
+		// protocols.add(traceprot);
+
 		protocols.add(simprot);
-		protocols.add(simInprot);
+		if (strong) {
+			protocols.add(simInprot);
+		}
 		config.setProtocols(protocols);
 		config.setScheduler(params);
 
@@ -70,10 +73,12 @@ public class TestSimulationScheduling extends TestCase {
 
 		final TraceProtocolConfig traceprot2 = TraceProtocolConfig.create();
 		traceprot2.setFileName(".");
+		// protocols2.add(traceprot2);
 
-		protocols2.add(traceprot2);
 		protocols2.add(simprot2);
-		protocols2.add(simInprot2);
+		if (strong) {
+			protocols2.add(simInprot2);
+		}
 
 		config2.setProtocols(protocols2);
 		config2.setScheduler(params2);
@@ -87,8 +92,12 @@ public class TestSimulationScheduling extends TestCase {
 		agent.scheduleStop(6000000);
 		agent.start();
 
+		int count = 0;
 		try {
-			Thread.sleep(5000);
+			while (!agent.isStop() && count < 100) {
+				count++;
+				Thread.sleep(500);
+			}
 		} catch (final InterruptedException e) {}
 
 		assertTrue(agent.isStop());

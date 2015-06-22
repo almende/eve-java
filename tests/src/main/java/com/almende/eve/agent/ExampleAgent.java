@@ -16,6 +16,7 @@ import com.almende.eve.instantiation.CanHibernate;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
+import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
 import com.almende.util.TypeUtil;
@@ -33,6 +34,18 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	private static final Logger	LOG	= Logger.getLogger(ExampleAgent.class
 											.getName());
 
+	
+	/**
+	 * Gets the (Incorrect overload) config.
+	 *
+	 * @param test
+	 *            the test
+	 * @return the config
+	 */
+	public ObjectNode getConfig(@Optional @Name("test") String test) {
+		return super.getConfig();
+	}
+	
 	/**
 	 * Hello world.
 	 * 
@@ -247,6 +260,16 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	public String doMore() {
 		LOG.info("Doing more!");
 		return "Some string!";
+	}
+	
+	/**
+	 * Gets the sub agent.
+	 *
+	 * @return the sub agent
+	 */
+	@Namespace("test")
+	public MyAgent getSubAgent(){
+		return new MyAgent("test");
 	}
 	
 	/**
