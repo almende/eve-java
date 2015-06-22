@@ -175,7 +175,7 @@ public class JSONRpcProtocol implements RpcBasedProtocol {
 	 * @return the methods
 	 */
 	public ObjectNode getMethods() {
-		return JSONRpc.describe(getHandle().get(), "", auth.get());
+		return JSONRpc.describe(getHandle().get(), auth.get());
 	}
 
 	private <T> void addCallback(final JSONRequest request,

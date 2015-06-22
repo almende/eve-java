@@ -20,7 +20,6 @@ import com.almende.eve.protocol.jsonrpc.NamespaceUtil.CallTuple;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
-import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.eve.protocol.jsonrpc.annotation.Optional;
 import com.almende.eve.protocol.jsonrpc.annotation.RequestId;
 import com.almende.eve.protocol.jsonrpc.annotation.Sender;
@@ -28,7 +27,6 @@ import com.almende.eve.protocol.jsonrpc.formats.JSONRPCException;
 import com.almende.eve.protocol.jsonrpc.formats.JSONRequest;
 import com.almende.eve.protocol.jsonrpc.formats.JSONResponse;
 import com.almende.util.AnnotationUtil;
-import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
 import com.almende.util.AnnotationUtil.AnnotatedParam;
 import com.almende.util.AnnotationUtil.CachedAnnotation;
@@ -232,33 +230,29 @@ public final class JSONRpc {
 	 *
 	 * @param c
 	 *            The class to be described
-	 * @param namespace
-	 *            the namespace
 	 * @param auth
 	 *            the authorizor
 	 * @return the Map
 	 */
-	public static ObjectNode describe(final Object c, String namespace,
-			final Authorizor auth) {
+	public static ObjectNode describe(final Object c, final Authorizor auth) {
 		final ObjectNode methods = JOM.createObjectNode();
-		try {
-			if (c == null) {
-				return methods;
-			}
-			final AnnotatedClass annotatedClass = AnnotationUtil.get(c
-					.getClass());
-			for (final AnnotatedMethod method : annotatedClass.getMethods()) {
-				if (isAvailable(method, null, URIUtil.create("local:null"),
-						auth)) {
+		if (c == null) {
+			return methods;
+		}
+		for (final String path : NamespaceUtil.getAllMethodPaths(c)) {
+			try {
+				final CallTuple method = NamespaceUtil.get(c, path);
+				if (isAvailable(method.getMethod(), method.getDestination(),
+						URIUtil.create("local:null"), auth)) {
 					final ObjectNode result = JOM.createObjectNode();
 					result.put("type", "method");
-					result.put("description",
-							typeToString(method.getGenericReturnType()));
-					result.set("returns",
-							typeToJsonSchema(method.getGenericReturnType()));
-					// format as JSON
+					result.put("description", typeToString(method.getMethod()
+							.getGenericReturnType()));
+					result.set("returns", typeToJsonSchema(method.getMethod()
+							.getGenericReturnType()));
 					final ArrayNode params = JOM.createArrayNode();
-					for (final AnnotatedParam param : method.getParams()) {
+					for (final AnnotatedParam param : method.getMethod()
+							.getParams()) {
 						if (param.getAnnotation(Sender.class) == null
 								&& param.getAnnotation(RequestId.class) == null) {
 							final ObjectNode paramData = JOM.createObjectNode();
@@ -273,34 +267,12 @@ public final class JSONRpc {
 						}
 					}
 					result.set("params", params);
-					if ("*".equals(namespace)) {
-						namespace = (String) annotatedClass.getAnnotation(
-								Namespace.class).value();
-					}
-
-					String methodName = method.getName();
-					CachedAnnotation anno = method.getAnnotation(Name.class);
-					if (anno != null) {
-						methodName = (String) anno.value();
-					}
-
-					final String fullName = namespace.isEmpty() ? methodName
-							: namespace + "." + methodName;
-					methods.set(fullName, result);
+					methods.set(path, result);
 				}
+			} catch (Exception e) {
+				LOG.log(Level.WARNING, "Failed to describe: " + path
+						+ " in class:" + c.getClass().getName());
 			}
-			for (final AnnotatedMethod method : annotatedClass
-					.getAnnotatedMethods(Namespace.class)) {
-				final String innerNamespace = (String) method.getAnnotation(
-						Namespace.class).value();
-				methods.setAll(describe(
-						method.getActualMethod().invoke(c, (Object[]) null),
-						innerNamespace, auth));
-			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "Failed to describe class:" + c.toString(),
-					e);
-			return null;
 		}
 		return methods;
 	}

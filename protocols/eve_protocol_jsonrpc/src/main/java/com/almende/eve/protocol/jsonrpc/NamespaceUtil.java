@@ -5,10 +5,14 @@
 package com.almende.eve.protocol.jsonrpc;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +21,7 @@ import com.almende.eve.protocol.jsonrpc.annotation.Namespace;
 import com.almende.util.AnnotationUtil;
 import com.almende.util.AnnotationUtil.AnnotatedClass;
 import com.almende.util.AnnotationUtil.AnnotatedMethod;
+import com.almende.util.AnnotationUtil.CachedAnnotation;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -24,9 +29,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * The Class NamespaceUtil.
  */
 final class NamespaceUtil {
-	private static final Map<String, AnnotatedMethod[]>	CACHE		= new HashMap<String, AnnotatedMethod[]>();
-	private static final Pattern						PATTERN		= Pattern
-																			.compile("\\.[^.]+$");
+	private static final Logger							LOG		= Logger.getLogger(NamespaceUtil.class
+																		.getName());
+	private static final Map<String, AnnotatedMethod[]>	CACHE	= new HashMap<String, AnnotatedMethod[]>();
+	private static final Pattern						PATTERN	= Pattern
+																		.compile("\\.[^.]+$");
 
 	/**
 	 * Instantiates a new namespace util.
@@ -34,7 +41,7 @@ final class NamespaceUtil {
 	private NamespaceUtil() {}
 
 	/**
-	 * Populate cache.
+	 * Populate cache with Namespace getters and their results.
 	 * 
 	 * @param destination
 	 *            the destination
@@ -53,7 +60,8 @@ final class NamespaceUtil {
 		final AnnotatedClass clazz = AnnotationUtil.get(destination.getClass());
 		for (final AnnotatedMethod method : clazz
 				.getAnnotatedMethods(Namespace.class)) {
-			String namespace = (String) method.getAnnotation(Namespace.class).value();
+			String namespace = (String) method.getAnnotation(Namespace.class)
+					.value();
 			final Object newDest = method.getActualMethod().invoke(destination,
 					(Object[]) null);
 			if (namespace.equals("*")) {
@@ -61,8 +69,8 @@ final class NamespaceUtil {
 				if (newDest != null) {
 					final AnnotatedClass destClazz = AnnotationUtil.get(newDest
 							.getClass());
-					namespace = (String) destClazz.getAnnotation(Namespace.class)
-							.value();
+					namespace = (String) destClazz.getAnnotation(
+							Namespace.class).value();
 				} else {
 					continue;
 				}
@@ -77,6 +85,57 @@ final class NamespaceUtil {
 						Arrays.copyOf(methods, methods.length + 1));
 			}
 		}
+	}
+
+	private static void addMethodsPaths(final List<String> result,
+			final Object destination, final String path) {
+		// Loop through methods
+		final AnnotatedClass annotatedClass = AnnotationUtil.get(destination
+				.getClass());
+		for (final Entry<String, List<AnnotatedMethod>> methods : annotatedClass
+				.getMethodNames().entrySet()) {
+			if (methods.getValue().size() == 1) {
+				final AnnotatedMethod method = methods.getValue().get(0);
+				if (method.getAnnotation(Namespace.class) != null){
+					continue;
+				}
+				
+				String methodName = method.getName();
+				CachedAnnotation anno = method.getAnnotation(Name.class);
+				if (anno != null) {
+					methodName = (String) anno.value();
+				}
+				result.add(path + methodName);
+			}
+		}
+	}
+
+	public static List<String> getAllMethodPaths(final Object destination) {
+		final ArrayList<String> result = new ArrayList<String>();
+		addMethodsPaths(result, destination, "");
+		for (Entry<String, AnnotatedMethod[]> namespace : CACHE.entrySet()) {
+			if (namespace.getKey().isEmpty()) {
+				continue;
+			}
+			Object newDestination = destination;
+			for (final AnnotatedMethod method : namespace.getValue()) {
+				if (method != null) {
+					try {
+						newDestination = method.getActualMethod().invoke(
+								newDestination, (Object[]) null);
+					} catch (Exception e) {
+						LOG.log(Level.WARNING,
+								"Namespace getter ran into trouble");
+					}
+				}
+			}
+			if (newDestination != null) {
+				addMethodsPaths(result, newDestination, namespace.getKey()
+						.replace(destination.getClass().getName() + ".", "")
+						+ ".");
+			}
+		}
+		return result;
 	}
 
 	/**

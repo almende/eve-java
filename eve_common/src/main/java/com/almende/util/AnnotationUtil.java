@@ -218,6 +218,15 @@ public final class AnnotationUtil {
 		}
 
 		/**
+		 * Get all methods, grouped by name allowing detection of overloading.
+		 *
+		 * @return the method names
+		 */
+		public Map<String, List<AnnotatedMethod>> getMethodNames() {
+			return methodNames;
+		}
+		
+		/**
 		 * Get all methods including methods declared in superclasses, filtered
 		 * by name.
 		 * 
