@@ -373,7 +373,7 @@ public class Config extends ObjectNode {
 		if (this.has("builder")) {
 			return this.get("builder").asText();
 		} else {
-			LOG.warning("Couldn't find 'builder' field, falling back to the backwards compatibility 'class' field.");
+			LOG.warning(this.getClass().getName()+": Couldn't find 'builder' field, falling back to the backwards compatibility 'class' field.");
 			return getClassName();
 		}
 	}

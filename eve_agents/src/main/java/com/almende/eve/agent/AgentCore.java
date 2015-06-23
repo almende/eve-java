@@ -524,23 +524,25 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	}
 
 	private void loadScheduler(final ObjectNode params) {
-		final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
-				.decorate(params);
-		if (schedulerConfig != null) {
-			if (agentId != null && schedulerConfig.has("state")) {
-				final StateConfig stateConfig = StateConfig
-						.decorate((ObjectNode) schedulerConfig.get("state"));
+		if (params != null) {
+			final SimpleSchedulerConfig schedulerConfig = SimpleSchedulerConfig
+					.decorate(params);
+			if (schedulerConfig != null) {
+				if (agentId != null && schedulerConfig.has("state")) {
+					final StateConfig stateConfig = StateConfig
+							.decorate((ObjectNode) schedulerConfig.get("state"));
 
-				if (stateConfig.getId() == null) {
-					stateConfig.setId("scheduler_" + agentId);
-					schedulerConfig.set("state", stateConfig);
+					if (stateConfig.getId() == null) {
+						stateConfig.setId("scheduler_" + agentId);
+						schedulerConfig.set("state", stateConfig);
+					}
 				}
+				if (agentId != null && schedulerConfig.getId() == null) {
+					schedulerConfig.setId(agentId);
+				}
+				scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
+						.withHandle(sender).build();
 			}
-			if (agentId != null && schedulerConfig.getId() == null) {
-				schedulerConfig.setId(agentId);
-			}
-			scheduler = new SchedulerBuilder().withConfig(schedulerConfig)
-					.withHandle(sender).build();
 		}
 	}
 
