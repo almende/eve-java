@@ -207,39 +207,6 @@ public class Graph {
 		}
 	}
 
-	// LinkedList
-	class Links {
-		private Boolean	done	= false;
-		private URI		prev	= null;
-		private URI		next	= null;
-
-		public Links() {}
-
-		public Boolean getDone() {
-			return done;
-		}
-
-		public void setDone(Boolean done) {
-			this.done = done;
-		}
-
-		public URI getPrev() {
-			return prev;
-		}
-
-		public void setPrev(URI prev) {
-			this.prev = prev;
-		}
-
-		public URI getNext() {
-			return next;
-		}
-
-		public void setNext(URI next) {
-			this.next = next;
-		}
-	}
-
 	/**
 	 * Sets the comparator, an object that implements this agents side of
 	 * comparable<ObjectNode>
@@ -249,9 +216,59 @@ public class Graph {
 	 * @param comparator
 	 *            the comparator used to order the LinkedList.
 	 */
-	public void llComparator(final String tag,
+	public void llcomparator(final String tag,
 			final Comparable<ObjectNode> comparator) {
 		this.comparators.put(tag, comparator);
+	}
+
+	@JsonIgnore
+	private URI getPeer(final String fullTag) {
+		Edge[] edge = getByTag(fullTag);
+		if (edge != null && edge.length == 1) {
+			return edge[0].getAddress();
+		}
+		return null;
+	}
+
+	private boolean setPeer(final String fullTag, final URI peer) {
+		Edge[] edge = getByTag(fullTag);
+		if (edge.length == 0) {
+			addEdge(new Edge(peer, fullTag, null));
+			return true;
+		} else if (edge.length != 1) {
+			LOG.warning(caller.getSenderUrlByScheme("local")
+					+ ": Node edge is non-singular:" + fullTag);
+			return false;
+		} else {
+			edge[0].setAddress(peer);
+			return true;
+		}
+	}
+
+	private boolean sendRequest(final URI peer, final Links request,
+			final String tag) {
+		Links res = new Links();
+		final Params params = new Params();
+		params.add("tag", tag);
+		params.add("request", request);
+		while (!res.isDone()) {
+			try {
+				res = caller.callSync(peer, "graph.llrequest", params,
+						Links.class);
+				if (res == null) {
+					res = new Links();
+				}
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, caller.getSenderUrlByScheme("local")
+						+ ": Failed to contact prev:" + peer, e);
+				break;
+			} catch (Exception e) {
+				LOG.log(Level.WARNING, caller.getSenderUrlByScheme("local")
+						+ ": Prev threw an exception:" + peer, e);
+				break;
+			}
+		}
+		return res.isDone();
 	}
 
 	/**
@@ -268,13 +285,228 @@ public class Graph {
 	@Access(AccessType.PUBLIC)
 	public Links llrequest(@Name("tag") String tag,
 			@Name("request") Links request, @Sender URI sender) {
+		// TODO: revert behavior?
 		final Links res = new Links();
 		if (!lllock.tryLock()) {
 			return res;
 		}
-		// TODO!
+		if (request.getPrev() != null) {
+			if (request.getPrev().equals(sender)) {
+				if (setPeer(tag + "_prev", request.getPrev())) {
+					res.setPrev(request.getPrev());
+					res.setDone(true);
+				}
+			} else {
+				// Contact request.prev and request change, on report update
+				// locally.
+				final Links prevReq = new Links();
+				prevReq.setNext(caller.getSenderUrlByScheme(sender.getScheme()));
+				if (sendRequest(request.getPrev(), prevReq, tag)) {
+					if (setPeer(tag + "_prev", request.getPrev())) {
+						res.setPrev(request.getPrev());
+						res.setDone(true);
+					}
+				}
+			}
+		}
+		if (request.getNext() != null) {
+			if (request.getNext().equals(sender)) {
+				if (setPeer(tag + "_next", request.getNext())) {
+					res.setNext(request.getNext());
+					res.setDone(true);
+				}
+			} else {
+				// Contact request.next and request change, on report update
+				// locally.
+				final Links nextReq = new Links();
+				nextReq.setPrev(caller.getSenderUrlByScheme(sender.getScheme()));
+				if (sendRequest(request.getNext(), nextReq, tag)) {
+					if (setPeer(tag + "_next", request.getNext())) {
+						res.setNext(request.getNext());
+						res.setDone(true);
+					}
+				}
+			}
+		}
 		lllock.unlock();
 		return res;
+	}
+
+	/**
+	 * Do the actual insert of a node in the linked list.
+	 *
+	 * @param tag
+	 *            the tag
+	 * @param compare
+	 *            the comparator
+	 * @param sender
+	 *            the sender
+	 * @return true, if successful
+	 */
+	@Access(AccessType.PUBLIC)
+	public Boolean lldoinsert(@Name("tag") final String tag,
+			@Name("compare") final ObjectNode compare, @Sender URI sender) {
+		boolean res = false;
+		final Comparable<ObjectNode> me = this.comparators.get(tag);
+		if (me != null) {
+			final Links request = new Links();
+			final int comp = me.compareTo(compare);
+			switch (comp) {
+				case 0:
+					break;
+				case 1:
+					// New node is prev
+					request.setPrev(getPeer(tag + "_prev"));
+					request.setNext(caller.getSenderUrlByScheme(sender
+							.getScheme()));
+					if (sendRequest(sender, request, tag)) {
+						setPeer(tag + "_prev", sender);
+						res = true;
+					}
+					break;
+				case -1:
+					// New node is next
+					request.setNext(getPeer(tag + "_next"));
+					request.setPrev(caller.getSenderUrlByScheme(sender
+							.getScheme()));
+					if (sendRequest(sender, request, tag)) {
+						setPeer(tag + "_next", sender);
+						res = true;
+					}
+					break;
+				default:
+					LOG.warning("Strange comparison result:" + comp);
+			}
+		} else {
+			LOG.warning("Comparable not set for:" + tag);
+		}
+		return res;
+	}
+
+	/**
+	 * Do the actual swap if needed.
+	 *
+	 * @param tag
+	 *            the tag
+	 * @param request
+	 *            the request
+	 * @param compare
+	 *            the compare
+	 * @param sender
+	 *            the sender
+	 * @return true, if successful
+	 */
+	@Access(AccessType.PUBLIC)
+	public boolean lldoswap(@Name("tag") final String tag,
+			@Name("request") Links request,
+			@Name("compare") final ObjectNode compare, @Sender URI sender) {
+		boolean res = false;
+		final boolean up = sender.equals(request.getNext());
+		final Comparable<ObjectNode> me = this.comparators.get(tag);
+		if (me != null) {
+			final Links prev_request = new Links();
+			final Links next_request = new Links();
+			final int comp = me.compareTo(compare);
+			switch (comp) {
+				case 0:
+					break;
+				case 1:
+					// I'm bigger, if up don't do anything, else swap
+					if (!up) {
+						prev_request.setPrev(getPeer(tag + "_prev"));
+						prev_request.setNext(caller.getSenderUrlByScheme(sender
+								.getScheme()));
+						if (sendRequest(sender, prev_request, tag)) {
+							setPeer(tag + "_prev", sender);
+							next_request.setPrev(caller
+									.getSenderUrlByScheme(sender.getScheme()));
+							if (sendRequest(request.getNext(), next_request,
+									tag)) {
+								setPeer(tag + "_next", request.getNext());
+								res = true;
+							}
+						}
+					}
+					break;
+				case -1:
+					// I'm smaller, if !up don't do anything, else swap
+					if (up) {
+						next_request.setNext(getPeer(tag + "_next"));
+						next_request.setPrev(caller.getSenderUrlByScheme(sender
+								.getScheme()));
+						if (sendRequest(sender, next_request, tag)) {
+							setPeer(tag + "_next", sender);
+							prev_request.setNext(caller
+									.getSenderUrlByScheme(sender.getScheme()));
+							if (sendRequest(request.getPrev(), prev_request,
+									tag)) {
+								setPeer(tag + "_prev", request.getPrev());
+								res = true;
+							}
+						}
+					}
+					break;
+				default:
+					LOG.warning("Strange comparison result:" + comp);
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * Check if this node need to swap with neighbor.
+	 *
+	 * @param tag
+	 *            the tag
+	 * @param up
+	 *            the up
+	 * @param compare
+	 *            the compare
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.PUBLIC)
+	public void llswap(@Name("tag") final String tag, @Name("up") Boolean up,
+			@Name("compare") final ObjectNode compare) throws IOException {
+		final Links request = new Links();
+		final Params params = new Params();
+		params.add("tag", tag);
+		params.add("compare", compare);
+		URI peer = getPeer(tag + "_prev");
+		if (!up) {
+			request.setPrev(caller.getSenderUrlByScheme(peer.getScheme()));
+			request.setNext(getPeer(tag + "_next"));
+		} else {
+			peer = getPeer(tag + "_next");
+			request.setNext(caller.getSenderUrlByScheme(peer.getScheme()));
+			request.setPrev(getPeer(tag + "_prev"));
+		}
+		params.add("request", request);
+		if (peer != null) {
+			caller.callSync(peer, "graph.lldoswap", params, Boolean.class);
+		}
+	}
+
+	/**
+	 * Insert of a node in the linked list.
+	 * 
+	 * @param tag
+	 *            the tag
+	 * @param compare
+	 *            the compare
+	 * @param peer
+	 *            the peer
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Access(AccessType.PUBLIC)
+	public void llinsert(@Name("tag") final String tag,
+			@Name("compare") final ObjectNode compare, @Name("peer") URI peer)
+			throws IOException {
+		final Params params = new Params();
+		params.add("tag", tag);
+		params.add("compare", compare);
+		caller.callSync(peer, "graph.lldoinsert", params, Boolean.class);
 	}
 
 	// ScaleFreeNetwork
