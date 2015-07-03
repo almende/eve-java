@@ -194,7 +194,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	 * Destroy the agent.
 	 */
 	@Access(AccessType.UNAVAILABLE)
-	public void destroy(Boolean instanceOnly) {
+	protected void destroy(Boolean instanceOnly) {
 		onDestroy();
 		if (scheduler != null) {
 			scheduler.delete();
