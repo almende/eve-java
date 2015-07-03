@@ -76,12 +76,19 @@ public class RedisStateBuilder extends AbstractCapabilityBuilder<RedisState> {
 
 		@Override
 		public void delete(State instance) {
-			Jedis redis = getInstance();
-			if (redis.sismember(IDKEY, instance.getId())) {
-				redis.srem(IDKEY, instance.getId());
-			}
-			returnInstance(redis);
+			delete(instance, false);
 		}
+		
+		@Override
+                public void delete(State instance, Boolean instanceOnly) {
+		        if(!instanceOnly) {
+        		    Jedis redis = getInstance();
+                            if (redis.sismember(IDKEY, instance.getId())) {
+                                    redis.srem(IDKEY, instance.getId());
+                            }
+                            returnInstance(redis);
+		        }
+                }
 
 		@Override
 		public Set<String> getStateIds() {

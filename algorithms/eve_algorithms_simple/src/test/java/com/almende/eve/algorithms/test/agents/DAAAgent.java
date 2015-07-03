@@ -148,8 +148,8 @@ public class DAAAgent extends NodeAgent {
 		return daa.getCurrentEstimate().avgTTL();
 	}
 
-	public void destroy() {
-		super.destroy();
+	public void destroy(@Name("instanceOnly") Boolean instanceOnly) {
+		super.destroy(instanceOnly);
 	}
 
 }

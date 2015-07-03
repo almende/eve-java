@@ -268,13 +268,25 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		 */
 		@Override
 		public void delete(final State instance) {
-			final String id = instance.getId();
-			final File file = new File(getFilename(id));
-			if (file.exists()) {
-				file.delete();
-			}
-			states.remove(id);
+			delete(instance, false);
 		}
+		
+		/*
+                 * (non-Javadoc)
+                 * @see
+                 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+                 */
+                @Override
+                public void delete(final State instance, final Boolean instanceOnly) {
+                        final String id = instance.getId();
+                        if(!instanceOnly) {
+                            final File file = new File(getFilename(id));
+                            if (file.exists()) {
+                                    file.delete();
+                            }
+                        }
+                        states.remove(id);
+                }
 
 		/*
 		 * (non-Javadoc)
