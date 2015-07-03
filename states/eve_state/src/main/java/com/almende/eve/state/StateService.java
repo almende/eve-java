@@ -21,6 +21,14 @@ public interface StateService {
 	void delete(State instance);
 	
 	/**
+         * Delete. and only instance
+         * 
+         * @param instance
+         *            the instance
+         */
+        void delete(State instance, Boolean instanceOnly);
+	
+	/**
 	 * Gets the existing stateIds.
 	 *
 	 * @return the stateIds

@@ -18,7 +18,7 @@ public interface State extends Capability {
 	/**
 	 * Delete this state.
 	 */
-	void delete();
+	void delete(Boolean instanceOnly);
 	
 	/**
 	 * Gets the state's id.

@@ -187,8 +187,8 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	 * @see com.almende.eve.agent.Agent#destroy()
 	 */
 	@Override
-	public void destroy() {
-		super.destroy();
+	public void destroy(@Name("instanceOnly") Boolean instanceOnly) {
+		super.destroy(instanceOnly);
 	}
 
 	/**
