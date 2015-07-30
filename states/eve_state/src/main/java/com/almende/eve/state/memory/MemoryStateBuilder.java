@@ -73,6 +73,17 @@ public class MemoryStateBuilder extends AbstractCapabilityBuilder<MemoryState>
 	public void delete(final State instance) {
 		STATES.remove(instance.getId());
 	}
+	
+	/*
+         * (non-Javadoc)
+         * 
+         * @see
+         * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+         */
+        @Override
+        public void delete(final State instance, final Boolean instanceOnly) {
+                STATES.remove(instance.getId());
+        }
 
 	@Override
 	public Set<String> getStateIds() {

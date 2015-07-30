@@ -270,15 +270,26 @@ public abstract class AbstractState<V> implements State {
 	}
 	
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.state.State#delete()
-	 */
+         * (non-Javadoc)
+         * 
+         * @see com.almende.eve.state.State#delete()
+         */
 	@Override
-	public void delete() {
+        public void delete() {
+	    this.delete(false);
+	}
+	
+	/*
+         * (non-Javadoc)
+         * 
+         * @see com.almende.eve.state.State#delete()
+         */
+	public void delete(Boolean instanceOnly) {
 		if (service != null) {
-			clear();
-			service.delete(this);
+		        if(!instanceOnly) {
+		            clear();
+		        }
+			service.delete(this, instanceOnly);
 		}
 	}
 	

@@ -136,7 +136,7 @@ public class TestDAA extends TestCase {
 		}
 		
 		LOG.warning("changing sum to 5");
-		agents[0].destroy();
+		agents[0].destroy(false);
 		for (int i = 0; i < 60; i++) {
 			try {
 				Thread.sleep(500);

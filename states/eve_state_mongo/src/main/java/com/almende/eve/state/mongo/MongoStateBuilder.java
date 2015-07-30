@@ -160,18 +160,30 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 		}
 
 		/*
-		 * (non-Javadoc)
-		 * @see
-		 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
-		 */
-		@Override
-		public void delete(final State instance) {
-			try {
-				getCollection().remove("{_id: #}", instance.getId());
-			} catch (final Exception e) {
-				LOG.log(Level.WARNING, "delete error", e);
-			}
-		}
+                 * (non-Javadoc)
+                 * @see
+                 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+                 */
+                @Override
+                public void delete(final State instance) {
+                        delete(instance, false);
+                }
+                
+                /*
+                 * (non-Javadoc)
+                 * @see
+                 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+                 */
+                @Override
+                public void delete(final State instance, final Boolean instanceOnly) {
+                        if(!instanceOnly) {
+                            try {
+                                    getCollection().remove("{_id: #}", instance.getId());
+                            } catch (final Exception e) {
+                                    LOG.log(Level.WARNING, "delete error", e);
+                            }
+                        }
+                }
 
 		@Override
 		public Set<String> getStateIds() {

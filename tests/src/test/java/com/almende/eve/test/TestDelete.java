@@ -56,7 +56,7 @@ public class TestDelete extends TestCase {
 		config = null;
 
 		WeakReference<Agent> test = new WeakReference<Agent>(agent);
-		agent.destroy();
+		agent.destroy(false);
 		agent = null;
 
 		System.gc();

@@ -143,15 +143,28 @@ public class CouchStateBuilder extends AbstractCapabilityBuilder<CouchState> {
 		}
 		
 		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
-		 */
-		@Override
-		public void delete(final State instance) {
-			db.delete(instance);
-		}
+                 * (non-Javadoc)
+                 * 
+                 * @see
+                 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+                 */
+                @Override
+                public void delete(final State instance) {
+                        delete(instance, false);
+                }
+                
+                /*
+                 * (non-Javadoc)
+                 * 
+                 * @see
+                 * com.almende.eve.state.StateService#delete(com.almende.eve.state.State)
+                 */
+                @Override
+                public void delete(final State instance, final Boolean instanceOnly) {
+                        if(!instanceOnly) {
+                            db.delete(instance);
+                        }
+                }
 		
 		/**
 		 * Check the key if it starts with a _
