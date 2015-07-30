@@ -7,11 +7,9 @@ package com.almende.eve.state.file;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,11 +70,10 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 	}
 
 	class FileStateProvider implements StateService {
-		private String									path		= null;
-		private Boolean									json		= true;
-		private Boolean									multilevel	= false;
-		private final Map<String, WeakReference<State>>	states		= new ConcurrentHashMap<String, WeakReference<State>>(
-																			10);
+		private String									path	= null;
+		private Boolean									json	= true;
+		private final Map<String, WeakReference<State>>	states	= new ConcurrentHashMap<String, WeakReference<State>>(
+																		10);
 
 		/**
 		 * Instantiates a new file state provider.
@@ -88,10 +85,6 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 			final FileStateConfig config = FileStateConfig.decorate(params);
 			json = config.getJson();
 			setPath(config.getPath());
-
-			if (params.has("multilevel")) {
-				multilevel = params.get("multilevel").asBoolean();
-			}
 		}
 
 		/**
@@ -108,7 +101,6 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		public FileStateProvider(final String path, final Boolean json,
 				final Boolean multilevel) {
 			this.json = json;
-			this.multilevel = multilevel;
 			setPath(path);
 		}
 
@@ -242,22 +234,6 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		private String getFilename(final String agentId) {
 
 			final String apath = path != null ? path : "./";
-
-			if (multilevel) {
-				// try 1 level of subdirs. I need this badly, tymon
-				final File folder = new File(apath);
-				final File[] files = folder.listFiles();
-				final List<File> totalList = Arrays.asList(files);
-				for (final File file : totalList) {
-					if (!file.isDirectory()) {
-						continue;
-					}
-					final String ret = apath + file.getName() + "/" + agentId;
-					if (new File(ret).exists()) {
-						return ret;
-					}
-				}
-			}
 			return apath + agentId;
 		}
 
@@ -291,20 +267,8 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 		@Override
 		public Set<String> getStateIds() {
 			final File folder = new File(this.path);
-			final File[] files = folder.listFiles();
-			final List<File> totalList = Arrays.asList(files);
-			if (multilevel) {
-				for (final File file : new ArrayList<File>(totalList)) {
-					if (!file.isDirectory()) {
-						continue;
-					}
-					totalList.add(file);
-				}
-			}
-			Set<String> result = new HashSet<String>(totalList.size());
-			for (final File file : totalList) {
-				result.add(file.getName());
-			}
+			final String[] list = folder.list();
+			final Set<String> result = new HashSet<String>(Arrays.asList(list));
 			return result;
 		}
 	}
