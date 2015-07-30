@@ -7,9 +7,12 @@ package com.almende.eve.state.file;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -266,9 +269,21 @@ public class FileStateBuilder extends AbstractCapabilityBuilder<State> {
 
 		@Override
 		public Set<String> getStateIds() {
-			final File folder = new File(this.path);
-			final String[] list = folder.list();
-			final Set<String> result = new HashSet<String>(Arrays.asList(list));
+			final Set<String> result = new HashSet<String>();
+			try {
+				Iterator<Path> iter = Files.newDirectoryStream(
+						Paths.get(this.path)).iterator();
+				while (iter.hasNext()) {
+					final Path path = iter.next();
+					final File file = path.toFile();
+					if (!file.isDirectory()) {
+						result.add(path.getFileName().toString());
+					}
+				}
+			} catch (IOException e) {
+				LOG.log(Level.WARNING,
+						"Couldn't read the path at:" + this.path, e);
+			}
 			return result;
 		}
 	}
