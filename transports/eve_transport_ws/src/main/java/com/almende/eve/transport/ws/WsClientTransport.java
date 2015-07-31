@@ -25,6 +25,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -102,7 +103,7 @@ public class WsClientTransport extends WebsocketTransport {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void send(final byte[] message) throws IOException {
-		send(serverUrl, message, null);
+		send(serverUrl, message, null, null);
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class WsClientTransport extends WebsocketTransport {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void send(final String message) throws IOException {
-		send(serverUrl, message, null);
+		send(serverUrl, message, null, null);
 	}
 
 	/*
@@ -123,8 +124,8 @@ public class WsClientTransport extends WebsocketTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
@@ -143,7 +144,7 @@ public class WsClientTransport extends WebsocketTransport {
 				if (rte.getMessage().equals("Socket is not connected.")) {
 					remote = null;
 					// retry!
-					send(receiverUri, message, tag);
+					send(receiverUri, message, tag, callback);
 				}
 			}
 		} else {
@@ -157,8 +158,8 @@ public class WsClientTransport extends WebsocketTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		if (!receiverUri.equals(serverUrl)) {
 			throw new IOException(
 					"Currently it's only possible to send to the server agent directly, not other agents:"
@@ -175,7 +176,7 @@ public class WsClientTransport extends WebsocketTransport {
 				if (rte.getMessage().equals("Socket is not connected.")) {
 					remote = null;
 					// retry!
-					send(receiverUri, message, tag);
+					send(receiverUri, message, tag, callback);
 				}
 			}
 		} else {

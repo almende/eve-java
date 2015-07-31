@@ -650,7 +650,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 			final Meta wrapper = protocolStack.outbound(message, url, null);
 			if (wrapper != null) {
 				transport.send(wrapper.getPeer(), wrapper.getMsg(),
-						wrapper.getTag());
+						wrapper.getTag(), null);
 			}
 		}
 
@@ -661,7 +661,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 			final Meta wrapper = protocolStack.outbound(message, url, tag);
 			if (wrapper != null) {
 				transport.send(wrapper.getPeer(), wrapper.getMsg(),
-						wrapper.getTag());
+						wrapper.getTag(), null);
 			}
 		}
 
@@ -677,7 +677,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 				throws IOException {
 			final JSONRequest message = new JSONRequest(method, params,
 					callback);
-			call(url, message);
+			call(url, message, null);
 		}
 
 		@Override
@@ -689,7 +689,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 			final Meta wrapper = protocolStack.outbound(message, url, null);
 			if (wrapper != null) {
 				transport.send(wrapper.getPeer(), wrapper.getMsg(),
-						wrapper.getTag());
+						wrapper.getTag(), callback);
 			}
 		}
 
@@ -739,7 +739,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 			final Meta wrapper = protocolStack.outbound(message, url, null);
 			if (wrapper != null) {
 				transport.send(wrapper.getPeer(), wrapper.getMsg(),
-						wrapper.getTag());
+						wrapper.getTag(), callback);
 			}
 			try {
 				return callback.get();

@@ -13,6 +13,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.amqp.AmqpTransportBuilder.AmqpService;
+import com.almende.util.callback.AsyncCallback;
 
 /**
  * The Class XmppTransport.
@@ -38,7 +39,7 @@ public class AmqpTransport extends AbstractTransport  {
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public <T> void send(final URI receiverUri, final String message, final String tag, final AsyncCallback<T> callback)
 			throws IOException {
 		// TODO Auto-generated method stub
 		
@@ -48,7 +49,7 @@ public class AmqpTransport extends AbstractTransport  {
 	 * @see com.almende.eve.transport.Transport#send(java.net.URI, byte[], java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public <T> void send(final URI receiverUri, final byte[] message, final String tag, final AsyncCallback<T> callback)
 			throws IOException {
 		// TODO Auto-generated method stub
 		

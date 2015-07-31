@@ -78,8 +78,8 @@ public class HttpTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> exceptionCallback) throws IOException {
 		if (tag != null) {
 			if (callbacks != null) {
 				final AsyncCallback<String> callback = callbacks.get(tag);
@@ -97,7 +97,7 @@ public class HttpTransport extends AbstractTransport {
 		}
 		// Check and deliver local shortcut.
 		if (sendLocal(receiverUri, message)) {
-			return;
+		    return;
 		}
 		final String senderUrl = super.getAddress().toASCIIString();
 		final Handler<Receiver> handle = super.getHandle();
@@ -118,17 +118,31 @@ public class HttpTransport extends AbstractTransport {
 							.execute(httpPost);
 					final String result = EntityUtils.toString(webResp
 							.getEntity());
-					if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+					if (webResp.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+					    if(exceptionCallback!=null) {
+                                                exceptionCallback.onFailure( new Exception("Received HTTP Error Status:"
+                                                    + webResp.getStatusLine().getStatusCode() + ":"
+                                                    + webResp.getStatusLine().getReasonPhrase()) );
+                                            }
+					} else if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 						LOG.warning("Received HTTP Error Status:"
 								+ webResp.getStatusLine().getStatusCode() + ":"
 								+ webResp.getStatusLine().getReasonPhrase());
 						LOG.warning(result);
+						if(exceptionCallback!=null) {
+    						    exceptionCallback.onFailure( new Exception("Received HTTP Error Status:"
+                                                        + webResp.getStatusLine().getStatusCode() + ":"
+                                                        + webResp.getStatusLine().getReasonPhrase()) );
+						}
 					} else {
 						handle.get().receive(result, receiverUri, null);
 					}
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING,
 							"HTTP roundtrip resulted in exception!", e);
+					if(exceptionCallback!=null) {
+                                            exceptionCallback.onFailure( new Exception("HTTP roundtrip resulted in exception!") );
+                                        }
 				} finally {
 					if (httpPost != null) {
 						httpPost.abort();
@@ -145,9 +159,9 @@ public class HttpTransport extends AbstractTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
-		send(receiverUri, Base64.encodeBase64(message), tag);
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
+		send(receiverUri, Base64.encodeBase64(message), tag, callback);
 	}
 	
 	/**
