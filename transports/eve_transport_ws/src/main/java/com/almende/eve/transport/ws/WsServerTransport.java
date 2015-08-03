@@ -21,6 +21,7 @@ import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -107,8 +108,8 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> calback) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
 			final Async remote = remotes.get(receiverUri);
 			remote.sendText(message);
@@ -127,8 +128,8 @@ public class WsServerTransport extends WebsocketTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> calback) throws IOException {
 		if (remotes.containsKey(receiverUri)) {
 			final Async remote = remotes.get(receiverUri);
 			remote.sendBinary(ByteBuffer.wrap(message));

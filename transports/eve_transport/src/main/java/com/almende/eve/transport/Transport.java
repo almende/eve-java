@@ -11,6 +11,7 @@ import java.util.List;
 import com.almende.eve.capabilities.Capability;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.TypeUtil;
+import com.almende.util.callback.AsyncCallback;
 
 /**
  * The Interface Transport.
@@ -35,7 +36,7 @@ public interface Transport extends Capability {
 	 *             Signals that an I/O exception has occurred.
 	 * @oaran receiverUrl
 	 */
-	void send(final URI receiverUri, final String message, final String tag)
+	<T> void send(final URI receiverUri, final String message, final String tag, final AsyncCallback<T> callback)
 			throws IOException;
 
 	/**
@@ -53,7 +54,7 @@ public interface Transport extends Capability {
 	 *             Signals that an I/O exception has occurred.
 	 * @oaran receiverUrl
 	 */
-	void send(final URI receiverUri, final byte[] message, final String tag)
+	<T> void send(final URI receiverUri, final byte[] message, final String tag, final AsyncCallback<T> callback)
 			throws IOException;
 
 	/**
@@ -70,7 +71,7 @@ public interface Transport extends Capability {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	void send(final URI receiverUri, final Object message, final String tag)
+	<T> void send(final URI receiverUri, final Object message, final String tag, final AsyncCallback<T> callback)
 			throws IOException;
 
 	/**

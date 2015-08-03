@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -103,8 +104,8 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 * java.lang.String, java.lang.String)
 		 */
 		@Override
-		public void send(final URI receiverUri, final String message,
-				final String tag) throws IOException {
+		public <T> void send(final URI receiverUri, final String message,
+				final String tag, final AsyncCallback<T> callback) throws IOException {
 			if (!sendLocal(receiverUri, message)) {
 				throw new IOException("No local agent found at:"
 						+ receiverUri.toASCIIString());
@@ -117,8 +118,8 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 * java.lang.String)
 		 */
 		@Override
-		public void send(final URI receiverUri, final byte[] message,
-				final String tag) throws IOException {
+		public <T> void send(final URI receiverUri, final byte[] message,
+				final String tag, final AsyncCallback<T> callback) throws IOException {
 			if (!sendLocal(receiverUri, message)) {
 				throw new IOException("No local agent found at:"
 						+ receiverUri.toASCIIString());
@@ -131,8 +132,8 @@ public class LocalTransportBuilder extends AbstractCapabilityBuilder<Transport> 
 		 * java.lang.String)
 		 */
 		@Override
-		public void send(final URI receiverUri, final Object message,
-				final String tag) throws IOException {
+		public <T> void send(final URI receiverUri, final Object message,
+				final String tag, final AsyncCallback<T> callback) throws IOException {
 			if (!sendLocal(receiverUri, message)) {
 				throw new IOException("No local agent found at:"
 						+ receiverUri.toASCIIString());

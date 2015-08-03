@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.callback.AsyncCallback;
 import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -48,12 +49,12 @@ public abstract class AbstractTransport implements Transport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final Object message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final Object message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		if (message == null){
-			send(receiverUri, "", tag);
+			send(receiverUri, "", tag, callback);
 		} else {
-			send(receiverUri, message.toString(), tag);
+			send(receiverUri, message.toString(), tag, callback);
 		}
 	}
 	

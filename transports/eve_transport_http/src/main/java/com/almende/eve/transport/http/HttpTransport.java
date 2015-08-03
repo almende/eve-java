@@ -73,8 +73,8 @@ public class HttpTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> exceptionCallback) throws IOException {
 		if (tag != null) {
 			if (callbacks != null) {
 				final AsyncCallback<String> callback = callbacks.get(tag);
@@ -92,7 +92,7 @@ public class HttpTransport extends AbstractTransport {
 		}
 		// Check and deliver local shortcut.
 		if (sendLocal(receiverUri, message)) {
-			return;
+		    return;
 		}
 		final String senderUrl = super.getAddress().toASCIIString();
 		final Handler<Receiver> handle = super.getHandle();
@@ -122,6 +122,11 @@ public class HttpTransport extends AbstractTransport {
 						LOG.warning(result);
 						// TODO: should we send back a JSONRPCException? (Which
 						// is not a known type at this point!)
+						if(exceptionCallback!=null) {
+                                                    exceptionCallback.onFailure( new Exception("Received HTTP Error Status:"
+                                                        + webResp.getStatusLine().getStatusCode() + ":"
+                                                        + webResp.getStatusLine().getReasonPhrase()) );
+                                                }
 					} else {
 						ThreadPool.getPool().execute(new Runnable() {
 							public void run() {
@@ -132,6 +137,9 @@ public class HttpTransport extends AbstractTransport {
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING,
 							"HTTP roundtrip resulted in exception!", e);
+					if(exceptionCallback!=null) {
+                                            exceptionCallback.onFailure( new Exception("HTTP roundtrip resulted in exception!") );
+                                        }
 				} finally {
 					if (httpPost != null) {
 						httpPost.reset();
@@ -147,9 +155,9 @@ public class HttpTransport extends AbstractTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
-		send(receiverUri, Base64.encodeBase64String(message), tag);
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
+		send(receiverUri, Base64.encodeBase64String(message), tag, callback);
 	}
 
 	/**
