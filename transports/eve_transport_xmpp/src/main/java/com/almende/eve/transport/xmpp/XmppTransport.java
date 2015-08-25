@@ -26,6 +26,7 @@ import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 
 /**
  * The Class XmppTransport.
@@ -79,12 +80,8 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
-		// Check and deliver local shortcut.
-		if (sendLocal(receiverUri, message)) {
-			return;
-		}
+	public<T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		if (!isConnected()) {
 			connect();
 		}
@@ -108,9 +105,9 @@ public class XmppTransport extends AbstractTransport implements PacketListener {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
-		send(receiverUri, Base64.encodeBase64String(message), tag);
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
+		send(receiverUri, Base64.encodeBase64String(message), tag, callback);
 	}
 	
 	private boolean isConnected() {

@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.almende.eve.capabilities.handler.Handler;
+import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.almende.util.threads.ThreadPool;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -55,12 +56,12 @@ public class Router implements Transport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
-			transport.send(receiverUri, message, tag);
+			transport.send(receiverUri, message, tag, callback);
 		} else {
 			throw new IOException("No transport known for scheme:"
 					+ receiverUri.getScheme());
@@ -73,12 +74,12 @@ public class Router implements Transport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		final Transport transport = transports.get(receiverUri.getScheme()
 				.toLowerCase());
 		if (transport != null) {
-			transport.send(receiverUri, message, tag);
+			transport.send(receiverUri, message, tag, callback);
 		} else {
 			throw new IOException("No transport known for scheme:"
 					+ receiverUri.getScheme());
@@ -91,16 +92,16 @@ public class Router implements Transport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final Object message,
-			final String tag) throws IOException {
-		final Transport transport = transports.get(receiverUri.getScheme()
-				.toLowerCase(Locale.ENGLISH));
-		if (transport != null) {
-			transport.send(receiverUri, message, tag);
-		} else {
-			throw new IOException("No transport known for scheme:"
-					+ receiverUri.getScheme());
-		}
+	public <T> void send(final URI receiverUri, final Object message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
+	        final Transport transport = transports.get(receiverUri.getScheme()
+	                                                   .toLowerCase(Locale.ENGLISH));
+    		if (transport != null) {
+    			transport.send(receiverUri, message, tag, callback);
+    		} else {
+    			throw new IOException("No transport known for scheme:"
+    					+ receiverUri.getScheme());
+    		}
 	}
 
 	/*

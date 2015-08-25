@@ -4,6 +4,8 @@
  */
 package com.almende.eve.algorithms.clustering;
 
+import java.net.URI;
+
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.protocol.Meta;
 import com.almende.eve.protocol.Protocol;
@@ -47,8 +49,11 @@ public class GlobalAddressProtocol implements Protocol {
 	public boolean outbound(Meta msg) {
 		// just forwarding...
 		if (msg.getPeer().getScheme().equals("eve")) {
-			msg.setPeer(GlobalAddressMapper.get().get(
-					msg.getPeer().toASCIIString()));
+		    URI uri = GlobalAddressMapper.get().get(msg.getPeer().toASCIIString());
+		    if(uri==null) {
+		       throw new GlobalAddressMappingNotFoundException(); 
+		    }
+		    msg.setPeer(uri);
 		}
 		return msg.nextOut();
 	}

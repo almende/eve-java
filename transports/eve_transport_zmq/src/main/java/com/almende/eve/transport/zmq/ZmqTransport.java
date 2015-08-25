@@ -76,8 +76,8 @@ public class ZmqTransport extends AbstractTransport {
 	 * @param tag
 	 *            the tag
 	 */
-	public void sendAsync(final byte[] zmqType, final String token,
-			final URI receiverUrl, final byte[] message, final String tag) {
+	public <T> void sendAsync(final byte[] zmqType, final String token,
+			final URI receiverUrl, final byte[] message, final String tag, final AsyncCallback<T> callback) {
 		final String senderUrl = super.getAddress().toString();
 		ThreadPool.getPool().execute(new Runnable() {
 			@Override
@@ -94,6 +94,7 @@ public class ZmqTransport extends AbstractTransport {
 
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
+					callback.onFailure( new IOException( "Failed to send JSON through ZMQ, e: " + e.getMessage() ) );
 				}
 				socket.setTCPKeepAlive(-1);
 				socket.setLinger(-1);
@@ -108,14 +109,10 @@ public class ZmqTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final String message,
-			final String tag) throws IOException {
-		// Check and deliver local shortcut.
-		if (sendLocal(receiverUri, message)) {
-			return;
-		}
+	public <T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
-				message.getBytes(), tag);
+				message.getBytes(), tag, callback);
 	}
 
 	/*
@@ -124,13 +121,10 @@ public class ZmqTransport extends AbstractTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(final URI receiverUri, final byte[] message,
-			final String tag) throws IOException {
-		if (sendLocal(receiverUri, message)) {
-			return;
-		}
+	public <T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback) throws IOException {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
-				message, tag);
+				message, tag, callback);
 	}
 
 	/*
@@ -256,7 +250,7 @@ public class ZmqTransport extends AbstractTransport {
 			// Reply token corresponding to timestamp.
 			final String res = tokenstore.get(body);
 			sendAsync(ZMQ.HANDSHAKE_RESPONSE, res, senderUrl, res.getBytes(),
-					null);
+					null, null);
 			return;
 		} else if (Arrays.equals(msg[0].array(), ZMQ.HANDSHAKE_RESPONSE)) {
 			// post response to callback for handling by other thread
@@ -274,7 +268,7 @@ public class ZmqTransport extends AbstractTransport {
 				final SyncCallback<String> callback = new SyncCallback<String>() {};
 				CALLBACKS.put(key, "", callback);
 				sendAsync(ZMQ.HANDSHAKE, token.toString(), senderUrl, token
-						.getTime().getBytes(), null);
+						.getTime().getBytes(), null, null);
 
 				String retToken = null;
 				try {

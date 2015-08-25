@@ -49,7 +49,7 @@ public class TestHttp extends TestCase {
 
 		transport.send(
 				URIUtil.create("http://localhost:8080/agents/testAgent"),
-				"Hello World", null);
+				"Hello World", null, null);
 	}
 
 	/**

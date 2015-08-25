@@ -51,7 +51,7 @@ public class TestTransports extends TestCase {
 		transport.connect();
 
 		transport.send(URIUtil.create("xmpp:gloria@openid.almende.org"),
-				"Hello World", null);
+				"Hello World", null, null);
 
 		try {
 			Thread.sleep(10000);
@@ -74,7 +74,7 @@ public class TestTransports extends TestCase {
 		transport.connect();
 
 		transport.send(URIUtil.create("zmq://tcp://127.0.0.1:5678"),
-				"Hello World", null);
+				"Hello World", null, null);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class TestTransports extends TestCase {
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
 
-		transport.send(URI.create("local:testMe"), "Hello World", null);
+		transport.send(URI.create("local:testMe"), "Hello World", null, null);
 	}
 
 	/**
@@ -122,10 +122,10 @@ public class TestTransports extends TestCase {
 				.withConfig(clientConfig).withHandle(new MyReceiver()).build();
 		client.connect();
 
-		server.send(URIUtil.create("wsclient:testClient"), "Hi there!", null);
+		server.send(URIUtil.create("wsclient:testClient"), "Hi there!", null, null);
 
 		client.send(URIUtil.create("ws://localhost:8082/ws/testServer"),
-				"Good day to you!", null);
+				"Good day to you!", null, null);
 
 	}
 

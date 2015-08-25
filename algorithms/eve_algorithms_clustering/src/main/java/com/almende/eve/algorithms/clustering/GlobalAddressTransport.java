@@ -17,6 +17,7 @@ import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.TransportService;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -61,7 +62,7 @@ public class GlobalAddressTransport extends AbstractTransport {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, String message, String tag)
+	public <T> void send(URI receiverUri, String message, String tag, AsyncCallback<T> callback)
 			throws IOException {
 		throw new IOException("This transport can't send anything!");
 	}
@@ -72,7 +73,7 @@ public class GlobalAddressTransport extends AbstractTransport {
 	 * java.lang.String)
 	 */
 	@Override
-	public void send(URI receiverUri, byte[] message, String tag)
+	public <T> void send(URI receiverUri, byte[] message, String tag, AsyncCallback<T> callback)
 			throws IOException {
 		throw new IOException("This transport can't send anything!");
 	}
