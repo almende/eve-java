@@ -14,3 +14,7 @@ TestXMPPAsk.java
 
 .scaleTest
 .wakeservices
+.testStrong1
+.testStrong2
+.testWeak1
+.testWeak2
