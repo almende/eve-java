@@ -1,9 +1,0 @@
-To compile:
-mvn clean install
-
-To run:
-java -jar target/GameOfLiveDemo-3.0.0-SNAPSHOT-jar-with-dependencies.jar eve.yaml < 55blink.txt
-
-
-
-
