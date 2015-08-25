@@ -71,7 +71,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	private String					agentId			= null;
 	private ObjectNode				literalConfig	= null;
 	private AgentConfig				config			= null;
-	private InstantiationService	is				= null;
+	private InstantiationService	instService		= null;
 	private State					state			= null;
 	private Router					transport		= new Router();
 	private Scheduler				scheduler		= null;
@@ -213,9 +213,9 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 			state.delete(instanceOnly);
 			state = null;
 		}
-		if (is != null) {
-			is.deregister(agentId);
-			is = null;
+		if (instService != null) {
+			instService.deregister(agentId);
+			instService = null;
 		}
 	}
 
@@ -273,10 +273,13 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	private void loadConfig() {
 		agentId = config.getId();
 		loadInstantiationService(config.getInstantiationService());
-		if (is != null && config.isCanHibernate()) {
-			setHandler(new HibernationHandler<Object>(this, agentId, is));
-			setReceiver(new HibernationHandler<Receiver>(this, agentId, is));
-			setSender(new HibernationHandler<Caller>(caller, agentId, is));
+		if (instService != null && config.isCanHibernate()) {
+			setHandler(new HibernationHandler<Object>(this, agentId,
+					instService));
+			setReceiver(new HibernationHandler<Receiver>(this, agentId,
+					instService));
+			setSender(new HibernationHandler<Caller>(caller, agentId,
+					instService));
 		}
 		loadState(config.getState());
 		loadProtocols(config.getProtocols());
@@ -397,7 +400,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	 */
 	@JsonIgnore
 	protected InstantiationService getInstantiationService() {
-		return is;
+		return instService;
 	}
 
 	private void loadInstantiationService(final ObjectNode config) {
@@ -410,8 +413,10 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 				stateConfig.setId(agentId);
 				iscfg.setState(stateConfig);
 			}
-			is = new InstantiationServiceBuilder().withConfig(iscfg).build();
-			is.register(agentId, literalConfig, this.getClass().getName());
+			instService = new InstantiationServiceBuilder().withConfig(iscfg)
+					.build();
+			instService.register(agentId, literalConfig, this.getClass()
+					.getName());
 		}
 	}
 
