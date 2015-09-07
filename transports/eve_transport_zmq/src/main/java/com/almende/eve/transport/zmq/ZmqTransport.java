@@ -64,7 +64,9 @@ public class ZmqTransport extends AbstractTransport {
 
 	/**
 	 * Send async.
-	 * 
+	 *
+	 * @param <T>
+	 *            the generic type
 	 * @param zmqType
 	 *            the zmq type
 	 * @param token
@@ -75,11 +77,19 @@ public class ZmqTransport extends AbstractTransport {
 	 *            the message
 	 * @param tag
 	 *            the tag
+	 * @param callback
+	 *            the callback
 	 */
 	public <T> void sendAsync(final byte[] zmqType, final String token,
-			final URI receiverUrl, final byte[] message, final String tag, final AsyncCallback<T> callback) {
+			final URI receiverUrl, final byte[] message, final String tag,
+			final AsyncCallback<T> callback) {
 		final String senderUrl = super.getAddress().toString();
 		ThreadPool.getPool().execute(new Runnable() {
+
+			/*
+			 * (non-Javadoc)
+			 * @see java.lang.Runnable#run()
+			 */
 			@Override
 			public void run() {
 				final String addr = receiverUrl.toString().replaceFirst(
@@ -94,7 +104,9 @@ public class ZmqTransport extends AbstractTransport {
 
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING, "Failed to send JSON through ZMQ", e);
-					callback.onFailure( new IOException( "Failed to send JSON through ZMQ, e: " + e.getMessage() ) );
+					callback.onFailure(new IOException(
+							"Failed to send JSON through ZMQ, e: "
+									+ e.getMessage()));
 				}
 				socket.setTCPKeepAlive(-1);
 				socket.setLinger(-1);
@@ -110,7 +122,8 @@ public class ZmqTransport extends AbstractTransport {
 	 */
 	@Override
 	public <T> void send(final URI receiverUri, final String message,
-			final String tag, final AsyncCallback<T> callback) throws IOException {
+			final String tag, final AsyncCallback<T> callback)
+			throws IOException {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message.getBytes(), tag, callback);
 	}
@@ -122,7 +135,8 @@ public class ZmqTransport extends AbstractTransport {
 	 */
 	@Override
 	public <T> void send(final URI receiverUri, final byte[] message,
-			final String tag, final AsyncCallback<T> callback) throws IOException {
+			final String tag, final AsyncCallback<T> callback)
+			throws IOException {
 		sendAsync(ZMQ.NORMAL, tokenstore.create().toString(), receiverUri,
 				message, tag, callback);
 	}

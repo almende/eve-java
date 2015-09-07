@@ -22,8 +22,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Access(AccessType.PUBLIC)
 public class TestScaleAgent extends Agent {
 
-	URI			parent		= null;
-	List<URI>	children	= new ArrayList<URI>();
+	private URI				parent		= null;
+	private final List<URI>	children	= new ArrayList<URI>();
+	private final List<URI>	result		= new ArrayList<URI>();
+	private final int[]		resCount	= new int[1];
 
 	/**
 	 * Instantiates a new test scale agent.
@@ -51,9 +53,6 @@ public class TestScaleAgent extends Agent {
 			}
 		}
 	}
-
-	final List<URI>	result		= new ArrayList<URI>();
-	final int[]		resCount	= new int[1];
 
 	/**
 	 * Put leafs.

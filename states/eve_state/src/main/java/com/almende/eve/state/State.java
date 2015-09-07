@@ -15,18 +15,22 @@ import com.fasterxml.jackson.databind.JavaType;
  * The Interface State.
  */
 public interface State extends Capability {
+
 	/**
 	 * Delete this state.
+	 *
+	 * @param instanceOnly
+	 *            the instance only
 	 */
 	void delete(Boolean instanceOnly);
-	
+
 	/**
 	 * Gets the state's id.
 	 * 
 	 * @return the state's id
 	 */
 	String getId();
-	
+
 	/**
 	 * Put.
 	 * 
@@ -37,7 +41,7 @@ public interface State extends Capability {
 	 * @return the object
 	 */
 	Object put(String key, Object value);
-	
+
 	/**
 	 * Removes the.
 	 * 
@@ -46,7 +50,7 @@ public interface State extends Capability {
 	 * @return the object
 	 */
 	Object remove(String key);
-	
+
 	/**
 	 * Put if unchanged.
 	 * 
@@ -59,7 +63,7 @@ public interface State extends Capability {
 	 * @return true, if successful
 	 */
 	boolean putIfUnchanged(String key, Object newVal, Object oldVal);
-	
+
 	/**
 	 * Contains key.
 	 * 
@@ -68,26 +72,26 @@ public interface State extends Capability {
 	 * @return true, if successful
 	 */
 	boolean containsKey(String key);
-	
+
 	/**
 	 * Key set.
 	 * 
 	 * @return the sets the
 	 */
 	Set<String> keySet();
-	
+
 	/**
 	 * Clear.
 	 */
 	void clear();
-	
+
 	/**
 	 * Size.
 	 * 
 	 * @return the int
 	 */
 	int size();
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -100,7 +104,7 @@ public interface State extends Capability {
 	 * @return the t
 	 */
 	<T> T get(String key, Class<T> type);
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -113,7 +117,7 @@ public interface State extends Capability {
 	 * @return the t
 	 */
 	<T> T get(String key, Type type);
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -126,7 +130,7 @@ public interface State extends Capability {
 	 * @return the t
 	 */
 	<T> T get(String key, JavaType type);
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -139,7 +143,7 @@ public interface State extends Capability {
 	 * @return the t
 	 */
 	<T> T get(String key, TypeUtil<T> type);
-	
+
 	/**
 	 * Gets the.
 	 * 
@@ -150,12 +154,12 @@ public interface State extends Capability {
 	 * @return the t
 	 */
 	<T> T get(TypedKey<T> key);
-	
+
 	/**
 	 * Gets the service.
 	 *
 	 * @return the service
 	 */
 	StateService getService();
-	
+
 }

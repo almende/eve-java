@@ -192,6 +192,9 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 
 	/**
 	 * Destroy the agent.
+	 *
+	 * @param instanceOnly
+	 *            the instance only
 	 */
 	@Access(AccessType.UNAVAILABLE)
 	protected void destroy(Boolean instanceOnly) {

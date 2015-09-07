@@ -76,6 +76,8 @@ public class TestScale extends TestCase {
 
 		final long end = System.currentTimeMillis();
 		LOG.warning("Done!" + end + "(" + (end - created) + " ms)");
+		
+		Thread.sleep(50000);
 
 	}
 

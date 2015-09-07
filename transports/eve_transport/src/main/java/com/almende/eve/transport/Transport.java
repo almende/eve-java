@@ -25,36 +25,22 @@ public interface Transport extends Capability {
 
 	/**
 	 * Send a message to an other agent.
-	 * 
+	 *
+	 * @param <T>
+	 *            the generic type
 	 * @param receiverUri
 	 *            the receiver url
 	 * @param message
 	 *            the message
 	 * @param tag
 	 *            the tag
+	 * @param callback
+	 *            the callback
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
-	 * @oaran receiverUrl
 	 */
-	<T> void send(final URI receiverUri, final String message, final String tag, final AsyncCallback<T> callback)
-			throws IOException;
-
-	/**
-	 * Send bytes to an other agent. String based transports
-	 * may need to encode these bytes to base64. (e.g. through
-	 * org.apache.commons.codec.binary.Base64)
-	 * 
-	 * @param receiverUri
-	 *            the receiver url
-	 * @param message
-	 *            the message
-	 * @param tag
-	 *            the tag
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @oaran receiverUrl
-	 */
-	<T> void send(final URI receiverUri, final byte[] message, final String tag, final AsyncCallback<T> callback)
+	<T> void send(final URI receiverUri, final String message,
+			final String tag, final AsyncCallback<T> callback)
 			throws IOException;
 
 	/**
@@ -62,16 +48,43 @@ public interface Transport extends Capability {
 	 * may need to encode these bytes to base64. (e.g. through
 	 * org.apache.commons.codec.binary.Base64)
 	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param receiverUri
+	 *            the receiver url
+	 * @param message
+	 *            the message
+	 * @param tag
+	 *            the tag
+	 * @param callback
+	 *            the callback
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	<T> void send(final URI receiverUri, final byte[] message,
+			final String tag, final AsyncCallback<T> callback)
+			throws IOException;
+
+	/**
+	 * Send bytes to an other agent. String based transports
+	 * may need to encode these bytes to base64. (e.g. through
+	 * org.apache.commons.codec.binary.Base64)
+	 *
+	 * @param <T>
+	 *            the generic type
 	 * @param receiverUri
 	 *            the receiver uri
 	 * @param message
 	 *            the message
 	 * @param tag
 	 *            the tag
+	 * @param callback
+	 *            the callback
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	<T> void send(final URI receiverUri, final Object message, final String tag, final AsyncCallback<T> callback)
+	<T> void send(final URI receiverUri, final Object message,
+			final String tag, final AsyncCallback<T> callback)
 			throws IOException;
 
 	/**

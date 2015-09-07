@@ -6,12 +6,11 @@ package com.almende.eve.state;
 
 import java.util.Set;
 
-
 /**
  * A service for managing State objects.
  */
 public interface StateService {
-	
+
 	/**
 	 * Delete.
 	 * 
@@ -19,15 +18,17 @@ public interface StateService {
 	 *            the instance
 	 */
 	void delete(State instance);
-	
+
 	/**
-         * Delete. and only instance
-         * 
-         * @param instance
-         *            the instance
-         */
-        void delete(State instance, Boolean instanceOnly);
-	
+	 * Delete.
+	 *
+	 * @param instance
+	 *            the instance
+	 * @param instanceOnly
+	 *            the instance only
+	 */
+	void delete(State instance, Boolean instanceOnly);
+
 	/**
 	 * Gets the existing stateIds.
 	 *
