@@ -6,17 +6,17 @@ package com.almende.eve.state.mongo;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jongo.MongoCollection;
 import org.jongo.marshall.jackson.oid.Id;
-
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -228,16 +228,30 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/**
-	 * Esc.
-	 * 
-	 * @param key
-	 *            the key
-	 * @return the string
-	 */
-	private String esc(final String key){
-		return key.replace('$', '\uFF04').replace('.', '\uFF0E');
-	}
+        /**
+         * Escapes the invalid mongo keys like '.' and '$' and replaces them with
+         * their unicode equivaluent
+         * 
+         * @param key
+         *            the key
+         * @return the string
+         */
+        private String esc(final String key) {
+    
+            return key.replace('$', '\uFF04').replace('.', '\uFF0E');
+        }
+        
+        /**
+         * Un-Escapes the unicode equivalue of '.' and '$'
+         * 
+         * @param key
+         *            the key
+         * @return the string 0
+         */
+        private String unEsc(final String key) {
+    
+            return key.replace('\uFF04', '$').replace('\uFF0E', '.');
+        }
 	
 	/*
 	 * (non-Javadoc)
@@ -260,31 +274,31 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
-	 * com.fasterxml.jackson.databind.JsonNode)
-	 */
-	@Override
-	public synchronized JsonNode locPut(final String key, final JsonNode value) {
-		JsonNode result = null;
-		try {
-			result = properties.put(esc(key), value);
-			updateProperties(false);
-		} catch (final UpdateConflictException e) {
-			LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "="
-					+ value + "]");
-			reloadProperties();
-			// go recursive if update conflict occurs
-			result = locPut(key, value);
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "locPut error: Adding [" + key + "="
-					+ value + "] "+properties, e);
-		}
-		
-		return result;
-	}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
+         * com.fasterxml.jackson.databind.JsonNode)
+         */
+        @Override
+        public synchronized JsonNode locPut(final String key, final JsonNode value) {
+    
+            JsonNode result = null;
+            try {
+                result = properties.put(esc(key), value);
+                updateProperties(false);
+            }
+            catch (final UpdateConflictException e) {
+                LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "=" + value + "]");
+                reloadProperties();
+                // go recursive if update conflict occurs
+                result = locPut(key, value);
+            }
+            catch (final Exception e) {
+                LOG.log(Level.WARNING, "locPut error: Adding [" + key + "=" + value + "] " + properties, e);
+            }
+            return result;
+        }
 	
 	/*
 	 * (non-Javadoc)
@@ -367,7 +381,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 				.as(MongoState.class);
 		if (updatedState != null) {
 			timestamp = updatedState.timestamp;
-			properties = updatedState.properties;
+                        properties = findAndEscapeAllDotsInKeys(updatedState.properties, false);
 		} else {
 			properties = Collections
 					.synchronizedMap(new HashMap<String, JsonNode>());
@@ -387,6 +401,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	private synchronized boolean updateProperties(final boolean force)
 			throws UpdateConflictException {
 		final Long now = System.nanoTime();
+		//escape mongo invalid keys
+		properties = findAndEscapeAllDotsInKeys(properties, true);
 		/* write to database */
 		final WriteResult result = (force) ? collection.update("{_id: #}",
 				getId()).with("{$set: {properties: #, timestamp: #}}",
@@ -405,4 +421,71 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return updatedExisting;
 	}
 	
+        /**
+         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
+         * unicode charecters \uff0e and \u0024.
+         * @param object
+         * @param forEncode
+         *            If true Replaces all ObjectNode fieldNames containing . and $
+         *            with corresponding unicode charecters \uff0e and \u0024. else
+         *            vice versa.
+         * @return
+         */
+        private synchronized Map<String, JsonNode> findAndEscapeAllDotsInKeys(final Map<String, JsonNode> object,
+            boolean forEncode) {
+    
+            HashMap<String, JsonNode> result = new HashMap<String, JsonNode>(1);
+            for (String objectKey : object.keySet()) {
+                JsonNode obj = object.get(objectKey);
+                result.put(forEncode ? esc(objectKey) : unEsc(objectKey), findAndEscapeAllDotsInKeys(obj, forEncode));
+            }
+            return result;
+        }
+
+        /**
+         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
+         * unicode charecters \uff0e and \u0024.
+         * @param object
+         * @param forEncode
+         *            If true Replaces all ObjectNode fieldNames containing . and $
+         *            with corresponding unicode charecters \uff0e and \u0024. else
+         *            vice versa.
+         * @return
+         */
+        private synchronized JsonNode findAndEscapeAllDotsInKeys(final JsonNode obj, boolean forEncode) {
+
+            ObjectNode objectNode = null;
+            if (obj != null) {
+                Iterator<String> keysFromObj = obj.fieldNames();
+                if (keysFromObj.hasNext()) {
+                    objectNode = JOM.getInstance().createObjectNode();
+                    while (keysFromObj.hasNext()) {
+                        String key = keysFromObj.next();
+                        JsonNode node = obj.get(key);
+                        //encode the . and $
+                        if (forEncode) {
+                            key = esc(key);
+                        }
+                        //dencode the . and $
+                        else {
+                            key = unEsc(key);
+                        }
+                        if (node != null) {
+                            JsonNode nodeFromRecursion = findAndEscapeAllDotsInKeys(node, forEncode);
+                            if (nodeFromRecursion != null) {
+                                objectNode.set(key, nodeFromRecursion);
+                            }
+                            else {
+                                objectNode.set(key, node);
+                            }
+                        }
+                    }
+                }
+                else {
+                    //in case its a single node, just return it
+                    return obj;
+                }
+            }
+            return objectNode;
+        }
 }
