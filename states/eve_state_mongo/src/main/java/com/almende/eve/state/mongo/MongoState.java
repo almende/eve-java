@@ -4,9 +4,9 @@
  */
 package com.almende.eve.state.mongo;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -18,6 +18,9 @@ import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,8 +75,10 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	private static final Logger		LOG			= Logger.getLogger("MongoState");
 	
 	/* mapping object that contains variables used by the agent */
-	private Map<String, JsonNode>	properties	= Collections
-														.synchronizedMap(new HashMap<String, JsonNode>());
+	@JsonIgnore
+        private Map<String, JsonNode> properties = Collections.synchronizedMap(new HashMap<String, JsonNode>());
+	@JsonProperty("properties")
+	private String propertiesJson = null;
 	private Long					timestamp;
 	
 	@JsonIgnore
@@ -241,17 +246,17 @@ public class MongoState extends AbstractState<JsonNode> implements State {
             return key.replace('$', '\uFF04').replace('.', '\uFF0E');
         }
         
-        /**
-         * Un-Escapes the unicode equivalue of '.' and '$'
-         * 
-         * @param key
-         *            the key
-         * @return the string 0
-         */
-        private String unEsc(final String key) {
-    
-            return key.replace('\uFF04', '$').replace('\uFF0E', '.');
-        }
+//        /**
+//         * Un-Escapes the unicode equivalue of '.' and '$'
+//         * 
+//         * @param key
+//         *            the key
+//         * @return the string 0
+//         */
+//        private String unEsc(final String key) {
+//    
+//            return key.replace('\uFF04', '$').replace('\uFF0E', '.');
+//        }
 	
 	/*
 	 * (non-Javadoc)
@@ -260,19 +265,21 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 */
 	@Override
 	@JsonIgnore
-	public JsonNode get(final String key) {
-		JsonNode result = null;
-		try {
-			result = properties.get(esc(key));
-			if (result == null) {
-				reloadProperties();
-				result = properties.get(esc(key));
-			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "get error", e);
-		}
-		return result;
-	}
+        public JsonNode get(final String key) {
+    
+            JsonNode result = null;
+            try {
+                result = properties.get(esc(key));
+                if (result == null) {
+                    reloadProperties();
+                    result = properties.get(esc(key));
+                }
+            }
+            catch (final Exception e) {
+                LOG.log(Level.WARNING, "get error", e);
+            }
+            return result;
+        }
 	
         /*
          * (non-Javadoc)
@@ -345,17 +352,54 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * 
 	 * @return the properties
 	 */
+	@JsonIgnore
 	public Map<String, JsonNode> getProperties() {
 		return properties;
 	}
+	
+	/**
+	 * Gets the serialized version of {@link MongoState#properties}
+	 * @return
+	 */
+	@JsonProperty("properties")
+        public String getPropertiesJSON() {
+    
+            if(properties != null) {
+                try {
+                    propertiesJson = JOM.getInstance().writeValueAsString(properties);
+                    return propertiesJson;
+                }
+                catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "{}";
+        }
+	
+        @JsonProperty("properties")
+        public void setProperties(String propertiesJson) {
+
+            try {
+                if (propertiesJson != null) {
+                    this.propertiesJson = propertiesJson;
+                    properties = JOM.getInstance().readValue(propertiesJson, new TypeReference<Map<String, JsonNode>>() {
+                    });
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 	
 	/**
 	 * set all property values from a collection. (Warning, keys in the properties map should be MongoDB safe: no '$', nor '.' in the keys!)
 	 * 
 	 * @param properties
 	 *            the properties
+	 * @throws JsonProcessingException 
 	 */
-	public void setProperties(final Map<String, JsonNode> properties) {
+	@JsonIgnore
+	public void setProperties(final Map<String, JsonNode> properties) throws JsonProcessingException {
 		this.properties.clear();
 		this.properties.putAll(properties);
 		try {
@@ -381,7 +425,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 				.as(MongoState.class);
 		if (updatedState != null) {
 			timestamp = updatedState.timestamp;
-                        properties = findAndEscapeAllDotsInKeys(updatedState.properties, false);
+//                        properties = findAndEscapeAllDotsInKeys(updatedState.properties, false);
+			properties = updatedState.properties;
 		} else {
 			properties = Collections
 					.synchronizedMap(new HashMap<String, JsonNode>());
@@ -402,90 +447,90 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			throws UpdateConflictException {
 		final Long now = System.nanoTime();
 		//escape mongo invalid keys
-		properties = findAndEscapeAllDotsInKeys(properties, true);
+//		properties = findAndEscapeAllDotsInKeys(properties, true);
+		propertiesJson = getPropertiesJSON();
 		/* write to database */
-		final WriteResult result = (force) ? collection.update("{_id: #}",
-				getId()).with("{$set: {properties: #, timestamp: #}}",
-				properties, now) : collection.update("{_id: #, timestamp: #}",
-				getId(), timestamp).with(
-				"{$set: {properties: #, timestamp: #}}", properties, now);
+                final WriteResult result = (force)
+                    ? collection.update("{_id: #}", getId()).with("{$set: {properties: #, timestamp: #}}", propertiesJson, now)
+                    : collection.update("{_id: #, timestamp: #}", getId(), timestamp)
+                                .with("{$set: {properties: #, timestamp: #}}", propertiesJson, now);
 		/* check results */
 		final Boolean updatedExisting = (Boolean) result
 				.getField("updatedExisting");
 		if (result.getN() == 0 && result.getError() == null) {
 			throw new UpdateConflictException(timestamp);
 		} else if (result.getN() != 1) {
-			throw new MongoException(result.getError()+ " <--- "+properties);
+			throw new MongoException(result.getError()+ " <--- "+propertiesJson);
 		}
 		timestamp = now;
 		return updatedExisting;
 	}
 	
-        /**
-         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
-         * unicode charecters \uff0e and \u0024.
-         * @param object
-         * @param forEncode
-         *            If true Replaces all ObjectNode fieldNames containing . and $
-         *            with corresponding unicode charecters \uff0e and \u0024. else
-         *            vice versa.
-         * @return
-         */
-        private synchronized Map<String, JsonNode> findAndEscapeAllDotsInKeys(final Map<String, JsonNode> object,
-            boolean forEncode) {
-    
-            HashMap<String, JsonNode> result = new HashMap<String, JsonNode>(1);
-            for (String objectKey : object.keySet()) {
-                JsonNode obj = object.get(objectKey);
-                result.put(forEncode ? esc(objectKey) : unEsc(objectKey), findAndEscapeAllDotsInKeys(obj, forEncode));
-            }
-            return result;
-        }
-
-        /**
-         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
-         * unicode charecters \uff0e and \u0024.
-         * @param object
-         * @param forEncode
-         *            If true Replaces all ObjectNode fieldNames containing . and $
-         *            with corresponding unicode charecters \uff0e and \u0024. else
-         *            vice versa.
-         * @return
-         */
-        private synchronized JsonNode findAndEscapeAllDotsInKeys(final JsonNode obj, boolean forEncode) {
-
-            ObjectNode objectNode = null;
-            if (obj != null) {
-                Iterator<String> keysFromObj = obj.fieldNames();
-                if (keysFromObj.hasNext()) {
-                    objectNode = JOM.getInstance().createObjectNode();
-                    while (keysFromObj.hasNext()) {
-                        String key = keysFromObj.next();
-                        JsonNode node = obj.get(key);
-                        //encode the . and $
-                        if (forEncode) {
-                            key = esc(key);
-                        }
-                        //dencode the . and $
-                        else {
-                            key = unEsc(key);
-                        }
-                        if (node != null) {
-                            JsonNode nodeFromRecursion = findAndEscapeAllDotsInKeys(node, forEncode);
-                            if (nodeFromRecursion != null) {
-                                objectNode.set(key, nodeFromRecursion);
-                            }
-                            else {
-                                objectNode.set(key, node);
-                            }
-                        }
-                    }
-                }
-                else {
-                    //in case its a single node, just return it
-                    return obj;
-                }
-            }
-            return objectNode;
-        }
+//        /**
+//         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
+//         * unicode charecters \uff0e and \u0024.
+//         * @param object
+//         * @param forEncode
+//         *            If true Replaces all ObjectNode fieldNames containing . and $
+//         *            with corresponding unicode charecters \uff0e and \u0024. else
+//         *            vice versa.
+//         * @return
+//         */
+//        private synchronized Map<String, JsonNode> findAndEscapeAllDotsInKeys(final Map<String, JsonNode> object,
+//            boolean forEncode) {
+//    
+//            HashMap<String, JsonNode> result = new HashMap<String, JsonNode>(1);
+//            for (String objectKey : object.keySet()) {
+//                JsonNode obj = object.get(objectKey);
+//                result.put(forEncode ? esc(objectKey) : unEsc(objectKey), findAndEscapeAllDotsInKeys(obj, forEncode));
+//            }
+//            return result;
+//        }
+//
+//        /**
+//         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
+//         * unicode charecters \uff0e and \u0024.
+//         * @param object
+//         * @param forEncode
+//         *            If true Replaces all ObjectNode fieldNames containing . and $
+//         *            with corresponding unicode charecters \uff0e and \u0024. else
+//         *            vice versa.
+//         * @return
+//         */
+//        private synchronized JsonNode findAndEscapeAllDotsInKeys(final JsonNode obj, boolean forEncode) {
+//
+//            ObjectNode objectNode = null;
+//            if (obj != null) {
+//                Iterator<String> keysFromObj = obj.fieldNames();
+//                if (keysFromObj.hasNext()) {
+//                    objectNode = JOM.getInstance().createObjectNode();
+//                    while (keysFromObj.hasNext()) {
+//                        String key = keysFromObj.next();
+//                        JsonNode node = obj.get(key);
+//                        //encode the . and $
+//                        if (forEncode) {
+//                            key = esc(key);
+//                        }
+//                        //dencode the . and $
+//                        else {
+//                            key = unEsc(key);
+//                        }
+//                        if (node != null) {
+//                            JsonNode nodeFromRecursion = findAndEscapeAllDotsInKeys(node, forEncode);
+//                            if (nodeFromRecursion != null) {
+//                                objectNode.set(key, nodeFromRecursion);
+//                            }
+//                            else {
+//                                objectNode.set(key, node);
+//                            }
+//                        }
+//                    }
+//                }
+//                else {
+//                    //in case its a single node, just return it
+//                    return obj;
+//                }
+//            }
+//            return objectNode;
+//        }
 }
