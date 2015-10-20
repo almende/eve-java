@@ -233,31 +233,6 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-        /**
-         * Escapes the invalid mongo keys like '.' and '$' and replaces them with
-         * their unicode equivaluent
-         * 
-         * @param key
-         *            the key
-         * @return the string
-         */
-        private String esc(final String key) {
-    
-            return key.replace('$', '\uFF04').replace('.', '\uFF0E');
-        }
-        
-//        /**
-//         * Un-Escapes the unicode equivalue of '.' and '$'
-//         * 
-//         * @param key
-//         *            the key
-//         * @return the string 0
-//         */
-//        private String unEsc(final String key) {
-//    
-//            return key.replace('\uFF04', '$').replace('\uFF0E', '.');
-//        }
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -269,10 +244,10 @@ public class MongoState extends AbstractState<JsonNode> implements State {
     
             JsonNode result = null;
             try {
-                result = properties.get(esc(key));
+                result = properties.get(key);
                 if (result == null) {
                     reloadProperties();
-                    result = properties.get(esc(key));
+                    result = properties.get(key);
                 }
             }
             catch (final Exception e) {
@@ -292,7 +267,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
     
             JsonNode result = null;
             try {
-                result = properties.put(esc(key), value);
+                result = properties.put(key, value);
                 updateProperties(false);
             }
             catch (final UpdateConflictException e) {
@@ -321,8 +296,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		boolean result = false;
 		try {
 			JsonNode cur = NullNode.getInstance();
-			if (properties.containsKey(esc(key))) {
-				cur = properties.get(esc(key));
+			if (properties.containsKey(key)) {
+				cur = properties.get(key);
 			}
 			if (oldVal == null) {
 				oldVal = NullNode.getInstance();
@@ -332,7 +307,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			// e.g.
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
-				properties.put(esc(key), newVal);
+				properties.put(key, newVal);
 				result = updateProperties(false);
 			}
 		} catch (final UpdateConflictException e) {
@@ -425,7 +400,6 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 				.as(MongoState.class);
 		if (updatedState != null) {
 			timestamp = updatedState.timestamp;
-//                        properties = findAndEscapeAllDotsInKeys(updatedState.properties, false);
 			properties = updatedState.properties;
 		} else {
 			properties = Collections
@@ -446,8 +420,6 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	private synchronized boolean updateProperties(final boolean force)
 			throws UpdateConflictException {
 		final Long now = System.nanoTime();
-		//escape mongo invalid keys
-//		properties = findAndEscapeAllDotsInKeys(properties, true);
 		propertiesJson = getPropertiesJSON();
 		/* write to database */
                 final WriteResult result = (force)
@@ -465,72 +437,4 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		timestamp = now;
 		return updatedExisting;
 	}
-	
-//        /**
-//         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
-//         * unicode charecters \uff0e and \u0024.
-//         * @param object
-//         * @param forEncode
-//         *            If true Replaces all ObjectNode fieldNames containing . and $
-//         *            with corresponding unicode charecters \uff0e and \u0024. else
-//         *            vice versa.
-//         * @return
-//         */
-//        private synchronized Map<String, JsonNode> findAndEscapeAllDotsInKeys(final Map<String, JsonNode> object,
-//            boolean forEncode) {
-//    
-//            HashMap<String, JsonNode> result = new HashMap<String, JsonNode>(1);
-//            for (String objectKey : object.keySet()) {
-//                JsonNode obj = object.get(objectKey);
-//                result.put(forEncode ? esc(objectKey) : unEsc(objectKey), findAndEscapeAllDotsInKeys(obj, forEncode));
-//            }
-//            return result;
-//        }
-//
-//        /**
-//         * Escapes or unescapes all ObjectNode fieldNames containing . and $ with corresponding
-//         * unicode charecters \uff0e and \u0024.
-//         * @param object
-//         * @param forEncode
-//         *            If true Replaces all ObjectNode fieldNames containing . and $
-//         *            with corresponding unicode charecters \uff0e and \u0024. else
-//         *            vice versa.
-//         * @return
-//         */
-//        private synchronized JsonNode findAndEscapeAllDotsInKeys(final JsonNode obj, boolean forEncode) {
-//
-//            ObjectNode objectNode = null;
-//            if (obj != null) {
-//                Iterator<String> keysFromObj = obj.fieldNames();
-//                if (keysFromObj.hasNext()) {
-//                    objectNode = JOM.getInstance().createObjectNode();
-//                    while (keysFromObj.hasNext()) {
-//                        String key = keysFromObj.next();
-//                        JsonNode node = obj.get(key);
-//                        //encode the . and $
-//                        if (forEncode) {
-//                            key = esc(key);
-//                        }
-//                        //dencode the . and $
-//                        else {
-//                            key = unEsc(key);
-//                        }
-//                        if (node != null) {
-//                            JsonNode nodeFromRecursion = findAndEscapeAllDotsInKeys(node, forEncode);
-//                            if (nodeFromRecursion != null) {
-//                                objectNode.set(key, nodeFromRecursion);
-//                            }
-//                            else {
-//                                objectNode.set(key, node);
-//                            }
-//                        }
-//                    }
-//                }
-//                else {
-//                    //in case its a single node, just return it
-//                    return obj;
-//                }
-//            }
-//            return objectNode;
-//        }
 }
