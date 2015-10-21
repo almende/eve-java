@@ -4,20 +4,23 @@
  */
 package com.almende.eve.state.mongo;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jongo.MongoCollection;
 import org.jongo.marshall.jackson.oid.Id;
-
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
+import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,8 +75,10 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	private static final Logger		LOG			= Logger.getLogger("MongoState");
 	
 	/* mapping object that contains variables used by the agent */
-	private Map<String, JsonNode>	properties	= Collections
-														.synchronizedMap(new HashMap<String, JsonNode>());
+	@JsonIgnore
+        private Map<String, JsonNode> properties = Collections.synchronizedMap(new HashMap<String, JsonNode>());
+	@JsonProperty("properties")
+	private String propertiesJson = null;
 	private Long					timestamp;
 	
 	@JsonIgnore
@@ -228,17 +233,6 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		return result;
 	}
 	
-	/**
-	 * Esc.
-	 * 
-	 * @param key
-	 *            the key
-	 * @return the string
-	 */
-	private String esc(final String key){
-		return key.replace('$', '\uFF04').replace('.', '\uFF0E');
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -246,45 +240,47 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 */
 	@Override
 	@JsonIgnore
-	public JsonNode get(final String key) {
-		JsonNode result = null;
-		try {
-			result = properties.get(esc(key));
-			if (result == null) {
-				reloadProperties();
-				result = properties.get(esc(key));
-			}
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "get error", e);
-		}
-		return result;
-	}
+        public JsonNode get(final String key) {
+    
+            JsonNode result = null;
+            try {
+                result = properties.get(key);
+                if (result == null) {
+                    reloadProperties();
+                    result = properties.get(key);
+                }
+            }
+            catch (final Exception e) {
+                LOG.log(Level.WARNING, "get error", e);
+            }
+            return result;
+        }
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
-	 * com.fasterxml.jackson.databind.JsonNode)
-	 */
-	@Override
-	public synchronized JsonNode locPut(final String key, final JsonNode value) {
-		JsonNode result = null;
-		try {
-			result = properties.put(esc(key), value);
-			updateProperties(false);
-		} catch (final UpdateConflictException e) {
-			LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "="
-					+ value + "]");
-			reloadProperties();
-			// go recursive if update conflict occurs
-			result = locPut(key, value);
-		} catch (final Exception e) {
-			LOG.log(Level.WARNING, "locPut error: Adding [" + key + "="
-					+ value + "] "+properties, e);
-		}
-		
-		return result;
-	}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.almende.eve.state.AbstractState#locPut(java.lang.String,
+         * com.fasterxml.jackson.databind.JsonNode)
+         */
+        @Override
+        public synchronized JsonNode locPut(final String key, final JsonNode value) {
+    
+            JsonNode result = null;
+            try {
+                result = properties.put(key, value);
+                updateProperties(false);
+            }
+            catch (final UpdateConflictException e) {
+                LOG.log(Level.WARNING, e.getMessage() + " Adding [" + key + "=" + value + "]");
+                reloadProperties();
+                // go recursive if update conflict occurs
+                result = locPut(key, value);
+            }
+            catch (final Exception e) {
+                LOG.log(Level.WARNING, "locPut error: Adding [" + key + "=" + value + "] " + properties, e);
+            }
+            return result;
+        }
 	
 	/*
 	 * (non-Javadoc)
@@ -300,8 +296,8 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		boolean result = false;
 		try {
 			JsonNode cur = NullNode.getInstance();
-			if (properties.containsKey(esc(key))) {
-				cur = properties.get(esc(key));
+			if (properties.containsKey(key)) {
+				cur = properties.get(key);
 			}
 			if (oldVal == null) {
 				oldVal = NullNode.getInstance();
@@ -311,7 +307,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			// e.g.
 			// IntNode versus LongNode
 			if (oldVal.equals(cur) || oldVal.toString().equals(cur.toString())) {
-				properties.put(esc(key), newVal);
+				properties.put(key, newVal);
 				result = updateProperties(false);
 			}
 		} catch (final UpdateConflictException e) {
@@ -331,17 +327,54 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * 
 	 * @return the properties
 	 */
+	@JsonIgnore
 	public Map<String, JsonNode> getProperties() {
 		return properties;
 	}
+	
+	/**
+	 * Gets the serialized version of {@link MongoState#properties}
+	 * @return
+	 */
+	@JsonProperty("properties")
+        public String getPropertiesJSON() {
+    
+            if(properties != null) {
+                try {
+                    propertiesJson = JOM.getInstance().writeValueAsString(properties);
+                    return propertiesJson;
+                }
+                catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "{}";
+        }
+	
+        @JsonProperty("properties")
+        public void setProperties(String propertiesJson) {
+
+            try {
+                if (propertiesJson != null) {
+                    this.propertiesJson = propertiesJson;
+                    properties = JOM.getInstance().readValue(propertiesJson, new TypeReference<Map<String, JsonNode>>() {
+                    });
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 	
 	/**
 	 * set all property values from a collection. (Warning, keys in the properties map should be MongoDB safe: no '$', nor '.' in the keys!)
 	 * 
 	 * @param properties
 	 *            the properties
+	 * @throws JsonProcessingException 
 	 */
-	public void setProperties(final Map<String, JsonNode> properties) {
+	@JsonIgnore
+	public void setProperties(final Map<String, JsonNode> properties) throws JsonProcessingException {
 		this.properties.clear();
 		this.properties.putAll(properties);
 		try {
@@ -387,22 +420,21 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	private synchronized boolean updateProperties(final boolean force)
 			throws UpdateConflictException {
 		final Long now = System.nanoTime();
+		propertiesJson = getPropertiesJSON();
 		/* write to database */
-		final WriteResult result = (force) ? collection.update("{_id: #}",
-				getId()).with("{$set: {properties: #, timestamp: #}}",
-				properties, now) : collection.update("{_id: #, timestamp: #}",
-				getId(), timestamp).with(
-				"{$set: {properties: #, timestamp: #}}", properties, now);
+                final WriteResult result = (force)
+                    ? collection.update("{_id: #}", getId()).with("{$set: {properties: #, timestamp: #}}", propertiesJson, now)
+                    : collection.update("{_id: #, timestamp: #}", getId(), timestamp)
+                                .with("{$set: {properties: #, timestamp: #}}", propertiesJson, now);
 		/* check results */
 		final Boolean updatedExisting = (Boolean) result
 				.getField("updatedExisting");
 		if (result.getN() == 0 && result.getError() == null) {
 			throw new UpdateConflictException(timestamp);
 		} else if (result.getN() != 1) {
-			throw new MongoException(result.getError()+ " <--- "+properties);
+			throw new MongoException(result.getError()+ " <--- "+propertiesJson);
 		}
 		timestamp = now;
 		return updatedExisting;
 	}
-	
 }
