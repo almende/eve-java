@@ -102,7 +102,7 @@ public abstract class AbstractState<V> implements State {
 	 */
 	@Override
 	public synchronized Object put(final String key, final Object value) {
-		if (value != null && JsonNode.class.isAssignableFrom(value.getClass())) {
+		if (value == null || JsonNode.class.isAssignableFrom(value.getClass())) {
 			return locPut(key, (JsonNode) value);
 		} else if (Serializable.class.isAssignableFrom(value.getClass())) {
 			return locPut(key, (Serializable) value);
