@@ -15,8 +15,8 @@
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
-		<mongodb.version>2.11.3</mongodb.version>
-		<jongo.version>1.0</jongo.version>
+		<mongodb.version>2.12.3</mongodb.version>
+		<jongo.version>1.2</jongo.version>
 		<embedmongo.version>1.42</embedmongo.version>
 	</properties>
 

@@ -5,8 +5,10 @@
 package com.almende.eve.state.mongo;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +21,8 @@ import org.jongo.MongoCollection;
 import com.almende.eve.capabilities.AbstractCapabilityBuilder;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -99,8 +103,7 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 			final MongoStateConfig config = MongoStateConfig.decorate(params);
 
 			// initialization of client & jongo
-			final MongoClient client = createClient(config.getHost(),
-					config.getPort());
+			final MongoClient client = createClient(config.getHosts());
 			jongo = new Jongo(client.getDB(config.getDatabase()));
 			collectionName = config.getCollection();
 
@@ -109,13 +112,15 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 
 		}
 
-		private MongoClient createClient(final String databaseUri,
-				final int port) throws UnknownHostException {
+		private MongoClient createClient(final ArrayNode hosts) throws UnknownHostException {
 			final MongoClientOptions options = MongoClientOptions.builder()
 					.connectionsPerHost(100)
 					.threadsAllowedToBlockForConnectionMultiplier(1500).build();
-			final MongoClient client = new MongoClient(new ServerAddress(
-					databaseUri, port), options);
+			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+			for(final JsonNode host : hosts) {
+			    addresses.add( new ServerAddress(host.get("host").asText(), host.get("port").asInt()) );
+			}
+			final MongoClient client = new MongoClient(addresses, options);
 			return client;
 		}
 
