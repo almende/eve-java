@@ -79,6 +79,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @return the url
 	 */
 	@Deprecated
+	@JsonIgnore
 	public String getHost() {
 		if (this.has("host")) {
 			return this.get("host").asText();
@@ -106,6 +107,7 @@ public class MongoStateConfig extends StateConfig {
 	 * @return the port 
 	 */
 	@Deprecated
+	@JsonIgnore
 	public int getPort() {
 		if (this.has("port")) {
 			return this.get("port").asInt();
