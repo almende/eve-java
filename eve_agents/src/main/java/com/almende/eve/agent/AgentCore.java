@@ -483,6 +483,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 	protected String schedule(final JSONRequest request, final DateTime due) {
 		final Scheduler scheduler = this.scheduler;
 		if (scheduler == null || request == null) {
+			LOG.warning("Trying to schedule, with missing scheduler/request.");
 			return "";
 		}
 		final JsonNode id = request.getId();

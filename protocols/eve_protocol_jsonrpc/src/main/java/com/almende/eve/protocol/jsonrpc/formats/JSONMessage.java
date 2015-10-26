@@ -68,7 +68,7 @@ public class JSONMessage implements Serializable {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Value of member 'jsonrpc' is not equal to '2.0'");
 		}
-		if (jsonNode.has(EXTRA) && !jsonNode.get(EXTRA).isObject()) {
+		if (jsonNode.has(EXTRA) && !(jsonNode.get(EXTRA).isObject()||jsonNode.get(EXTRA).isNull())) {
 			throw new JSONRPCException(JSONRPCException.CODE.INVALID_REQUEST,
 					"Value of member 'extra' should be an object");
 		}

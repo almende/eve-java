@@ -40,7 +40,7 @@ public class RunnableClock implements Runnable, Clock {
 	public void run() {
 		final List<Runnable> toRun = new ArrayList<Runnable>();
 		while (true) {
-			final Entry<ClockEntry,ClockEntry> first = TIMELINE.firstEntry();
+			final Entry<ClockEntry,ClockEntry> first = TIMELINE.pollFirstEntry();
 			if (first == null){
 				break;
 			}
@@ -48,7 +48,6 @@ public class RunnableClock implements Runnable, Clock {
 			final DateTime now = DateTime.now();
 
 			if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
-				TIMELINE.remove(ce);
 				toRun.add(ce.getCallback());
 				continue;
 			}
@@ -56,8 +55,10 @@ public class RunnableClock implements Runnable, Clock {
 					.toDurationMillis();
 			//TODO: 5ms is arbitrary, shouldn't this be different?
 			if (interval <= 5) {
+				toRun.add(ce.getCallback());
 				break;
 			}
+			TIMELINE.put(ce, ce);
 			if (future == null || future.isDone() || future.getDelay(TimeUnit.MILLISECONDS) > interval) {
 				if (future != null) {
 					future.cancel(false);
