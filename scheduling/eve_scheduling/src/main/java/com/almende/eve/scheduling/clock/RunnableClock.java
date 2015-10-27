@@ -6,13 +6,13 @@ package com.almende.eve.scheduling.clock;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import org.joda.time.DateTime;
@@ -32,6 +32,7 @@ public class RunnableClock implements Runnable, Clock {
 	protected static final Executor							RUNNER		= ThreadPool
 																				.getPool();
 	protected ScheduledFuture<?>							future		= null;
+	protected ReentrantLock									futureLock	= new ReentrantLock();
 
 	/*
 	 * Non locking task scheduling
@@ -39,42 +40,82 @@ public class RunnableClock implements Runnable, Clock {
 	@Override
 	public void run() {
 		final List<Runnable> toRun = new ArrayList<Runnable>();
-		while (true) {
-			final Entry<ClockEntry,ClockEntry> first = TIMELINE.pollFirstEntry();
-			if (first == null){
-				break;
-			}
-			ClockEntry ce = first.getValue();
-			final DateTime now = DateTime.now();
-
-			if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
-				toRun.add(ce.getCallback());
-				continue;
-			}
-			final long interval = new Interval(now, ce.getDue())
-					.toDurationMillis();
-			//TODO: 5ms is arbitrary, shouldn't this be different?
-			if (interval <= 5) {
-				toRun.add(ce.getCallback());
-				break;
-			}
-			TIMELINE.put(ce, ce);
-			if (future == null || future.isDone() || future.getDelay(TimeUnit.MILLISECONDS) > interval) {
-				if (future != null) {
-					future.cancel(false);
+		synchronized (TIMELINE) {
+			while (!TIMELINE.isEmpty()) {
+				final ClockEntry ce = TIMELINE.firstEntry().getValue();
+				final DateTime now = DateTime.now();
+				if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
+					TIMELINE.remove(ce);
+					toRun.add(ce.getCallback());
+					continue;
 				}
-				future = SCHEDULER.schedule(this, interval,
-						TimeUnit.MILLISECONDS);
+				final long interval = new Interval(now, ce.getDue())
+						.toDurationMillis();
+				if (interval <= 0) {
+					continue;
+				}
+				if (future == null
+						|| future.getDelay(TimeUnit.MILLISECONDS) != interval) {
+					if (future != null) {
+						future.cancel(false);
+					}
+					future = SCHEDULER.schedule(this, interval,
+							TimeUnit.MILLISECONDS);
+				}
+				break;
 			}
-			break;
+			if (future == null && !TIMELINE.isEmpty()) {
+				LOG.warning("Lost trigger, should never happen!");
+			}
 		}
 		for (Runnable run : toRun) {
 			RUNNER.execute(run);
 		}
-		if ((future == null || future.isDone()) && !TIMELINE.isEmpty()) {
-			// recurse, to cover race-condition between TIMELINE.isEmpty() and scheduling
-			run();
-		}
+
+//		final List<Runnable> toRun = new ArrayList<Runnable>();
+//		while (true) {
+//			final Entry<ClockEntry, ClockEntry> first = TIMELINE
+//					.pollFirstEntry();
+//			if (first == null) {
+//				break;
+//			}
+//			ClockEntry ce = first.getValue();
+//			final DateTime now = DateTime.now();
+//
+//			if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
+//				toRun.add(ce.getCallback());
+//				continue;
+//			}
+//			final long interval = new Interval(now, ce.getDue())
+//					.toDurationMillis();
+//			// TODO: 5ms is arbitrary, shouldn't this be different?
+//			if (interval <= 5) {
+//				toRun.add(ce.getCallback());
+//				break;
+//			}
+//			TIMELINE.put(ce, ce);
+//
+//			futureLock.lock();
+//			if (future == null || future.isDone()
+//					|| future.getDelay(TimeUnit.MILLISECONDS) > interval) {
+//				if (future != null) {
+//					future.cancel(false);
+//				}
+//				future = SCHEDULER.schedule(this, interval,
+//						TimeUnit.MILLISECONDS);
+//			}
+//			futureLock.unlock();
+//
+//			break;
+//		}
+//		for (Runnable run : toRun) {
+//			RUNNER.execute(run);
+//		}
+//		if ((future == null || future.isDone()) && !TIMELINE.isEmpty()) {
+//			// recurse, to cover race-condition between TIMELINE.isEmpty() and
+//			// scheduling
+//			run();
+//		}
 	}
 
 	/*
@@ -116,10 +157,12 @@ public class RunnableClock implements Runnable, Clock {
 	@Override
 	public void clear() {
 		TIMELINE.clear();
+		futureLock.lock();
 		if (future != null) {
 			future.cancel(false);
 			future = null;
 		}
+		futureLock.unlock();
 	}
 
 	@Override

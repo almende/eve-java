@@ -44,6 +44,7 @@ public class SimpleScheduler implements Scheduler {
 	}
 
 	protected void handleTrigger(final Object msg, final String triggerId) {
+//		LOG.warning("Handle trigger:" + triggerId + " : " + msg.toString());
 		try {
 			handle.get().call(myUrl, msg);
 		} catch (IOException e) {
@@ -65,6 +66,9 @@ public class SimpleScheduler implements Scheduler {
 		}
 		final String uuid = triggerId != null ? triggerId : new UUID()
 				.toString();
+
+		// LOG.warning("Requesting trigger:" + uuid + " : " + msg.toString()
+		// + " at: " + due);
 		clock.requestTrigger(uuid, due, new Runnable() {
 
 			@Override
