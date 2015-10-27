@@ -34,7 +34,7 @@ public class TestScheduling extends TestCase {
 		new AgentBuilder().withConfig(agentconf).build();
 
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(22000);
 		} catch (final InterruptedException e) {}
 
 	}

@@ -39,8 +39,9 @@ public class SchedulingAgent extends Agent {
 	 */
 	@Access(AccessType.PUBLIC)
 	public void repeatTest() {
-		schedule("repeatTest", null, DateTime.now().plusMillis(500));
-		schedule("test", null, DateTime.now());
+		//schedule("test", null, DateTime.now());
+		test();
+		schedule("repeatTest", null, DateTime.now().plusMillis(1000));
 	}
 
 	/**
