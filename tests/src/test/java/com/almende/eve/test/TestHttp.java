@@ -12,6 +12,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import com.almende.eve.agent.AgentBuilder;
+import com.almende.eve.agent.AgentConfig;
+import com.almende.eve.agent.ExampleAgent;
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
@@ -50,6 +53,39 @@ public class TestHttp extends TestCase {
 		transport.send(
 				URIUtil.create("http://localhost:8080/agents/testAgent"),
 				"Hello World", null, null);
+	}
+
+	/**
+	 * Test manual http.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testManualHttp() throws IOException {
+		final HttpTransportConfig transportConfig = HttpTransportConfig
+				.create();
+		transportConfig.setServletUrl("http://localhost:8080/agents/");
+		transportConfig
+				.setServletClass(com.almende.eve.transport.http.DebugServlet.class
+						.getName());
+		transportConfig.setServletLauncher("JettyLauncher");
+		final ObjectNode jettyParms = JOM.createObjectNode();
+		jettyParms.put("port", 8080);
+		transportConfig.set("jetty", jettyParms);
+
+		final AgentConfig agentConf = AgentConfig.create("manual");
+		agentConf.addTransport(transportConfig);
+		agentConf.setClassName(ExampleAgent.class.getName());
+
+		new AgentBuilder().withConfig(agentConf).build();
+
+		try {
+			Thread.sleep(120000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -47,6 +47,16 @@ public class ExampleAgent extends Agent implements ExampleAgentInterface {
 	}
 	
 	/**
+	 * Test func.
+	 *
+	 * @param someObject
+	 *            the some object
+	 */
+	public void testFunc(@Name("parm") Object someObject){
+		LOG.warning("TestFunc called with object:"+someObject);
+	}
+	
+	/**
 	 * Hello world.
 	 * 
 	 * @param message

@@ -153,7 +153,7 @@ function Controller($scope, $resource) {
     };
 
 	function formExample(type){
-		if (type.type == "object"){		
+		if (type.type == "object" && typeof type.properties != "undefined"){		
 			var result = {};
 			var keys = Object.keys(type.properties);
 			for (var i = 0; i < keys.length; i++){
@@ -328,7 +328,7 @@ function Controller($scope, $resource) {
         send ('getMethods', {}, function (err, result) {
             if (!err) {
                 $scope.methods = result;
-                $scope.methodKeys = Object.keys(result);
+                $scope.methodKeys = Object.keys(result).sort();
                 $scope.methodName = $scope.methodKeys[0];
                 $scope.setMethod();
 				
