@@ -112,6 +112,11 @@ public final class JOM {
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
 
+		// Needed for NaN/Infinity:
+		mapper.configure(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS, false);
+		mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+
+		
 		// Convenient for JSON configuration documents
 		mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 		mapper.configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true);
