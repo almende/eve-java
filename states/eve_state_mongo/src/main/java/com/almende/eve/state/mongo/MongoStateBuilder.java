@@ -35,6 +35,7 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 	private static final Logger						LOG			= Logger.getLogger(MongoStateBuilder.class
 																		.getName());
 	private static Map<String, MongoStateProvider>	instances	= new ConcurrentHashMap<String, MongoStateProvider>();
+	private static MongoClient client = null;
 
 	@Override
 	public MongoState build() {
@@ -113,14 +114,16 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 		}
 
 		private MongoClient createClient(final ArrayNode hosts) throws UnknownHostException {
-			final MongoClientOptions options = MongoClientOptions.builder()
-					.connectionsPerHost(100)
-					.threadsAllowedToBlockForConnectionMultiplier(1500).build();
-			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
-			for(final JsonNode host : hosts) {
-			    addresses.add( new ServerAddress(host.get("host").asText(), host.get("port").asInt()) );
+			if(client == null) {
+    		   final MongoClientOptions options = MongoClientOptions.builder()
+    					.connectionsPerHost(100)
+    					.threadsAllowedToBlockForConnectionMultiplier(1500).build();
+    			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+    			for(final JsonNode host : hosts) {
+    			    addresses.add( new ServerAddress(host.get("host").asText(), host.get("port").asInt()) );
+    			}
+    			client = new MongoClient(addresses, options);
 			}
-			final MongoClient client = new MongoClient(addresses, options);
 			return client;
 		}
 
