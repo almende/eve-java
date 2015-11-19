@@ -6,6 +6,7 @@ package com.almende.eve.state.mongo;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +41,7 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 
     private static final Logger LOG = Logger.getLogger(MongoStateBuilder.class.getName());
     private static Map<String, MongoStateProvider> instances = new ConcurrentHashMap<String, MongoStateProvider>();
-    private static MongoClient client = null;
+    private static Map<String, MongoClient> clientMap = null;
     
 	@Override
 	public MongoState build() {
@@ -73,7 +74,8 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
                     if (!instances.containsKey(key)) {
                         try {
                             // initialization of client & jongo
-                            MongoClient client = getClientInstance(config.getHosts(), config.getMongoCredentials());
+                            MongoClient client = getClientInstance(config.getHosts(), config.getMongoCredentials(),
+                                config.getMongoClientLabel());
                             final MongoStateProvider result = new MongoStateProvider(getJongo(client, config.getDatabase()),
                                 config.getCollection());
                             if (result != null) {
@@ -90,24 +92,28 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
         }
         
         /**
-     * Returns a single instance of the MongoClient. Expects all hosts to be
-     * given at first instance creation time.
-     * 
-     * @param hosts
-     *            Arraynode of "host" and corresponding "ports"
-     * @return
-     * @throws UnknownHostException
-     */
-        public static MongoClient getClientInstance(final ArrayNode hosts, final List<MongoCredential> credentials)
-            throws UnknownHostException {
+         * Returns a single instance of the MongoClient. Expects all hosts to be
+         * given at first instance creation time.
+         * 
+         * @param hosts
+         *            Arraynode of "host" and corresponding "ports"
+         * @return
+         * @throws UnknownHostException
+         */
+        public static MongoClient getClientInstance(final ArrayNode hosts, final List<MongoCredential> credentials,
+            String hostKey) throws UnknownHostException {
     
-            if (client == null) {
+            hostKey = hostKey != null ? hostKey : ""; //update it to empty (default type)
+            if (clientMap == null || clientMap.get(hostKey) == null) {
+    
+                clientMap = clientMap != null ? clientMap : new HashMap<String, MongoClient>();
                 final MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(500)
                                                                      .threadsAllowedToBlockForConnectionMultiplier(1500)
                                                                      .build();
-                client = new MongoClient(getHosts(hosts), credentials, options);
+                MongoClient mongoClient = new MongoClient(getHosts(hosts), credentials, options);
+                clientMap.put(hostKey, mongoClient);
             }
-            return client;
+            return clientMap.get(hostKey);
         }
         
         /**
@@ -175,8 +181,8 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
 		 * 
 		 * @return the collection
 		 */
-                public MongoCollection getInstance() {
-        
+                protected MongoCollection getInstance() {
+                    
                     final MongoCollection collection = jongo.getCollection(collectionName);
                     collection.ensureIndex("{ _id: 1, timestamp:1 }");
                     return collection;

@@ -225,6 +225,28 @@ public class MongoStateConfig extends StateConfig {
         }
         
         /**
+         * If this agent has to have its own unique MongoClient instance, this field should
+         * be set in eve.yaml. Else it will load a single instance of MongoClient
+         * 
+         * @return
+         */
+        public String getMongoClientLabel() {
+    
+            if (this.has("mongoClientKey")) {
+                return this.get("mongoClientKey").asText();
+            }
+            return null;
+        }
+        
+        /**
+         * Sets the mongoClientLabel to the current config
+         * @param credentials
+         */
+        public void setMongoClientLabel(String mongoClientKey) {
+            this.put("mongoClientKey", mongoClientKey);
+        }
+        
+        /**
          * Helper method to fetch the list of Mongocredentials based on the config
          * 
          * @param credentials
