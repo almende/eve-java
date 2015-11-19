@@ -73,9 +73,9 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
                     if (!instances.containsKey(key)) {
                         try {
                             // initialization of client & jongo
-                            MongoClient client = getClientInstance(config.getHosts(), null);
-                            final MongoStateProvider result = new MongoStateProvider(getJongo(client, 
-                                config.getDatabase()), config);
+                            MongoClient client = getClientInstance(config.getHosts(), config.getMongoCredentials());
+                            final MongoStateProvider result = new MongoStateProvider(getJongo(client, config.getDatabase()),
+                                config.getCollection());
                             if (result != null) {
                                 instances.put(key, result);
                             }
@@ -90,13 +90,14 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
         }
         
         /**
-         * Returns a single instance of the MongoClient
-         * 
-         * @param hosts
-         *            Arraynode of "host" and corresponding "ports"
-         * @return
-         * @throws UnknownHostException
-         */
+     * Returns a single instance of the MongoClient. Expects all hosts to be
+     * given at first instance creation time.
+     * 
+     * @param hosts
+     *            Arraynode of "host" and corresponding "ports"
+     * @return
+     * @throws UnknownHostException
+     */
         public static MongoClient getClientInstance(final ArrayNode hosts, final List<MongoCredential> credentials)
             throws UnknownHostException {
     
@@ -109,6 +110,12 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
             return client;
         }
         
+        /**
+         * Gets a new instance of Jongo connection for the given dataBaseName
+         * @param client
+         * @param dataBaseName
+         * @return
+         */
         public static Jongo getJongo(final MongoClient client, String dataBaseName) {
     
             return new Jongo(client.getDB(dataBaseName), new JacksonMapper.Builder().addModifier(new MapperModifier() {
@@ -137,7 +144,7 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
             }
             return addresses;
         }
-
+        
 	/**
 	 * A service for managing MemoryState objects.
 	 */
@@ -157,9 +164,9 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
                  * @throws UnknownHostException
                  *             the unknown host exception
                  */
-                public MongoStateProvider(final Jongo jongo, final MongoStateConfig config) throws UnknownHostException {
+                public MongoStateProvider(final Jongo jongo, final String collectionName) throws UnknownHostException {
         
-                    collectionName = config.getCollection();
+                    this.collectionName = collectionName;
                     this.jongo = jongo;
                 }
 

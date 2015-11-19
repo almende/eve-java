@@ -4,14 +4,16 @@
  */
 package com.almende.eve.state.mongo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
-
 import com.almende.eve.state.StateConfig;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.MongoCredential;
 
 /**
  * The Class MongoStateConfig.
@@ -199,4 +201,49 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return "agents";
 	}
+	
+        /**
+         * Gets the credentials for the mongoDb from the config
+         * 
+         * @return An ArrayNode of credentials. Where each credential is an
+         *         objectNode
+         */
+        public ArrayNode getCredentials() {
+    
+            if (this.has("credentials") && this.get("credentials") instanceof ArrayNode) {
+                return (ArrayNode) this.get("credentials");
+            }
+            return null;
+        }
+        
+        /**
+         * Sets the credentials to the current config
+         * @param credentials
+         */
+        public void setCredentials(ArrayNode credentials) {
+            this.set("credentials", credentials);
+        }
+        
+        /**
+         * Helper method to fetch the list of Mongocredentials based on the config
+         * 
+         * @param credentials
+         * @return
+         */
+        @JsonIgnore
+        public List<MongoCredential> getMongoCredentials() {
+    
+            ArrayNode credentials = getCredentials();
+            List<MongoCredential> mongoCredentials = null;
+            if (credentials != null) {
+                mongoCredentials = new ArrayList<MongoCredential>(1);
+                for (JsonNode credential : credentials) {
+                    if (credential.has("user") && credential.has("database") && credential.has("password")) {
+                        mongoCredentials.add(MongoCredential.createMongoCRCredential(credential.get("user").asText(),
+                            credential.get("database").asText(), credential.get("password").asText().toCharArray()));
+                    }
+                }
+            }
+            return mongoCredentials;
+        }
 }
