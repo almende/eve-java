@@ -90,16 +90,22 @@ public class MongoStateBuilder extends AbstractCapabilityBuilder<MongoState> {
                 }
             }
         }
-        
+
         /**
-         * Returns a single instance of the MongoClient. Expects all hosts to be
-         * given at first instance creation time.
-         * 
-         * @param hosts
-         *            Arraynode of "host" and corresponding "ports"
-         * @return
-         * @throws UnknownHostException
-         */
+     * Returns a single instance of the MongoClient. Expects all hosts to be
+     * given at first instance creation time.
+     * 
+     * @param hosts
+     *            ArrayNode of hosts must have host:<string> and port:<int>
+     * @param credentials
+     *            MongoCredentials which is used to access the db
+     * @param hostKey
+     *            Optional. If a new MongoClient instance is needed, pass a
+     *            unique key here. Ideally one MongoClient instance is
+     *            sufficient per JVM
+     * @return
+     * @throws UnknownHostException
+     */
         public static MongoClient getClientInstance(final ArrayNode hosts, final List<MongoCredential> credentials,
             String hostKey) throws UnknownHostException {
     
