@@ -123,7 +123,7 @@ function Controller($scope, $resource) {
             var method = keys[i];
             if (method == $scope.methodName) {
                 $scope.method = $scope.methods[method];
-				$scope.request = JSON.stringify(form2json(), null, 2);
+				$scope.request = JSON.stringify(form2json(true), null, 2);
                 break;
             }
         }
@@ -177,7 +177,7 @@ function Controller($scope, $resource) {
 		return null;
 	}
 
-    function form2json() {
+    function form2json(doExample) {
             var request = {};
             request.id = 1;
 	    	if (typeof $scope.method == "undefined"){
@@ -189,7 +189,7 @@ function Controller($scope, $resource) {
             request.params = {};
             for (var i = 0; i < $scope.method.params.length; i++) {
                 var param = $scope.method.params[i];
-                if ((param.type.type == "object" || param.type.type == "array") && !param.value){
+                if ((param.type.type == "object" || param.type.type == "array") && doExample && !param.value){
                 	param.value = JSON.stringify(formExample(param.type));
                 } 
                 if (param.required || (param.value && param.value.length > 0) ) {
@@ -210,7 +210,7 @@ function Controller($scope, $resource) {
      */
     $scope.sendForm = function () {
         try {
-            var request = form2json();
+            var request = form2json(false);
             var start = +new Date();
             $scope.formStatus = 'sending...';
             agent.post({}, request, function (response) {
@@ -335,13 +335,13 @@ function Controller($scope, $resource) {
 				// update method select box and the json version
                 setTimeout(function () {
                     new Chosen(document.getElementById('methods'));
-		    		$scope.request = JSON.stringify(form2json(), null, 2);
+		    		$scope.request = JSON.stringify(form2json(true), null, 2);
                 }, 15);
             }
         });
     };
 
-    $scope.request = JSON.stringify(form2json(), null, 2);
+    $scope.request = JSON.stringify(form2json(true), null, 2);
 	$scope.methodKeys = [];
     $scope.loading = true;
     $scope.load();
