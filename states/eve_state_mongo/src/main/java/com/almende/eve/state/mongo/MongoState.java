@@ -16,8 +16,10 @@ import org.jongo.marshall.jackson.oid.Id;
 import com.almende.eve.state.AbstractState;
 import com.almende.eve.state.State;
 import com.almende.eve.state.StateService;
+import com.almende.eve.state.mongo.MongoStateBuilder.MongoStateProvider;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,6 +32,7 @@ import com.mongodb.WriteResult;
 /**
  * The Class MongoState.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MongoState extends AbstractState<JsonNode> implements State {
 	
 	/**
@@ -72,17 +75,16 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		
 	}
 	
-	private static final Logger		LOG			= Logger.getLogger("MongoState");
-	
-	/* mapping object that contains variables used by the agent */
-	@JsonIgnore
+        private static final Logger LOG = Logger.getLogger("MongoState");
+    
+        /* mapping object that contains variables used by the agent */
+        @JsonIgnore
         private Map<String, JsonNode> properties = Collections.synchronizedMap(new HashMap<String, JsonNode>());
-	@JsonProperty("properties")
-	private String propertiesJson = null;
-	private Long					timestamp;
-	
-	@JsonIgnore
-	private MongoCollection			collection;
+        @JsonProperty("properties")
+        private String propertiesJson = null;
+        private Long timestamp;
+        @JsonIgnore
+        private MongoStateProvider provider = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -96,53 +98,27 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	}
 	
 	/**
-	 * Instantiates a new memory state.
+	 * Default constructor
 	 */
-	public MongoState() {
-		timestamp = System.nanoTime();
-	}
-	
-	/**
-	 * Instantiates a new mongo state.
-	 * 
-	 * @param id
-	 *            the state's id
-	 * @param service
-	 *            the service
-	 * @param params
-	 *            the params
-	 */
-	public MongoState(final String id, final StateService service,
-			final ObjectNode params) {
-		super(id, service, params);
-		timestamp = System.nanoTime();
-	}
-	
-	/**
-	 * Sets the collection.
-	 * 
-	 * @param collection
-	 *            the new collection
-	 */
-	@JsonIgnore
-	public void setCollection(final MongoCollection collection) {
-		this.collection = collection;
-		// assuming this is called only once after creation, simply save the
-		// entire state
-		collection.save(this);
-		collection.ensureIndex("{ _id: 1}");
-		collection.ensureIndex("{ _id: 1, timestamp:1 }");
-	}
-	
-	/**
-	 * Gets the collection.
-	 * 
-	 * @return the collection
-	 */
-	@JsonIgnore
-	public MongoCollection getCollection() {
-		return collection;
-	}
+        public MongoState() {
+            timestamp = System.nanoTime();
+        }
+        
+        /**
+         * Instantiates a new mongo state.
+         * 
+         * @param id
+         *            the state's id
+         * @param mongoStateProvider
+         *            the service
+         * @param params
+         *            the params
+         */
+        public MongoState(final String id, final MongoStateProvider mongoStateProvider, final ObjectNode params) {
+            super(id, mongoStateProvider, params);
+            provider = mongoStateProvider;
+            timestamp = System.nanoTime();
+        }
 	
 	/**
 	 * Gets the timestamp.
@@ -151,6 +127,20 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 */
 	public Long getTimestamp() {
 		return timestamp;
+	}
+	
+	@Override
+	public StateService getService() {
+	
+	    return provider;
+	}
+	
+	@Override
+	public void setService(StateService service) {
+	
+	    if(service instanceof MongoStateProvider) {
+	           provider = (MongoStateProvider) service;
+	    }
 	}
 	
 	/*
@@ -395,18 +385,19 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 	 * is not guaranteed to be executed properly.
 	 * 
 	 */
-	private synchronized void reloadProperties() {
-		final MongoState updatedState = collection.findOne("{_id: #}", getId())
-				.as(MongoState.class);
-		if (updatedState != null) {
-			timestamp = updatedState.timestamp;
-			properties = updatedState.properties;
-		} else {
-			properties = Collections
-					.synchronizedMap(new HashMap<String, JsonNode>());
-			timestamp = System.nanoTime();
-		}
-	}
+        private synchronized void reloadProperties() {
+    
+            final MongoCollection collection = provider.getInstance();
+            final MongoState updatedState = collection.findOne("{_id: #}", getId()).as(MongoState.class);
+            if (updatedState != null) {
+                timestamp = updatedState.timestamp;
+                properties = updatedState.properties;
+            }
+            else {
+                properties = Collections.synchronizedMap(new HashMap<String, JsonNode>());
+                timestamp = System.nanoTime();
+            }
+        }
 	
 	/**
 	 * updating the entire properties object at the same time, with force flag
@@ -421,6 +412,7 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 			throws UpdateConflictException {
 		final Long now = System.nanoTime();
 		propertiesJson = getPropertiesJSON();
+		final MongoCollection collection = provider.getInstance();
 		/* write to database */
                 final WriteResult result = (force)
                     ? collection.update("{_id: #}", getId()).with("{$set: {properties: #, timestamp: #}}", propertiesJson, now)
