@@ -122,7 +122,7 @@ public final class Boot {
 	 */
 	public static Config boot(final ObjectNode config, final ClassLoader cl) {
 		final Config conf = Config.decorate(config);
-		return boot(conf, null);
+		return boot(conf, cl);
 	}
 
 	/**
