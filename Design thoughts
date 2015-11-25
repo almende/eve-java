@@ -1,0 +1,8 @@
+Ideas from Inertia/Bridge:
+	-Having a scenario agent to do demo control/management
+	-Having a logger agent to do graphs output (including real-time forwarding to vis)
+	-Build real-time graphs through websocket client in vis.js+eve.js
+	-Startup agents from a mgmt agent, keeping pointers to the agents for bookkeeping
+	-Using inheritence modeling to build a graph of agents.
+	-Proxy agents to adapt to external domains.
+	
