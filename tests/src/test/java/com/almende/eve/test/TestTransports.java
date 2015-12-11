@@ -17,6 +17,7 @@ import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
+import com.almende.eve.transport.pubnub.PubNubTransportConfig;
 import com.almende.eve.transport.ws.WebsocketTransportConfig;
 import com.almende.eve.transport.ws.WsClientTransport;
 import com.almende.eve.transport.ws.WsClientTransportBuilder;
@@ -85,12 +86,41 @@ public class TestTransports extends TestCase {
 	 */
 	@Test
 	public void testLocal() throws IOException {
-		final LocalTransportConfig config = new LocalTransportConfig("testMe");
+		final LocalTransportConfig config = LocalTransportConfig.create();
+		config.setId("testMe");
 
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
 
 		transport.send(URI.create("local:testMe"), "Hello World", null, null);
+	}
+	
+	/**
+	 * Test pub nub.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testPubNub() throws IOException {
+		final PubNubTransportConfig config = PubNubTransportConfig.create();
+		config.setAddress("pubnub:testMe");
+		//My test account:
+		config.setPublishKey("pub-c-fe1f34ab-67e4-4673-9f51-61ebb0fa1a34");
+		config.setSubscribeKey("sub-c-1da70282-b33c-11e3-aab4-02ee2ddab7fe");
+		config.setDoShortcut(false);
+		config.setUseSSL(false);
+		
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(new MyReceiver()).build();
+		transport.connect();
+		
+		transport.send(URI.create("pubnub:testMe"), "Hello World", null, null);
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	/**

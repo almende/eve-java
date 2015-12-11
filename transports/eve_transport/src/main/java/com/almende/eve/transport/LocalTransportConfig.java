@@ -33,6 +33,19 @@ public class LocalTransportConfig extends TransportConfig {
 	/**
 	 * Instantiates a new local transport config.
 	 *
+	 * @param id
+	 *            the id
+	 * @return the local transport config
+	 */
+	public static LocalTransportConfig create(final String id) {
+		final LocalTransportConfig res = create();
+		res.setId(id);
+		return res;
+	}
+	
+	/**
+	 * Instantiates a new local transport config.
+	 *
 	 * @param node
 	 *            the node
 	 * @return the local transport config
@@ -41,17 +54,6 @@ public class LocalTransportConfig extends TransportConfig {
 		final LocalTransportConfig res = new LocalTransportConfig();
 		res.extend(node);
 		return res;
-	}
-
-	/**
-	 * Instantiates a new local transport config.
-	 * 
-	 * @param id
-	 *            the id
-	 */
-	public LocalTransportConfig(final String id) {
-		this();
-		setId(id);
 	}
 
 	/**

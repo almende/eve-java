@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 
@@ -116,12 +117,12 @@ public final class JOM {
 		mapper.configure(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS, false);
 		mapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
 
-		
 		// Convenient for JSON configuration documents
 		mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 		mapper.configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true);
 
 		mapper.registerModule(new JodaModule());
+		mapper.registerModule(new JsonOrgModule());
 
 		SimpleModule throwableModule = new SimpleModule("ThrowableModule",
 				new Version(1, 0, 0, null, null, null)) {

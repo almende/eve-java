@@ -646,7 +646,7 @@ public class AgentCore implements Receiver, Configurable, Authorizor {
 		}
 		// All agents have a local transport
 		this.transport.register(new LocalTransportBuilder()
-				.withConfig(new LocalTransportConfig(agentId))
+				.withConfig(LocalTransportConfig.create(agentId))
 				.withHandle(receiver).build());
 	}
 
