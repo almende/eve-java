@@ -12,7 +12,7 @@ import com.almende.eve.transport.TransportConfig;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class XmppTransportConfig.
+ * The Class AmqpTransportConfig.
  */
 public class AmqpTransportConfig extends TransportConfig {
 	private static final Logger	LOG		= Logger.getLogger(AmqpTransportConfig.class
@@ -20,14 +20,14 @@ public class AmqpTransportConfig extends TransportConfig {
 	private static final String	BUILDER	= AmqpTransportBuilder.class.getName();
 
 	/**
-	 * Instantiates a new xmpp transport config.
+	 * Instantiates a new AMQP transport config.
 	 */
 	protected AmqpTransportConfig() {
 		super();
 	}
 
 	/**
-	 * Instantiates a new AMQ transport config.
+	 * Instantiates a new AMQP transport config.
 	 *
 	 * @return the amqp transport config
 	 */

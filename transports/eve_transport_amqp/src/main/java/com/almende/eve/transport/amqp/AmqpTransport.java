@@ -16,12 +16,12 @@ import com.almende.eve.transport.amqp.AmqpTransportBuilder.AmqpService;
 import com.almende.util.callback.AsyncCallback;
 
 /**
- * The Class XmppTransport.
+ * The Class AmqpTransport.
  */
 public class AmqpTransport extends AbstractTransport  {
 
 	/**
-	 * Instantiates a new amqp transport.
+	 * Instantiates a new AMQP transport.
 	 *
 	 * @param config
 	 *            the config

@@ -17,7 +17,7 @@ import com.almende.eve.transport.TransportService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class XmppService.
+ * The Class AmqpTransportService.
  */
 public class AmqpTransportBuilder extends
 		AbstractCapabilityBuilder<AmqpTransport> {
@@ -38,7 +38,7 @@ public class AmqpTransportBuilder extends
 		private boolean	doesShortcut	= true;
 
 		/**
-		 * Gets the actual XMPP transport
+		 * Gets the actual AMQP transport
 		 * 
 		 * @param <T>
 		 *            the generic type
