@@ -6,6 +6,7 @@ package com.almende.eve.test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
@@ -17,6 +18,7 @@ import com.almende.eve.transport.LocalTransportConfig;
 import com.almende.eve.transport.Receiver;
 import com.almende.eve.transport.Transport;
 import com.almende.eve.transport.TransportBuilder;
+import com.almende.eve.transport.amqp.AmqpTransportConfig;
 import com.almende.eve.transport.pubnub.PubNubTransportConfig;
 import com.almende.eve.transport.ws.WebsocketTransportConfig;
 import com.almende.eve.transport.ws.WsClientTransport;
@@ -25,6 +27,7 @@ import com.almende.eve.transport.xmpp.XmppTransportBuilder;
 import com.almende.eve.transport.xmpp.XmppTransportConfig;
 import com.almende.eve.transport.zmq.ZmqTransportConfig;
 import com.almende.util.URIUtil;
+import com.almende.util.callback.AsyncCallback;
 import com.almende.util.jackson.JOM;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -94,7 +97,7 @@ public class TestTransports extends TestCase {
 
 		transport.send(URI.create("local:testMe"), "Hello World", null, null);
 	}
-	
+
 	/**
 	 * Test pub nub.
 	 *
@@ -105,22 +108,62 @@ public class TestTransports extends TestCase {
 	public void testPubNub() throws IOException {
 		final PubNubTransportConfig config = PubNubTransportConfig.create();
 		config.setAddress("pubnub:testMe");
-		//My test account:
+		// My test account:
 		config.setPublishKey("pub-c-fe1f34ab-67e4-4673-9f51-61ebb0fa1a34");
 		config.setSubscribeKey("sub-c-1da70282-b33c-11e3-aab4-02ee2ddab7fe");
 		config.setDoShortcut(false);
 		config.setUseSSL(false);
-		
+
 		final Transport transport = new TransportBuilder().withConfig(config)
 				.withHandle(new MyReceiver()).build();
 		transport.connect();
-		
+
 		transport.send(URI.create("pubnub:testMe"), "Hello World", null, null);
-		
+
 		try {
 			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		} catch (InterruptedException e) {}
+	}
+
+	/**
+	 * Test AMQP
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testAmqp() throws IOException {
+		final AmqpTransportConfig config = AmqpTransportConfig.create();
+		config.setId("testMe");
+		config.setHostUri("amqp://localhost");
+		config.setDoShortcut(false);
+
+		final Transport transport = new TransportBuilder().withConfig(config)
+				.withHandle(new MyReceiver()).build();
+		transport.connect();
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {}
+		
+		transport.send(URI.create("amqp:testMe"), "Hello World", null,
+				new AsyncCallback<Void>() {
+
+					@Override
+					public void onSuccess(Void result) {
+						LOG.warning("Success!");
+					}
+
+					@Override
+					public void onFailure(Exception e) {
+						LOG.log(Level.WARNING, "Failed to send amqp message", e);
+					}
+
+				});
+
+		try {
+			Thread.sleep(20000);
+		} catch (InterruptedException e) {}
 	}
 
 	/**
@@ -152,7 +195,8 @@ public class TestTransports extends TestCase {
 				.withConfig(clientConfig).withHandle(new MyReceiver()).build();
 		client.connect();
 
-		server.send(URIUtil.create("wsclient:testClient"), "Hi there!", null, null);
+		server.send(URIUtil.create("wsclient:testClient"), "Hi there!", null,
+				null);
 
 		client.send(URIUtil.create("ws://localhost:8082/ws/testServer"),
 				"Good day to you!", null, null);

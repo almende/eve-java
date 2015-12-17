@@ -5,10 +5,10 @@
 package com.almende.eve.transport.amqp;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import com.almende.eve.transport.TransportConfig;
+import com.almende.util.URIUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -38,11 +38,11 @@ public class AmqpTransportConfig extends TransportConfig {
 	}
 
 	/**
-	 * Instantiates a new AMQ transport config.
+	 * Instantiates a new AMQP transport config.
 	 *
 	 * @param node
 	 *            the node
-	 * @return the amqp transport config
+	 * @return the AMQP transport config
 	 */
 	public static AmqpTransportConfig decorate(final ObjectNode node) {
 		final AmqpTransportConfig res = new AmqpTransportConfig();
@@ -53,50 +53,59 @@ public class AmqpTransportConfig extends TransportConfig {
 
 	/**
 	 * Gets the address.
-	 * 
+	 *
 	 * @return the address
 	 */
 	public URI getAddress() {
-		if (this.has("address")) {
-			try {
-				return new URI(this.get("address").asText());
-			} catch (final URISyntaxException e) {
-				LOG.warning("Couldn't parse URI from: "
-						+ this.get("address").asText());
-			}
+		if (!"".equals(getId())) {
+			return URIUtil.create("amqp:" + getId());
 		}
 		return null;
 	}
 
 	/**
-	 * Sets the address.
-	 * 
-	 * @param address
-	 *            the new address
+	 * Gets the id.
+	 *
+	 * @return the id
 	 */
-	public void setAddress(final String address) {
-		this.put("address", address);
+	public String getId() {
+		if (this.has("id")) {
+			return this.get("id").asText();
+		}
+		LOG.warning("Required field 'id' is missing!");
+		return "";
 	}
 
 	/**
-	 * Gets the password.
-	 * 
-	 * @return the password
+	 * Sets the id.
+	 *
+	 * @param id
+	 *            the new id
 	 */
-	public String getPassword() {
-		if (this.has("password")) {
-			return this.get("password").asText();
+	public void setId(final String id) {
+		this.put("id", id);
+	}
+
+	/**
+	 * Gets the host uri.
+	 *
+	 * @return the host uri
+	 */
+	public String getHostUri() {
+		if (this.has("hostUri")) {
+			return this.get("hostUri").asText();
 		}
+		LOG.warning("Required field 'hostUri' is missing!");
 		return null;
 	}
 
 	/**
-	 * Sets the password.
-	 * 
-	 * @param password
-	 *            the new password
+	 * Sets the host uri.
+	 *
+	 * @param uri
+	 *            the new host uri
 	 */
-	public void setPassword(final String password) {
-		this.put("password", password);
+	public void setHostUri(final String uri) {
+		this.put("hostUri", uri);
 	}
 }

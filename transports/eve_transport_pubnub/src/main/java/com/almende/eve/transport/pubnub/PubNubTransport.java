@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
 
 import com.almende.eve.capabilities.handler.Handler;
 import com.almende.eve.transport.AbstractTransport;
 import com.almende.eve.transport.Receiver;
+import com.almende.eve.transport.envelop.JSONEnvelop;
 import com.almende.eve.transport.pubnub.PubNubTransportBuilder.PubNubService;
 import com.almende.util.URIUtil;
 import com.almende.util.callback.AsyncCallback;
@@ -73,14 +73,10 @@ public class PubNubTransport extends AbstractTransport {
 		if (sendLocal(receiverUri, message)) {
 			return;
 		}
-		final ObjectNode envelop = JOM.createObjectNode();
-		envelop.put("to", receiverUri.getSchemeSpecificPart());
-		envelop.put("from", getAddress().getSchemeSpecificPart());
-		envelop.put("message", message);
 
 		final Callback pubnubCB = new Callback() {
 			public void successCallback(String channel, Object response) {
-				LOG.warning("successfully send:" + envelop + " to:" + channel
+				LOG.warning("successfully send:" + message + " to:" + channel
 						+ " response:" + response);
 			}
 
@@ -92,8 +88,9 @@ public class PubNubTransport extends AbstractTransport {
 				}
 			}
 		};
-		pubnub.publish(receiverUri.getSchemeSpecificPart(), JOM.getInstance()
-				.treeToValue(envelop, JSONObject.class), pubnubCB);
+		pubnub.publish(receiverUri.getSchemeSpecificPart(), JSONEnvelop
+				.wrapAsJSONObject(getAddress().getSchemeSpecificPart(),
+						receiverUri.getSchemeSpecificPart(), message), pubnubCB);
 	}
 
 	/*
