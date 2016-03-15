@@ -256,6 +256,10 @@ public class RunQueue extends AbstractExecutorService {
 
 	@Override
 	public void execute(final Runnable command) {
+		if (command == null) {
+			throw new NullPointerException(
+					"Command to execute may never be null.");
+		}
 		if (isShutdown()) {
 			LOG.warning("Execute called after shutdown, dropping command");
 			return;
@@ -410,5 +414,12 @@ public class RunQueue extends AbstractExecutorService {
 				break;
 			}
 		}
+	}
+
+	public String toString() {
+		return this.getClass().getName() + ": ru:" + running.size() + " wa:"
+				+ waiting.size() + " rs:" + reserve.size() + " t:"
+				+ tasks.size() + " nofCores:" + nofCores + " int:" + interval
+				+ " ms.";
 	}
 }
