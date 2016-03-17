@@ -19,8 +19,8 @@ import com.mongodb.MongoCredential;
  * The Class MongoStateConfig.
  */
 public class MongoStateConfig extends StateConfig {
-        private static final Logger     LOG             = Logger.getLogger(MongoStateConfig.class
-                                                                       .getName());
+	private static final Logger	LOG		= Logger.getLogger(MongoStateConfig.class
+												.getName());
 	private static final String	BUILDER	= MongoStateBuilder.class.getName();
 
 	protected MongoStateConfig() {
@@ -94,7 +94,6 @@ public class MongoStateConfig extends StateConfig {
 	 * 
 	 * @param port
 	 *            the new port
-	 *            
 	 * @deprecated Please use setHosts(hosts[])
 	 */
 	@Deprecated
@@ -106,7 +105,7 @@ public class MongoStateConfig extends StateConfig {
 	 * Gets the port.
 	 * 
 	 * @deprecated Please use getHosts(hosts[])
-	 * @return the port 
+	 * @return the port
 	 */
 	@Deprecated
 	@JsonIgnore
@@ -116,47 +115,47 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return 27017;
 	}
-	
+
 	/**
-         * Gets the host configurations.
-         * 
-         * @return the host configurations.
-         */
-        public ArrayNode getHosts() {
-                final JsonNode res = this.get("hosts");
-                if (res == null && this.has("host")) {
-                        LOG.warning("This configuration is deprecated! Host should be renamed to 'hosts' and needs to be an array.");
-                        final ArrayNode other = JOM.createArrayNode();
-                        final ObjectNode server = JOM.createObjectNode();
-                        
-                        if (this.has("host")) {
-                            server.set( "host", this.get("host") );
-                        } else {
-                            server.put( "host", "localhost" );
-                        }
-                        
-                        if(this.has( "port" )) {
-                            server.set( "port", this.get("port") );
-                        } else {
-                            server.put( "port", 27017 );
-                        }
-                        
-                        other.add(server);
-                        
-                        return other;
-                }
-                return (ArrayNode) res;
-        }
-        
-        /**
-         * Sets the list of host configurations.
-         * 
-         * @param hosts
-         *            the new transport config
-         */
-        public void setHosts(final ArrayNode hosts) {
-                this.set("hosts", hosts);
-        }
+	 * Gets the host configurations.
+	 * 
+	 * @return the host configurations.
+	 */
+	public ArrayNode getHosts() {
+		final JsonNode res = this.get("hosts");
+		if (res == null && this.has("host")) {
+			LOG.warning("This configuration is deprecated! Host should be renamed to 'hosts' and needs to be an array.");
+			final ArrayNode other = JOM.createArrayNode();
+			final ObjectNode server = JOM.createObjectNode();
+
+			if (this.has("host")) {
+				server.set("host", this.get("host"));
+			} else {
+				server.put("host", "localhost");
+			}
+
+			if (this.has("port")) {
+				server.set("port", this.get("port"));
+			} else {
+				server.put("port", 27017);
+			}
+
+			other.add(server);
+
+			return other;
+		}
+		return (ArrayNode) res;
+	}
+
+	/**
+	 * Sets the list of host configurations.
+	 * 
+	 * @param hosts
+	 *            the new transport config
+	 */
+	public void setHosts(final ArrayNode hosts) {
+		this.set("hosts", hosts);
+	}
 
 	/**
 	 * Sets the database.
@@ -201,71 +200,82 @@ public class MongoStateConfig extends StateConfig {
 		}
 		return "agents";
 	}
-	
-        /**
-         * Gets the credentials for the mongoDb from the config
-         * 
-         * @return An ArrayNode of credentials. Where each credential is an
-         *         objectNode
-         */
-        public ArrayNode getCredentials() {
-    
-            if (this.has("credentials") && this.get("credentials") instanceof ArrayNode) {
-                return (ArrayNode) this.get("credentials");
-            }
-            return null;
-        }
-        
-        /**
-         * Sets the credentials to the current config
-         * @param credentials
-         */
-        public void setCredentials(ArrayNode credentials) {
-            this.set("credentials", credentials);
-        }
-        
-        /**
-         * If this agent has to have its own unique MongoClient instance, this field should
-         * be set in eve.yaml. Else it will load a single instance of MongoClient
-         * 
-         * @return
-         */
-        public String getMongoClientLabel() {
-    
-            if (this.has("mongoClientKey")) {
-                return this.get("mongoClientKey").asText();
-            }
-            return null;
-        }
-        
-        /**
-         * Sets the mongoClientLabel to the current config
-         * @param credentials
-         */
-        public void setMongoClientLabel(String mongoClientKey) {
-            this.put("mongoClientKey", mongoClientKey);
-        }
-        
-        /**
-         * Helper method to fetch the list of Mongocredentials based on the config
-         * 
-         * @param credentials
-         * @return
-         */
-        @JsonIgnore
-        public List<MongoCredential> getMongoCredentials() {
-    
-            ArrayNode credentials = getCredentials();
-            List<MongoCredential> mongoCredentials = null;
-            if (credentials != null) {
-                mongoCredentials = new ArrayList<MongoCredential>(1);
-                for (JsonNode credential : credentials) {
-                    if (credential.has("user") && credential.has("database") && credential.has("password")) {
-                        mongoCredentials.add(MongoCredential.createMongoCRCredential(credential.get("user").asText(),
-                            credential.get("database").asText(), credential.get("password").asText().toCharArray()));
-                    }
-                }
-            }
-            return mongoCredentials;
-        }
+
+	/**
+	 * Gets the credentials for the mongoDb from the config
+	 * 
+	 * @return An ArrayNode of credentials. Where each credential is an
+	 *         objectNode
+	 */
+	public ArrayNode getCredentials() {
+
+		if (this.has("credentials")
+				&& this.get("credentials") instanceof ArrayNode) {
+			return (ArrayNode) this.get("credentials");
+		}
+		return null;
+	}
+
+	/**
+	 * Sets the credentials to the current config.
+	 *
+	 * @param credentials
+	 *            the new credentials
+	 */
+	public void setCredentials(ArrayNode credentials) {
+		this.set("credentials", credentials);
+	}
+
+	/**
+	 * If this agent has to have its own unique MongoClient instance, this
+	 * field should
+	 * be set in eve.yaml. Else it will load a single instance of
+	 * MongoClient
+	 *
+	 * @return the mongo client label
+	 */
+	public String getMongoClientLabel() {
+
+		if (this.has("mongoClientKey")) {
+			return this.get("mongoClientKey").asText();
+		}
+		return null;
+	}
+
+	/**
+	 * Sets the mongoClientLabel to the current config.
+	 *
+	 * @param mongoClientKey
+	 *            the new mongo client label
+	 */
+	public void setMongoClientLabel(String mongoClientKey) {
+		this.put("mongoClientKey", mongoClientKey);
+	}
+
+	/**
+	 * Helper method to fetch the list of Mongocredentials based on the
+	 * config.
+	 *
+	 * @return the mongo credentials
+	 */
+	@JsonIgnore
+	public List<MongoCredential> getMongoCredentials() {
+
+		ArrayNode credentials = getCredentials();
+		List<MongoCredential> mongoCredentials = null;
+		if (credentials != null) {
+			mongoCredentials = new ArrayList<MongoCredential>(1);
+			for (JsonNode credential : credentials) {
+				if (credential.has("user") && credential.has("database")
+						&& credential.has("password")) {
+					mongoCredentials.add(MongoCredential
+							.createMongoCRCredential(credential.get("user")
+									.asText(), credential.get("database")
+									.asText(), credential.get("password")
+									.asText().toCharArray()));
+				}
+			}
+		}
+		return mongoCredentials;
+	}
 }
