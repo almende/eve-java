@@ -394,6 +394,8 @@ public class RunQueue extends AbstractExecutorService {
 					if (thread.task != null) {
 						threadWaiting(thread);
 						count++;
+					} else {
+						threadDone(thread);
 					}
 					break;
 				case TERMINATED:
