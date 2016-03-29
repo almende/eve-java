@@ -103,12 +103,16 @@ public class RunQueue extends AbstractExecutorService {
 					continue;
 				}
 				while (task == null) {
-					try {
-						condition.await();
-					} catch (InterruptedException e) {}
 					if (isShutdown) {
 						return;
 					}
+					try {
+						if (running.contains(this)) {
+							threadDone(this);
+							continue;
+						}
+						condition.await();
+					} catch (InterruptedException e) {}
 				}
 				if (!running.contains(this)) {
 					threadContinue(this);
