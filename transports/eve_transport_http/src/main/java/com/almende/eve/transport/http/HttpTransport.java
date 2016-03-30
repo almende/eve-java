@@ -14,9 +14,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
@@ -74,7 +76,8 @@ public class HttpTransport extends AbstractTransport {
 	 */
 	@Override
 	public <T> void send(final URI receiverUri, final String message,
-			final String tag, final AsyncCallback<T> exceptionCallback) throws IOException {
+			final String tag, final AsyncCallback<T> exceptionCallback)
+			throws IOException {
 		if (tag != null) {
 			if (callbacks != null) {
 				final AsyncCallback<String> callback = callbacks.get(tag);
@@ -92,12 +95,12 @@ public class HttpTransport extends AbstractTransport {
 		}
 		// Check and deliver local shortcut.
 		if (sendLocal(receiverUri, message)) {
-		    return;
+			return;
 		}
 		final String senderUrl = super.getAddress().toASCIIString();
 		final Handler<Receiver> handle = super.getHandle();
 		// Use fresh Executor instead of the RunQueue, as this thread will sleep
-		// most of it's run.
+		// most of its run.
 		RUNNER.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -112,9 +115,10 @@ public class HttpTransport extends AbstractTransport {
 							.toString());
 					httpPost.addHeader("X-Eve-SenderUrl", senderUrl);
 					final HttpResponse webResp = ApacheHttpClient.get()
-							.execute(httpPost);
-					final String result = EntityUtils.toString(webResp
-							.getEntity());
+							.execute(httpPost, HttpClientContext.create());
+					final HttpEntity entity = webResp.getEntity();
+					final String result = EntityUtils.toString(entity, "UTF-8");
+					EntityUtils.consumeQuietly(entity);
 					if (webResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 						LOG.warning("Received HTTP Error Status:"
 								+ webResp.getStatusLine().getStatusCode() + ":"
@@ -122,11 +126,15 @@ public class HttpTransport extends AbstractTransport {
 						LOG.warning(result);
 						// TODO: should we send back a JSONRPCException? (Which
 						// is not a known type at this point!)
-						if(exceptionCallback!=null) {
-                                                    exceptionCallback.onFailure( new Exception("Received HTTP Error Status:"
-                                                        + webResp.getStatusLine().getStatusCode() + ":"
-                                                        + webResp.getStatusLine().getReasonPhrase()) );
-                                                }
+						if (exceptionCallback != null) {
+							exceptionCallback.onFailure(new Exception(
+									"Received HTTP Error Status:"
+											+ webResp.getStatusLine()
+													.getStatusCode()
+											+ ":"
+											+ webResp.getStatusLine()
+													.getReasonPhrase()));
+						}
 					} else {
 						ThreadPool.getPool().execute(new Runnable() {
 							public void run() {
@@ -137,11 +145,13 @@ public class HttpTransport extends AbstractTransport {
 				} catch (final Exception e) {
 					LOG.log(Level.WARNING,
 							"HTTP roundtrip resulted in exception!", e);
-					if(exceptionCallback!=null) {
-                                            exceptionCallback.onFailure( new Exception("HTTP roundtrip resulted in exception!") );
-                                        }
+					if (exceptionCallback != null) {
+						exceptionCallback.onFailure(new Exception(
+								"HTTP roundtrip resulted in exception!"));
+					}
 				} finally {
 					if (httpPost != null) {
+						httpPost.completed();
 						httpPost.reset();
 					}
 				}
@@ -156,7 +166,8 @@ public class HttpTransport extends AbstractTransport {
 	 */
 	@Override
 	public <T> void send(final URI receiverUri, final byte[] message,
-			final String tag, final AsyncCallback<T> callback) throws IOException {
+			final String tag, final AsyncCallback<T> callback)
+			throws IOException {
 		send(receiverUri, Base64.encodeBase64String(message), tag, callback);
 	}
 

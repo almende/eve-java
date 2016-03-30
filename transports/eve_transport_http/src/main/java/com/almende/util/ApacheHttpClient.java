@@ -8,16 +8,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
@@ -36,22 +38,41 @@ public final class ApacheHttpClient {
 	 */
 	private ApacheHttpClient() {
 
-		final HttpClientBuilder builder = HttpClientBuilder.create();
+		final HttpClientBuilder builder = HttpClients.custom();
 
 		// Allow self-signed SSL certificates:
 		try {
-			final SSLContextBuilder sslbuilder = new SSLContextBuilder();
-			sslbuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-			final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-					sslbuilder.build(),
-					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+			final SSLContext sslContext = new SSLContextBuilder()
+					.loadTrustMaterial(null, new TrustStrategy() {
 
+						@Override
+						public boolean isTrusted(
+								java.security.cert.X509Certificate[] arg0,
+								String arg1)
+								throws java.security.cert.CertificateException {
+							return true;
+						}
+					}).build();
+
+			// For HttpClient 4.3.x
+			final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+					sslContext,
+					SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 			builder.setSSLSocketFactory(sslsf);
+
+			// For HttpClient 4.4+
+			// builder.setSslcontext(sslContext).setSSLHostnameVerifier(
+			// new NoopHostnameVerifier());
+
 		} catch (final Exception e) {
 			LOG.log(Level.WARNING, "Couldn't init SSL strategy", e);
 		}
 		// Work with PoolingClientConnectionManager
-		final HttpClientConnectionManager connection = new PoolingHttpClientConnectionManager();
+		final PoolingHttpClientConnectionManager connection = new PoolingHttpClientConnectionManager();
+
+		// For HttpClient 4.4+
+		// connection.setValidateAfterInactivity(1000);
+
 		builder.setConnectionManager(connection);
 
 		// Provide eviction thread to clear out stale threads.
@@ -73,9 +94,15 @@ public final class ApacheHttpClient {
 
 		builder.setDefaultCookieStore(new BasicCookieStore());
 		final RequestConfig globalConfig = RequestConfig.custom()
+
+				// For HttpClient 4.3.X:
 				.setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
-				.setConnectTimeout(20000).setStaleConnectionCheckEnabled(false)
-				.build();
+				.setStaleConnectionCheckEnabled(false)
+
+				// For HttpClient 4.4+
+				// .setCookieSpec(CookieSpecs.DEFAULT)
+
+				.setConnectTimeout(20000).build();
 
 		builder.setDefaultRequestConfig(globalConfig);
 
