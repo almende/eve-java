@@ -71,51 +71,6 @@ public class RunnableClock implements Runnable, Clock {
 		for (Runnable run : toRun) {
 			RUNNER.execute(run);
 		}
-
-//		final List<Runnable> toRun = new ArrayList<Runnable>();
-//		while (true) {
-//			final Entry<ClockEntry, ClockEntry> first = TIMELINE
-//					.pollFirstEntry();
-//			if (first == null) {
-//				break;
-//			}
-//			ClockEntry ce = first.getValue();
-//			final DateTime now = DateTime.now();
-//
-//			if (ce.getDue().isEqual(now) || ce.getDue().isBefore(now)) {
-//				toRun.add(ce.getCallback());
-//				continue;
-//			}
-//			final long interval = new Interval(now, ce.getDue())
-//					.toDurationMillis();
-//			// TODO: 5ms is arbitrary, shouldn't this be different?
-//			if (interval <= 5) {
-//				toRun.add(ce.getCallback());
-//				break;
-//			}
-//			TIMELINE.put(ce, ce);
-//
-//			futureLock.lock();
-//			if (future == null || future.isDone()
-//					|| future.getDelay(TimeUnit.MILLISECONDS) > interval) {
-//				if (future != null) {
-//					future.cancel(false);
-//				}
-//				future = SCHEDULER.schedule(this, interval,
-//						TimeUnit.MILLISECONDS);
-//			}
-//			futureLock.unlock();
-//
-//			break;
-//		}
-//		for (Runnable run : toRun) {
-//			RUNNER.execute(run);
-//		}
-//		if ((future == null || future.isDone()) && !TIMELINE.isEmpty()) {
-//			// recurse, to cover race-condition between TIMELINE.isEmpty() and
-//			// scheduling
-//			run();
-//		}
 	}
 
 	/*
