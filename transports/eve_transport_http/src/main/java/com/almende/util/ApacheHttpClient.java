@@ -69,7 +69,11 @@ public final class ApacheHttpClient {
 		}
 		// Work with PoolingClientConnectionManager
 		final PoolingHttpClientConnectionManager connection = new PoolingHttpClientConnectionManager();
-
+		
+		//Make sure we have enough connections available for outbound traffic....
+		connection.setDefaultMaxPerRoute(1000);
+		connection.setMaxTotal(1000);
+		
 		// For HttpClient 4.4+
 		// connection.setValidateAfterInactivity(1000);
 
@@ -112,6 +116,7 @@ public final class ApacheHttpClient {
 
 		// generate httpclient
 		httpClient = builder.build();
+		
 	}
 
 	/**

@@ -17,6 +17,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
@@ -108,7 +109,8 @@ public class HttpTransport extends AbstractTransport {
 				try {
 					httpPost = new HttpPost(receiverUri);
 					// invoke via Apache HttpClient request:
-					httpPost.setEntity(new StringEntity(message));
+					httpPost.setEntity(new StringEntity(message, "UTF-8"));
+					httpPost.setProtocolVersion(HttpVersion.HTTP_1_1);
 
 					// // Add token for HTTP handshake
 					httpPost.addHeader("X-Eve-Token", tokenstore.create()

@@ -101,7 +101,7 @@ public abstract class AbstractState<V> implements State {
 	 * @see com.almende.eve.state.State#put(java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public synchronized Object put(final String key, final Object value) {
+	public Object put(final String key, final Object value) {
 		if (value == null || JsonNode.class.isAssignableFrom(value.getClass())) {
 			return locPut(key, (JsonNode) value);
 		} else if (Serializable.class.isAssignableFrom(value.getClass())) {
@@ -119,7 +119,7 @@ public abstract class AbstractState<V> implements State {
 	 * java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public synchronized boolean putIfUnchanged(final String key,
+	public boolean putIfUnchanged(final String key,
 			final Object newVal, final Object oldVal) {
 		if (newVal == null
 				|| Serializable.class.isAssignableFrom(newVal.getClass())) {
@@ -244,7 +244,7 @@ public abstract class AbstractState<V> implements State {
 	 *            the value
 	 * @return the serializable
 	 */
-	public synchronized Serializable locPut(final String key,
+	public Serializable locPut(final String key,
 			final Serializable value) {
 		final ObjectMapper om = JOM.getInstance();
 		locPut(key, om.valueToTree(value));
