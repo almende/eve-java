@@ -151,19 +151,23 @@ public class Goldemo {
 		} catch (final InterruptedException e) {
 			System.err.println("Early interrupt");
 		}
+		System.err.println(ThreadPool.getPool().toString());
 		System.err.println("Trigger start!");
 		for (final Cell cell : cells) {
 			cell.start();
 		}
+		System.err.println(ThreadPool.getPool().toString());
 		System.err.println("Started for " + runTime + "s!");
 		try {
 			Thread.sleep(runTime * 1000);
 		} catch (final InterruptedException e) {
 			System.err.println("Early interrupt");
 		}
+		System.err.println(ThreadPool.getPool().toString());
 		for (final Cell cell : cells) {
 			cell.stop();
 		}
+		System.err.println(ThreadPool.getPool().toString());
 		System.err.println("Stopped!");
 		final HashMap<String, ArrayList<CycleState>> results = new HashMap<String, ArrayList<CycleState>>();
 		int max_full = 0;
@@ -175,6 +179,7 @@ public class Goldemo {
 		}
 
 		if (reportOnly) {
+			System.out.println(ThreadPool.getPool().toString());
 			System.out.println("Cycles:" + (max_full - 1) + "(" + N + "x" + M
 					+ ": ~" + ((max_full - 1) / (runTime)) + " cycles/second)");
 			System.out.println(((max_full - 1) * M * N * 8) / (runTime)
@@ -189,7 +194,7 @@ public class Goldemo {
 					final String ESC = "\033[";
 					System.out.print(ESC + "2J");
 				}
-				System.out.println("nofCores:" + nofCores);
+				System.out.println(ThreadPool.getPool().toString());
 				System.out.println("Cycle:" + cycle + "/" + (max_full - 1));
 				System.out.println(((max_full - 1) * M * N * 8) / (runTime)
 						+ " RPCs/second (" + runTime + " sec)");

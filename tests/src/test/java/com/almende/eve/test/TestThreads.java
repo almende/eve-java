@@ -25,45 +25,8 @@ public class TestThreads extends TestCase {
 	 * Test scheduling.
 	 */
 	@Test
-	public void testThreads() {
-		int nofjobs = 1000000;
-		int duration = 50000;
-		final boolean[] flags = new boolean[nofjobs];
-
-		for (int i = 0; i < nofjobs; i++) {
-			final int j = i;
-			flags[j] = true;
-			ThreadPool.getPool().execute(new Runnable() {
-				@Override
-				public void run() {
-					int count = 0;
-					while (count < 10000) {
-						count++;
-						String.valueOf(count);
-					}
-					flags[j] = false;
-				}
-			});
-		}
-		try {
-			Thread.sleep(duration);
-		} catch (InterruptedException e) {}
-		int count = 0;
-		for (int i = 0; i < nofjobs; i++) {
-			if (flags[i]) {
-				count++;
-			}
-		}
-		LOG.warning(count + " jobs didn't finish in time (" + duration
-				+ " ms for " + nofjobs + " jobs)");
-	}
-
-	/**
-	 * Test scheduling.
-	 */
-	@Test
 	public void testSleepingThreads() {
-		int nofjobs = 2000;
+		int nofjobs = 5000;
 		DateTime start = DateTime.now();
 		final boolean[] flags = new boolean[nofjobs];
 
@@ -100,10 +63,55 @@ public class TestThreads extends TestCase {
 				}
 			}
 		}
+		LOG.warning(ThreadPool.getPool().toString());
 		LOG.warning(count + " jobs took: "
 				+ (new Duration(start, DateTime.now()).getMillis()) + " ms");
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {}
 	}
+
+	/**
+	 * Test scheduling.
+	 */
+	@Test
+	public void testThreads() {
+		int nofjobs = 1000000;
+		int duration = 50000;
+		final boolean[] flags = new boolean[nofjobs];
+		final boolean[] stopped = new boolean[] { false };
+
+		for (int i = 0; i < nofjobs; i++) {
+			final int j = i;
+			flags[j] = true;
+			ThreadPool.getPool().execute(new Runnable() {
+				@Override
+				public void run() {
+					int count = 0;
+					while (count < 10000) {
+						if (stopped[0]) {
+							return;
+						}
+						count++;
+						String.valueOf(count);
+					}
+					flags[j] = false;
+				}
+			});
+		}
+		try {
+			Thread.sleep(duration);
+		} catch (InterruptedException e) {}
+		int count = 0;
+		for (int i = 0; i < nofjobs; i++) {
+			if (flags[i]) {
+				count++;
+			}
+		}
+		LOG.warning(ThreadPool.getPool().toString());
+		stopped[0] = true;
+		LOG.warning(count + " jobs didn't finish in time (" + duration
+				+ " ms for " + nofjobs + " jobs)");
+	}
+
 }
