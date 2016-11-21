@@ -117,9 +117,7 @@ public class RedisStateBuilder extends AbstractCapabilityBuilder<RedisState> {
 		}
 
 		public void returnInstance(final Jedis instance) {
-			if (pool != null && instance != null) {
-				pool.returnResource(instance);
-			}
+			instance.close();
 		}
 	}
 

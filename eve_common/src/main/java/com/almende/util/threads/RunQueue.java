@@ -353,10 +353,10 @@ public class RunQueue extends AbstractExecutorService {
 		}
 		if (!isShutdown && len < nofCores - 1) {
 			for (int i = len; i < nofCores; i++) {
-				final Worker worker = new Worker();
-				workers.add(worker);
-				free.add(worker);
-				// avail_arr.add(worker);
+				final Worker thread = new Worker();
+				workers.add(thread);
+				free.add(thread);
+				avail_arr.add(thread);
 			}
 		}
 		if (!isShutdown) {

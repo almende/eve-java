@@ -92,6 +92,13 @@ public class Agent extends AgentCore implements AgentInterface {
 	@Access(AccessType.PUBLIC)
 	@Override
 	@JsonIgnore
+	public URI getUrlByScheme(final @Name("scheme") String scheme) {
+		return caller.getSenderUrlByScheme(scheme);
+	}	
+	
+	@Access(AccessType.PUBLIC)
+	@Override
+	@JsonIgnore
 	public ObjectNode getMethods() {
 		// TODO: find a different way to get this list. (maybe loop over all
 		// protocols, let each JSONRpcProtocol add methods.

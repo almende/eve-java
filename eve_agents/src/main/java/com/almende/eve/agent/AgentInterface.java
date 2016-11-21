@@ -7,6 +7,7 @@ package com.almende.eve.agent;
 import java.net.URI;
 import java.util.List;
 
+import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -42,5 +43,14 @@ public interface AgentInterface {
 	 * @return urls
 	 */
 	List<URI> getUrls();
-
+	
+	/**
+	 * Retrieve the agent url for a specific transport service, keyed on its
+	 * scheme. (e.g. http, https, local, xmpp, etc.)
+	 *
+	 * @param scheme
+	 *            the scheme
+	 * @return the url by scheme
+	 */
+	URI getUrlByScheme(final @Name("scheme") String scheme);
 }

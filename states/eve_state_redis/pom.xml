@@ -15,7 +15,7 @@
 	<url>http://almende.github.com/eve</url>
 
 	<properties>
-		<redis.version>2.2.1</redis.version>
+		<redis.version>2.9.0</redis.version>
 	</properties>
 
 	<dependencies>
