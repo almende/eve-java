@@ -1,0 +1,21 @@
+
+#Some empty comment
+
+templates:
+   defaultAgent:
+        scheduler:
+           builder: com.almende.eve.scheduling.SimpleSchedulerBuilder
+        transports:
+        -  builder: com.almende.eve.transport.ws.WebsocketTransportBuilder
+           address: ws://localhost:8082/agents
+           server: true
+           doShortcut: true
+           doAuthentication: false
+           servletLauncher: JettyLauncher
+           jetty: 
+              port: 8082
+
+agents:
+-   id: player2
+    class: com.almende.luis.HandGameServer
+    extends: templates/defaultAgent

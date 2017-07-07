@@ -1,0 +1,222 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.almende.luis</groupId>
+	<artifactId>HandGameServer</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<name>HandGameServer</name>
+	<description>This is an example getting started project from working with Eve Java</description>
+	<url>http://github.com/almende/eve-java</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+		<license>
+			<name>The MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:almende/eve-java.git</connection>
+		<url>scm:git:git@github.com:almende/eve-java.git</url>
+		<developerConnection>scm:git:git@github.com:almende/eve-java.git</developerConnection>
+	</scm>
+
+
+	<organization>
+		<name>Almende BV</name>
+		<url>http://www.almende.com/</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<name>Luis Cunha</name>
+			<id>luis</id>
+			<email>luis@almende.org</email>
+			<organization>Almende BV, the Netherlands</organization>
+			<url>http://www.almende.org/</url>
+			<timezone>1</timezone>
+		</developer>
+		<developer>
+			<name>Ludo Stellingwerff</name>
+			<id>ludo</id>
+			<email>ludo@almende.org</email>
+			<organization>Almende BV, the Netherlands</organization>
+			<url>http://www.almende.org/</url>
+			<timezone>1</timezone>
+		</developer>
+	</developers>
+
+
+	<properties>
+		<skipTests>true</skipTests>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.scm.version>1.9</maven.scm.version>
+		<wagon-scm.version>2.6</wagon-scm.version>
+		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
+		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+		<maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+		<maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
+		<maven-sonar-plugin.version>2.4</maven-sonar-plugin.version>
+		<maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
+		<maven.shade.version>2.3</maven.shade.version>
+		<gpg.version>1.5</gpg.version>
+		<junit.version>4.11</junit.version>
+		<java.version>1.7</java.version>
+		<eve.version>3.2.0-SNAPSHOT</eve.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.almende.eve</groupId>
+			<artifactId>eve-bundle-full-embed</artifactId>
+			<version>${eve.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<extensions>
+		</extensions>
+
+		<pluginManagement>
+			<plugins>
+				<!-- Configure the Maven2 Eclipse IDE Integration (m2e) for non-standard 
+					plug-in executions during the compile-test-run life-cycles by the IDE -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<!-- or install the buildhelper in Eclipse :: Window :: Preferences 
+									:: Maven :: Discovery :: Open Catalog -->
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<!-- Make compiler UTF-8/ISO-8859-1 aware, set JVM to 1.6+ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>UTF-8</encoding>
+					<compilerArguments>
+						<verbose />
+					</compilerArguments>
+				</configuration>
+			</plugin>
+			<!-- Have Eclipse IDE's Maven integration (specified in <pluginManagement/>) 
+				download sources and javadoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${maven-eclipse-plugin.version}</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<!-- Make resources UTF-8/ISO-8859-1 aware -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<!-- skip all tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<useSystemClassLoader>true</useSystemClassLoader>
+					<useManifestOnlyJar>false</useManifestOnlyJar>
+					<childDelegation>false</childDelegation>
+					<skipTests>${skipTests}</skipTests>
+					<forkCount>1</forkCount>
+					<threadCount>10</threadCount>
+				</configuration>
+			</plugin>
+
+			<!-- Attach sources -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Create executable JAR, including all dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>${maven.shade.version}</version>
+				<configuration>
+					<transformers>
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<!-- vvv YOU CAN CHANGE THIS TO YOU OWN MAIN-METHOD CLASS! vvv -->
+							<mainClass>com.almende.eve.deploy.Boot</mainClass>
+							<!-- ^^^ YOU CAN CHANGE THIS TO YOU OWN MAIN-METHOD CLASS! ^^^ -->
+						</transformer>
+					</transformers>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
