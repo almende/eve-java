@@ -1,0 +1,73 @@
+
+#Some empty comment
+
+templates:
+   defaultCar:
+        scheduler:
+           builder: com.almende.eve.scheduling.SimpleSchedulerBuilder
+        transports:
+        -  builder: com.almende.eve.transport.http.HttpTransportBuilder
+           servletUrl: http://localhost:8084/caragents/
+           servletLauncher: JettyLauncher
+           servletClass: com.almende.eve.transport.http.DebugServlet
+           doShortcut: true
+           doAuthentication: false
+           jetty: 
+             port: 8084 
+        -  builder: com.almende.eve.transport.ws.WebsocketTransportBuilder
+           address: ws://localhost:8084/agents
+           server: true
+           doShortcut: true
+           doAuthentication: false
+           servletLauncher: JettyLauncher
+           jetty: 
+              port: 8084
+   defaultPole:
+        scheduler:
+           builder: com.almende.eve.scheduling.SimpleSchedulerBuilder
+        transports:
+        -  builder: com.almende.eve.transport.http.HttpTransportBuilder
+           servletUrl: http://localhost:8084/poleagents/
+           servletLauncher: JettyLauncher
+           servletClass: com.almende.eve.transport.http.DebugServlet
+           doShortcut: true
+           doAuthentication: false
+           jetty: 
+             port: 8084
+        -  builder: com.almende.eve.transport.ws.WebsocketTransportBuilder
+           address: ws://localhost:8084/agents
+           server: true
+           doShortcut: true
+           doAuthentication: false
+           servletLauncher: JettyLauncher
+           jetty: 
+              port: 8084
+        state:
+           builder: com.almende.eve.state.memory.MemoryStateBuilder
+
+agents:
+-   id: carServer
+    class: com.almende.eve.lightsonthestreet.Car
+    extends: templates/defaultCar
+-   id: pole0
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole1
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole2
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole3
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole4
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole5
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+-   id: pole6
+    class: com.almende.eve.lightsonthestreet.Pole
+    extends: templates/defaultPole
+
