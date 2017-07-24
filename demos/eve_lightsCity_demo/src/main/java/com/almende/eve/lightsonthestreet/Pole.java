@@ -47,9 +47,9 @@ public class Pole extends Agent {
     
     private static int poleRange = 25;
     private boolean previousCarDetectedFlag = false;
-    /* States strings
-        "myLightState"      (int: 0 - 100)  // current light state
-        "carDetected"
+    /* String States
+        "myLightState"      (int: 0 - 100)              // current light state
+        "carDetected"       (Boolean: true - false)     // car detected or not
     */
     
     // The browser will call this method just to create a WS communication 
@@ -57,17 +57,16 @@ public class Pole extends Agent {
         System.out.println("WS Connection opened with " + getId());
     }
     
-    /* Set properties about the pole:
+    /* 
+     * Set properties about the pole:
      * poleNumber       -> Number of the pole (e.g.: "2")
-     * polePosition     -> Space x position (e.g.: 150)
-     * neighbors        -> IDs of the poles that make affect on the light of this pole 
+     * polePosition     -> Space (x,y) position (e.g.: (150, 30)
      * polesToAffect    -> Poles IDs with light percentage levels. It will make sure that those poles have AT LEAST that percentage of light
-     *                  when a this poles detect a car
+     *                  when this pole detects a car
     */
     public void setPoleProperties(@Name("poleNumber") String poleNumber, 
             @Name("polePositionX") int polePositionX,
             @Name("polePositionY") int polePositionY,
-            //@Name("neighbors") List<String> neighbors,
             @Name("polesToAffect") Map<String, Integer> polesToAffect
             ){
       
@@ -76,7 +75,6 @@ public class Pole extends Agent {
         //this.polePosition = polePosition;
         this.polePositionX = polePositionX;
         this.polePositionY = polePositionY;
-        //this.neighbors = neighbors;
         this.polesToAffect = polesToAffect;
         
         // print pole info
@@ -87,13 +85,6 @@ public class Pole extends Agent {
                 "\n\t neighbors: " + this.neighbors +
                 "\n\t polesToAffect: " + this.polesToAffect;
                 ;
-        
-        
-        //for (Map.Entry<String,Integer> entry : this.polesToAffect.entrySet()) {
-        //    String key = entry.getKey();
-        //    int value = entry.getValue();
-        //    nb = nb + "\n\t\t" + key + ": level = " + value;
-        //}
         
         System.out.println(poleText);
     }
@@ -107,44 +98,31 @@ public class Pole extends Agent {
         getState().put("myLightState",      100);   // current light intensity of this pole
         getState().put("carDetected",       false); // flag to know if car was detected or not
         
-        // set initial state of neighbors memory (Not needed anymore)
-        //for(int i = 0; i < this.neighbors.size(); i++){
-        //    getState().put(this.neighbors.get(i), 0);
-        //    System.out.println("neighbor: " + getId() + " set to: " + getState().get(this.neighbors.get(i), INTTYPE));
-        //}
-        
-        //for (Map.Entry<String,Integer> entry : this.neighbors.entrySet()) {
-        //    String key = entry.getKey();
-        //    getState().put(key, 0);
-        //    System.out.println(getId() + " --> key: " + key + " set to: " + getState().get(key, INTTYPE));
-        //}
-        
-        
         System.out.println("Pole: " + getId() + " is starting to detect!");
+        
         // start detecting
         startDetect();
         
-        // After 5 seconds (to make sure all poles were started already) this pole should start to check its own intensity
+        // After 6 seconds (to make sure all poles are started already) this pole should start to check its own intensity
         schedule("checkLightIntensity", null, DateTime.now().plusSeconds(6));
         
     }
     
     /*
      * Start detection
-     * 
-     * ( To reduce the amount of messages sent to other poles we could check if the states
-     * did change compared with the previous detection then send information just when it really changed!
-     * But for now it is just a prove of concept! )
      * */
     public void startDetect() throws IOException{
         
-        boolean carDetectedFlag = false;
+        boolean carDetectedFlag = false; // initialize flag
+        
+        // Check if any car is around the pole
         for(int i = 0; (i < Pole.numberOfCars); i++){
-            int carX = getCarPositionX("carServer" + i);   // Stupid implementation for now
+            // get car position
+            int carX = getCarPositionX("carServer" + i);   // Bad implementation for now
             int carY = getCarPositionY("carServer" + i);            
-          //Position carX = getCarPosition();
+            //Position carX = getCarPosition();
             
-            carDetectedFlag = carDetectedFlag | checkPoleLimits(carX, carY);
+            carDetectedFlag = carDetectedFlag | checkPoleLimits(carX, carY); // actualize flag
             if(carDetectedFlag){
                 //System.out.println(getId() + " detected carServer" + i);
                 break;
@@ -152,27 +130,21 @@ public class Pole extends Agent {
         }
          
         
-        // if flag changed then perform a task
+        // if flag changed then perform alert neighbors
         if(previousCarDetectedFlag != carDetectedFlag){
-            previousCarDetectedFlag = carDetectedFlag; // change flag
+            previousCarDetectedFlag = carDetectedFlag; // actualize change flag
             
-            if(carDetectedFlag){
-                // change state
-                getState().put("carDetected", true);
-              
-                // send messages poles to turn on
-                alertNeighbors("ON");
+            if(carDetectedFlag){                        // if car detected
+                getState().put("carDetected", true);    // update state
+                alertNeighbors("ON");                   // send messages poles to turn on
                 
-            }else{
-                
-                getState().put("carDetected", false);
-    
-                // send messages poles to turn off  
-                alertNeighbors("OFF");            
+            }else{                                      // if car not detected
+                getState().put("carDetected", false);   // update state
+                alertNeighbors("OFF");                  // send messages poles to turn off             
             }
         }
         
-        // call the function itself
+        // call this function again
         schedule("startDetect", null, DateTime.now().plusMillis(100));
     }
     
@@ -180,9 +152,7 @@ public class Pole extends Agent {
      * This function checks and updates the intensity of this pole
      * */
     public void checkLightIntensity() throws IOException{
-       
 
-              
         // get pole light state
         int myLight = getState().get("myLightState", INTTYPE);
         int myNewLight = myLight;
@@ -193,23 +163,15 @@ public class Pole extends Agent {
         if(!carDetected){ // if car not detected
                 
             int intensity,
-            maxIntensity = 0;
-            String aux;
+                maxIntensity = 0;
+            
+            // for all neighbors check the required max intensity
             for(int i = 0; i < this.neighbors.size(); i++) {
-                
-                aux = this.neighbors.get(i);
-                
-                //System.out.println(getId() + ":"
-                //        + "\n\tnbArrayStrings size: " + nbArrayStrings.size()
-                //        + "\n\ti: " + i
-                //        + "\n\tnbArrayStrings.get(i): " + nbArrayStrings.get(i)
-                //        + "\n\tgetState().get(aux, INTTYPE) = " + getState().get(aux, INTTYPE));
-                
-                intensity = getState().get(aux, INTTYPE);
-                maxIntensity = Math.max(maxIntensity, intensity);
+                intensity = getState().get(this.neighbors.get(i), INTTYPE); // get required neighbor intensity 
+                maxIntensity = Math.max(maxIntensity, intensity);           // get max
             }
           
-            // reduce 30%
+            // reduce 15%
             myNewLight = myNewLight - 15; 
             
             // get the highest value
@@ -229,54 +191,39 @@ public class Pole extends Agent {
         
     }
     
-    /* This function will send information to the neighbor poles about how much 
-     * light intensity they should have at least
+    /* 
+     * This function will send information to the neighbor poles about how much 
+     * light intensity they should have, at least
      * */
     private void alertNeighbors(String alert) throws IOException {
-        
-        // list of poles to have affect
-        //for (Map.Entry<String,Integer> entry : this.neighbors.entrySet()) {
-        //    String key = entry.getKey();
-        //    getState().put(key, 0);
-        //    System.out.println(getId() + " --> key: " + key + " set to: " + getState().get(key, INTTYPE));
-        //}
         
         Params params = new Params();
         URI url;
         String method = "setLightInfo";
-        
-        // set light intensities
-        if(alert.equals("ON")){
+    
+        // for every poleToAffect send message with the required intensity
+        for (Map.Entry<String,Integer> entry : this.polesToAffect.entrySet()) {
+            String key = entry.getKey();
+            int value = entry.getValue();
             
-            for (Map.Entry<String,Integer> entry : this.polesToAffect.entrySet()) {
-                String key = entry.getKey();
-                int value = entry.getValue();
-                
-                // send message to pole to have affect
+            // set light intensity
+            if(alert.equals("ON")){
                 params.add("lightIntensity", value);
-                params.add("poleInfo", getId());
-                url = URIUtil.create("http://localhost:8084/poleagents/" + key);        
-                call(url, method, params, null);  
-            }
-            
-            
-        }else{
-
-            for (Map.Entry<String,Integer> entry : this.polesToAffect.entrySet()) {
-                String key = entry.getKey();
-                
-                // send message to pole to have affect
+            } else {
                 params.add("lightIntensity", 0);
-                params.add("poleInfo", getId());
-                url = URIUtil.create("http://localhost:8084/poleagents/" + key);        
-                call(url, method, params, null);  
             }
+            
+            // identify pole
+            params.add("poleInfo", getId());
+            
+            // send message to pole
+            url = URIUtil.create("http://localhost:8084/poleagents/" + key);        
+            call(url, method, params, null);  
         }
-        
     }
     
     /* 
-     * Neighbors will use this method to inform if they detected a car and how much intensity this pole should set
+     * Neighbors will use this method to inform if they detected a car and how much intensity this pole should set at least
      * */
     public void setLightInfo(@Name("poleInfo") String poleInfo, @Name("lightIntensity") int lightIntensity){
         
@@ -327,7 +274,7 @@ public class Pole extends Agent {
     
     
     //--------------------------------------------------------------------------------------
-    // Stupid implementation until I figure out how to return a serialized object
+    // Bad implementation until I figure out how to return a serialized object
     /*
      * Ask to the car his position
      * */
