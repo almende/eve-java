@@ -3,7 +3,7 @@
  * License: The Apache Software License, Version 2.0
  * Author: Luis F. M. Cunha
  */
-package com.almende.eve.lightsonthestreet;
+package com.almende.eve.lightscity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -123,7 +123,7 @@ public class Car extends Agent {
 
     public void startDrive() throws IOException {
 
-        if (this.route == 0) {
+        if (this.route == 0) { // !! THIS ROUTE SHOULD CHANGE IN ORDE TO USE THE INTERCEPTIONS VARIABLES !!
             // If car is on the limits of the road then change direction
             if ((this.carPositionY >= this.bottomLimit) && (this.carPositionX <= this.leftLimit)) {
                 // car is on the left bottom corner
@@ -271,7 +271,7 @@ public class Car extends Agent {
     }
 
     // ----------------------------------------------------------------------------------------
-    // Stupid implementation until I figure out how to return a object in just
+    // Bad implementation until I figure out how to return a object in just
     // one function
     public int getCarPositionX() {
         return this.carPositionX;

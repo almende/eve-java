@@ -3,7 +3,7 @@
  * License: The Apache Software License, Version 2.0
  * Author: Luis F. M. Cunha
  */
-package com.almende.eve.lightsonthestreet;
+package com.almende.eve.lightscity;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +15,7 @@ import java.util.Map;
 import org.joda.time.DateTime;
 
 import com.almende.eve.agent.Agent;
-import com.almende.eve.lightsonthestreet.Car.Position;
+import com.almende.eve.lightscity.Car.Position;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
