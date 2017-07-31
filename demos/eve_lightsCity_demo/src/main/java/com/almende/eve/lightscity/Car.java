@@ -6,20 +6,15 @@
 package com.almende.eve.lightscity;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 
 import com.almende.eve.agent.Agent;
-import com.almende.eve.protocol.jsonrpc.JSONRpc;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
 import com.almende.eve.protocol.jsonrpc.formats.Params;
-import com.almende.util.StringUtil;
 import com.almende.util.TypeUtil;
 
 @Access(AccessType.PUBLIC)
@@ -263,6 +258,9 @@ public class Car extends Agent {
             // don't do anything
         }
 
+        this.carPosition.setX(this.carPositionX);
+        this.carPosition.setY(this.carPositionY);
+        
         updatePositionToBrowser(this.carPositionX, this.carPositionY);
 
         // Call this function again
@@ -318,16 +316,7 @@ public class Car extends Agent {
     }
 
     // ------ Classes ------
-    class Position {
-        public int x = 0;
-        public int y = 0;
 
-        // constructor
-        public Position(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
 
     class Interception {
         public Position topLeft;

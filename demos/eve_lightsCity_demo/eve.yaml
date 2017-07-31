@@ -47,615 +47,615 @@ templates:
 
 agents:
 -   id: carServer0
-    class: com.almende.eve.lightsonthestreet.Car
+    class: com.almende.eve.lightscity.Car
     extends: templates/defaultCar
 -   id: carServer1
-    class: com.almende.eve.lightsonthestreet.Car
+    class: com.almende.eve.lightscity.Car
     extends: templates/defaultCar
 -   id: carServer2
-    class: com.almende.eve.lightsonthestreet.Car
+    class: com.almende.eve.lightscity.Car
     extends: templates/defaultCar
 -   id: carServer3
-    class: com.almende.eve.lightsonthestreet.Car
+    class: com.almende.eve.lightscity.Car
     extends: templates/defaultCar
 -   id: pole0
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole1
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole2
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole3
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole4
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole5
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole6
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole7
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole8
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole9
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole10
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole11
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole12
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole13
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole14
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole15
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole16
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole17
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole18
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole19
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole20
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole21
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole22
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole23
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole24
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole25
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole26
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole27
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole28
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole29
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole30
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole31
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole32
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole33
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole34
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole35
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole36
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole37
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole38
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole39
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole40
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole41
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole42
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole43
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole44
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole45
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole46
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole47
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole48
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole49
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole50
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole51
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole52
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole53
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole54
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole55
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole56
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole57
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole58
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole59
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole60
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole61
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole62
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole63
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole64
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole65
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole66
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole67
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole68
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole69
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole70
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole71
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole72
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole73
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole74
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole75
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole76
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole77
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole78
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole79
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole80
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole81
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole82
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole83
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole84
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole85
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole86
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole87
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole88
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole89
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole90
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole91
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole92
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole93
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole94
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole95
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole96
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole97
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole98
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole99
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole100
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole101
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole102
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole103
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole104
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole105
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole106
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole107
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole108
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole109
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole110
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole111
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole112
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole113
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole114
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole115
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole116
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole117
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole118
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole119
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole120
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole121
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole122
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole123
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole124
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole125
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole126
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole127
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole128
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole129
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole130
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole131
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole132
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole133
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole134
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole135
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole136
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole137
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole138
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole139
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole140
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole141
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole142
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole143
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole144
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole145
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole146
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole147
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole148
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole149
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole150
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole151
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole152
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole153
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole154
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole155
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole156
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole157
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole158
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole159
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole160
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole161
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole162
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole163
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole164
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole165
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole166
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole167
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole168
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole169
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole170
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole171
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole172
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole173
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole174
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole175
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole176
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole177
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole178
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole179
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole180
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole181
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole182
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole183
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole184
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole185
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole186
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole187
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole188
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole189
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole190
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole191
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole192
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole193
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole194
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole195
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole196
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole197
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole198
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 -   id: pole199
-    class: com.almende.eve.lightsonthestreet.Pole
+    class: com.almende.eve.lightscity.Pole
     extends: templates/defaultPole
 

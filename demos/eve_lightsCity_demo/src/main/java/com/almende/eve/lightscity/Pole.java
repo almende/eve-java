@@ -15,7 +15,6 @@ import java.util.Map;
 import org.joda.time.DateTime;
 
 import com.almende.eve.agent.Agent;
-import com.almende.eve.lightscity.Car.Position;
 import com.almende.eve.protocol.jsonrpc.annotation.Access;
 import com.almende.eve.protocol.jsonrpc.annotation.AccessType;
 import com.almende.eve.protocol.jsonrpc.annotation.Name;
@@ -30,7 +29,7 @@ import com.almende.util.URIUtil;
 public class Pole extends Agent {
     
     // Create a string type using TypeUtil. When the type is used a lot it performs better declaring it this way
-    private final static TypeUtil<String>   STRINGTYPE      =  new TypeUtil<String>(){};
+//    private final static TypeUtil<String>   STRINGTYPE      =  new TypeUtil<String>(){};
     private final static TypeUtil<Integer>  INTTYPE         =  new TypeUtil<Integer>(){};
     private final static TypeUtil<Boolean>  BOOLEANTYPE     =  new TypeUtil<Boolean>(){};
     private final static TypeUtil<Position> POSITIONTYPE    =  new TypeUtil<Position>(){};
@@ -118,11 +117,11 @@ public class Pole extends Agent {
         // Check if any car is around the pole
         for(int i = 0; (i < Pole.numberOfCars); i++){
             // get car position
-            int carX = getCarPositionX("carServer" + i);   // Bad implementation for now
-            int carY = getCarPositionY("carServer" + i);            
-            //Position carX = getCarPosition();
+//            int carX = getCarPositionX("carServer" + i);   // Bad implementation for now
+//            int carY = getCarPositionY("carServer" + i);            
+            Position carPos = getCarPosition("carServer" + i);
             
-            carDetectedFlag = carDetectedFlag | checkPoleLimits(carX, carY); // actualize flag
+            carDetectedFlag = carDetectedFlag | checkPoleLimits(carPos); // actualize flag
             if(carDetectedFlag){
                 //System.out.println(getId() + " detected carServer" + i);
                 break;
@@ -248,13 +247,34 @@ public class Pole extends Agent {
         Params params = new Params();
         params.add("intensity", light);    
         
-        caller.callSync(url, method, params, STRINGTYPE);       
+        caller.call(url, method, params);       
     }
+    
+//    /*
+//     * Check if car is in the range of the pole detection
+//     * */
+//    private boolean checkPoleLimits(int carX, int carY) {
+//        boolean carDetectedFlag = false;
+//        
+//        int leftLimit   = this.polePositionX - Pole.poleRange;
+//        int rightLimit  = this.polePositionX + Pole.poleRange;
+//        int topLimit    = this.polePositionY - Pole.poleRange;
+//        int bottomLimit = this.polePositionY + Pole.poleRange;
+//        
+//        if( (carX >= leftLimit ) && 
+//            (carX <= rightLimit) && 
+//            (carY >= topLimit)   && 
+//            (carY <= bottomLimit) ){
+//            carDetectedFlag = true;
+//        }
+//        
+//        return carDetectedFlag;
+//    }
     
     /*
      * Check if car is in the range of the pole detection
      * */
-    private boolean checkPoleLimits(int carX, int carY) {
+    private boolean checkPoleLimits(Position carPos) {
         boolean carDetectedFlag = false;
         
         int leftLimit   = this.polePositionX - Pole.poleRange;
@@ -262,16 +282,15 @@ public class Pole extends Agent {
         int topLimit    = this.polePositionY - Pole.poleRange;
         int bottomLimit = this.polePositionY + Pole.poleRange;
         
-        if( (carX >= leftLimit ) && 
-            (carX <= rightLimit) && 
-            (carY >= topLimit)   && 
-            (carY <= bottomLimit) ){
+        if( (carPos.getX() >= leftLimit ) && 
+            (carPos.getX() <= rightLimit) && 
+            (carPos.getY() >= topLimit)   && 
+            (carPos.getY() <= bottomLimit) ){
             carDetectedFlag = true;
         }
         
         return carDetectedFlag;
     }
-    
     
     //--------------------------------------------------------------------------------------
     // Bad implementation until I figure out how to return a serialized object
@@ -297,10 +316,10 @@ public class Pole extends Agent {
     }       
     
     //NOT WORKING!! WHY???? HOW CAN I RETURN A STRINGFYED OBJECT???
-    public Position getCarPosition() throws IOException{
+    public Position getCarPosition(String carName) throws IOException{
         //Position newP = new Position(5, 5);
         // send a sync message to carServer
-        URI url = URIUtil.create("http://localhost:8084/caragents/carServer0");
+        URI url = URIUtil.create("http://localhost:8084/caragents/" + carName);
         String method = "getCarPosition";
         Position pos = caller.callSync(url, method, null, POSITIONTYPE);
         
