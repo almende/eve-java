@@ -32,4 +32,17 @@ public class Position implements Serializable {
         this.x = x;
         this.y = y;
     }
+    
+    public void incX(int x){
+    	this.x += x;
+    }
+    public void decX(int x){
+    	this.x -= x;
+    }
+    public void incY(int y){
+    	this.y += y;
+    }
+    public void decY(int y){
+    	this.y -= y;
+    }
 }

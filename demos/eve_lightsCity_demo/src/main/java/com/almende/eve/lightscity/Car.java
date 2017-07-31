@@ -20,315 +20,379 @@ import com.almende.util.TypeUtil;
 @Access(AccessType.PUBLIC)
 public class Car extends Agent {
 
-    // Create a string type using TypeUtil. When the type is used a lot of times
-    // it performs better declaring it this way
-    private final static TypeUtil<String> STRINGTYPE = new TypeUtil<String>() {
-    };
+	enum directions {
+		down, right, up, left
+	};
 
-    private String carNumber;
-    private int route = 0;
+	// Create a string type using TypeUtil. When the type is used a lot of times
+	// it performs better declaring it this way
+	private String							carNumber;
+	private int								route			= 0;
+	private int								route_index		= 0;
 
-    private Position carPosition = new Position(0, 0);
-    private int carPositionX = 55;
-    private int carPositionY = 0;
+	private Position						carPosition		= new Position(0, 0);
 
-    private String direction = "down"; // right, left, down, up
-    private int rightLimit = 1105; // limit to change direction
-    private int leftLimit = 55; // limit to change direction
-    private int topLimit = 55; // limit to change direction
-    private int bottomLimit = 855; // limit to change direction
-    private int velocity = 80;
+	private directions						direction		= directions.down;
+	private int								velocity		= 80;
 
-    // map info
-    private static int verticalLine0 = 80;
-    private static int verticalLine1 = 380;
-    private static int verticalLine2 = 630;
-    private static int verticalLine3 = 1080;
+	// map info
+	private static int						verticalLine0	= 80;
+	private static int						verticalLine1	= 380;
+	private static int						verticalLine2	= 630;
+	private static int						verticalLine3	= 1080;
 
-    private static int horizontalLine0 = 80;
-    private static int horizontalLine1 = 430;
-    private static int horizontalLine2 = 830;
+	private static int						horizontalLine0	= 80;
+	private static int						horizontalLine1	= 430;
+	private static int						horizontalLine2	= 830;
 
-    private static int handDistance = 25;
+	private static int						handDistance	= 25;
 
-    private Interception interception01 = new Interception(
-            new Position(verticalLine1 - handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine1 + handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine1 - handDistance, horizontalLine0 + handDistance),
-            new Position(verticalLine1 + handDistance, horizontalLine0 + handDistance));
+	private final Interception				interception00	= new Interception(
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine0
+																					+ handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine0
+																					+ handDistance));
 
-    private Interception interception02 = new Interception(
-            new Position(verticalLine2 - handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine2 + handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine2 - handDistance, horizontalLine0 + handDistance),
-            new Position(verticalLine2 + handDistance, horizontalLine0 + handDistance));
+	private final Interception				interception01	= new Interception(
+																	new Position(
+																			verticalLine1
+																					- handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine1
+																					+ handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine1
+																					- handDistance,
+																			horizontalLine0
+																					+ handDistance),
+																	new Position(
+																			verticalLine1
+																					+ handDistance,
+																			horizontalLine0
+																					+ handDistance));
 
-    private Interception interception03 = new Interception(
-            new Position(verticalLine3 - handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine3 + handDistance, horizontalLine0 - handDistance),
-            new Position(verticalLine3 - handDistance, horizontalLine0 + handDistance),
-            new Position(verticalLine3 + handDistance, horizontalLine0 + handDistance));
+	private final Interception				interception02	= new Interception(
+																	new Position(
+																			verticalLine2
+																					- handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine2
+																					+ handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine2
+																					- handDistance,
+																			horizontalLine0
+																					+ handDistance),
+																	new Position(
+																			verticalLine2
+																					+ handDistance,
+																			horizontalLine0
+																					+ handDistance));
 
-    private Interception interception10 = new Interception(
-            new Position(verticalLine0 - handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine0 + handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine0 - handDistance, horizontalLine1 + handDistance),
-            new Position(verticalLine0 + handDistance, horizontalLine1 + handDistance));
+	private final Interception				interception03	= new Interception(
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine0
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine0
+																					+ handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine0
+																					+ handDistance));
 
-    private Interception interception12 = new Interception(
-            new Position(verticalLine2 - handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine2 + handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine2 - handDistance, horizontalLine1 + handDistance),
-            new Position(verticalLine2 + handDistance, horizontalLine1 + handDistance));
+	private final Interception				interception10	= new Interception(
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine1
+																					+ handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine1
+																					+ handDistance));
 
-    private Interception interception13 = new Interception(
-            new Position(verticalLine3 - handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine3 + handDistance, horizontalLine1 - handDistance),
-            new Position(verticalLine3 - handDistance, horizontalLine1 + handDistance),
-            new Position(verticalLine3 + handDistance, horizontalLine1 + handDistance));
+	private final Interception				interception12	= new Interception(
+																	new Position(
+																			verticalLine2
+																					- handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine2
+																					+ handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine2
+																					- handDistance,
+																			horizontalLine1
+																					+ handDistance),
+																	new Position(
+																			verticalLine2
+																					+ handDistance,
+																			horizontalLine1
+																					+ handDistance));
 
-    private Interception interception21 = new Interception(
-            new Position(verticalLine1 - handDistance, horizontalLine2 - handDistance),
-            new Position(verticalLine1 + handDistance, horizontalLine2 - handDistance),
-            new Position(verticalLine1 - handDistance, horizontalLine2 + handDistance),
-            new Position(verticalLine1 + handDistance, horizontalLine2 + handDistance));
+	private final Interception				interception13	= new Interception(
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine1
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine1
+																					+ handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine1
+																					+ handDistance));
 
-    // constructor
-    public Car() {
-    }
+	private final Interception				interception20	= new Interception(
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine0
+																					- handDistance,
+																			horizontalLine2
+																					+ handDistance),
+																	new Position(
+																			verticalLine0
+																					+ handDistance,
+																			horizontalLine2
+																					+ handDistance));
 
-    public void openConnectionAndStart() throws IOException {
-        System.out.println("Connection opened with " + getId());
-        // start();
-    }
+	private final Interception				interception21	= new Interception(
+																	new Position(
+																			verticalLine1
+																					- handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine1
+																					+ handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine1
+																					- handDistance,
+																			horizontalLine2
+																					+ handDistance),
+																	new Position(
+																			verticalLine1
+																					+ handDistance,
+																			horizontalLine2
+																					+ handDistance));
 
-    public void setCarProperties(@Name("carNumber") String carNumber, @Name("route") int route,
-            @Name("carPositionX") int carPositionX, @Name("carPositionY") int carPositionY) {
+	private final Interception				interception23	= new Interception(
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine2
+																					- handDistance),
+																	new Position(
+																			verticalLine3
+																					- handDistance,
+																			horizontalLine2
+																					+ handDistance),
+																	new Position(
+																			verticalLine3
+																					+ handDistance,
+																			horizontalLine2
+																					+ handDistance));
 
-        this.route = route;
-        this.carNumber = carNumber;
-        this.carPositionX = carPositionX;
-        this.carPositionY = carPositionY;
+	private final int[][][]					route_array		= new int[][][] {
+			{ { this.interception20.bottomLeft.y, directions.right.ordinal() },
+			{ this.interception23.bottomRight.x, directions.up.ordinal() },
+			{ this.interception03.topRight.y, directions.left.ordinal() },
+			{ this.interception00.topLeft.x, directions.down.ordinal() } },
+			{ { this.interception21.bottomLeft.y, directions.right.ordinal() },
+			{ this.interception21.bottomRight.x, directions.up.ordinal() },
+			{ this.interception01.topRight.y, directions.left.ordinal() },
+			{ this.interception01.topLeft.x, directions.down.ordinal() } },
+			{ { this.interception10.bottomLeft.y, directions.right.ordinal() },
+			{ this.interception13.bottomRight.x, directions.up.ordinal() },
+			{ this.interception13.topRight.y, directions.left.ordinal() },
+			{ this.interception10.topLeft.x, directions.down.ordinal() } },
+			{ { this.interception13.topLeft.y, directions.left.ordinal() },
+			{ this.interception12.topRight.x, directions.up.ordinal() },
+			{ this.interception02.bottomRight.y, directions.right.ordinal() },
+			{ this.interception03.bottomLeft.x, directions.down.ordinal() } } };
 
-    }
+	// constructor
+	public Car() {}
 
-    public void start() {
-        schedule("startDrive", null, DateTime.now().plusSeconds(2));
-    }
+	public void openConnectionAndStart() throws IOException {
+		System.out.println("Connection opened with " + getId());
+		// start();
+	}
 
-    public void startDrive() throws IOException {
+	public void setCarProperties(@Name("carNumber") String carNumber,
+			@Name("route") int route, @Name("carPositionX") int carPositionX,
+			@Name("carPositionY") int carPositionY) {
 
-        if (this.route == 0) { // !! THIS ROUTE SHOULD CHANGE IN ORDE TO USE THE INTERCEPTIONS VARIABLES !!
-            // If car is on the limits of the road then change direction
-            if ((this.carPositionY >= this.bottomLimit) && (this.carPositionX <= this.leftLimit)) {
-                // car is on the left bottom corner
+		this.route = route;
+		this.carNumber = carNumber;
+		this.carPosition = new Position(carPositionX, carPositionY);
 
-                // change direction
-                this.direction = "right";
+	}
 
-                // set car to the correct position to drive
-                this.carPositionY = this.bottomLimit;
-                this.carPositionX = this.leftLimit;
+	public void start() {
+		schedule("startDrive", null, DateTime.now().plusSeconds(2));
+	}
 
-            } else if ((this.carPositionY >= this.bottomLimit) && (this.carPositionX >= this.rightLimit)) {
-                // car is on the right bottom corner
+	public void startDrive() throws IOException {
 
-                // change direction
-                this.direction = "up";
+		int limit = route_array[route][route_index][0];
+		boolean next = false;
+		// Move car position, check next leg
+		switch (direction) {
+			case down:
+				this.carPosition.incY(5);
+				if (this.carPosition.getY() >= limit) {
+					this.carPosition.setY(limit);
+					next = true;
+				}
+				break;
+			case right:
+				this.carPosition.incX(5);
+				if (this.carPosition.getX() >= limit) {
+					this.carPosition.setX(limit);
+					next = true;
+				}
+				break;
+			case up:
+				this.carPosition.decY(5);
+				if (this.carPosition.getY() <= limit) {
+					this.carPosition.setY(limit);
+					next = true;
+				}
+				break;
+			case left:
+				this.carPosition.decX(5);
+				if (this.carPosition.getX() <= limit) {
+					this.carPosition.setX(limit);
+					next = true;
+				}
+				break;
+		}
+		if (next) {
+			this.direction = directions.values()[route_array[route][route_index][1]];
+			route_index = (route_index + 1) % route_array[route].length;
+		}
+		updatePositionToBrowser(this.carPosition);
 
-                // set car to the correct position to drive
-                this.carPositionY = this.bottomLimit;
-                this.carPositionX = this.rightLimit;
+		// Call this function again
+		schedule("startDrive", null, DateTime.now().plusMillis(this.velocity));
 
-            } else if ((this.carPositionY <= this.topLimit) && (this.carPositionX >= this.rightLimit)) {
-                // car is on the right top corner
+	}
 
-                // change direction
-                this.direction = "left";
+	public Position getCarPosition() {
+		return (this.carPosition);
+	}
 
-                // set car to the correct position to drive
-                this.carPositionY = this.topLimit;
-                this.carPositionX = this.rightLimit;
+	// ----------------------------------------------------------------------------------------
 
-            } else if ((this.carPositionY <= this.topLimit) && (this.carPositionX <= this.leftLimit)) {
-                // car is on the left top corner
+	public void updatePositionToBrowser(Position carPosition)
+			throws IOException {
+		
+		URI url = URI.create("wsclient:carBrowser" + this.carNumber);
+		String method = "updatePosition";
+		Params params = new Params();
+		params.add("x", carPosition.getX());
+		params.add("y", carPosition.getY());
 
-                // change direction
-                this.direction = "down";
+		caller.call(url, method, params);
+	}
 
-                // set car to the correct position to drive
-                this.carPositionY = this.topLimit;
-                this.carPositionX = this.leftLimit;
-            } else if (this.carPositionX <= this.leftLimit) {
-                // car is between top left corner and bottom left corner
-                this.direction = "down";
-            } else if (this.carPositionY >= this.bottomLimit) {
-                // car is between top left corner and bottom left corner
-                this.direction = "right";
-            } else if (this.carPositionX >= this.rightLimit) {
-                // car is between top left corner and bottom left corner
-                this.direction = "up";
-            } else if (this.carPositionY <= this.topLimit) {
-                // car is between top left corner and bottom left corner
-                this.direction = "left";
+	public String getCarDirection() {
+		return this.direction.name();
+	}
 
-            } else {
-                // place car at a start position
-                this.carPositionY = this.topLimit;
-                this.carPositionX = this.leftLimit;
-                // change direction
-                this.direction = "down";
-            }
+	public void setVelocity(@Name("vel") int vel) {
+		this.velocity = vel;
+	}
 
-        } else if (this.route == 1) {
-            // the car will drive from top to bottom on the second horizontal street
-            if ((this.carPositionY <= this.interception01.topLeft.y)
-                    && (this.carPositionX <= this.interception01.topLeft.x)) {
-                this.direction = "down";
-                this.carPositionX = this.interception01.topLeft.x;
-            } else if ((this.carPositionY >= this.interception21.bottomRight.y)
-                    && (this.carPositionX >= this.interception21.bottomRight.x)) {
-                this.direction = "up";
-                this.carPositionX = this.interception21.bottomRight.x;
-            } else if ((this.carPositionY >= this.interception21.bottomLeft.y)) {
-                this.direction = "right";
-                this.carPositionY = this.interception21.bottomLeft.y;
-            } else if ((this.carPositionY <= this.interception01.topRight.y)) {
-                this.direction = "left";
-            } else {
+	// ------ Classes ------
 
-            }
+	class Interception {
+		public Position	topLeft;
+		public Position	topRight;
+		public Position	bottomLeft;
+		public Position	bottomRight;
 
-        } else if (this.route == 2) {
-            // the car will drive on the middle horizontal street forward and back
-            if ((this.carPositionY <= this.interception10.topLeft.y)
-                    && (this.carPositionX <= this.interception10.topLeft.x)) {
-                this.direction = "down";
-                this.carPositionX = this.interception10.topLeft.x;
-            } else if ((this.carPositionY >= this.interception13.bottomRight.y)
-                    && (this.carPositionX >= this.interception13.bottomRight.x)) {
-                this.direction = "up";
-                this.carPositionX = this.interception13.bottomRight.x;
-            } else if ((this.carPositionY >= this.interception10.bottomLeft.y)) {
-                this.direction = "right";
-                this.carPositionY = this.interception10.bottomLeft.y;
-            } else if ((this.carPositionY <= this.interception13.topRight.y)) {
-                this.direction = "left";
-                this.carPositionY = this.interception10.topRight.y;
-            } else {
-
-            }
-
-        } else if (this.route == 3) {
-            // the car will drive in circles around the top 3th island
-            if ((this.carPositionY <= this.interception02.bottomRight.y)
-                    && (this.carPositionX <= this.interception02.bottomRight.x)) {
-                this.direction = "right";
-                this.carPositionY = this.interception02.bottomRight.y;
-            } else if ((this.carPositionY <= this.interception03.bottomLeft.y)
-                    && (this.carPositionX >= this.interception03.bottomLeft.x)) {
-                this.direction = "down";
-                this.carPositionX = this.interception03.bottomLeft.x;
-            } else if ((this.carPositionY >= this.interception13.topLeft.y)
-                    && (this.carPositionX >= this.interception13.topLeft.x)) {
-                this.direction = "left";
-                this.carPositionY = this.interception13.topLeft.y;
-            } else if ((this.carPositionY >= this.interception12.topRight.y)
-                    && (this.carPositionX <= this.interception12.topRight.x)) {
-                this.direction = "up";
-                this.carPositionX = this.interception12.topRight.x;
-            } else {
-                
-            }
-
-        } else {
-
-        }
-
-        // Move car position
-        if (direction.equals("down")) {
-            this.carPositionY += 5;
-        } else if (direction.equals("up")) {
-            this.carPositionY -= 5;
-        } else if (direction.equals("right")) {
-            this.carPositionX += 5;
-        } else if (direction.equals("left")) {
-            this.carPositionX -= 5;
-        } else {
-            // don't do anything
-        }
-
-        this.carPosition.setX(this.carPositionX);
-        this.carPosition.setY(this.carPositionY);
-        
-        updatePositionToBrowser(this.carPositionX, this.carPositionY);
-
-        // Call this function again
-        schedule("startDrive", null, DateTime.now().plusMillis(this.velocity));
-
-    }
-
-    // ----------------------------------------------------------------------------------------
-    // Bad implementation until I figure out how to return a object in just
-    // one function
-    public int getCarPositionX() {
-        return this.carPositionX;
-    }
-
-    public int getCarPositionY() {
-        return this.carPositionY;
-    }
-
-    public Position getCarPosition() {
-        /*
-         * final ObjectNode envelop = JOM.createObjectNode(); envelop.put("x",
-         * this.carPosition.x); envelop.put("y", this.carPosition.y); return
-         * envelop;
-         * 
-         * JSONRpc.invoke(destination, request,
-         * auth).stringify(this.carPosition, null, 2); InputStream abc = new
-         * InputStream(); StringUtil.streamToString(new InputStream
-         * (this.carPosition).toString()); System.out.println("CAR: (" +
-         * this.carPosition.x + ", " + this.carPosition.y + ")");
-         */
-        return (this.carPosition);
-    }
-    // ----------------------------------------------------------------------------------------
-
-    public void updatePositionToBrowser(int carPositionX, int carPositionY) throws IOException {
-        // System.out.println("Updating car position to: " + carPosition);
-
-        URI url = URI.create("wsclient:carBrowser" + this.carNumber);
-        String method = "updatePosition";
-        Params params = new Params();
-        params.add("x", carPositionX);
-        params.add("y", carPositionY);
-
-        caller.callSync(url, method, params, STRINGTYPE);
-    }
-
-    public String getCarDirection() {
-        return this.direction;
-    }
-
-    public void setVelocity(@Name("vel") int vel) {
-        this.velocity = vel;
-    }
-
-    // ------ Classes ------
-
-
-    class Interception {
-        public Position topLeft;
-        public Position topRight;
-        public Position bottomLeft;
-        public Position bottomRight;
-
-        public Interception(Position topLeft, Position topRight, Position bottomLeft, Position bottomRight) {
-            this.topLeft = topLeft;
-            this.topRight = topRight;
-            this.bottomLeft = bottomLeft;
-            this.bottomRight = bottomRight;
-        }
-    }
+		public Interception(Position topLeft, Position topRight,
+				Position bottomLeft, Position bottomRight) {
+			this.topLeft = topLeft;
+			this.topRight = topRight;
+			this.bottomLeft = bottomLeft;
+			this.bottomRight = bottomRight;
+		}
+	}
 }

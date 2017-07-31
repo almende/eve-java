@@ -216,7 +216,7 @@ public class Pole extends Agent {
             params.add("poleInfo", getId());
             
             // send message to pole
-            url = URIUtil.create("http://localhost:8084/poleagents/" + key);        
+            url = URIUtil.create("http://localhost:8084/agents/" + key);        
             call(url, method, params, null);  
         }
     }
@@ -249,28 +249,7 @@ public class Pole extends Agent {
         
         caller.call(url, method, params);       
     }
-    
-//    /*
-//     * Check if car is in the range of the pole detection
-//     * */
-//    private boolean checkPoleLimits(int carX, int carY) {
-//        boolean carDetectedFlag = false;
-//        
-//        int leftLimit   = this.polePositionX - Pole.poleRange;
-//        int rightLimit  = this.polePositionX + Pole.poleRange;
-//        int topLimit    = this.polePositionY - Pole.poleRange;
-//        int bottomLimit = this.polePositionY + Pole.poleRange;
-//        
-//        if( (carX >= leftLimit ) && 
-//            (carX <= rightLimit) && 
-//            (carY >= topLimit)   && 
-//            (carY <= bottomLimit) ){
-//            carDetectedFlag = true;
-//        }
-//        
-//        return carDetectedFlag;
-//    }
-    
+
     /*
      * Check if car is in the range of the pole detection
      * */
@@ -291,35 +270,11 @@ public class Pole extends Agent {
         
         return carDetectedFlag;
     }
-    
-    //--------------------------------------------------------------------------------------
-    // Bad implementation until I figure out how to return a serialized object
-    /*
-     * Ask to the car his position
-     * */
-    public int getCarPositionX(String carName) throws IOException{
-            
-        // send a sync message to carServer
-        URI url = URIUtil.create("http://localhost:8084/caragents/" + carName);
-        String method = "getCarPositionX";
-        int x = caller.callSync(url, method, null, INTTYPE);
-        return x;
-    }   
-    
-    public int getCarPositionY(String carName) throws IOException{
-        
-        // send a sync message to carServer
-        URI url = URIUtil.create("http://localhost:8084/caragents/" + carName);
-        String method = "getCarPositionY";
-        int y = caller.callSync(url, method, null, INTTYPE);
-        return y;
-    }       
-    
-    //NOT WORKING!! WHY???? HOW CAN I RETURN A STRINGFYED OBJECT???
+   
+
     public Position getCarPosition(String carName) throws IOException{
-        //Position newP = new Position(5, 5);
         // send a sync message to carServer
-        URI url = URIUtil.create("http://localhost:8084/caragents/" + carName);
+        URI url = URIUtil.create("http://localhost:8084/agents/" + carName);
         String method = "getCarPosition";
         Position pos = caller.callSync(url, method, null, POSITIONTYPE);
         
