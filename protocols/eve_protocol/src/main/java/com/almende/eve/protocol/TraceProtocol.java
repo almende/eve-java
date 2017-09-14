@@ -17,8 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Class InboxProtocol, provides an easy way to get a single threaded agent,
- * only one inbound message in a single thread at a time.
+ * The Class TraceProtocol, provides an easy way to log all traffic.
  */
 public class TraceProtocol implements Protocol {
 	private static final Logger	LOG		= Logger.getLogger(TraceProtocol.class
