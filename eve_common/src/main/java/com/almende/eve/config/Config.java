@@ -133,10 +133,14 @@ public class Config extends ObjectNode {
 				if (val.isArray()) {
 					final ArrayNode array = JOM.createArrayNode();
 					for (JsonNode elem : val) {
-						final Config item = new Config();
-						item.getKids().pointers.add(Config
+						if (elem.isObject()){
+							final Config item = new Config();
+							item.getKids().pointers.add(Config
 								.decorate((ObjectNode) elem));
-						array.add(item);
+							array.add(item);
+						} else {
+							array.add(elem);
+						}
 					}
 					super.put(strKey, array);
 					otherres = array;
