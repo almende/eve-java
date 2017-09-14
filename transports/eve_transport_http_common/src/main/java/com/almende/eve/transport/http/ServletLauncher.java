@@ -5,6 +5,7 @@
 package com.almende.eve.transport.http;
 
 import java.net.URI;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -58,6 +59,9 @@ public interface ServletLauncher {
 	 *            the filterpath
 	 * @param path
 	 *            the path
+	 * @param initParams
+	 *            the init params for this filter - leave null if non.
 	 */
-	void addFilter(String filterpath, String path);
+	void addFilter(String filterpath, String path,
+			Map<String, String> initParams);
 }

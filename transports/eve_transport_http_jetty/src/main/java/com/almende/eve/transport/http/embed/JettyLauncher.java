@@ -6,6 +6,8 @@ package com.almende.eve.transport.http.embed;
 
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +19,7 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
@@ -68,7 +71,21 @@ public class JettyLauncher implements ServletLauncher {
 			if (params.get("cors").has("path")) {
 				corsPath = params.get("cors").get("path").asText();
 			}
-			addFilter(corsClass, corsPath);
+			if (params.get("cors").has("initParams")) {
+				final Map<String, String> initParams = new HashMap<String, String>();
+				for (JsonNode item : params.get("cors").get("initParams")) {
+					if (!item.has("name") || !item.has("value")) {
+						LOG.warning("Cors, init params have wrong syntax, skipping:"
+								+ item);
+					} else {
+						initParams.put(item.get("name").asText(),
+								item.get("value").asText());
+					}
+				}
+				addFilter(corsClass, corsPath, initParams);
+			} else {
+				addFilter(corsClass, corsPath, null);
+			}
 		}
 
 		try {
@@ -113,10 +130,14 @@ public class JettyLauncher implements ServletLauncher {
 	}
 
 	@Override
-	public void addFilter(final String filterpath, final String path) {
+	public void addFilter(final String filterpath, final String path,
+			Map<String, String> initParams) {
 		LOG.info("Adding filter:" + filterpath + " / " + path);
-		context.addFilter(filterpath, path,
+		FilterHolder holder = context.addFilter(filterpath, path,
 				EnumSet.of(DispatcherType.INCLUDE, DispatcherType.REQUEST));
+		if (initParams != null) {
+			holder.setInitParameters(initParams);
+		}
 	}
 
 	/*
