@@ -247,7 +247,7 @@ public abstract class AbstractState<V> implements State {
 	public Serializable locPut(final String key,
 			final Serializable value) {
 		final ObjectMapper om = JOM.getInstance();
-		locPut(key, om.valueToTree(value));
+		locPut(key, (JsonNode)om.valueToTree(value));
 		return value;
 	}
 	
@@ -265,8 +265,8 @@ public abstract class AbstractState<V> implements State {
 	public boolean locPutIfUnchanged(final String key,
 			final Serializable newVal, final Serializable oldVal) {
 		final ObjectMapper om = JOM.getInstance();
-		return locPutIfUnchanged(key, om.valueToTree(newVal),
-				om.valueToTree(oldVal));
+		return locPutIfUnchanged(key, (JsonNode)om.valueToTree(newVal),
+				(JsonNode)om.valueToTree(oldVal));
 	}
 	
 	/*
