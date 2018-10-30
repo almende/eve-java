@@ -434,4 +434,14 @@ public class MongoState extends AbstractState<JsonNode> implements State {
 		timestamp = now;
 		return updatedExisting;
 	}
+
+	@Override
+	public void delete(Boolean instanceOnly) {
+		if (provider != null) {
+			if(!instanceOnly) {
+				clear();
+			}
+			provider.delete(this, instanceOnly);
+		}
+	}
 }
